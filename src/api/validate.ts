@@ -25,6 +25,7 @@ export function normalizeResponse(raw: CheckResponse): CheckResponse {
     spokenWarning: raw.spokenWarning ?? raw.summary,
     flags: raw.flags ?? [],
     linkChecks: raw.linkChecks ?? [],
+    sources: raw.sources ?? [],
     actions: raw.actions ?? [],
     scamType: raw.scamType ?? 'none',
     createdAt: raw.createdAt ?? new Date().toISOString(),

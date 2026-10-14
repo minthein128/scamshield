@@ -103,7 +103,7 @@ GASA: 46,000 adults surveyed, 42 countries, about $442 bn lost, 57% scammed in t
 </div>
 </div>
 
-<!-- _footer: "Rina and Ibu are a design persona, not a real user. Screens are design mockups." -->
+<!-- _footer: "Rina and Ibu are design personas, not real users. Screens are captures of the running web app; Family data is sample data." -->
 
 ---
 
@@ -158,14 +158,14 @@ Marketplace listings and sellers. Flags prices that are too low and payment rout
 # Live demo: a job ad in, a verdict out
 
 <div class="shots">
-<figure><img class="phone" src="img/spot.png"><figcaption>1. Tap the Shield on a job post</figcaption></figure>
+<figure><img class="phone" src="img/check.png"><figcaption>1. Paste, upload or share</figcaption></figure>
 <figure><img class="phone" src="img/checking.png"><figcaption>2. Six stages run</figcaption></figure>
 <figure><img class="phone" src="img/verdict.png"><figcaption>3. Danger, with voice</figcaption></figure>
-<figure><img class="phone" src="img/chatverdict.png"><figcaption>Also: chat verdict</figcaption></figure>
+<figure><img class="phone" src="img/safe.png"><figcaption>4. Safe: no false alarm</figcaption></figure>
 </div>
 
 <!--
-Speaker notes. Show the web demo or the Android app. Run three flows: a pasted Burmese job post, a pig-butchering chat screenshot, and the floating Shield over a social feed. Inputs are in pitch/demo-inputs.md.
+Speaker notes. Show the web demo or the Android app. Run these flows: a pasted Burmese job post, a pig-butchering chat screenshot, a legitimate school message, and the floating Shield over a social feed. Inputs are in pitch/demo-inputs.md.
 -->
 
 ---

@@ -11,8 +11,15 @@ import theme from '../theme/theme';
 
 const { colors, fonts } = theme;
 
-const STEPS = ['Reading what you sent', 'Checking the sender and links', 'Comparing with known scams'];
-const STEP_MS = 1100;
+const STEPS = [
+  'Reading what you sent',
+  'Picking out names, numbers and links',
+  'Spotting red flags',
+  'Checking the links and the company',
+  'Scoring the risk',
+  'Writing your warning',
+];
+const STEP_MS = 900;
 
 export const CheckingScreen: React.FC<RootScreenProps<'Checking'>> = ({ navigation, route }) => {
   const { request, source } = route.params;

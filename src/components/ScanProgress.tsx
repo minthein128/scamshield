@@ -10,10 +10,8 @@ interface ScanProgressProps {
   foundLabel?: string;
 }
 
-const SCAN_TOPS = [20, 110, 200, 270];
-
 export const ScanProgress: React.FC<ScanProgressProps> = ({ steps, step, title, foundLabel }) => {
-  const scanTop = SCAN_TOPS[Math.min(step, SCAN_TOPS.length - 1)];
+  const scanTop = 20 + 250 * Math.min(step / steps.length, 1);
   return (
     <View style={styles.root}>
       <View style={styles.phoneGraphic}>

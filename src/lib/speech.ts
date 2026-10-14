@@ -1,31 +1,58 @@
 import { Platform } from 'react-native';
 import * as Speech from 'expo-speech';
-import type { LanguageCode } from '../api/types';
+import type { CheckClient, LanguageCode } from '../api/types';
+import { playWavBase64, stopAudio } from './audio';
 import { languageOption } from './languages';
 
-export function pickSpeechLocale(voiceLanguages: string[], code: LanguageCode): string {
+export function findVoiceLocale(voiceLanguages: string[], code: LanguageCode): string | undefined {
   const wanted = languageOption(code).speechLocale;
-  const base = wanted.split('-')[0].toLowerCase();
-  const aliases = code === 'tl' ? ['fil', 'tl'] : [base];
-  const exact = voiceLanguages.find(v => v.replace('_', '-').toLowerCase() === wanted.toLowerCase());
-  if (exact) return exact;
-  const loose = voiceLanguages.find(v => aliases.includes(v.replace('_', '-').split('-')[0].toLowerCase()));
-  return loose ?? languageOption('en').speechLocale;
+  const aliases = code === 'tl' ? ['fil', 'tl'] : [wanted.split('-')[0].toLowerCase()];
+  const norm = (v: string) => v.replace('_', '-');
+  const exact = voiceLanguages.find(v => norm(v).toLowerCase() === wanted.toLowerCase());
+  return exact ?? voiceLanguages.find(v => aliases.includes(norm(v).split('-')[0].toLowerCase()));
 }
 
-export async function speak(text: string, code: LanguageCode, onEnd?: () => void): Promise<void> {
-  let locale = languageOption('en').speechLocale;
+export function pickSpeechLocale(voiceLanguages: string[], code: LanguageCode): string {
+  return findVoiceLocale(voiceLanguages, code) ?? languageOption('en').speechLocale;
+}
+
+async function availableVoiceLanguages(): Promise<string[]> {
+  const timeout = new Promise<never>((_, reject) => setTimeout(() => reject(new Error('voice list timeout')), 1500));
   try {
-    const voices = await Speech.getAvailableVoicesAsync();
-    locale = pickSpeechLocale(voices.map(v => v.language), code);
+    const voices = await Promise.race([Speech.getAvailableVoicesAsync(), timeout]);
+    return voices.map(v => v.language);
   } catch {
-    locale = languageOption(code).speechLocale;
+    return [];
   }
+}
+
+function speakLocally(text: string, locale: string, onEnd?: () => void): void {
   stopSpeaking();
   Speech.speak(text, { language: locale, onDone: onEnd, onStopped: onEnd, onError: onEnd });
 }
 
+export async function speak(text: string, code: LanguageCode, onEnd?: () => void, client?: CheckClient): Promise<void> {
+  const voices = await availableVoiceLanguages();
+  const local = findVoiceLocale(voices, code);
+  if (code === 'en' || local) {
+    speakLocally(text, local ?? languageOption('en').speechLocale, onEnd);
+    return;
+  }
+  if (client && !client.isMock) {
+    try {
+      const audio = await client.speak({ text: text.slice(0, 600), language: code });
+      stopSpeaking();
+      await playWavBase64(audio.audioBase64, onEnd);
+      return;
+    } catch {
+      // fall through to the English voice
+    }
+  }
+  speakLocally(text, languageOption('en').speechLocale, onEnd);
+}
+
 export function stopSpeaking(): void {
+  stopAudio().catch(() => undefined);
   if (Platform.OS === 'web') {
     if (typeof window !== 'undefined') window.speechSynthesis?.cancel();
     return;

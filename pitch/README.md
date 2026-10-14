@@ -7,7 +7,7 @@
 | `deck.pdf` | Rendered deck |
 | `video-script.md` | Timed shot list and voice-over for the video under 3 minutes |
 | `demo-inputs.md` | Fictional test inputs for the demo flows |
-| `img/` | Phone screens cropped from the design mockup |
+| `img/` | Phone-width (430px) screenshots of the running web app, plus mockup crops for the Android overlay |
 
 ## Re-render the PDF
 
@@ -33,19 +33,19 @@ Slide 2 holds the track name and the criteria map. If the track changes to BFSI,
 
 ## To replace before submission
 
-Slide images are cropped from the design mockup and are not screenshots of the running app. Replace them with real captures at the same file names in `img/` (about 410x848 px or larger, same aspect ratio).
+`img/home.png`, `check.png`, `checking.png`, `verdict.png`, `safe.png` and `family.png` are real captures of the web build at 430px (2x) against the local backend. `shield.png` and `spot.png` are still mockup crops, because the Android overlay cannot run in a browser. Replace them with device screenshots when an APK is available.
 
-| File | Slide | Content to capture |
+| File | Slide | Content |
 | --- | --- | --- |
 | `img/home.png` | 4 | Home screen |
-| `img/family.png` | 4 | Family Guardian, missed check-in |
-| `img/shield.png` | 5 | Turn on Shield screen |
-| `img/spot.png` | 6 | Floating Shield over a job post |
+| `img/family.png` | 4 | Family circle, missed check-in |
+| `img/shield.png` | 5 | Turn on Shield screen (mockup crop) |
+| `img/check.png` | 6 | Check form with a pasted job post |
 | `img/checking.png` | 6 | Checking screen, six stages |
-| `img/verdict.png` | 6 | Danger verdict with Listen button |
-| `img/chatverdict.png` | 6 | Chat (pig butchering) verdict |
+| `img/verdict.png` | 6 | Danger report with Listen button |
+| `img/safe.png` | 6 | Safe report |
 
-Unused spare images: `img/risk.png`, `img/chat.png`, `img/sms.png`.
+Unused spare images: `img/risk.png`, `img/chat.png`, `img/sms.png`, `img/spot.png`, `img/chatverdict.png` (mockup crops). `e2e/` holds the full-run screenshots of the four end-to-end checks.
 
 Other items to supply:
 

@@ -52,6 +52,23 @@ export interface CheckAction {
   value?: string;
 }
 
+export interface Source {
+  title: string;
+  url: string;
+}
+
+export interface SpeakRequest {
+  text: string;
+  language: LanguageCode;
+}
+
+export interface SpeakResponse {
+  audioBase64: string;
+  mimeType: 'audio/wav';
+  sampleRate: number;
+  model: string;
+}
+
 export interface CheckResponse {
   id: string;
   createdAt: string;
@@ -64,6 +81,7 @@ export interface CheckResponse {
   scamType: ScamType;
   flags: Flag[];
   linkChecks: LinkCheck[];
+  sources?: Source[];
   actions: CheckAction[];
   model: string;
 }
@@ -88,4 +106,5 @@ export interface CheckClient {
   readonly isMock: boolean;
   check(request: CheckRequest, options?: RequestOptions): Promise<CheckResponse>;
   health(options?: RequestOptions): Promise<HealthResponse>;
+  speak(request: SpeakRequest, options?: RequestOptions): Promise<SpeakResponse>;
 }

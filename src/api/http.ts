@@ -1,5 +1,5 @@
 import { ApiError, codeFromStatus } from './errors';
-import type { ApiErrorBody, CheckClient, CheckRequest, CheckResponse, HealthResponse, RequestOptions } from './types';
+import type { ApiErrorBody, CheckClient, CheckRequest, CheckResponse, HealthResponse, RequestOptions, SpeakRequest, SpeakResponse } from './types';
 import { hasInput, isCheckResponse, normalizeResponse } from './validate';
 
 export interface HttpClientConfig {
@@ -64,6 +64,11 @@ export function createHttpClient(config: HttpClientConfig): CheckClient {
       const body = await send('/v1/check', { method: 'POST', body: JSON.stringify(request) }, options);
       if (!isCheckResponse(body)) throw new ApiError('invalid_response', 'Unexpected response shape');
       return normalizeResponse(body);
+    },
+    async speak(request: SpeakRequest, options?: RequestOptions): Promise<SpeakResponse> {
+      const body = (await send('/v1/speak', { method: 'POST', body: JSON.stringify(request) }, options)) as SpeakResponse | null;
+      if (!body || typeof body.audioBase64 !== 'string') throw new ApiError('invalid_response', 'Unexpected response shape');
+      return body;
     },
     async health(options?: RequestOptions): Promise<HealthResponse> {
       return (await send('/healthz', { method: 'GET' }, options)) as HealthResponse;
