@@ -127,7 +127,7 @@ export const DemoStepper: React.FC<Props> = ({ steps, accent = colors.accent, on
 
 const styles = StyleSheet.create({
   root: { gap: 12 },
-  page: { alignItems: 'center', gap: 6, paddingHorizontal: 4 },
+  page: { alignItems: 'center', gap: 6 },
   title: { alignSelf: 'stretch', color: colors.textPrimary, fontSize: 18, lineHeight: 24, fontFamily: fonts.bold },
   caption: { alignSelf: 'stretch', color: colors.textSecondary, fontSize: 14, lineHeight: 20, fontFamily: fonts.regular, marginBottom: 6 },
   frame: { borderRadius: 18, overflow: 'hidden', borderWidth: 1, borderColor: colors.borderLight, backgroundColor: colors.white },
