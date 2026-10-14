@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import { useApiUrl } from '../config/runtime';
 import { Screen } from '../components/Screen';
 import { ShieldCard } from '../components/ShieldCard';
 import { Button, Chip, LinkButton } from '../components/ui';
@@ -15,7 +16,7 @@ const { colors, fonts } = theme;
 
 export const OnboardingScreen: React.FC<{ onDone: (next?: AfterOnboarding) => void }> = ({ onDone }) => {
   const { profile, finishOnboarding } = useAppState();
-  const steps = onboardingSteps(shieldSupport() === 'ready');
+  const steps = onboardingSteps(shieldSupport(Platform.OS, useApiUrl()) === 'ready');
   const [index, setIndex] = useState(0);
   const [language, setLanguage] = useState<LanguageCode>(profile.language);
   const [home, setHome] = useState<CountryCode | undefined>(profile.homeCountry);

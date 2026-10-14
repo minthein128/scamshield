@@ -1,16 +1,17 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AppState, PermissionsAndroid, Platform } from 'react-native';
 import * as ShieldModule from 'shield-module';
-import { API_URL } from '../config/env';
+import { useApiUrl } from '../config/runtime';
 import { isCleartext } from '../lib/shield';
 import { getAuthToken } from '../services/token';
 import { useAppState } from '../state/AppState';
 
 export type ShieldSupport = 'ready' | 'web' | 'no-service' | 'insecure-service' | 'unsupported';
 
-export function shieldSupport(platform: string = Platform.OS, apiUrl: string = API_URL): ShieldSupport {
+export function shieldSupport(platform: string = Platform.OS, apiUrl: string | null = ''): ShieldSupport {
   if (platform === 'web') return 'web';
   if (platform !== 'android') return 'unsupported';
+  if (apiUrl === null) return 'ready';
   if (!apiUrl) return 'no-service';
   if (isCleartext(apiUrl)) return 'insecure-service';
   return 'ready';
@@ -37,7 +38,8 @@ export interface ShieldControl {
 
 export function useShieldControl(): ShieldControl {
   const { language } = useAppState();
-  const support = shieldSupport();
+  const apiUrl = useApiUrl();
+  const support = shieldSupport(Platform.OS, apiUrl);
   const [running, setRunning] = useState(false);
   const [step, setStep] = useState<ShieldStep>('idle');
   const [error, setError] = useState<string | null>(null);
@@ -73,7 +75,7 @@ export function useShieldControl(): ShieldControl {
       }
       setStep('starting');
       const token = await getAuthToken();
-      const ok = await ShieldModule.startShield({ apiUrl: API_URL, language, ...(token ? { authToken: token } : {}) });
+      const ok = await ShieldModule.startShield({ apiUrl: apiUrl ?? '', language, ...(token ? { authToken: token } : {}) });
       if (!ok) setError('The shield did not start. Check that "Display over other apps" is allowed and try again.');
       setStep('idle');
       await refresh();
@@ -83,7 +85,7 @@ export function useShieldControl(): ShieldControl {
     } finally {
       busy.current = false;
     }
-  }, [language, refresh]);
+  }, [language, refresh, apiUrl]);
 
   useEffect(() => {
     refresh().catch(() => undefined);

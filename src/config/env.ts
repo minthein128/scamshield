@@ -33,4 +33,3 @@ export const FIREBASE_CONFIG = readFirebaseConfig({
 
 export const GOOGLE_SIGNIN_WEB = process.env.EXPO_PUBLIC_GOOGLE_SIGNIN === '1';
 
-export const IS_MOCK_MODE = __DEV__ && !API_URL;

@@ -6,10 +6,12 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import RootNavigator from './navigation/RootNavigator';
 import { AppStateProvider } from './state/AppState';
 import { AuthProvider } from './state/AuthState';
-import { IS_MOCK_MODE } from './config/env';
+import { useApiUrl } from './config/runtime';
 import theme from './theme/theme';
 
 export default function App() {
+  const apiUrl = useApiUrl();
+  const mockMode = __DEV__ && apiUrl === '';
   const [fontsLoaded] = useFonts({
     'PlusJakartaSans-Regular': require('../assets/fonts/PlusJakartaSans-Regular.ttf'),
     'PlusJakartaSans-Medium': require('../assets/fonts/PlusJakartaSans-Medium.ttf'),
@@ -32,7 +34,7 @@ export default function App() {
       <StatusBar style="dark" />
       <View style={styles.page}>
         <View style={styles.column}>
-          {IS_MOCK_MODE ? (
+          {mockMode ? (
             <View testID="mock-banner" accessibilityRole="alert" style={styles.mock}>
               <Text style={styles.mockText}>Offline demo mode</Text>
             </View>
