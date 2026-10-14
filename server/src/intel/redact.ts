@@ -229,6 +229,12 @@ const RULES: Rule[] = [
   },
   { priority: 11, re: /(?<![\w@.])@[A-Za-z0-9_]{3,32}\b/g, placeholder: '[HANDLE]' },
   {
+    priority: 11,
+    re: /\b(?:instagram|insta|ig|facebook|fb|tiktok|telegram|tg|twitter|snapchat|wechat|line|viber|whatsapp)\s+(?:account\s+|page\s+|id\s+|name\s+|handle\s+|user\s+)?(?!(?:me|us|id|group|channel|app|page|account|number|for|and|or|the|to|at|on|is|now|here|link|then|today|if|you|your|we|our|a|an)\b)([A-Za-z0-9][A-Za-z0-9_]*(?:\.[A-Za-z0-9_]+)+|[A-Za-z][A-Za-z0-9]*_[A-Za-z0-9_]+)/gi,
+    group: 1,
+    placeholder: '[HANDLE]',
+  },
+  {
     priority: 12,
     folded: true,
     re: /(?:USD|US\$|\$|THB|฿|Rp\.?|IDR|PHP|₱|MMK|Ks\.?|RM|SGD|VND|₫|KHR|៛)\s?\d[\d.,]*(?:\s?(?:k|K|million|juta|ribu|rb|lakh|ล้าน|သိန်း|သောင်း))?|(?:ဒေါ်လာ|ဘတ်|ကျပ်|ดอลลาร์|บาท)\s?\d[\d.,]*|\d[\d.,]*\s?(?:USD|THB|baht|dollars?|ringgit|rupiah|pesos?|piso|kyat|ks|MMK|PHP|IDR|ကျပ်|ဘတ်|ဒေါ်လာ|ดอลลาร์|บาท|riel)/gi,

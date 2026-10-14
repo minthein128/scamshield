@@ -5,14 +5,17 @@ const emptyBucket = (): Bucket => ({ days: {}, fam: {} });
 export interface MemoryStore extends IntelStore {
   signals: Map<string, SignalDoc>;
   aggs: Map<string, AggDoc>;
+  markers: Map<string, boolean>;
 }
 
 export function createMemoryStore(): MemoryStore {
   const signals = new Map<string, SignalDoc>();
   const aggs = new Map<string, AggDoc>();
+  const markers = new Map<string, boolean>();
   return {
     signals,
     aggs,
+    markers,
     async record(id, sig, writes: AggWrite[], clusters: ClusterMeta[] = []) {
       if (signals.has(id)) return 'duplicate';
       signals.set(id, sig);
@@ -22,6 +25,10 @@ export function createMemoryStore(): MemoryStore {
         }
       }
       for (const w of writes) {
+        if (w.marker) {
+          if (markers.has(w.marker)) continue;
+          markers.set(w.marker, Boolean(sig.seed));
+        }
         const cur: AggDoc = aggs.get(w.id) ?? {
           id: w.id,
           kind: w.kind,
@@ -63,6 +70,7 @@ export function createMemoryStore(): MemoryStore {
       return removed;
     },
     async purgeSeed() {
+      for (const [m, seed] of markers) if (seed) markers.delete(m);
       let removedSignals = 0;
       for (const [id, s] of signals) {
         if (s.seed) {

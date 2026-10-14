@@ -120,6 +120,29 @@ describe('network lookup', () => {
   });
 });
 
+describe('campaign across clusters', () => {
+  it('sums every cluster of one campaign instead of picking one', async () => {
+    const intel = createIntel({ store: createMemoryStore(), pepper: 'p', now: () => NOW });
+    const texts = [
+      'Urgent data entry jobs in Mae Sot, send your passport photo today',
+      'Wir suchen zwei Leute fuer Dateneingabe, melden Sie sich sofort bitte',
+      'zzzz qqqq wwww xxxx vvvv nnnn mmmm kkkk jjjj hhhh gggg ffff dddd ssss aaaa pppp',
+    ];
+    for (const [i, t] of texts.entries()) {
+      for (const [j, phone] of [`08${i}1111111`, `08${i}2222222`].entries()) {
+        const p = intel.prepare({ kind: 'job', language: 'en' }, extraction(phone, t));
+        await intel.record(p, { verdict: 'danger', score: 85, scamType: 'job_trafficking', flags }, { now: daysAgo(i + j) });
+      }
+    }
+    const q = intel.prepare(
+      { kind: 'job', language: 'en' },
+      extraction('0899999999', 'some other words entirely different from all of them here', 'Mae Sot data entry job'),
+    );
+    const r = await intel.lookup(q, 'en');
+    expect(r.network?.campaign).toEqual({ name: 'Mae Sot data-entry job', seenThisWeek: 6 });
+  });
+});
+
 describe('severity ladder', () => {
   it('maps counts to low, medium and high', () => {
     expect([3, 5, 6, 14, 15, 40].map(severityForCount)).toEqual(['low', 'low', 'medium', 'medium', 'high', 'high']);

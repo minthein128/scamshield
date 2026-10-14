@@ -61,7 +61,9 @@ export function createPipeline(deps: {
           flags: own.flags,
         };
         await settle(
-          deps.intel.record(prepared, outcome).catch((err: Error) => log('WARNING', 'intel_record_failed', { error: err.message })),
+          deps.intel
+            .record(prepared, outcome, { uid: req.uid })
+            .catch((err: Error) => log('WARNING', 'intel_record_failed', { error: err.message })),
           RECORD_TIMEOUT_MS,
           undefined,
         );

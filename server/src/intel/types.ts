@@ -20,6 +20,8 @@ export interface SignalDoc {
   clusterId?: string;
   ind: HashedIndicator[];
   domains: string[];
+  /** Per-day reporter key: HMAC(pepper, uid + day). Absent when the request had no uid. */
+  rk?: string;
   day: string;
   dayTs: Date;
   expireAt: Date;
@@ -60,6 +62,8 @@ export interface AggWrite {
   scamType?: ScamType;
   day: string;
   fams: Family[];
+  /** Set when the signal has a reporter key: counts once per reporter, day and counter. */
+  marker?: string;
 }
 
 export interface ClusterMeta {

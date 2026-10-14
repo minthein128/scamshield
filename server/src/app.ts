@@ -43,7 +43,8 @@ export function createApp(cfg: Config, pipeline: Pipeline, speaker: Speaker, int
         throw new ApiError(400, 'bad_request', 'Body must be valid JSON');
       }
       const req = parseRequest(body);
-      const res = await pipeline.run(req);
+      const uid = c.get('uid' as never) as string | undefined;
+      const res = await pipeline.run(uid ? { ...req, uid } : req);
       log('INFO', 'check_done', {
         id: res.id,
         kind: res.kind,

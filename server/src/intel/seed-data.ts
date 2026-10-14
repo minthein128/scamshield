@@ -346,6 +346,7 @@ export interface SeedCheck {
   verdict: Verdict;
   scamType: ScamType;
   fictional: string[];
+  uid: string;
 }
 
 export function generateSeedChecks(now: Date, seed = 20261018): SeedCheck[] {
@@ -412,6 +413,7 @@ export function generateSeedChecks(now: Date, seed = 20261018): SeedCheck[] {
         verdict: sc.verdict,
         scamType: sc.scamType,
         fictional,
+        uid: `seed-user-${sc.id}-${Math.floor(rand() * 60)}`,
       });
     }
   }
@@ -442,7 +444,7 @@ export async function runSeed(intel: Intel, now = new Date(), onProgress?: (n: n
     const r = await intel.record(
       p,
       { verdict: c.verdict, score: c.score, scamType: c.scamType, flags: c.extraction.flags },
-      { now: c.when, seed: true },
+      { now: c.when, seed: true, uid: c.uid },
     );
     res[r]++;
     res.fictional.push(...c.fictional);
