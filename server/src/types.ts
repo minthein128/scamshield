@@ -32,6 +32,8 @@ export interface CheckRequest {
   language: Lang;
   /** false opts this check out of the anonymous network signal. */
   shareSignals?: boolean;
+  /** Verified Firebase uid set by the auth layer, never read from the body. */
+  uid?: string;
 }
 
 export interface Flag {

@@ -92,14 +92,17 @@ export function buildSignal(
   p: Prepared,
   o: Outcome,
   hasher: Hasher,
-  opts: { now?: Date; clusterId?: string; seed?: boolean; nonce?: string; expireBase?: Date } = {},
+  opts: { now?: Date; clusterId?: string; seed?: boolean; nonce?: string; expireBase?: Date; uid?: string } = {},
 ): { id: string; doc: SignalDoc } {
   const now = opts.now ?? new Date();
   const day = dayKey(now);
   const dayTs = dayToDate(day);
   const flags = strongestFlags(o.flags);
   const anchor = [...p.ind.map((i) => `${i.t}:${i.h}`), ...p.domains].sort().join(',');
-  const idSource = anchor ? `${day}|${o.scamType}|${anchor}` : `${day}|${o.scamType}|${p.template ?? opts.nonce ?? Math.random()}`;
+  const rk = opts.uid ? hasher.hash('rk', `${opts.uid}|${day}`) : undefined;
+  const idSource = anchor
+    ? `${day}|${o.scamType}|${anchor}|${rk ?? ''}`
+    : `${day}|${o.scamType}|${p.template ?? opts.nonce ?? Math.random()}`;
   const doc: SignalDoc = {
     v: 1,
     scamType: o.scamType,
@@ -119,6 +122,7 @@ export function buildSignal(
   if (p.template) doc.template = p.template;
   if (p.campaign) doc.campaign = p.campaign;
   if (opts.clusterId) doc.clusterId = opts.clusterId;
+  if (rk) doc.rk = rk;
   if (opts.seed) doc.seed = true;
   return { id: hasher.hash('sig', idSource), doc };
 }
@@ -158,5 +162,6 @@ export function aggregateWrites(doc: SignalDoc, hasher: Hasher): AggWrite[] {
   for (const i of doc.ind) {
     out.push({ id: aggId('ind', GLOBAL, i.h), kind: 'ind', scope: GLOBAL, key: i.h, itype: i.t, day: doc.day, fams: [] });
   }
+  if (doc.rk) for (const w of out) w.marker = hasher.hash('seen', `${doc.rk}|${w.id}`);
   return out;
 }

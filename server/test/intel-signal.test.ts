@@ -189,3 +189,81 @@ describe('retention sweep', () => {
     expect(store.signals.size).toBe(0);
   });
 });
+
+describe('reporter keys', () => {
+  const NOW1 = new Date('2026-10-14T10:00:00Z');
+  const ex = (domain?: string) => ({
+    ...extractionFor('Call 0812345678 now for the job in Mae Sot, send passport', [{ type: 'phone', value: '0812345678' }]),
+    urls: domain ? [`https://${domain}/x`] : [],
+  });
+  const o = { verdict: 'danger' as const, score: 80, scamType: 'job_trafficking' as const, flags: ex().flags };
+  const phoneCount = (store: ReturnType<typeof createMemoryStore>) => {
+    const a = [...store.aggs.values()].find((x) => x.kind === 'ind');
+    return Object.values(a?.real.days ?? {}).reduce((s, n) => s + n, 0);
+  };
+
+  it('counts one person once per day across different wordings', async () => {
+    const store = createMemoryStore();
+    const intel = createIntel({ store, pepper: 'p' });
+    for (const d of [undefined, 'a.example', 'b.example']) {
+      await intel.record(intel.prepare({ kind: 'job', language: 'en' }, ex(d)), o, { now: NOW1, uid: 'user-1' });
+    }
+    expect(phoneCount(store)).toBe(1);
+  });
+
+  it('counts different people separately on the same day', async () => {
+    const store = createMemoryStore();
+    const intel = createIntel({ store, pepper: 'p' });
+    for (const uid of ['user-1', 'user-2', 'user-3']) {
+      await intel.record(intel.prepare({ kind: 'job', language: 'en' }, ex()), o, { now: NOW1, uid });
+    }
+    expect(phoneCount(store)).toBe(3);
+    expect(store.signals.size).toBe(3);
+  });
+
+  it('counts the same person again on another day, with an unlinkable key', async () => {
+    const store = createMemoryStore();
+    const intel = createIntel({ store, pepper: 'p' });
+    await intel.record(intel.prepare({ kind: 'job', language: 'en' }, ex()), o, { now: NOW1, uid: 'user-1' });
+    await intel.record(intel.prepare({ kind: 'job', language: 'en' }, ex()), o, { now: new Date('2026-10-15T10:00:00Z'), uid: 'user-1' });
+    expect(phoneCount(store)).toBe(2);
+    const keys = [...store.signals.values()].map((s) => s.rk);
+    expect(keys[0]).toMatch(/^[0-9a-f]{32}$/);
+    expect(keys[0]).not.toBe(keys[1]);
+    expect(JSON.stringify([...store.signals.values()])).not.toContain('user-1');
+  });
+
+  it('falls back to the old behaviour without a uid', async () => {
+    const store = createMemoryStore();
+    const intel = createIntel({ store, pepper: 'p' });
+    await intel.record(intel.prepare({ kind: 'job', language: 'en' }, ex()), o, { now: NOW1 });
+    await intel.record(intel.prepare({ kind: 'job', language: 'en' }, ex()), o, { now: NOW1 });
+    expect(phoneCount(store)).toBe(1);
+    expect([...store.signals.values()][0]?.rk).toBeUndefined();
+  });
+
+  it('takes the uid from the auth layer, never from the body', async () => {
+    const { createApp } = await import('../src/app.js');
+    const { loadConfig } = await import('../src/config.js');
+    const { createPipeline } = await import('../src/pipeline.js');
+    const { createMockCorrelator, createMockGrounder } = await import('../src/mock.js');
+    const { createMockSpeaker } = await import('../src/speak.js');
+    const store = createMemoryStore();
+    const intel = createIntel({ store, pepper: 'p' });
+    const cfg = loadConfig({ MOCK: '1' });
+    const pipeline = createPipeline({
+      extractor: { extract: async () => ex() },
+      correlator: createMockCorrelator(),
+      grounder: createMockGrounder(),
+      model: 'm',
+      intel,
+    });
+    const app = createApp(cfg, pipeline, createMockSpeaker(cfg), intel);
+    await app.request('/v1/check', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ kind: 'job', text: 'offer', uid: 'spoofed' }),
+    });
+    expect([...store.signals.values()][0]?.rk).toBeUndefined();
+  });
+});

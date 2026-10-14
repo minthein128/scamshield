@@ -4,6 +4,7 @@ import type { AggDoc, AggKind, AggWrite, Bucket, ClusterMeta, IntelStore, Signal
 
 export const SIGNALS = 'intel_signals';
 export const AGGREGATES = 'intel_aggregates';
+export const SEEN = 'intel_seen';
 
 const ALREADY_EXISTS = 6;
 const codeOf = (e: unknown) => (e as { code?: number }).code;
@@ -55,30 +56,51 @@ export function createFirestoreStore(opts: { projectId?: string; db?: Firestore 
           }
         }),
       );
-      const batch = db.batch();
-      batch.create(db.collection(SIGNALS).doc(id), clean({ ...sig, dayTs: Timestamp.fromDate(sig.dayTs), expireAt }));
       const which = sig.seed ? 'seed' : 'real';
-      for (const w of writes) {
+      const sigRef = db.collection(SIGNALS).doc(id);
+      const sigData = clean({ ...sig, dayTs: Timestamp.fromDate(sig.dayTs), expireAt });
+      const aggData = (w: AggWrite) => {
         const counters: { days: Record<string, FieldValue>; fam: Record<string, FieldValue> } = {
           days: { [w.day]: FieldValue.increment(1) },
           fam: {},
         };
         for (const f of w.fams) counters.fam[f] = FieldValue.increment(1);
-        batch.set(
-          db.collection(AGGREGATES).doc(w.id),
-          clean({
-            kind: w.kind,
-            scope: w.scope,
-            key: w.key,
-            value: w.value,
-            itype: w.itype,
-            scamType: w.scamType,
-            [which]: counters,
-            expireAt,
-          }),
-          { merge: true },
-        );
+        return clean({
+          kind: w.kind,
+          scope: w.scope,
+          key: w.key,
+          value: w.value,
+          itype: w.itype,
+          scamType: w.scamType,
+          [which]: counters,
+          expireAt,
+        });
+      };
+      const seenExpire = Timestamp.fromDate(new Date(sig.dayTs.getTime() + 2 * 86_400_000));
+
+      if (writes.some((w) => w.marker)) {
+        return db.runTransaction(async (tx) => {
+          if ((await tx.get(sigRef)).exists) return 'duplicate' as const;
+          const refs = writes.map((w) => (w.marker ? db.collection(SEEN).doc(w.marker) : null));
+          const have = new Set<string>();
+          const real = refs.filter((r): r is NonNullable<typeof r> => r !== null);
+          if (real.length) for (const snap of await tx.getAll(...real)) if (snap.exists) have.add(snap.id);
+          tx.create(sigRef, sigData);
+          writes.forEach((w, i) => {
+            const ref = refs[i];
+            if (ref) {
+              if (have.has(ref.id)) return;
+              tx.create(ref, { expireAt: seenExpire, seed: Boolean(sig.seed) });
+            }
+            tx.set(db.collection(AGGREGATES).doc(w.id), aggData(w), { merge: true });
+          });
+          return 'recorded' as const;
+        });
       }
+
+      const batch = db.batch();
+      batch.create(sigRef, sigData);
+      for (const w of writes) batch.set(db.collection(AGGREGATES).doc(w.id), aggData(w), { merge: true });
       try {
         await batch.commit();
       } catch (e) {
@@ -101,7 +123,7 @@ export function createFirestoreStore(opts: { projectId?: string; db?: Firestore 
 
     async sweepExpired(now) {
       let removed = 0;
-      for (const name of [SIGNALS, AGGREGATES]) {
+      for (const name of [SIGNALS, AGGREGATES, SEEN]) {
         for (let round = 0; round < 10; round++) {
           const q = await db.collection(name).where('expireAt', '<', Timestamp.fromDate(now)).limit(400).get();
           if (q.empty) break;
@@ -123,6 +145,13 @@ export function createFirestoreStore(opts: { projectId?: string; db?: Firestore 
         for (const d of q.docs) batch.delete(d.ref);
         await batch.commit();
         signals += q.size;
+      }
+      for (;;) {
+        const q = await db.collection(SEEN).where('seed', '==', true).limit(400).get();
+        if (q.empty) break;
+        const batch = db.batch();
+        for (const d of q.docs) batch.delete(d.ref);
+        await batch.commit();
       }
       let aggregates = 0;
       const all = await db.collection(AGGREGATES).get();
