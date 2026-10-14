@@ -23,6 +23,7 @@ export interface Config {
   debugTimings: boolean;
   cacheEnabled: boolean;
   earlyLinks: boolean;
+  streamExtract: boolean;
   dangerGroundCapMs: number;
   recordAfterResponse: boolean;
   resultCacheTtlMs: number;
@@ -72,7 +73,8 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     debugTimings: bool(env.DEBUG_TIMINGS),
     cacheEnabled: env.CACHE !== '0',
     earlyLinks: env.EARLY_LINKS !== '0',
-    dangerGroundCapMs: Number(env.GROUND_DANGER_CAP_MS ?? 0),
+    streamExtract: env.STREAM_EXTRACT !== '0',
+    dangerGroundCapMs: Number(env.GROUND_DANGER_CAP_MS ?? 1500),
     recordAfterResponse: bool(env.RECORD_AFTER_RESPONSE),
     resultCacheTtlMs: Number(env.RESULT_CACHE_TTL_MS ?? 600_000),
     linkCacheTtlMs: Number(env.LINK_CACHE_TTL_MS ?? 3_600_000),
@@ -93,6 +95,7 @@ export function pipelineOptions(cfg: Config) {
     budgetMs: cfg.requestBudgetMs,
     model: cfg.model,
     earlyLinks: cfg.earlyLinks,
+    earlyGrounding: cfg.streamExtract,
     dangerGroundCapMs: cfg.dangerGroundCapMs,
     recordAfterResponse: cfg.recordAfterResponse,
     resultCacheTtlMs: cfg.cacheEnabled ? cfg.resultCacheTtlMs : 0,

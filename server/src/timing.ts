@@ -9,6 +9,7 @@ export interface Span {
 
 export interface CallStat {
   ms: number;
+  firstChunkMs?: number;
   inputTokens?: number;
   outputTokens?: number;
   thoughtTokens?: number;
@@ -56,6 +57,7 @@ export class Timings {
 
 export const timingStore = new AsyncLocalStorage<Timings>();
 
+type StreamChunk = { usageMetadata?: Record<string, number | undefined> };
 type GenerateParams = { config?: { tools?: unknown[]; responseModalities?: string[] } };
 
 function labelOf(p: GenerateParams): string {
@@ -69,6 +71,32 @@ export function instrumentClient<C extends Pick<GoogleGenAI, 'models'>>(client: 
   const models = new Proxy(client.models, {
     get(target, prop, receiver) {
       const value = Reflect.get(target, prop, receiver);
+      if (prop === 'generateContentStream' && typeof value === 'function') {
+        return async (params: GenerateParams) => {
+          const t = performance.now();
+          const inner = (await (value as (p: unknown) => Promise<AsyncGenerator<StreamChunk>>).call(
+            target,
+            params,
+          )) as AsyncGenerator<StreamChunk>;
+          return (async function* () {
+            let usage: StreamChunk['usageMetadata'];
+            let first: number | undefined;
+            for await (const chunk of inner) {
+              first ??= performance.now() - t;
+              usage = chunk.usageMetadata ?? usage;
+              yield chunk;
+            }
+            timingStore.getStore()?.call(labelOf(params), {
+              ms: round(performance.now() - t),
+              firstChunkMs: first === undefined ? undefined : round(first),
+              inputTokens: usage?.promptTokenCount,
+              outputTokens: usage?.candidatesTokenCount,
+              thoughtTokens: usage?.thoughtsTokenCount,
+              cachedTokens: usage?.cachedContentTokenCount,
+            });
+          })();
+        };
+      }
       if (prop !== 'generateContent' || typeof value !== 'function') return typeof value === 'function' ? value.bind(target) : value;
       return async (params: GenerateParams) => {
         const t = performance.now();

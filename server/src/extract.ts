@@ -5,7 +5,7 @@ import { buildUserParts, SYSTEM_PROMPT } from './prompt.js';
 import { ApiError, type CheckRequest, type Entities, type Extraction, FAMILIES, SCAM_TYPES, SEVERITIES } from './types.js';
 import { findUrls, mergeUrls } from './urls.js';
 
-const responseSchema: Schema = {
+export const responseSchema: Schema = {
   type: Type.OBJECT,
   properties: {
     flags: {

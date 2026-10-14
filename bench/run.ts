@@ -1,8 +1,9 @@
 import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, extname, join, relative, resolve, sep } from 'node:path';
-import { loadConfig } from '../server/src/config.js';
+import { loadConfig, pipelineOptions } from '../server/src/config.js';
 import { createCorrelator } from '../server/src/correlate.js';
-import { createClient, createGeminiExtractor } from '../server/src/extract.js';
+import { createClient } from '../server/src/extract.js';
+import { createExtractor } from '../server/src/extract-stream.js';
 import { createGrounder } from '../server/src/ground.js';
 import { redactDeterministic } from '../server/src/intel/redact.js';
 import { countCertainty } from '../server/src/language-guard.js';
@@ -94,7 +95,7 @@ if (flags.inprocess) {
   model = cfg.model;
   const client = createClient(cfg);
   const pipeline = createPipeline({
-    extractor: createGeminiExtractor(cfg, client),
+    extractor: createExtractor(cfg, client),
     correlator: createCorrelator(cfg, { getToken: async () => undefined }),
     grounder: createGrounder(cfg, client),
     model,

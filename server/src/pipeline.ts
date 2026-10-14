@@ -3,8 +3,9 @@ import { createTtlLru } from './cache.js';
 import type { Correlator } from './correlate.js';
 import { buildActions, titleFor, withWebRiskNote } from './explain.js';
 import type { Extractor } from './extract.js';
+import type { StreamOpts } from './extract-stream.js';
 import type { Feedback } from './feedback/service.js';
-import type { Grounder } from './ground.js';
+import type { Grounder, GroundResult } from './ground.js';
 import { type Intel, NO_LOOKUP } from './intel/service.js';
 import { countCertainty, guardExtraction, guardFlags, isHeavy } from './language-guard.js';
 import { log } from './log.js';
@@ -90,6 +91,8 @@ export interface PipelineDeps {
   dangerGroundCapMs?: number;
   /** Start link checks on regex-found URLs before extraction ends. */
   earlyLinks?: boolean;
+  /** Start grounding when the streamed extraction has its entities, before the rest arrives. */
+  earlyGrounding?: boolean;
   /** Write the intel signal after the response instead of before it. */
   recordAfterResponse?: boolean;
   /** Identical-check cache. 0 or unset disables it. */
@@ -101,6 +104,7 @@ export function createPipeline(deps: PipelineDeps): Pipeline {
   const results = createTtlLru<CheckResponse>({ max: deps.resultCacheMax ?? 500, ttlMs: deps.resultCacheTtlMs ?? 0 });
   const caching = (deps.resultCacheTtlMs ?? 0) > 0;
   const earlyLinks = deps.earlyLinks ?? true;
+  const earlyEntities = deps.earlyGrounding ?? true;
 
   return {
     async run(req, opts = {}) {
@@ -132,8 +136,33 @@ export function createPipeline(deps: PipelineDeps): Pipeline {
           )
         : undefined;
 
+      let earlyGround: Promise<GroundResult> | undefined;
+      let groundStartedAt = 0;
+      const startGround = (entities: Extraction['entities'], ms: () => number) => {
+        stage('ground', 'start');
+        groundStartedAt = Date.now();
+        return tm
+          .span('ground', () =>
+            settle(deps.grounder.ground(req, { entities } as Extraction, ms()), ms() + 50, {
+              flags: [] as Flag[],
+              sources: [] as Source[],
+            }),
+          )
+          .then((g) => {
+            stage('ground', 'done');
+            return g;
+          });
+      };
+      const streamOpts: StreamOpts = {
+        onEntities: (entities) => {
+          if (earlyEntities && !earlyGround) {
+            earlyGround = startGround(entities, left);
+            tm.meta.groundEarlyAtMs = Math.round(tm.now());
+          }
+        },
+      };
       stage('extract', 'start');
-      const first = await tm.span('extract', () => deps.extractor.extract(req));
+      const first = await tm.span('extract', () => deps.extractor.extract(req, streamOpts));
       stage('extract', 'done');
       let guarded = guardExtraction(first, req.language);
       const before0 = guarded.stats.before;
@@ -159,7 +188,8 @@ export function createPipeline(deps: PipelineDeps): Pipeline {
       const rules = ownScore(extraction.flags, []);
       const confidentDanger = rules.verdict === 'danger' && rules.score >= DANGER_SCORE && extraction.verdictDraft === 'danger';
       const capMs = deps.dangerGroundCapMs ?? 0;
-      const groundMs = () => (confidentDanger && capMs > 0 ? Math.min(left(), capMs) : left());
+      const capped = confidentDanger && capMs > 0;
+      const groundMs = () => (capped ? Math.min(left(), capMs) : left());
       tm.meta.confidentDanger = confidentDanger;
 
       let linksSettled: LinkCheck[] | undefined;
@@ -172,7 +202,6 @@ export function createPipeline(deps: PipelineDeps): Pipeline {
       };
 
       stage('links', 'start');
-      stage('ground', 'start');
       stage('intel', 'start');
       const linksP = tm
         .span('links', () => settle(fetchLinks(), left(), unknownLinks(extraction.urls), markDegraded))
@@ -181,14 +210,11 @@ export function createPipeline(deps: PipelineDeps): Pipeline {
           stage('links', 'done');
           return l;
         });
-      const groundP = tm
-        .span('ground', () =>
-          settle(deps.grounder.ground(req, extraction, groundMs()), groundMs() + 50, { flags: [] as Flag[], sources: [] as Source[] }),
-        )
-        .then((g) => {
-          stage('ground', 'done');
-          return g;
-        });
+      const groundP = earlyGround
+        ? capped
+          ? settle(earlyGround, capMs - (Date.now() - groundStartedAt), { flags: [] as Flag[], sources: [] as Source[] })
+          : earlyGround
+        : startGround(extraction.entities, groundMs);
       const networkP = tm
         .span('intel', () =>
           deps.intel && prepared

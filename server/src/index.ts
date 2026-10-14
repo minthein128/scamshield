@@ -3,7 +3,8 @@ import { createApp } from './app.js';
 import { createFirebaseVerifier } from './auth.js';
 import { loadConfig, pipelineOptions } from './config.js';
 import { createCorrelator } from './correlate.js';
-import { createClient, createGeminiExtractor } from './extract.js';
+import { createClient } from './extract.js';
+import { createExtractor } from './extract-stream.js';
 import { createFeedbackFromConfig } from './feedback/factory.js';
 import { createGrounder } from './ground.js';
 import { createIntelFromConfig } from './intel/factory.js';
@@ -19,7 +20,7 @@ const client = cfg.mock ? undefined : instrumentClient(createClient(cfg));
 const intel = await createIntelFromConfig(cfg);
 const feedback = createFeedbackFromConfig(cfg, intel);
 const pipeline = createPipeline({
-  extractor: client ? createGeminiExtractor(cfg, client) : createMockExtractor(),
+  extractor: client ? createExtractor(cfg, client) : createMockExtractor(),
   correlator: cfg.mock ? createMockCorrelator() : createCorrelator(cfg),
   grounder: client ? createGrounder(cfg, client) : createMockGrounder(),
   ...pipelineOptions(cfg),
