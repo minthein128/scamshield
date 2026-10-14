@@ -9,7 +9,7 @@ Hono + TypeScript service implementing `docs/api-contract.md`. Pipeline: Extract
 - `MOCK=1 npm run dev`: server on :8080 with canned responses. Mock is also on when no credentials are set.
 - `npm run smoke`: one real Gemini + Web Risk + RDAP call. Needs `GEMINI_API_KEY` (or Vertex env). Exits 2 if unconfigured.
 - `npm run eval`: 27 labelled cases (en/my/id/tl) through the real pipeline, sequential, prints a verdict table, accuracy and p50/p95. Needs a key; never part of `npm test`. Env: `GEMINI_MODEL`, `EVAL_ONLY=id,id`, `EVAL_DELAY_MS`, `EVAL_JSON=path`.
-- `./deploy.sh`: needs `GOOGLE_CLOUD_PROJECT` and an authenticated gcloud. Deploys with `gcloud run deploy --source`.
+- `../scripts/deploy-cloudrun.sh`: deploys to Cloud Run (see `../docs/setup-gcp.md`).
 
 ## Layout
 
