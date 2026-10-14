@@ -22,6 +22,10 @@ export function toCheckResponse(result: ShieldCheckResult): CheckResponse {
   });
 }
 
+export function sourceLabel(kind: string | undefined): string {
+  return kind === 'message' ? 'Message check' : 'Screen check';
+}
+
 export function apiUrlFromEnv(): string {
   return process.env.EXPO_PUBLIC_API_URL?.trim() ?? '';
 }

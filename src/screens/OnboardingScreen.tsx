@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import { useApiUrl } from '../config/runtime';
 import { Screen } from '../components/Screen';
+import { MessageGuardCard } from '../components/MessageGuardCard';
 import { ShieldCard } from '../components/ShieldCard';
 import { Button, Chip, LinkButton } from '../components/ui';
 import { shieldSupport } from '../hooks/useShieldControl';
@@ -104,6 +105,7 @@ export const OnboardingScreen: React.FC<{ onDone: (next?: AfterOnboarding) => vo
         <>
           <Heading title="Turn on the screen shield" body="Optional. You can also do this later from the home screen." />
           <ShieldCard />
+          <MessageGuardCard />
         </>
       ) : null}
 
