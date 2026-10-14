@@ -132,8 +132,21 @@ export interface HealthResponse {
   mock: boolean;
 }
 
+export type CheckStage = 'extract' | 'links' | 'ground' | 'intel';
+
+/**
+ * Progress of a streamed check. `verdict` is provisional: it comes right after reading the input and
+ * can only stay or rise when `final` arrives. `final` carries the full result with sources and network data.
+ */
+export type CheckUpdate =
+  | { type: 'stage'; stage: CheckStage; status: 'start' | 'done'; ms: number }
+  | { type: 'verdict'; response: CheckResponse }
+  | { type: 'final'; response: CheckResponse };
+
 export interface RequestOptions {
   signal?: AbortSignal;
+  /** check() only. Asks for a streamed check. Ignored by clients or servers that cannot stream. */
+  onUpdate?: (update: CheckUpdate) => void;
 }
 
 export interface CheckClient {

@@ -11,9 +11,18 @@ export { hasInput } from './validate';
 export { createHttpClient } from './http';
 export { createMockClient } from './mock';
 
+function streamFetch(): typeof fetch | undefined {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    return (require('expo/fetch') as { fetch: typeof fetch }).fetch;
+  } catch {
+    return undefined;
+  }
+}
+
 export function createClientFromEnv(apiUrl: string | undefined, allowMock: boolean = __DEV__): CheckClient {
   const url = apiUrl?.trim();
-  if (url) return createHttpClient({ baseUrl: url, getToken: getAuthToken });
+  if (url) return createHttpClient({ baseUrl: url, getToken: getAuthToken, streamFetchImpl: streamFetch() });
   return allowMock ? createMockClient() : createUnavailableClient();
 }
 

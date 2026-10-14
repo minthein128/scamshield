@@ -1,5 +1,6 @@
 import { ApiError, codeFromStatus } from './errors';
-import type { ApiErrorBody, CheckClient, CheckRequest, CheckResponse, HealthResponse, Insights, RequestOptions, SpeakRequest, SpeakResponse } from './types';
+import { createSseParser } from './sse';
+import type { ApiErrorBody, ApiErrorCode, CheckClient, CheckRequest, CheckResponse, CheckStage, CheckUpdate, HealthResponse, Insights, RequestOptions, SpeakRequest, SpeakResponse } from './types';
 import { hasInput, isCheckResponse, normalizeResponse } from './validate';
 
 export interface HttpClientConfig {
@@ -7,6 +8,10 @@ export interface HttpClientConfig {
   timeoutMs?: number;
   fetchImpl?: typeof fetch;
   getToken?: () => Promise<string | null>;
+  /** Set false to never ask for a streamed check. Default true. */
+  stream?: boolean;
+  /** fetch used only for streamed checks. React Native needs expo/fetch to read a response stream. */
+  streamFetchImpl?: typeof fetch;
 }
 
 export const DEFAULT_TIMEOUT_MS = 30000;
@@ -15,12 +20,75 @@ function isErrorBody(value: unknown): value is ApiErrorBody {
   return Boolean(value && typeof value === 'object' && 'error' in value && (value as ApiErrorBody).error?.code);
 }
 
+async function readJson(response: Response): Promise<unknown> {
+  try {
+    return await response.json();
+  } catch {
+    return null;
+  }
+}
+
+function emit(onUpdate: (u: CheckUpdate) => void, update: CheckUpdate) {
+  try {
+    onUpdate(update);
+  } catch {
+    // a failing listener must not fail the check
+  }
+}
+
+/** Reads a /v1/check?stream=1 reply. A server that ignores the flag answers plain JSON, which is accepted. */
+async function readCheckStream(response: Response, onUpdate: (u: CheckUpdate) => void): Promise<unknown> {
+  const type = response.headers?.get?.('content-type') ?? '';
+  if (!type.includes('text/event-stream')) return readJson(response);
+  let final: CheckResponse | null = null;
+  const parser = createSseParser(({ event, data }) => {
+    let payload: unknown;
+    try {
+      payload = JSON.parse(data);
+    } catch {
+      return;
+    }
+    if (event === 'stage') {
+      const p = payload as { stage: CheckStage; status: 'start' | 'done'; ms: number };
+      emit(onUpdate, { type: 'stage', stage: p.stage, status: p.status, ms: p.ms });
+    } else if (event === 'verdict' && isCheckResponse(payload)) {
+      emit(onUpdate, { type: 'verdict', response: normalizeResponse(payload) });
+    } else if (event === 'final' && isCheckResponse(payload)) {
+      final = normalizeResponse(payload);
+      emit(onUpdate, { type: 'final', response: final });
+    } else if (event === 'error' && isErrorBody(payload)) {
+      throw new ApiError(payload.error.code as ApiErrorCode, payload.error.message);
+    }
+  });
+  const reader = response.body?.getReader?.();
+  if (reader && typeof TextDecoder !== 'undefined') {
+    const decoder = new TextDecoder();
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      parser.push(decoder.decode(value, { stream: true }));
+    }
+  } else {
+    parser.push(await response.text());
+  }
+  parser.end();
+  return final;
+}
+
 export function createHttpClient(config: HttpClientConfig): CheckClient {
   const baseUrl = config.baseUrl.replace(/\/+$/, '');
   const timeoutMs = config.timeoutMs ?? DEFAULT_TIMEOUT_MS;
   const fetchImpl = config.fetchImpl ?? fetch;
+  const streaming = config.stream !== false;
 
-  async function send(path: string, init: RequestInit, options?: RequestOptions): Promise<unknown> {
+  async function send(
+    path: string,
+    init: RequestInit,
+    options?: RequestOptions,
+    readOk: (response: Response) => Promise<unknown> = readJson,
+    accept = 'application/json',
+    doFetch: typeof fetch = fetchImpl
+  ): Promise<unknown> {
     const controller = new AbortController();
     let timedOut = false;
     const timer = setTimeout(() => {
@@ -32,28 +100,21 @@ export function createHttpClient(config: HttpClientConfig): CheckClient {
 
     try {
       const token = (await config.getToken?.().catch(() => null)) ?? null;
-      const response = await fetchImpl(`${baseUrl}${path}`, {
+      const response = await doFetch(`${baseUrl}${path}`, {
         ...init,
         headers: {
           'Content-Type': 'application/json',
-          Accept: 'application/json',
+          Accept: accept,
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         signal: controller.signal,
       });
-      let body: unknown = null;
-      try {
-        body = await response.json();
-      } catch {
-        body = null;
-      }
-      if (!response.ok) {
-        const retryAfter = Number(response.headers?.get?.('retry-after'));
-        const retryAfterSec = Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter : undefined;
-        if (isErrorBody(body)) throw new ApiError(body.error.code, body.error.message, response.status, retryAfterSec);
-        throw new ApiError(codeFromStatus(response.status), `HTTP ${response.status}`, response.status, retryAfterSec);
-      }
-      return body;
+      if (response.ok) return await readOk(response);
+      const body = await readJson(response);
+      const retryAfter = Number(response.headers?.get?.('retry-after'));
+      const retryAfterSec = Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter : undefined;
+      if (isErrorBody(body)) throw new ApiError(body.error.code, body.error.message, response.status, retryAfterSec);
+      throw new ApiError(codeFromStatus(response.status), `HTTP ${response.status}`, response.status, retryAfterSec);
     } catch (e) {
       if (e instanceof ApiError) throw e;
       if (timedOut) throw new ApiError('timeout', 'Request timed out');
@@ -69,7 +130,18 @@ export function createHttpClient(config: HttpClientConfig): CheckClient {
     isMock: false,
     async check(request: CheckRequest, options?: RequestOptions): Promise<CheckResponse> {
       if (!hasInput(request)) throw new ApiError('bad_request', 'Nothing to check');
-      const body = await send('/v1/check', { method: 'POST', body: JSON.stringify(request) }, options);
+      const onUpdate = options?.onUpdate;
+      const body =
+        onUpdate && streaming
+          ? await send(
+              '/v1/check?stream=1',
+              { method: 'POST', body: JSON.stringify(request) },
+              options,
+              r => readCheckStream(r, onUpdate),
+              'text/event-stream, application/json',
+              config.streamFetchImpl ?? fetchImpl
+            )
+          : await send('/v1/check', { method: 'POST', body: JSON.stringify(request) }, options);
       if (!isCheckResponse(body)) throw new ApiError('invalid_response', 'Unexpected response shape');
       return normalizeResponse(body);
     },
