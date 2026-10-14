@@ -1,6 +1,7 @@
 import type { Correlator } from './correlate.js';
 import type { Extractor } from './extract.js';
 import type { Grounder } from './ground.js';
+import { redactDeterministic } from './intel/redact.js';
 import type { CheckRequest, Extraction, Kind, LinkCheck } from './types.js';
 import { findUrls } from './urls.js';
 
@@ -105,7 +106,16 @@ export function createMockExtractor(): Extractor {
           urls,
         };
       }
-      return { ...base, entities: base.entities ?? { companies: [], phones: [], domains: [] }, urls };
+      const phones = (req.text ?? '').match(/(?:\+|\b0)\d[\d\s().-]{7,}\d/g) ?? [];
+      const handles = (req.text ?? '').match(/(?<![\w@])@[A-Za-z0-9_]{3,32}/g) ?? [];
+      const template = req.text ? redactDeterministic(req.text).text.slice(0, 280) : undefined;
+      return {
+        ...base,
+        entities: base.entities ?? { companies: [], phones: [], domains: [] },
+        urls,
+        ...(template ? { template, templateSafe: true } : {}),
+        sender: { phones: phones.map((p) => p.trim()), handles, accounts: [] },
+      };
     },
   };
 }

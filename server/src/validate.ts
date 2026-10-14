@@ -11,7 +11,10 @@ const schema = z
     url: z.string().max(2048).optional(),
     imageBase64: z.string().optional(),
     imageMimeType: z.enum(['image/jpeg', 'image/png', 'image/webp']).optional(),
-    context: z.object({ destination: z.string().max(100).optional(), route: z.string().max(300).optional() }).optional(),
+    context: z
+      .object({ destination: z.string().max(100).optional(), route: z.string().max(300).optional(), home: z.string().max(100).optional() })
+      .optional(),
+    shareSignals: z.boolean().optional(),
     language: z.enum(LANGS).default('en'),
   })
   .refine((v) => Boolean(v.text?.trim() || v.url?.trim() || v.imageBase64), {
@@ -37,6 +40,7 @@ export function parseRequest(body: unknown): CheckRequest {
     out.imageMimeType = v.imageMimeType ?? 'image/jpeg';
   }
   if (v.context) out.context = v.context;
+  if (v.shareSignals !== undefined) out.shareSignals = v.shareSignals;
   return out;
 }
 

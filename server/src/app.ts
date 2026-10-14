@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { bodyLimit } from 'hono/body-limit';
 import { cors } from 'hono/cors';
 import type { Config } from './config.js';
+import { type Intel, isCountry } from './intel/service.js';
 import { log } from './log.js';
 import type { Pipeline } from './pipeline.js';
 import { createRateLimiter } from './ratelimit.js';
@@ -13,7 +14,7 @@ const clientIp = (forwarded?: string, real?: string) => forwarded?.split(',')[0]
 
 const errorBody = (code: string, message: string) => ({ error: { code, message } });
 
-export function createApp(cfg: Config, pipeline: Pipeline, speaker: Speaker) {
+export function createApp(cfg: Config, pipeline: Pipeline, speaker: Speaker, intel?: Intel) {
   const app = new Hono();
   const limiter = createRateLimiter(cfg.rateLimitPerMin);
 
@@ -58,6 +59,18 @@ export function createApp(cfg: Config, pipeline: Pipeline, speaker: Speaker) {
       return c.json(res);
     },
   );
+
+  app.get('/v1/insights', async (c) => {
+    const country = c.req.query('country')?.trim() || 'GLOBAL';
+    const days = Number(c.req.query('days') ?? 30);
+    if (!isCountry(country)) throw new ApiError(400, 'bad_request', 'country must be an ISO code such as TH, or GLOBAL');
+    if (!Number.isInteger(days) || days < 1 || days > 90) throw new ApiError(400, 'bad_request', 'days must be an integer from 1 to 90');
+    const out = intel
+      ? await intel.insights(country, days)
+      : { country: country.toUpperCase(), days, generatedAt: new Date().toISOString(), k: 3, risks: [], domains: [], campaigns: [] };
+    c.header('Cache-Control', 'public, max-age=60');
+    return c.json(out);
+  });
 
   app.post(
     '/v1/speak',
