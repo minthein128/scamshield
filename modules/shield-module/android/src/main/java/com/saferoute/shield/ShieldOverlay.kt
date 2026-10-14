@@ -76,6 +76,7 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
     }
     private var bubbleAttached = false
     private var onLeft = false
+    private var bubbleClosing = false
     private var tucked = false
     private var dragging = false
     private var xSpring: SpringAnimation? = null
@@ -83,13 +84,17 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
 
     private var targetView: CloseTargetView? = null
     private var targetParams: WindowManager.LayoutParams? = null
-    private var overTarget = false
 
     private var cardRoot: FrameLayout? = null
     private var cardView: ResultCardView? = null
     private var cardModel: CardModel? = null
     private var cardClosing = false
-    private var hiddenByDrag = false
+    private var resume: ResumeCard? = null
+    private var snapToken = 0
+    private var restX = 0
+    private var restY = 0
+    private var enterAnim: ObjectAnimator? = null
+    private val machine = DragMachine(max(ViewConfiguration.get(context).scaledTouchSlop, dp(6)))
     private var lastJson: JSONObject? = null
 
     private val autoCollapse = Runnable { collapseSafeResult() }
@@ -188,11 +193,11 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
             canOpenReport = true,
             description = "$chip. $title"
         )
-        showCard(model, animate = true)
+        presentCard(model)
         when (next) {
             State.SAFE -> {
                 ShieldHaptics.safe(context)
-                main.postDelayed(autoCollapse, AUTO_COLLAPSE_MS)
+                if (resume == null) main.postDelayed(autoCollapse, AUTO_COLLAPSE_MS)
             }
             State.CAREFUL -> ShieldHaptics.careful(context)
             else -> {
@@ -208,9 +213,8 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
         untuck()
         showBubbleNow()
         val chip = ShieldPalette.errorLabel(message)
-        showCard(
-            CardModel(State.ERROR, chip, "Tap to retry", message, emptyList(), false, "$chip. $message. Double tap to retry."),
-            animate = true
+        presentCard(
+            CardModel(State.ERROR, chip, "Tap to retry", message, emptyList(), false, "$chip. $message. Double tap to retry.")
         )
     }
 
@@ -236,8 +240,22 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
     fun refreshTheme() {
         palette = ShieldPalette.forContext(context)
         bubble.palette = palette
+        if (!bubbleAttached) return
+        if (machine.phase != DragMachine.Phase.DRAGGING) {
+            val minY = dp(24)
+            bubbleParams.x = restingX(onLeft, tucked)
+            bubbleParams.y = bubbleParams.y.coerceIn(minY, max(minY, screenH() - bubbleSize - dp(48)))
+            updateBubble()
+        }
+        if (machine.phase == DragMachine.Phase.SNAPPING) {
+            snapToEdge()
+            return
+        }
         val model = cardModel
-        if (cardRoot != null && model != null) showCard(model, animate = false)
+        val view = cardView
+        if (cardRoot != null && !cardClosing && model != null && view != null && !dragging) {
+            showCard(model, animate = false, expanded = view.isExpanded)
+        }
     }
 
     private fun collapseSafeResult() {
@@ -245,6 +263,7 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
     }
 
     private fun setState(next: State) {
+        resume = null
         state = next
         bubble.shieldState = next
         describeBubble()
@@ -285,7 +304,16 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
 
     // ---- result surface ----
 
-    private fun showCard(model: CardModel, animate: Boolean) {
+    private fun presentCard(model: CardModel) {
+        if (machine.phase == DragMachine.Phase.DRAGGING || machine.phase == DragMachine.Phase.SNAPPING) {
+            cardModel = model
+            resume = ResumeCard(model, false)
+        } else {
+            showCard(model, animate = true)
+        }
+    }
+
+    private fun showCard(model: CardModel, animate: Boolean, expanded: Boolean = false) {
         removeCardNow()
         cardModel = model
         val view = ResultCardView(context, palette, fonts, fontScale(), model, object : CardCallbacks {
@@ -303,9 +331,10 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
         }
         root.addView(
             view,
-            FrameLayout.LayoutParams(view.collapsedWidth, FrameLayout.LayoutParams.WRAP_CONTENT, if (onLeft) Gravity.START else Gravity.END)
+            FrameLayout.LayoutParams(view.collapsedWidth, FrameLayout.LayoutParams.WRAP_CONTENT, if (anchorFor(bubbleParams.x, bubbleParams.y).left) Gravity.START else Gravity.END)
         )
-        val belowBubble = bubbleCenterY() < screenH() / 2
+        if (expanded) view.setExpanded(true, false)
+        val anchor = anchorFor(bubbleParams.x, bubbleParams.y)
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.WRAP_CONTENT,
@@ -313,13 +342,9 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
             baseFlags,
             PixelFormat.TRANSLUCENT
         ).apply {
-            gravity = (if (belowBubble) Gravity.TOP else Gravity.BOTTOM) or (if (onLeft) Gravity.START else Gravity.END)
+            gravity = anchor.gravity
             x = 0
-            y = if (belowBubble) {
-                bubbleParams.y + pad + dp(BubbleView.CIRCLE_DP) + dp(8) - pad
-            } else {
-                screenH() - bubbleParams.y - pad + dp(8) - pad
-            }
+            y = anchor.offsetY
         }
         if (animate) view.alpha = 0f
         try {
@@ -344,7 +369,7 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
         aimPivotAtBubble(view)
         view.scaleX = 0.45f
         view.scaleY = 0.45f
-        ObjectAnimator.ofPropertyValuesHolder(
+        enterAnim = ObjectAnimator.ofPropertyValuesHolder(
             view,
             PropertyValuesHolder.ofFloat(View.ALPHA, 0f, 1f),
             PropertyValuesHolder.ofFloat(View.SCALE_X, 0.45f, 1f),
@@ -356,6 +381,28 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
         }
     }
 
+    private fun anchorFor(x: Int, y: Int) =
+        AnchorMath.compute(x, y, bubbleSize, pad, dp(8), screenW(), screenH())
+
+    /** Move the open card window to match the bubble. One layout pass, no per-frame work. */
+    private fun reanchorCard() {
+        val root = cardRoot ?: return
+        if (machine.phase == DragMachine.Phase.DRAGGING || cardClosing) return
+        val anchor = anchorFor(bubbleParams.x, bubbleParams.y)
+        val params = root.layoutParams as? WindowManager.LayoutParams ?: return
+        if (params.gravity == anchor.gravity && params.y == anchor.offsetY) return
+        params.gravity = anchor.gravity
+        params.y = anchor.offsetY
+        (cardView?.layoutParams as? FrameLayout.LayoutParams)?.let {
+            it.gravity = if (anchor.left) Gravity.START else Gravity.END
+            cardView?.layoutParams = it
+        }
+        try {
+            windowManager.updateViewLayout(root, params)
+        } catch (_: Exception) {
+        }
+    }
+
     private fun aimPivotAtBubble(view: View) {
         val loc = IntArray(2)
         view.getLocationOnScreen(loc)
@@ -363,7 +410,7 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
         view.pivotY = (bubbleParams.y + bubbleSize / 2f) - loc[1]
     }
 
-    private fun dismissCard(animated: Boolean) {
+    private fun dismissCard(animated: Boolean, duration: Long = 170) {
         val root = cardRoot ?: return
         val view = cardView
         if (!animated || view == null || cardClosing) {
@@ -371,9 +418,12 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
             return
         }
         cardClosing = true
+        enterAnim?.cancel()
+        enterAnim = null
+        view.cancelAnimations()
         aimPivotAtBubble(view)
-        view.animate().cancel()
-        view.animate().alpha(0f).scaleX(0.5f).scaleY(0.5f).setDuration(170)
+        main.postDelayed({ if (cardRoot === root) removeCardNow() }, duration + 80)
+        view.animate().alpha(0f).scaleX(0.4f).scaleY(0.4f).setDuration(duration)
             .setInterpolator(ResultCardView.EASE)
             .setListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
@@ -385,7 +435,9 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
     private fun removeCardNow() {
         main.removeCallbacks(autoCollapse)
         val root = cardRoot ?: return
-        cardView?.animate()?.cancel()
+        enterAnim?.cancel()
+        enterAnim = null
+        cardView?.cancelAnimations()
         try {
             windowManager.removeView(root)
         } catch (_: Exception) {
@@ -411,9 +463,9 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
     }
 
     private fun tuck(value: Boolean) {
-        if (value == tucked || dragging) return
+        if (value == tucked || dragging || machine.phase != DragMachine.Phase.IDLE) return
         tucked = value
-        springTo(xProperty, restingX(onLeft, value).toFloat(), SPRING_SOFT)
+        springTo(xProperty, restingX(onLeft, value).toFloat(), SPRING_SOFT) { reanchorCard() }
     }
 
     private fun snapToEdge() {
@@ -421,16 +473,30 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
         val minY = dp(24)
         val maxY = screenH() - bubbleSize - dp(48)
         tucked = false
-        springTo(xProperty, restingX(onLeft, false).toFloat(), SPRING_BOUNCY) {
-            if (hiddenByDrag) {
-                hiddenByDrag = false
-                cardModel?.let { showCard(it, animate = true) }
-            }
-        }
-        val clampedY = bubbleParams.y.coerceIn(minY, max(minY, maxY))
-        if (clampedY != bubbleParams.y) springTo(yProperty, clampedY.toFloat(), SPRING_SOFT)
+        restX = restingX(onLeft, false)
+        restY = bubbleParams.y.coerceIn(minY, max(minY, maxY))
+        val token = ++snapToken
+        springTo(xProperty, restX.toFloat(), SPRING_BOUNCY) { settle(token) }
+        if (restY != bubbleParams.y) springTo(yProperty, restY.toFloat(), SPRING_SOFT)
+        main.postDelayed({ settle(token) }, SETTLE_FALLBACK_MS)
         main.removeCallbacks(tuckLater)
         if (state == State.IDLE) main.postDelayed(tuckLater, TUCK_DELAY_MS)
+    }
+
+    /** The snap ended: bring the result card back at the new anchor. */
+    private fun settle(token: Int) {
+        if (token != snapToken || machine.phase == DragMachine.Phase.DRAGGING) return
+        machine.settled()
+        val pending = resume ?: return
+        resume = null
+        xSpring?.cancel()
+        ySpring?.cancel()
+        bubbleParams.x = restX
+        bubbleParams.y = restY
+        updateBubble()
+        if (state == State.CHECKING || bubble.visibility != View.VISIBLE) return
+        showCard(pending.model, animate = true, expanded = pending.expanded)
+        if (state == State.SAFE && !pending.expanded) main.postDelayed(autoCollapse, AUTO_COLLAPSE_MS)
     }
 
     private fun springTo(
@@ -447,7 +513,7 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
                 stiffness = SpringForce.STIFFNESS_LOW + 150f
             }
             setMinimumVisibleChange(1f)
-            if (onEnd != null) addEndListener { _, _, _, _ -> onEnd() }
+            if (onEnd != null) addEndListener { _, canceled, _, _ -> if (!canceled) onEnd() }
         }
         if (isX) xSpring = spring else ySpring = spring
         spring.start()
@@ -469,12 +535,8 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
         private var startY = 0
         private var touchX = 0f
         private var touchY = 0f
-        private var moved = false
-        private var longPressed = false
-        private val slop = ViewConfiguration.get(context).scaledTouchSlop.coerceAtLeast(dp(6))
         private val longPress = Runnable {
-            if (!moved) {
-                longPressed = true
+            if (machine.longPress()) {
                 ShieldHaptics.tick(context)
                 closeBubble()
             }
@@ -485,37 +547,34 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
                 MotionEvent.ACTION_DOWN -> {
                     xSpring?.cancel()
                     ySpring?.cancel()
+                    snapToken++
                     main.removeCallbacks(tuckLater)
                     startX = bubbleParams.x
                     startY = bubbleParams.y
                     touchX = event.rawX
                     touchY = event.rawY
-                    moved = false
-                    longPressed = false
+                    machine.down()
                     main.postDelayed(longPress, ViewConfiguration.getLongPressTimeout().toLong() + 200)
                     return true
                 }
                 MotionEvent.ACTION_MOVE -> {
-                    if (longPressed) return true
                     val dx = (event.rawX - touchX).toInt()
                     val dy = (event.rawY - touchY).toInt()
-                    if (!moved && (abs(dx) > slop || abs(dy) > slop)) {
-                        moved = true
+                    if (machine.move(dx, dy)) {
                         main.removeCallbacks(longPress)
                         beginDrag()
                     }
-                    if (moved) {
-                        followFinger(startX + dx, startY + dy)
-                    }
+                    if (machine.phase == DragMachine.Phase.DRAGGING) followFinger(startX + dx, startY + dy)
                     return true
                 }
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                     main.removeCallbacks(longPress)
-                    if (longPressed) return true
-                    if (moved) {
-                        endDrag(event.actionMasked == MotionEvent.ACTION_UP)
-                    } else if (event.actionMasked == MotionEvent.ACTION_UP) {
-                        v.performClick()
+                    val released = event.actionMasked == MotionEvent.ACTION_UP
+                    when (machine.up(released)) {
+                        DragMachine.Outcome.TAP -> if (resume != null) snapToEdge() else v.performClick()
+                        DragMachine.Outcome.NONE -> if (resume != null && !bubbleClosing) snapToEdge()
+                        DragMachine.Outcome.SNAP -> endDrag(close = false)
+                        DragMachine.Outcome.CLOSE -> endDrag(close = true)
                     }
                     return true
                 }
@@ -527,10 +586,14 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
     private fun beginDrag() {
         dragging = true
         tucked = false
-        if (cardRoot != null && !cardClosing) {
-            hiddenByDrag = true
-            dismissCard(animated = true)
+        snapToken++
+        main.removeCallbacks(autoCollapse)
+        val model = cardModel
+        val view = cardView
+        if (resume == null && cardRoot != null && !cardClosing && model != null && view != null) {
+            resume = ResumeCard(model, view.isExpanded)
         }
+        dismissCard(animated = true, duration = 120)
         showTarget()
     }
 
@@ -539,8 +602,8 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
         val cx = rawX + bubbleSize / 2f
         val cy = rawY + bubbleSize / 2f
         val near = hypot(cx - target.first, cy - target.second) < dp(84)
-        if (near != overTarget) {
-            overTarget = near
+        if (near != machine.overTarget) {
+            machine.overTarget = near
             if (near) ShieldHaptics.tick(context)
             targetView?.animate()?.scaleX(if (near) 1.25f else 1f)?.scaleY(if (near) 1.25f else 1f)?.setDuration(120)?.start()
         }
@@ -554,13 +617,12 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
         updateBubble()
     }
 
-    private fun endDrag(released: Boolean) {
+    private fun endDrag(close: Boolean) {
         dragging = false
-        val close = released && overTarget
-        overTarget = false
         hideTarget()
         if (close) {
-            hiddenByDrag = false
+            resume = null
+            cardModel = null
             closeBubble()
         } else {
             snapToEdge()
@@ -618,6 +680,8 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
     }
 
     private fun closeBubble() {
+        bubbleClosing = true
+        resume = null
         main.removeCallbacks(tuckLater)
         main.removeCallbacks(autoCollapse)
         removeCardNow()
@@ -631,18 +695,24 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
             }).start()
     }
 
+    internal val bubbleViewForTest: View get() = bubble
+    internal val screenForTest: Pair<Int, Int> get() = Pair(screenW(), screenH())
+    internal val bubbleParamsForTest: WindowManager.LayoutParams get() = bubbleParams
+    internal val hasCardWindow: Boolean get() = cardRoot != null
+    internal val cardGravityForTest: Int? get() = (cardRoot?.layoutParams as? WindowManager.LayoutParams)?.gravity
+    internal val isCardResumePending: Boolean get() = resume != null
+    internal val dragPhase: DragMachine.Phase get() = machine.phase
+
     // ---- metrics ----
 
-    private fun screenW(): Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-        windowManager.maximumWindowMetrics.bounds.width()
-    } else {
-        context.resources.displayMetrics.widthPixels
+    private fun screenW(): Int {
+        val w = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) windowManager.maximumWindowMetrics.bounds.width() else 0
+        return if (w > 0) w else context.resources.displayMetrics.widthPixels
     }
 
-    private fun screenH(): Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-        windowManager.maximumWindowMetrics.bounds.height()
-    } else {
-        context.resources.displayMetrics.heightPixels
+    private fun screenH(): Int {
+        val h = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) windowManager.maximumWindowMetrics.bounds.height() else 0
+        return if (h > 0) h else context.resources.displayMetrics.heightPixels
     }
 
     private fun fontScale(): Float = min(context.resources.configuration.fontScale, MAX_FONT_SCALE)
@@ -652,9 +722,92 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
     companion object {
         private const val AUTO_COLLAPSE_MS = 8000L
         private const val TUCK_DELAY_MS = 1800L
+        private const val SETTLE_FALLBACK_MS = 800L
         private const val MAX_FONT_SCALE = 1.3f
         private const val CLOSE_BOX_DP = 72
         private const val SPRING_BOUNCY = 0.65f
         private const val SPRING_SOFT = 0.9f
     }
 }
+
+
+internal data class CardAnchor(val below: Boolean, val left: Boolean, val offsetY: Int) {
+    val gravity: Int
+        get() = (if (below) Gravity.TOP else Gravity.BOTTOM) or (if (left) Gravity.START else Gravity.END)
+}
+
+/** Where the result window goes for a bubble window at (bubbleX, bubbleY). All values are pixels. */
+internal object AnchorMath {
+    fun compute(
+        bubbleX: Int,
+        bubbleY: Int,
+        bubbleSize: Int,
+        pad: Int,
+        gap: Int,
+        screenW: Int,
+        screenH: Int
+    ): CardAnchor {
+        val centerX = bubbleX + bubbleSize / 2
+        val centerY = bubbleY + bubbleSize / 2
+        val left = centerX < screenW / 2
+        val below = centerY < screenH / 2
+        val circleTop = bubbleY + pad
+        val circleBottom = bubbleY + bubbleSize - pad
+        val offset = if (below) circleBottom + gap - pad else screenH - circleTop + gap - pad
+        return CardAnchor(below, left, max(0, offset))
+    }
+}
+
+/** Gesture phases of the bubble. Pure logic, so it is easy to test. */
+internal class DragMachine(private val slop: Int) {
+    enum class Phase { IDLE, PRESSED, DRAGGING, SNAPPING }
+    enum class Outcome { NONE, TAP, SNAP, CLOSE }
+
+    var phase = Phase.IDLE
+        private set
+    var overTarget = false
+
+    fun down() {
+        overTarget = false
+        phase = Phase.PRESSED
+    }
+
+    /** Returns true once, when the finger passes the touch slop. */
+    fun move(dx: Int, dy: Int): Boolean {
+        if (phase == Phase.PRESSED && (abs(dx) > slop || abs(dy) > slop)) {
+            phase = Phase.DRAGGING
+            return true
+        }
+        return false
+    }
+
+    fun up(released: Boolean): Outcome = when (phase) {
+        Phase.PRESSED -> {
+            phase = Phase.IDLE
+            if (released) Outcome.TAP else Outcome.NONE
+        }
+        Phase.DRAGGING -> {
+            val close = released && overTarget
+            overTarget = false
+            phase = if (close) Phase.IDLE else Phase.SNAPPING
+            if (close) Outcome.CLOSE else Outcome.SNAP
+        }
+        else -> Outcome.NONE
+    }
+
+    /** True when a long press fires without movement. */
+    fun longPress(): Boolean {
+        if (phase != Phase.PRESSED) return false
+        phase = Phase.IDLE
+        return true
+    }
+
+    /** The edge snap ended. True when the card may come back. */
+    fun settled(): Boolean {
+        if (phase != Phase.SNAPPING) return false
+        phase = Phase.IDLE
+        return true
+    }
+}
+
+internal data class ResumeCard(val model: CardModel, val expanded: Boolean)
