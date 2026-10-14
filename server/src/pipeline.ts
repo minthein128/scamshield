@@ -6,6 +6,7 @@ import type { Grounder } from './ground.js';
 import { type Intel, NO_LOOKUP } from './intel/service.js';
 import { log } from './log.js';
 import { score } from './score.js';
+import { Timings, timingStore } from './timing.js';
 import type { CheckRequest, CheckResponse } from './types.js';
 
 export interface Pipeline {
@@ -29,18 +30,24 @@ export function createPipeline(deps: {
   return {
     async run(req) {
       const deadline = Date.now() + (deps.budgetMs ?? 15000);
-      const extraction = await deps.extractor.extract(req);
+      const tm = timingStore.getStore() ?? new Timings();
+      const extraction = await tm.span('extract', () => deps.extractor.extract(req));
       const left = () => deadline - Date.now() - SAFETY_MARGIN_MS;
       const prepared = deps.intel?.prepare(req, extraction);
       const [linkChecks, grounded, network] = await Promise.all([
-        settle(
-          deps.correlator.checkAll(extraction.urls),
-          left(),
-          extraction.urls.map((url) => ({ url, webRisk: 'unknown' as const })),
+        tm.span('links', () =>
+          settle(
+            deps.correlator.checkAll(extraction.urls),
+            left(),
+            extraction.urls.map((url) => ({ url, webRisk: 'unknown' as const })),
+          ),
         ),
-        settle(deps.grounder.ground(req, extraction, left()), left(), { flags: [], sources: [] }),
-        deps.intel && prepared ? settle(deps.intel.lookup(prepared, req.language), left(), NO_LOOKUP) : Promise.resolve(NO_LOOKUP),
+        tm.span('ground', () => settle(deps.grounder.ground(req, extraction, left()), left(), { flags: [], sources: [] })),
+        tm.span('intel', () =>
+          deps.intel && prepared ? settle(deps.intel.lookup(prepared, req.language), left(), NO_LOOKUP) : Promise.resolve(NO_LOOKUP),
+        ),
       ]);
+      const scoreStart = performance.now();
       const ownFlags = [...extraction.flags, ...grounded.flags];
       const scoreWith = (flags: typeof ownFlags) =>
         score({
@@ -51,6 +58,7 @@ export function createPipeline(deps: {
           scamType: extraction.scamType,
         });
       const scored = network.flags.length ? scoreWith([...ownFlags, ...network.flags]) : scoreWith(ownFlags);
+      let scoreMs = performance.now() - scoreStart;
       const scamType = scored.flags.length === 0 ? 'none' : extraction.scamType;
       if (deps.intel && prepared && req.shareSignals !== false) {
         const own = network.flags.length ? scoreWith(ownFlags) : scored;
@@ -60,15 +68,18 @@ export function createPipeline(deps: {
           scamType: own.flags.length === 0 ? 'none' : extraction.scamType,
           flags: own.flags,
         };
-        await settle(
-          deps.intel
-            .record(prepared, outcome, { uid: req.uid })
-            .catch((err: Error) => log('WARNING', 'intel_record_failed', { error: err.message })),
-          RECORD_TIMEOUT_MS,
-          undefined,
+        await tm.span('record', () =>
+          settle(
+            deps.intel
+              ?.record(prepared, outcome, { uid: req.uid })
+              .catch((err: Error) => log('WARNING', 'intel_record_failed', { error: err.message })) ?? Promise.resolve(),
+            RECORD_TIMEOUT_MS,
+            undefined,
+          ),
         );
       }
-      return {
+      const explainStart = performance.now();
+      const response: CheckResponse = {
         id: `chk_${randomUUID().replaceAll('-', '').slice(0, 20)}`,
         createdAt: new Date().toISOString(),
         kind: req.kind,
@@ -85,6 +96,9 @@ export function createPipeline(deps: {
         model: deps.model,
         ...(network.network ? { network: network.network } : {}),
       };
+      scoreMs += performance.now() - explainStart;
+      tm.meta.scoreExplainMs = Math.round(scoreMs * 100) / 100;
+      return response;
     },
   };
 }

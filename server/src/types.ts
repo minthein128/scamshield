@@ -1,3 +1,5 @@
+import type { TimingsJson } from './timing.js';
+
 export const KINDS = ['job', 'message', 'link', 'shop', 'agency', 'screen'] as const;
 export const LANGS = ['en', 'id', 'tl', 'my'] as const;
 export const FAMILIES = ['too_good', 'pressure', 'payment_route', 'identity', 'link_risk', 'known_bad', 'trafficking'] as const;
@@ -103,6 +105,8 @@ export interface CheckResponse {
   actions: Action[];
   model: string;
   network?: { seenCount: number; firstSeen: string; campaign?: { name: string; seenThisWeek: number } };
+  /** Present only with ?debug=1 or DEBUG_TIMINGS=1. */
+  timings?: TimingsJson;
 }
 
 export class ApiError extends Error {

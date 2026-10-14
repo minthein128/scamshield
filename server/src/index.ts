@@ -10,9 +10,11 @@ import { log } from './log.js';
 import { createMockCorrelator, createMockExtractor, createMockGrounder } from './mock.js';
 import { createPipeline } from './pipeline.js';
 import { createGeminiSpeaker, createMockSpeaker } from './speak.js';
+import { instrumentClient } from './timing.js';
 
+const bootStart = performance.now();
 const cfg = loadConfig();
-const client = cfg.mock ? undefined : createClient(cfg);
+const client = cfg.mock ? undefined : instrumentClient(createClient(cfg));
 const intel = await createIntelFromConfig(cfg);
 const pipeline = createPipeline({
   extractor: client ? createGeminiExtractor(cfg, client) : createMockExtractor(),
@@ -36,6 +38,13 @@ serve(
     hostname: '0.0.0.0',
   },
   (info) => {
-    log('INFO', 'listening', { port: info.port, model: cfg.model, mock: cfg.mock, vertex: cfg.useVertex });
+    log('INFO', 'listening', {
+      port: info.port,
+      model: cfg.model,
+      mock: cfg.mock,
+      vertex: cfg.useVertex,
+      bootMs: Math.round(performance.now() - bootStart),
+      processUptimeMs: Math.round(process.uptime() * 1000),
+    });
   },
 );

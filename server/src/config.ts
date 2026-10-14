@@ -19,6 +19,7 @@ export interface Config {
   linkTimeoutMs: number;
   requestBudgetMs: number;
   grounding: boolean;
+  debugTimings: boolean;
   ttsModel: string;
   ttsVoice: string;
   intelPepper?: string;
@@ -60,6 +61,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     linkTimeoutMs: Number(env.LINK_TIMEOUT_MS ?? 4000),
     requestBudgetMs: Number(env.REQUEST_BUDGET_MS ?? 15000),
     grounding: env.GROUNDING !== '0',
+    debugTimings: bool(env.DEBUG_TIMINGS),
     ttsModel: env.TTS_MODEL || 'gemini-3.8-flash-tts',
     ttsVoice: env.TTS_VOICE || 'Kore',
     intelPepper: env.INTEL_PEPPER || undefined,

@@ -8,6 +8,7 @@ import { log } from './log.js';
 import type { Pipeline } from './pipeline.js';
 import { createRateLimiter } from './ratelimit.js';
 import type { Speaker } from './speak.js';
+import { Timings, timingStore } from './timing.js';
 import { ApiError } from './types.js';
 import { parseRequest, parseSpeakRequest } from './validate.js';
 
@@ -49,15 +50,18 @@ export function createApp(cfg: Config, pipeline: Pipeline, speaker: Speaker, int
     }),
     async (c) => {
       const started = Date.now();
+      const tm = new Timings();
       let body: unknown;
       try {
-        body = await c.req.json();
+        body = await tm.span('body', () => c.req.json());
       } catch {
         throw new ApiError(400, 'bad_request', 'Body must be valid JSON');
       }
-      const req = parseRequest(body);
+      const req = await tm.span('validate', () => parseRequest(body));
+      tm.meta.imageBytes = req.imageBase64 ? Math.floor((req.imageBase64.length * 3) / 4) : 0;
+      tm.meta.textChars = req.text?.length ?? 0;
       const uid = c.get('uid' as never) as string | undefined;
-      const res = await pipeline.run(uid ? { ...req, uid } : req);
+      const res = await timingStore.run(tm, () => pipeline.run(uid ? { ...req, uid } : req));
       log('INFO', 'check_done', {
         id: res.id,
         kind: res.kind,
@@ -69,8 +73,9 @@ export function createApp(cfg: Config, pipeline: Pipeline, speaker: Speaker, int
         sourceCount: res.sources.length,
         hasImage: Boolean(req.imageBase64),
         latencyMs: Date.now() - started,
+        timings: tm.toJSON(),
       });
-      return c.json(res);
+      return c.json(cfg.debugTimings || c.req.query('debug') === '1' ? { ...res, timings: tm.toJSON() } : res);
     },
   );
 
