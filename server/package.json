@@ -16,7 +16,11 @@
     "test": "vitest run",
     "check": "npm run typecheck && npm run lint && npm run test",
     "smoke": "tsx src/smoke.ts",
-    "eval": "tsx eval/run.ts"
+    "eval": "tsx eval/run.ts",
+    "eval:redaction": "tsx eval/redaction.ts",
+    "intel:seed": "tsx src/intel/seed.ts",
+    "intel:purge-seed": "tsx src/intel/purge-seed.ts",
+    "intel:sweep": "tsx src/intel/sweep.ts"
   },
   "dependencies": {
     "@google/genai": "^2.29.1",

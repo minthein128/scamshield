@@ -21,6 +21,8 @@ export interface Config {
   grounding: boolean;
   ttsModel: string;
   ttsVoice: string;
+  intelPepper?: string;
+  intelProject?: string;
   thinkingLevel?: 'MINIMAL' | 'LOW' | 'MEDIUM' | 'HIGH';
 }
 
@@ -60,6 +62,8 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     grounding: env.GROUNDING !== '0',
     ttsModel: env.TTS_MODEL || 'gemini-3.8-flash-tts',
     ttsVoice: env.TTS_VOICE || 'Kore',
+    intelPepper: env.INTEL_PEPPER || undefined,
+    intelProject: env.INTEL_PROJECT || project || 'saferoute-aibc',
     thinkingLevel: thinking(env.THINKING_LEVEL),
   };
 }

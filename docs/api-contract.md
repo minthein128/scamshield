@@ -26,9 +26,12 @@ Request:
   "imageBase64": "optional JPEG/PNG screenshot, base64, max ~4 MB",
   "imageMimeType": "image/jpeg",
   "context": { "destination": "optional, e.g. Thailand", "route": "optional" },
-  "language": "en" | "id" | "tl" | "my"
+  "language": "en" | "id" | "tl" | "my",
+  "shareSignals": false
 }
 ```
+
+`context.home` is an optional home country. `shareSignals: false` keeps this check out of the anonymous network signals (default true). See `docs/intel-design.md`.
 
 At least one of `text`, `url`, `imageBase64` is required.
 
@@ -59,11 +62,14 @@ Response 200:
   ],
   "sources": [ { "title": "Page title", "url": "https://..." } ],
   "actions": [ { "label": "Call hotline", "type": "call" | "share" | "block" | "learn", "value": "optional" } ],
-  "model": "gemini model id used"
+  "model": "gemini model id used",
+  "network": { "seenCount": 14, "firstSeen": "2026-07-20", "campaign": { "name": "Mae Sot data-entry job", "seenThisWeek": 23 } }
 }
 ```
 
 `sources` lists the Google Search pages used to verify the named company, phone number, domain or salary. It is `[]` when the input names no entity or verification did not finish in time. Flags from verification use the families `known_bad`, `identity` and `too_good`.
+
+`network` is present only when a phone, chat account, payment account or domain from the input was reported by at least 3 separate checks in the last 30 days, or the text matches an active campaign. `seenCount` is the 30 day count; the value itself is never returned. A match also adds a `known_bad` flag. `campaign` is optional.
 
 `actions[].value` for `type: "call"` is a dial string from the shared hotline data (`src/data/hotlines.ts`): the destination country's anti-trafficking line, else its police line. It is absent when `context.destination` names no known country. The app resolves the number against the same data.
 
@@ -80,6 +86,22 @@ Request: `{ "text": "max 600 chars", "language": "en" | "id" | "tl" | "my" }`
 Response 200: `{ "audioBase64": "...", "mimeType": "audio/wav", "sampleRate": 24000, "model": "..." }`
 
 The audio is a mono 16-bit PCM WAV file. Errors use the same body as `/v1/check`.
+
+## GET /v1/insights?country=TH&days=30
+
+`country` is an ISO code or `GLOBAL` (default). `days` is 1 to 90 (default 30). Sent with `Cache-Control: public, max-age=60`. Every item needs at least k=3 reports; no hashes are returned.
+
+```json
+{
+  "country": "TH", "days": 30, "generatedAt": "ISO-8601", "k": 3,
+  "risks": [ { "scamType": "job_trafficking", "label": "...", "count": 34, "trend": "up" | "down" | "flat",
+               "example": "redacted template", "topFlagFamilies": [ { "family": "trafficking", "share": 0.9 } ] } ],
+  "domains": [ { "domain": "example.example", "count": 7, "trend": "up" } ],
+  "campaigns": [ { "name": "...", "scamType": "...", "count": 11, "trend": "up", "example": "..." } ]
+}
+```
+
+Risks are ordered by trending score. Errors: 400 `bad_request` for a bad `country` or `days`.
 
 ## GET /healthz
 

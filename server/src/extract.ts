@@ -28,6 +28,19 @@ const responseSchema: Schema = {
     summary: { type: Type.STRING },
     spokenWarning: { type: Type.STRING },
     urls: { type: Type.ARRAY, items: { type: Type.STRING } },
+    template: { type: Type.STRING },
+    templateSafe: { type: Type.BOOLEAN },
+    campaign: { type: Type.STRING },
+    inputLanguage: { type: Type.STRING },
+    sender: {
+      type: Type.OBJECT,
+      properties: {
+        phones: { type: Type.ARRAY, items: { type: Type.STRING } },
+        handles: { type: Type.ARRAY, items: { type: Type.STRING } },
+        accounts: { type: Type.ARRAY, items: { type: Type.STRING } },
+      },
+      required: ['phones', 'handles', 'accounts'],
+    },
     entities: {
       type: Type.OBJECT,
       properties: {
@@ -62,6 +75,17 @@ const parsed = z.object({
   summary: z.string().default(''),
   spokenWarning: z.string().default(''),
   urls: z.array(z.string()).default([]),
+  template: z.string().nullish(),
+  templateSafe: z.boolean().nullish(),
+  campaign: z.string().nullish(),
+  inputLanguage: z.string().nullish(),
+  sender: z
+    .object({
+      phones: z.array(z.string()).default([]),
+      handles: z.array(z.string()).default([]),
+      accounts: z.array(z.string()).default([]),
+    })
+    .nullish(),
   entities: z
     .object({
       companies: z.array(z.string()).default([]),
@@ -133,5 +157,12 @@ export function parseExtraction(raw: string | undefined, req: CheckRequest): Ext
   if (role) entities.role = role;
   if (country) entities.country = country;
   if (salaryClaim) entities.salaryClaim = salaryClaim;
-  return { ...r.data, entities, urls };
+  const { template, templateSafe, campaign, inputLanguage, sender, ...core } = r.data;
+  const out: Extraction = { ...core, entities, urls };
+  if (template) out.template = template;
+  if (templateSafe !== null && templateSafe !== undefined) out.templateSafe = templateSafe;
+  if (campaign) out.campaign = campaign;
+  if (inputLanguage) out.inputLanguage = inputLanguage;
+  if (sender) out.sender = sender;
+  return out;
 }

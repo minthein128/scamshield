@@ -21,7 +21,7 @@ function make(env: Record<string, string> = {}) {
     grounder: createMockGrounder(),
     model: cfg.model,
   });
-  return createApp(cfg, pipeline, createMockSpeaker(cfg), verifier);
+  return createApp(cfg, pipeline, createMockSpeaker(cfg), undefined, verifier);
 }
 
 const check = (app: ReturnType<typeof make>, token?: string, ip = '1.1.1.1') =>
