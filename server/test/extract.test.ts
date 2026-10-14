@@ -38,6 +38,7 @@ describe('gemini extractor', () => {
     expect(call[0].model).toBe('gemini-test');
     expect(call[0].config.responseMimeType).toBe('application/json');
     expect(call[0].config.responseSchema).toBeTruthy();
+    expect((call[0].config as { thinkingConfig?: unknown }).thinkingConfig).toEqual({ thinkingLevel: 'LOW' });
     expect(call[0].contents[0]?.parts).toHaveLength(2);
     expect(JSON.stringify(call[0].contents)).toContain('Burmese');
     expect(out.urls).toEqual(['https://evil.xyz/', 'https://other.com/']);
