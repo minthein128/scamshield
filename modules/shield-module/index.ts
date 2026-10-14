@@ -28,7 +28,8 @@ export interface ShieldCheckResult {
 }
 
 export interface ShieldStartOptions {
-  apiUrl: string;
+  /** Defaults to EXPO_PUBLIC_API_URL. */
+  apiUrl?: string;
   language?: 'en' | 'id' | 'tl' | 'my';
 }
 
@@ -124,7 +125,8 @@ export async function requestScreenCapturePermission(): Promise<boolean> {
 export async function startShield(options?: ShieldStartOptions): Promise<boolean> {
   if (nativeShieldModule) {
     try {
-      return await nativeShieldModule.startShield(options);
+      const apiUrl = options?.apiUrl || process.env.EXPO_PUBLIC_API_URL || '';
+      return await nativeShieldModule.startShield({ ...options, apiUrl });
     } catch (e) {
       console.warn('Native startShield error:', e);
       return false;
