@@ -1,4 +1,4 @@
-import type { Family, Flag, LinkCheck, Severity, Verdict } from './types.js';
+import type { Family, Flag, LinkCheck, ScamType, Severity, Verdict } from './types.js';
 
 export const FAMILY_WEIGHT: Record<Family, number> = {
   too_good: 1.4,
@@ -21,6 +21,7 @@ export interface ScoreInput {
   linkChecks: LinkCheck[];
   unsolicited: boolean;
   llmVerdict?: Verdict;
+  scamType?: ScamType;
 }
 
 export interface ScoreResult {
@@ -85,6 +86,11 @@ export function score(input: ScoreInput): ScoreResult {
   if (strongest.get('trafficking') === 'high') {
     value = Math.max(value, 80);
     overrides.push('trafficking_high');
+  }
+  const namedPattern = input.scamType !== undefined && input.scamType !== 'none' && input.scamType !== 'other';
+  if (namedPattern && input.flags.length > 0 && value < 35) {
+    value = 35;
+    overrides.push('scam_pattern_floor');
   }
   if (input.llmVerdict === 'danger' && value < 35 && flags.length > 0) {
     value = 35;

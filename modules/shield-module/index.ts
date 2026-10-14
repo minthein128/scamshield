@@ -1,12 +1,55 @@
 import { Platform } from 'react-native';
 import { requireNativeModule } from 'expo-modules-core';
 
+export type ShieldVerdict = 'safe' | 'careful' | 'danger';
+
+export interface ShieldFlag {
+  family: string;
+  label: string;
+  evidence?: string;
+  severity: 'low' | 'medium' | 'high';
+}
+
+/** Response of POST /v1/check (docs/api-contract.md). */
+export interface ShieldCheckResult {
+  id: string;
+  createdAt: string;
+  kind: string;
+  verdict: ShieldVerdict;
+  score: number;
+  title: string;
+  summary: string;
+  spokenWarning?: string;
+  scamType?: string;
+  flags: ShieldFlag[];
+  linkChecks?: unknown[];
+  actions?: unknown[];
+  model?: string;
+}
+
+export interface ShieldStartOptions {
+  apiUrl: string;
+  language?: 'en' | 'id' | 'tl' | 'my';
+}
+
+export interface ShieldSubscription {
+  remove(): void;
+}
+
 interface ShieldModuleType {
   hasOverlayPermission(): Promise<boolean>;
-  requestOverlayPermission(): Promise<void>;
-  startShield(options?: Record<string, any>): Promise<boolean>;
+  requestOverlayPermission(): Promise<boolean>;
+  requestScreenCapturePermission(): Promise<boolean>;
+  startShield(options?: ShieldStartOptions): Promise<boolean>;
   stopShield(): Promise<boolean>;
   isShieldRunning(): Promise<boolean>;
+  checkScreenNow(): Promise<void>;
+  getShieldResult(id: string): Promise<string | null>;
+  takeUnsyncedResults(): Promise<string[]>;
+  addListener(
+    event: 'onShieldResult',
+    listener: (e: { id: string; json: string }) => void
+  ): ShieldSubscription;
 }
 
 let nativeShieldModule: ShieldModuleType | null = null;
@@ -19,36 +62,67 @@ if (Platform.OS === 'android') {
   }
 }
 
-// In-memory state for mock/web environment
+const MOCK_RESULT: ShieldCheckResult = {
+  id: 'chk_mock_0001',
+  createdAt: '2026-01-01T00:00:00.000Z',
+  kind: 'screen',
+  verdict: 'danger',
+  score: 88,
+  title: 'This looks like a job scam',
+  summary: 'The chat asks you to pay a fee before you start work and to move to a private app.',
+  spokenWarning: 'Stop. This looks like a job scam. Do not pay anything.',
+  scamType: 'job_trafficking',
+  flags: [
+    { family: 'payment_route', label: 'Fee before work', evidence: 'Send 5,000 baht for your visa first', severity: 'high' },
+    { family: 'pressure', label: 'Rush', evidence: 'Reply in 10 minutes or lose the job', severity: 'medium' },
+    { family: 'too_good', label: 'Pay too high', evidence: '$3,000 a month, no experience', severity: 'medium' },
+  ],
+  model: 'mock',
+};
+
 let mockRunning = false;
-let mockPermissionGranted = false;
+let mockOverlayGranted = false;
+let mockCaptureGranted = false;
+const mockListeners = new Set<(r: ShieldCheckResult) => void>();
 
 export async function hasOverlayPermission(): Promise<boolean> {
-  if (nativeShieldModule?.hasOverlayPermission) {
+  if (nativeShieldModule) {
     try {
       return await nativeShieldModule.hasOverlayPermission();
     } catch {
       return false;
     }
   }
-  return mockPermissionGranted;
+  return mockOverlayGranted;
 }
 
 export async function requestOverlayPermission(): Promise<boolean> {
-  if (nativeShieldModule?.requestOverlayPermission) {
+  if (nativeShieldModule) {
     try {
-      await nativeShieldModule.requestOverlayPermission();
-      return true;
+      return await nativeShieldModule.requestOverlayPermission();
     } catch {
       return false;
     }
   }
-  mockPermissionGranted = true;
+  mockOverlayGranted = true;
   return true;
 }
 
-export async function startShield(options?: Record<string, any>): Promise<boolean> {
-  if (nativeShieldModule?.startShield) {
+/** Shows the system screen-capture consent dialog. Resolves true when the user allows. */
+export async function requestScreenCapturePermission(): Promise<boolean> {
+  if (nativeShieldModule) {
+    try {
+      return await nativeShieldModule.requestScreenCapturePermission();
+    } catch {
+      return false;
+    }
+  }
+  mockCaptureGranted = true;
+  return true;
+}
+
+export async function startShield(options?: ShieldStartOptions): Promise<boolean> {
+  if (nativeShieldModule) {
     try {
       return await nativeShieldModule.startShield(options);
     } catch (e) {
@@ -61,7 +135,7 @@ export async function startShield(options?: Record<string, any>): Promise<boolea
 }
 
 export async function stopShield(): Promise<boolean> {
-  if (nativeShieldModule?.stopShield) {
+  if (nativeShieldModule) {
     try {
       return await nativeShieldModule.stopShield();
     } catch (e) {
@@ -74,7 +148,7 @@ export async function stopShield(): Promise<boolean> {
 }
 
 export async function isShieldRunning(): Promise<boolean> {
-  if (nativeShieldModule?.isShieldRunning) {
+  if (nativeShieldModule) {
     try {
       return await nativeShieldModule.isShieldRunning();
     } catch {
@@ -84,10 +158,68 @@ export async function isShieldRunning(): Promise<boolean> {
   return mockRunning;
 }
 
+/** Same as tapping the bubble. The result arrives through addShieldResultListener. */
+export async function checkScreenNow(): Promise<void> {
+  if (nativeShieldModule) {
+    await nativeShieldModule.checkScreenNow();
+    return;
+  }
+  if (!mockRunning) throw new Error('Shield is not running');
+  setTimeout(() => {
+    const result = { ...MOCK_RESULT, createdAt: new Date().toISOString() };
+    mockListeners.forEach((cb) => cb(result));
+  }, 800);
+}
+
+export function addShieldResultListener(
+  callback: (result: ShieldCheckResult) => void
+): ShieldSubscription {
+  if (nativeShieldModule) {
+    return nativeShieldModule.addListener('onShieldResult', (e) => {
+      try {
+        callback(JSON.parse(e.json) as ShieldCheckResult);
+      } catch (err) {
+        console.warn('[ShieldModule] Bad result payload:', err);
+      }
+    });
+  }
+  mockListeners.add(callback);
+  return { remove: () => mockListeners.delete(callback) };
+}
+
+/** Result of a recent check by id, for the saferoute://report/<id> deep link. */
+export async function getShieldResult(id: string): Promise<ShieldCheckResult | null> {
+  if (nativeShieldModule) {
+    try {
+      const json = await nativeShieldModule.getShieldResult(id);
+      return json ? (JSON.parse(json) as ShieldCheckResult) : null;
+    } catch {
+      return null;
+    }
+  }
+  return id === MOCK_RESULT.id ? MOCK_RESULT : null;
+}
+
+/** Results produced while no JS listener was attached. Call on app start, then save them. */
+export async function takeUnsyncedResults(): Promise<ShieldCheckResult[]> {
+  if (!nativeShieldModule) return [];
+  try {
+    const list = await nativeShieldModule.takeUnsyncedResults();
+    return list.map((json) => JSON.parse(json) as ShieldCheckResult);
+  } catch {
+    return [];
+  }
+}
+
 export default {
   hasOverlayPermission,
   requestOverlayPermission,
+  requestScreenCapturePermission,
   startShield,
   stopShield,
   isShieldRunning,
+  checkScreenNow,
+  addShieldResultListener,
+  getShieldResult,
+  takeUnsyncedResults,
 };

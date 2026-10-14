@@ -3,16 +3,25 @@ apply plugin: 'kotlin-android'
 
 android {
     namespace "com.saferoute.shield"
-    compileSdkVersion rootProject.ext.compileSdkVersion ?: 35
+    compileSdk rootProject.ext.compileSdkVersion
 
     defaultConfig {
-        minSdkVersion rootProject.ext.minSdkVersion ?: 24
-        targetSdkVersion rootProject.ext.targetSdkVersion ?: 35
+        minSdk rootProject.ext.minSdkVersion
+        targetSdk rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
     }
 
-    lintOptions {
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+
+    lint {
         abortOnError false
     }
 }
