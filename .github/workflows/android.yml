@@ -62,6 +62,12 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      - name: Set build version
+        run: |
+          jq --argjson code "${{ github.run_number }}" --arg ver "1.0.${{ github.run_number }}" \
+            '.expo.android.versionCode = $code | .expo.version = $ver' app.json > app.json.tmp
+          mv app.json.tmp app.json
+
       - run: npx expo prebuild -p android --clean
 
       - name: Assemble release
@@ -97,9 +103,9 @@ jobs:
         if: env.DISTRIBUTE == 'true'
         env:
           APP_ID: ${{ vars.FIREBASE_ANDROID_APP_ID }}
-          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          BRANCH: ${{ github.ref_name }}
         run: |
-          printf 'Build %s (%s)\n%s\n' "$GITHUB_RUN_NUMBER" "${GITHUB_SHA::7}" "${COMMIT_MESSAGE:-manual run}" > release-notes.txt
+          printf '%s %s: %s\n' "$BRANCH" "${GITHUB_SHA::7}" "$(git log -1 --format=%s)" > release-notes.txt
           npx -y firebase-tools@latest appdistribution:distribute dist-apk/saferoute-${{ github.run_number }}.apk \
             --app "$APP_ID" \
             --project "${{ vars.GCP_PROJECT_ID }}" \
