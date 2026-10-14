@@ -54,7 +54,7 @@ export const FeedbackSheet: React.FC<Props> = ({ visible, verdict, scamType, bus
             ) : (
               <>
                 <Text style={styles.body}>Your answer helps us warn others more accurately. Nothing you wrote is sent.</Text>
-                <Button testID="feedback-safe" label="It was safe" disabled={busy} onPress={() => onSend({ kind: 'safe' })} />
+                <Button testID="feedback-safe" label="It was safe" variant="secondary" disabled={busy} onPress={() => onSend({ kind: 'safe' })} />
                 <Button testID="feedback-different" label="It was a different scam" variant="secondary" disabled={busy} onPress={() => setPicking(true)} />
               </>
             )
