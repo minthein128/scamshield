@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ApiError, type CheckRequest, KINDS, LANGS } from './types.js';
+import { ApiError, type CheckRequest, KINDS, LANGS, type Lang } from './types.js';
 
 const MAX_IMAGE_B64 = 5_600_000;
 const MAX_TEXT = 20_000;
@@ -38,4 +38,14 @@ export function parseRequest(body: unknown): CheckRequest {
   }
   if (v.context) out.context = v.context;
   return out;
+}
+
+const speakSchema = z.object({ text: z.string().trim().min(1).max(600), language: z.enum(LANGS).default('en') });
+
+export function parseSpeakRequest(body: unknown): { text: string; language: Lang } {
+  const r = speakSchema.safeParse(body);
+  if (!r.success) {
+    throw new ApiError(400, 'bad_request', r.error.issues.map((i) => `${i.path.join('.') || 'body'}: ${i.message}`).join('; '));
+  }
+  return r.data;
 }

@@ -2,7 +2,7 @@ import { GoogleGenAI, type Schema, Type } from '@google/genai';
 import { z } from 'zod';
 import type { Config } from './config.js';
 import { buildUserParts, SYSTEM_PROMPT } from './prompt.js';
-import { ApiError, type CheckRequest, type Extraction, FAMILIES, SCAM_TYPES, SEVERITIES } from './types.js';
+import { ApiError, type CheckRequest, type Entities, type Extraction, FAMILIES, SCAM_TYPES, SEVERITIES } from './types.js';
 import { findUrls, mergeUrls } from './urls.js';
 
 const responseSchema: Schema = {
@@ -28,8 +28,20 @@ const responseSchema: Schema = {
     summary: { type: Type.STRING },
     spokenWarning: { type: Type.STRING },
     urls: { type: Type.ARRAY, items: { type: Type.STRING } },
+    entities: {
+      type: Type.OBJECT,
+      properties: {
+        companies: { type: Type.ARRAY, items: { type: Type.STRING } },
+        phones: { type: Type.ARRAY, items: { type: Type.STRING } },
+        domains: { type: Type.ARRAY, items: { type: Type.STRING } },
+        role: { type: Type.STRING, nullable: true },
+        country: { type: Type.STRING, nullable: true },
+        salaryClaim: { type: Type.STRING, nullable: true },
+      },
+      required: ['companies', 'phones', 'domains'],
+    },
   },
-  required: ['flags', 'scamType', 'verdictDraft', 'unsolicited', 'summary', 'spokenWarning', 'urls'],
+  required: ['flags', 'scamType', 'verdictDraft', 'unsolicited', 'summary', 'spokenWarning', 'urls', 'entities'],
   propertyOrdering: ['flags', 'scamType', 'verdictDraft', 'unsolicited', 'summary', 'spokenWarning', 'urls'],
 };
 
@@ -50,6 +62,16 @@ const parsed = z.object({
   summary: z.string().default(''),
   spokenWarning: z.string().default(''),
   urls: z.array(z.string()).default([]),
+  entities: z
+    .object({
+      companies: z.array(z.string()).default([]),
+      phones: z.array(z.string()).default([]),
+      domains: z.array(z.string()).default([]),
+      role: z.string().nullish(),
+      country: z.string().nullish(),
+      salaryClaim: z.string().nullish(),
+    })
+    .default({ companies: [], phones: [], domains: [] }),
 });
 
 export interface Extractor {
@@ -105,5 +127,10 @@ export function parseExtraction(raw: string | undefined, req: CheckRequest): Ext
   const r = parsed.safeParse(json);
   if (!r.success) throw new ApiError(502, 'upstream', 'Model output did not match the schema');
   const urls = mergeUrls(5, req.url ? [req.url] : [], r.data.urls, findUrls(req.text ?? ''));
-  return { ...r.data, urls };
+  const { role, country, salaryClaim, ...named } = r.data.entities;
+  const entities: Entities = { ...named };
+  if (role) entities.role = role;
+  if (country) entities.country = country;
+  if (salaryClaim) entities.salaryClaim = salaryClaim;
+  return { ...r.data, entities, urls };
 }

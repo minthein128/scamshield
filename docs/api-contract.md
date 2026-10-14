@@ -45,14 +45,27 @@ Response 200:
     { "url": "...", "webRisk": "clean" | "malware" | "social_engineering" | "unwanted_software" | "unknown",
       "domainAgeDays": 12, "registrar": "optional" }
   ],
+  "sources": [ { "title": "Page title", "url": "https://..." } ],
   "actions": [ { "label": "Call hotline", "type": "call" | "share" | "block" | "learn", "value": "optional" } ],
   "model": "gemini model id used"
 }
 ```
 
+`sources` lists the Google Search pages used to verify the named company, phone number, domain or salary. It is `[]` when the input names no entity or verification did not finish in time. Flags from verification use the families `known_bad`, `identity` and `too_good`.
+
 `score` is 0-100 (higher = riskier). `safe` < 35 <= `careful` < 70 <= `danger`.
 
 Errors: `{ "error": { "code": "bad_request" | "too_large" | "upstream" | "rate_limited", "message": "..." } }` with 4xx/5xx.
+
+## POST /v1/speak
+
+Spoken warning audio from a Gemini text-to-speech model, for phones with no voice for the language (for example Burmese).
+
+Request: `{ "text": "max 600 chars", "language": "en" | "id" | "tl" | "my" }`
+
+Response 200: `{ "audioBase64": "...", "mimeType": "audio/wav", "sampleRate": 24000, "model": "..." }`
+
+The audio is a mono 16-bit PCM WAV file. Errors use the same body as `/v1/check`.
 
 ## GET /healthz
 

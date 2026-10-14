@@ -1,6 +1,7 @@
 import { loadConfig } from './config.js';
 import { createCorrelator } from './correlate.js';
-import { createGeminiExtractor } from './extract.js';
+import { createClient, createGeminiExtractor } from './extract.js';
+import { createGrounder } from './ground.js';
 import { createPipeline } from './pipeline.js';
 
 const cfg = loadConfig({ ...process.env, MOCK: '0' });
@@ -8,8 +9,10 @@ if (!cfg.geminiApiKey && !(cfg.useVertex && cfg.project)) {
   console.error('smoke: set GEMINI_API_KEY (or GOOGLE_GENAI_USE_VERTEXAI=true with GOOGLE_CLOUD_PROJECT)');
   process.exit(2);
 }
+const client = createClient(cfg);
 const pipeline = createPipeline({
-  extractor: createGeminiExtractor(cfg),
+  extractor: createGeminiExtractor(cfg, client),
+  grounder: createGrounder(cfg, client),
   correlator: createCorrelator(cfg),
   model: cfg.model,
 });
