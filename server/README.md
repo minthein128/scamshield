@@ -4,7 +4,7 @@ Backend for the SafeRoute Android app. Implements `docs/api-contract.md` on Node
 
 Default model: `gemini-3.5-flash-lite` (set `GEMINI_MODEL` to change it, for example `gemini-3.8-flash`, which was about 2x slower with no accuracy gain in our eval).
 
-## Model choice (measured 2026-10-14, 27 eval cases, grounding on, thinking LOW)
+## Model choice (measured 2026-10-14, first 19 eval cases, grounding on, thinking LOW)
 
 | Model | Accuracy | p50 | p95 | Notes |
 | --- | --- | --- | --- | --- |
