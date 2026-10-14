@@ -8,11 +8,12 @@ const LEGACY_LANGUAGE_KEY = 'saferoute.language.v1';
 export interface Profile {
   onboarded: boolean;
   language: LanguageCode;
+  shareSignals: boolean;
   homeCountry?: CountryCode;
   destinationCountry?: CountryCode;
 }
 
-export const DEFAULT_PROFILE: Profile = { onboarded: false, language: 'en' };
+export const DEFAULT_PROFILE: Profile = { onboarded: false, language: 'en', shareSignals: true };
 
 export const LANGUAGE_CODES: LanguageCode[] = ['en', 'id', 'tl', 'my'];
 
@@ -26,12 +27,13 @@ export function parseProfile(raw: unknown): Profile {
   return {
     onboarded: r.onboarded === true,
     language: isLanguage(r.language) ? r.language : 'en',
+    shareSignals: r.shareSignals !== false,
     ...(isCountryCode(r.homeCountry) ? { homeCountry: r.homeCountry } : {}),
     ...(isCountryCode(r.destinationCountry) ? { destinationCountry: r.destinationCountry } : {}),
   };
 }
 
-export type ProfileChoices = Partial<Pick<Profile, 'language' | 'homeCountry' | 'destinationCountry'>>;
+export type ProfileChoices = Partial<Pick<Profile, 'language' | 'homeCountry' | 'destinationCountry' | 'shareSignals'>>;
 
 export function finishOnboarding(profile: Profile, choices: ProfileChoices = {}): Profile {
   return applyChoices({ ...profile, onboarded: true }, choices);
@@ -40,6 +42,7 @@ export function finishOnboarding(profile: Profile, choices: ProfileChoices = {})
 export function applyChoices(profile: Profile, choices: ProfileChoices): Profile {
   const next: Profile = { ...profile };
   if (choices.language) next.language = choices.language;
+  if (typeof choices.shareSignals === 'boolean') next.shareSignals = choices.shareSignals;
   if ('homeCountry' in choices) {
     if (choices.homeCountry) next.homeCountry = choices.homeCountry;
     else delete next.homeCountry;

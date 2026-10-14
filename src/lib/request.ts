@@ -5,6 +5,8 @@ export interface CheckForm {
   text: string;
   url: string;
   destination: string;
+  home?: string;
+  shareSignals?: boolean;
   imageBase64?: string;
   imageMimeType?: string;
   language: LanguageCode;
@@ -22,13 +24,16 @@ export function buildRequest(form: CheckForm): CheckRequest {
   const text = form.text.trim();
   const url = form.url.trim();
   const destination = form.destination.trim();
+  const home = form.home?.trim();
+  const context = { ...(destination ? { destination } : {}), ...(home ? { home } : {}) };
   return {
     kind: form.kind,
     language: form.language,
     ...(text ? { text } : {}),
     ...(url ? { url } : {}),
     ...(form.imageBase64 ? { imageBase64: form.imageBase64, imageMimeType: form.imageMimeType ?? 'image/jpeg' } : {}),
-    ...(destination ? { context: { destination } } : {}),
+    ...(Object.keys(context).length ? { context } : {}),
+    ...(form.shareSignals === false ? { shareSignals: false } : {}),
   };
 }
 

@@ -34,6 +34,14 @@ export const HomeScreen: React.FC<TabScreenProps<'Home'>> = ({ navigation }) => 
 
       <ShieldCard onDetails={() => navigation.navigate('Shield')} />
 
+      <TouchableOpacity testID="home-radar" accessibilityRole="button" accessibilityLabel="Scam radar: what people are reporting" activeOpacity={0.7} onPress={() => navigation.navigate('Radar')} style={styles.radar}>
+        <View style={{ flex: 1, gap: 2 }}>
+          <Text style={styles.radarTitle}>Scam radar</Text>
+          <Text style={styles.radarBody}>See which scams people are reporting right now.</Text>
+        </View>
+        <Text style={styles.radarChevron}>{'›'}</Text>
+      </TouchableOpacity>
+
       <Card style={{ gap: 12 }}>
         <View style={{ gap: 4 }}>
           <Text style={styles.cardTitle}>Check a job offer, message or link</Text>
@@ -125,6 +133,10 @@ const styles = StyleSheet.create({
   recent: { flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 56, paddingVertical: 10, paddingHorizontal: 14, borderRadius: 12, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.border },
   recentTitle: { color: colors.textPrimary, fontSize: 14, lineHeight: 19, fontFamily: fonts.semiBold, includeFontPadding: false },
   recentMeta: { color: colors.textSecondary, fontSize: 12, lineHeight: 16, fontFamily: fonts.regular, includeFontPadding: false },
+  radar: { flexDirection: 'row', alignItems: 'center', minHeight: 64, paddingVertical: 12, paddingHorizontal: 16, borderRadius: 16, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.border },
+  radarTitle: { color: colors.textPrimary, fontSize: 15, lineHeight: 20, fontFamily: fonts.bold },
+  radarBody: { color: colors.textSecondary, fontSize: 13, lineHeight: 18, fontFamily: fonts.regular },
+  radarChevron: { color: colors.textMuted, fontSize: 24 },
   help: { flexDirection: 'row', alignItems: 'center', minHeight: 64, paddingVertical: 12, paddingHorizontal: 16, borderRadius: 16, backgroundColor: colors.dangerSoftBg, borderWidth: 1, borderColor: colors.dangerBarTrack },
   helpTitle: { color: colors.dangerSoftText, fontSize: 15, lineHeight: 20, fontFamily: fonts.bold },
   helpBody: { color: colors.dangerDark, fontSize: 13, lineHeight: 18, fontFamily: fonts.regular },

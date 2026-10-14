@@ -82,8 +82,9 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         if (cancelled) return;
         const { profile: localProfile, history: localHistory, contacts: localContacts } = latest.current;
         if (snap.profile) {
-          setProfile(snap.profile);
-          await saveProfile(snap.profile);
+          const adopted = { ...snap.profile, shareSignals: localProfile.shareSignals };
+          setProfile(adopted);
+          await saveProfile(adopted);
         } else if (localProfile.onboarded) {
           await cloud.pushProfile(uid, localProfile);
         }

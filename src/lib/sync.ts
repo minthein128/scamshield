@@ -102,6 +102,7 @@ export function docToProfile(data: Record<string, unknown>): Profile | null {
   return {
     onboarded: true,
     language: data.language,
+    shareSignals: true,
     ...(isCountryCode(data.homeCountry) ? { homeCountry: data.homeCountry } : {}),
     ...(isCountryCode(data.destinationCountry) ? { destinationCountry: data.destinationCountry } : {}),
   };

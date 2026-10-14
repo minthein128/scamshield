@@ -17,6 +17,7 @@ import {
 } from '../lib/report';
 import { countryName } from '../lib/countries';
 import { resolveCallTarget } from '../lib/hotlines';
+import { seenLine } from '../lib/radar';
 import { callNumber } from '../lib/warn';
 import { WarnFamilySheet } from '../components/WarnFamilySheet';
 import { useAppState } from '../state/AppState';
@@ -141,6 +142,10 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
         </View>
       </View>
 
+      {seenLine(result.network?.seenCount) ? (
+        <Text testID="report-network" style={styles.network}>{seenLine(result.network?.seenCount)}</Text>
+      ) : null}
+
       <Card style={{ gap: 10 }}>
         <Text style={styles.reportTitle}>{result.title}</Text>
         <Text style={styles.summary}>{result.summary}</Text>
@@ -238,6 +243,7 @@ const styles = StyleSheet.create({
   scoreMax: { fontSize: 13, fontFamily: fonts.medium },
   segments: { flexDirection: 'row', gap: 4 },
   seg: { flex: 1, height: 6, borderRadius: 3 },
+  network: { color: colors.textSecondary, fontSize: 13, lineHeight: 18, fontFamily: fonts.medium, textAlign: 'center' },
   reportTitle: { fontSize: 16, lineHeight: 22, fontFamily: fonts.bold, color: colors.textPrimary },
   summary: { fontSize: 14, lineHeight: 22, fontFamily: fonts.medium, color: colors.textPrimary },
   listenRow: { flexDirection: 'row' },

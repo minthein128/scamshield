@@ -144,6 +144,9 @@ export function createMockClient(options: MockOptions = {}): CheckClient {
     async speak() {
       throw new ApiError('upstream', 'No speech service in mock mode');
     },
+    async insights(country) {
+      return { country, days: 30, generatedAt: new Date().toISOString(), k: 3, risks: [], domains: [] };
+    },
     async health() {
       return { ok: true, model: 'mock-heuristic-v1', mock: true };
     },

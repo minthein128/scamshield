@@ -15,6 +15,7 @@ import OnboardingScreen from '../screens/OnboardingScreen';
 import AccountScreen from '../screens/AccountScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import GetHelpScreen from '../screens/GetHelpScreen';
+import RadarScreen from '../screens/RadarScreen';
 import { navigationRef } from './ref';
 import { useAppState } from '../state/AppState';
 import { useShieldTokenSync } from '../hooks/useShieldTokenSync';
@@ -86,6 +87,7 @@ export const RootNavigator: React.FC = () => {
             <Stack.Screen name="Settings" component={SettingsScreen} />
             <Stack.Screen name="Account" component={AccountScreen} />
             <Stack.Screen name="GetHelp" component={GetHelpScreen} />
+            <Stack.Screen name="Radar" component={RadarScreen} />
             <Stack.Screen name="DemoBoard" component={DemoBoardScreen} />
           </>
         ) : (

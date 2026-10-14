@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Text, StyleSheet, View } from 'react-native';
+import { Switch, Text, StyleSheet, View } from 'react-native';
 import Constants from 'expo-constants';
 import { Screen } from '../components/Screen';
 import { Button, Card, Chip, LinkButton, Notice, ScreenHeader, SectionTitle } from '../components/ui';
@@ -142,6 +142,18 @@ export const SettingsScreen: React.FC<RootScreenProps<'Settings'>> = ({ navigati
       <View style={{ gap: 8 }}>
         <SectionTitle>Privacy</SectionTitle>
         <Card style={{ gap: 8 }}>
+          <View style={styles.switchRow}>
+            <Text style={[styles.strong, { flex: 1 }]}>Help others: share anonymous scam patterns</Text>
+            <Switch
+              testID="settings-share-signals"
+              accessibilityLabel="Help others: share anonymous scam patterns"
+              value={profile.shareSignals}
+              onValueChange={v => updateProfile({ shareSignals: v })}
+              trackColor={{ false: colors.borderLight, true: colors.accent }}
+              thumbColor={colors.white}
+            />
+          </View>
+          <Text style={styles.body}>No screenshots and no raw text are shared. Personal details are removed first, and phone numbers, accounts and links are stored only as one-way hashes. Patterns appear on the Scam radar once several people report them.</Text>
           {PRIVACY_POINTS.map(p => (
             <Text key={p} style={styles.body}>{p}</Text>
           ))}
@@ -157,6 +169,7 @@ export const SettingsScreen: React.FC<RootScreenProps<'Settings'>> = ({ navigati
 const styles = StyleSheet.create({
   strong: { color: colors.textPrimary, fontSize: 15, lineHeight: 21, fontFamily: fonts.bold },
   body: { color: colors.textSecondary, fontSize: 13, lineHeight: 19, fontFamily: fonts.regular },
+  switchRow: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 44 },
   wrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   version: { color: colors.textMuted, fontSize: 12, textAlign: 'center', fontFamily: fonts.regular },
 });

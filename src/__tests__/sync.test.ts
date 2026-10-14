@@ -80,9 +80,9 @@ describe('contacts and profile sync mapping', () => {
   });
 
   it('round-trips a profile and omits unset countries', () => {
-    const doc = profileToDoc({ onboarded: true, language: 'tl', homeCountry: 'PH' }, new Date('2026-10-14T00:00:00Z'));
+    const doc = profileToDoc({ onboarded: true, language: 'tl', shareSignals: true, homeCountry: 'PH' }, new Date('2026-10-14T00:00:00Z'));
     expect(doc).toEqual({ language: 'tl', homeCountry: 'PH', updatedAt: '2026-10-14T00:00:00.000Z' });
-    expect(docToProfile(doc as unknown as Record<string, unknown>)).toEqual({ onboarded: true, language: 'tl', homeCountry: 'PH' });
+    expect(docToProfile(doc as unknown as Record<string, unknown>)).toEqual({ onboarded: true, language: 'tl', shareSignals: true, homeCountry: 'PH' });
     expect(docToProfile({ language: 'zz' })).toBeNull();
   });
 });

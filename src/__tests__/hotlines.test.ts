@@ -1,6 +1,7 @@
 import { COUNTRIES } from '../data/countries';
 import { HOTLINES } from '../data/hotlines';
 import { allSections, helpSections, hotlineByDial, hotlinesForCountry, primaryHotline, resolveCallTarget } from '../lib/hotlines';
+import { defaultScope, seenLine, reportCountText } from '../lib/radar';
 import { countryFromText } from '../lib/countries';
 import { smsUrl, telLink, validateContact, normalizePhone } from '../lib/contacts';
 
@@ -85,5 +86,17 @@ describe('contact links', () => {
     expect(validateContact({ name: '', phone: '+959123456' })).toMatch(/name/i);
     expect(validateContact({ name: 'A', phone: '12' })).toMatch(/phone/i);
     expect(validateContact({ name: 'A', phone: '+959123456' })).toBeNull();
+  });
+});
+
+describe('radar helpers', () => {
+  it('defaults to destination, then home, then global', () => {
+    expect(defaultScope('TH', 'MM')).toBe('TH');
+    expect(defaultScope(undefined, 'MM')).toBe('MM');
+    expect(defaultScope()).toBe('GLOBAL');
+    expect(seenLine(19)).toBe('Reported 19 times by other SafeRoute users in the last 30 days');
+    expect(seenLine(1)).toMatch(/1 time by/);
+    expect(seenLine(undefined)).toBeNull();
+    expect(reportCountText(1)).toBe('1 report in 30 days');
   });
 });

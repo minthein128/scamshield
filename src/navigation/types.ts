@@ -26,6 +26,7 @@ export type RootStackParamList = {
   Account: { mode?: 'signUp' | 'signIn' } | undefined;
   Settings: undefined;
   GetHelp: undefined;
+  Radar: undefined;
   Checking: { request: CheckRequest; source?: string };
   Report: { result: CheckResponse; language: LanguageCode; fresh?: boolean };
   Shield: undefined;

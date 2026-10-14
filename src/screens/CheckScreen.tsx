@@ -71,7 +71,7 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nonce]);
 
-  const form = { kind, text, url, destination, imageBase64: image?.base64, imageMimeType: image?.mimeType, language };
+  const form = { kind, text, url, destination, home: countryName(profile.homeCountry), shareSignals: profile.shareSignals, imageBase64: image?.base64, imageMimeType: image?.mimeType, language };
   const ready = hasInput({ text, url, imageBase64: image?.base64 });
 
   const submit = () => {
