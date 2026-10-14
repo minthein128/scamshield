@@ -1,8 +1,18 @@
 # SafeRoute: Anti-Fraud & Scam Shield App
 
-A mobile anti-fraud and anti-trafficking application built in **React + Tailwind CSS** and configured for **Android Studio** via **Capacitor Android**.
+An anti-scam and anti-trafficking app built with **Expo SDK 52 (React Native)**. Paste text, a link or a screenshot, get a risk report from the Gemini-backed Check API, and hear the warning in your language. The same code runs on Android and in the browser.
 
-Based on the designs from `SafeRoute Anti-Fraud App Mockup.html`.
+## Development
+
+```bash
+pnpm install
+pnpm check            # typecheck + lint + tests
+pnpm web              # browser, uses the local mock API
+EXPO_PUBLIC_API_URL=https://your-cloud-run-url pnpm web   # real backend
+pnpm build:web && firebase deploy --only hosting
+```
+
+See `CLAUDE.md` for the code layout and the mock/real API switch.
 
 ---
 
