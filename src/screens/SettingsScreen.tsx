@@ -151,6 +151,7 @@ export const SettingsScreen: React.FC<RootScreenProps<'Settings'>> = ({ navigati
               onValueChange={v => updateProfile({ shareSignals: v })}
               trackColor={{ false: colors.borderLight, true: colors.accent }}
               thumbColor={colors.white}
+              {...({ activeThumbColor: colors.white } as object)}
             />
           </View>
           <Text style={styles.body}>No screenshots and no raw text are shared. Personal details are removed first, and phone numbers, accounts and links are stored only as one-way hashes. Patterns appear on the Scam radar once several people report them.</Text>

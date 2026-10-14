@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Modal, Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { Button } from './ui';
 import { useAppState } from '../state/AppState';
 import { shareText } from '../lib/notify';
@@ -17,9 +17,10 @@ interface Props {
 
 export const WarnFamilySheet: React.FC<Props> = ({ visible, message, onClose, onAddContact }) => {
   const { contacts } = useAppState();
+  const { height } = useWindowDimensions();
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <View style={styles.overlay}>
+      <View style={[styles.overlay, { height }]}>
       <Pressable accessibilityLabel="Close" style={styles.backdrop} onPress={onClose} />
       <View style={styles.sheet} testID="warn-sheet">
         <Text accessibilityRole="header" style={styles.title}>Warn someone you trust</Text>
@@ -48,7 +49,7 @@ export const WarnFamilySheet: React.FC<Props> = ({ visible, message, onClose, on
 };
 
 const styles = StyleSheet.create({
-  overlay: { flex: 1, justifyContent: 'flex-end', alignItems: 'center' },
+  overlay: { width: '100%', justifyContent: 'flex-end', alignItems: 'center' },
   backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(15,27,45,0.5)' },
   sheet: { backgroundColor: colors.background, padding: 20, gap: 10, borderTopLeftRadius: 20, borderTopRightRadius: 20, width: '100%', maxWidth: 430, alignSelf: 'center' },
   title: { color: colors.textPrimary, fontSize: 18, lineHeight: 24, fontFamily: fonts.bold },

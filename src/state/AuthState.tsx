@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { onAuthStateChanged, type User } from 'firebase/auth';
+import { onAuthStateChanged, onIdTokenChanged, type User } from 'firebase/auth';
 import {
   ensureAnonymous,
   removeAccount,
@@ -38,10 +38,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (!auth.currentUser) await ensureAnonymous(auth).catch(() => undefined);
       return (auth.currentUser as User | null)?.getIdToken() ?? null;
     });
-    return onAuthStateChanged(auth, user => {
+    const offState = onAuthStateChanged(auth, user => {
       setStatus(statusFromUser(user));
       if (!user) ensureAnonymous(auth).catch(() => undefined);
     });
+    const offToken = onIdTokenChanged(auth, user => {
+      if (user) setStatus(statusFromUser(user));
+    });
+    return () => {
+      offState();
+      offToken();
+    };
   }, [auth]);
 
   const need = useCallback(() => {
@@ -52,9 +59,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const value = useMemo<AuthValue>(
     () => ({
       status,
-      signUp: (email, password) => signUpWithEmail(need(), email, password),
+      signUp: async (email, password) => {
+        await signUpWithEmail(need(), email, password);
+        setStatus(statusFromUser(need().currentUser));
+      },
       signIn: (email, password) => signInWithEmail(need(), email, password),
-      google: () => signInWithGoogle(need()),
+      google: async () => {
+        await signInWithGoogle(need());
+        setStatus(statusFromUser(need().currentUser));
+      },
       sendReset: email => resetPassword(need(), email),
       signOut: () => signOutToAnonymous(need()),
       deleteAccount: async () => {
