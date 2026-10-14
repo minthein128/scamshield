@@ -1,3 +1,4 @@
+import { COUNTRIES, HOTLINES, type HotlineCategory } from './data/hotlines.generated.js';
 import type { Action, Lang, LinkCheck, ScamType, Verdict } from './types.js';
 
 const TITLES: Record<Verdict, Record<Lang, string>> = {
@@ -50,22 +51,16 @@ const LABELS: Record<'call' | 'share' | 'block' | 'learn', Record<Lang, string>>
   },
 };
 
-// Numbers must be confirmed by the operator before launch; override with HOTLINES_JSON.
-const DEFAULT_HOTLINES: Record<string, string> = { thailand: '1300', philippines: '1343' };
+export function countryOf(destination: string | undefined): string | undefined {
+  const d = destination?.toLowerCase();
+  return d ? COUNTRIES.find((c) => c.aliases.some((a) => d.includes(a)))?.code : undefined;
+}
 
 export function hotlineFor(destination: string | undefined, env: NodeJS.ProcessEnv = process.env): string | undefined {
-  let table = DEFAULT_HOTLINES;
-  if (env.HOTLINES_JSON) {
-    try {
-      table = { ...table, ...(JSON.parse(env.HOTLINES_JSON) as Record<string, string>) };
-    } catch {
-      /* keep defaults */
-    }
-  }
-  const d = destination?.toLowerCase();
-  if (!d) return env.DEFAULT_HOTLINE || undefined;
-  const hit = Object.keys(table).find((k) => d.includes(k));
-  return hit ? table[hit] : env.DEFAULT_HOTLINE || undefined;
+  const country = countryOf(destination);
+  const pick = (category: HotlineCategory) => HOTLINES.find((h) => h.country === country && h.category === category && h.dial);
+  const hit = country ? (pick('trafficking') ?? pick('police')) : undefined;
+  return hit?.dial ?? (env.DEFAULT_HOTLINE || undefined);
 }
 
 export function titleFor(verdict: Verdict, lang: Lang): string {
