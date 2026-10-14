@@ -7,6 +7,7 @@
     "node_modules",
     "server",
     "pitch",
+    "bench",
     "dist",
     "modules",
     ".expo"
