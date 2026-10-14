@@ -3,10 +3,14 @@ package com.saferoute.shield
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.LinearGradient
 import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.RectF
+import android.graphics.Shader
+import android.provider.Settings
+import android.view.animation.OvershootInterpolator
 import android.view.View
 import android.view.animation.LinearInterpolator
 
@@ -21,8 +25,10 @@ internal class BubbleView(context: Context, palette: ShieldPalette) : View(conte
 
     var shieldState: ShieldOverlay.State = ShieldOverlay.State.IDLE
         set(value) {
+            val before = field
             field = value
-            if (value == ShieldOverlay.State.CHECKING) startSpin() else stopSpin()
+            if (value == ShieldOverlay.State.CHECKING) startScan() else stopScan()
+            if (before == ShieldOverlay.State.CHECKING && value in VERDICTS) pop() else popScale = 1f
             invalidate()
         }
 
@@ -44,8 +50,12 @@ internal class BubbleView(context: Context, palette: ShieldPalette) : View(conte
     private val shieldPath = Path()
     private val markPath = Path()
     private val dotPath = Path()
-    private var spin = 0f
-    private var spinner: ValueAnimator? = null
+    private var phase = 0f
+    private var scanner: ValueAnimator? = null
+    private var popScale = 1f
+    private var markAlpha = 1f
+    private val scanPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val clip = Path()
 
     init {
         setLayerType(LAYER_TYPE_SOFTWARE, null)
@@ -68,25 +78,24 @@ internal class BubbleView(context: Context, palette: ShieldPalette) : View(conte
 
         val inset = ring.strokeWidth / 2f + 1.5f * d
         arcBounds.set(cx - radius + inset, cy - radius + inset, cx + radius - inset, cy + radius - inset)
-        if (shieldState == ShieldOverlay.State.CHECKING) {
-            ring.color = (palette.accent and 0x00FFFFFF) or 0x33000000
-            canvas.drawArc(arcBounds, 0f, 360f, false, ring)
-            ring.color = palette.accent
-            canvas.drawArc(arcBounds, spin, 110f, false, ring)
-        } else {
-            ring.color = accent
-            canvas.drawArc(arcBounds, 0f, 360f, false, ring)
-        }
+        ring.color = if (shieldState == ShieldOverlay.State.CHECKING) (palette.accent and 0x00FFFFFF) or 0x33000000 else accent
+        canvas.drawArc(arcBounds, 0f, 360f, false, ring)
 
+        val checking = shieldState == ShieldOverlay.State.CHECKING
+        val pulse = if (checking && scanner != null) 1f + 0.05f * Math.sin(phase * 2 * Math.PI).toFloat() else 1f
         val box = 26f * d
+        canvas.save()
+        canvas.scale(popScale * pulse, popScale * pulse, cx, cy)
         matrix.setScale(box, box)
         matrix.postTranslate(cx - box / 2f, cy - box / 2f)
         buildShield(shieldPath)
         shieldPath.transform(matrix)
         glyph.color = palette.glyph(shieldState)
         canvas.drawPath(shieldPath, glyph)
+        if (checking && scanner != null) drawScanLine(canvas, cx, cy, box)
 
-        mark.color = palette.surface
+        val markColor = (palette.surface and 0x00FFFFFF) or ((markAlpha * 255).toInt() shl 24)
+        mark.color = markColor
         mark.strokeWidth = 0.1f * box
         markPath.reset()
         dotPath.reset()
@@ -97,10 +106,14 @@ internal class BubbleView(context: Context, palette: ShieldPalette) : View(conte
                 markPath.lineTo(0.70f, 0.36f)
             }
             ShieldOverlay.State.DANGER -> {
-                markPath.moveTo(0.35f, 0.35f)
-                markPath.lineTo(0.65f, 0.65f)
-                markPath.moveTo(0.65f, 0.35f)
-                markPath.lineTo(0.35f, 0.65f)
+                mark.strokeWidth = 0.075f * box
+                markPath.moveTo(0.5f, 0.26f)
+                markPath.lineTo(0.75f, 0.70f)
+                markPath.lineTo(0.25f, 0.70f)
+                markPath.close()
+                markPath.moveTo(0.5f, 0.40f)
+                markPath.lineTo(0.5f, 0.54f)
+                dotPath.addCircle(0.5f, 0.61f, 0.035f, Path.Direction.CW)
             }
             ShieldOverlay.State.CAREFUL, ShieldOverlay.State.ERROR -> {
                 markPath.moveTo(0.5f, 0.28f)
@@ -115,10 +128,55 @@ internal class BubbleView(context: Context, palette: ShieldPalette) : View(conte
         }
         if (!dotPath.isEmpty) {
             dotPath.transform(matrix)
-            glyph.color = palette.surface
+            glyph.color = markColor
             canvas.drawPath(dotPath, glyph)
         }
+        canvas.restore()
     }
+
+    private fun drawScanLine(canvas: Canvas, cx: Float, cy: Float, box: Float) {
+        val top = cy - box / 2f
+        val y = top + box * (0.08f + 0.84f * phase)
+        canvas.save()
+        clip.set(shieldPath)
+        canvas.clipPath(clip)
+        val band = 0.22f * box
+        scanPaint.shader = LinearGradient(
+            0f, y - band, 0f, y,
+            palette.surface and 0x00FFFFFF, (palette.surface and 0x00FFFFFF) or 0x66000000,
+            Shader.TileMode.CLAMP
+        )
+        canvas.drawRect(cx - box / 2f, y - band, cx + box / 2f, y, scanPaint)
+        scanPaint.shader = null
+        scanPaint.color = (palette.surface and 0x00FFFFFF) or 0xCC000000.toInt()
+        scanPaint.strokeWidth = 1.5f * d
+        canvas.drawLine(cx - box / 2f, y, cx + box / 2f, y, scanPaint)
+        canvas.restore()
+    }
+
+    private fun pop() {
+        if (!animationsEnabled()) {
+            popScale = 1f
+            markAlpha = 1f
+            return
+        }
+        popScale = 0.8f
+        markAlpha = 0f
+        ValueAnimator.ofFloat(0f, 1f).apply {
+            duration = 340
+            interpolator = OvershootInterpolator(2.4f)
+            addUpdateListener {
+                val t = it.animatedValue as Float
+                popScale = 0.8f + 0.2f * t
+                markAlpha = (t * 2f).coerceIn(0f, 1f)
+                invalidate()
+            }
+            start()
+        }
+    }
+
+    private fun animationsEnabled(): Boolean =
+        Settings.Global.getFloat(context.contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f) > 0f
 
     private fun buildShield(path: Path) {
         path.reset()
@@ -131,38 +189,39 @@ internal class BubbleView(context: Context, palette: ShieldPalette) : View(conte
         path.close()
     }
 
-    private fun startSpin() {
-        if (spinner != null) return
-        spinner = ValueAnimator.ofFloat(0f, 360f).apply {
-            duration = 1100
+    private fun startScan() {
+        if (scanner != null || !animationsEnabled()) return
+        scanner = ValueAnimator.ofFloat(0f, 1f).apply {
+            duration = 1400
             repeatCount = ValueAnimator.INFINITE
             interpolator = LinearInterpolator()
             addUpdateListener {
-                spin = it.animatedValue as Float
+                phase = it.animatedValue as Float
                 invalidate()
             }
             start()
         }
     }
 
-    private fun stopSpin() {
-        spinner?.cancel()
-        spinner = null
+    private fun stopScan() {
+        scanner?.cancel()
+        scanner = null
     }
 
     override fun onDetachedFromWindow() {
-        stopSpin()
+        stopScan()
         super.onDetachedFromWindow()
     }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        if (shieldState == ShieldOverlay.State.CHECKING) startSpin()
+        if (shieldState == ShieldOverlay.State.CHECKING) startScan()
     }
 
     companion object {
         const val CIRCLE_DP = 56
         const val PAD_DP = 12
+        private val VERDICTS = setOf(ShieldOverlay.State.SAFE, ShieldOverlay.State.CAREFUL, ShieldOverlay.State.DANGER)
     }
 }
 
