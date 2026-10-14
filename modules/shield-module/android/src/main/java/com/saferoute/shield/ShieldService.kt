@@ -8,6 +8,7 @@ import android.app.Service
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.content.pm.ServiceInfo
 import android.media.projection.MediaProjectionManager
 import android.net.Uri
@@ -195,6 +196,15 @@ class ShieldService : Service(), ShieldOverlay.Listener {
 
     override fun onDismiss() {
         overlay?.reset()
+    }
+
+    override fun onClose() {
+        stopSelf()
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        overlay?.refreshTheme()
     }
 
     private fun promoteToForeground(withProjection: Boolean) {
