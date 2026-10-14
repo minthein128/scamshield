@@ -23,3 +23,5 @@ serviceAccount*.json
 gcp-*.json
 
 bench/private/
+
+server/eval/candidates.json

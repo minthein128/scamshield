@@ -3,12 +3,14 @@ import { createTtlLru } from './cache.js';
 import type { Correlator } from './correlate.js';
 import { buildActions, titleFor, withWebRiskNote } from './explain.js';
 import type { Extractor } from './extract.js';
+import type { Feedback } from './feedback/service.js';
 import type { Grounder } from './ground.js';
 import { type Intel, NO_LOOKUP } from './intel/service.js';
+import { countCertainty, guardExtraction, guardFlags, isHeavy } from './language-guard.js';
 import { log } from './log.js';
 import { score } from './score.js';
 import { Timings, timingStore } from './timing.js';
-import type { CheckRequest, CheckResponse, Extraction, LinkCheck, Source } from './types.js';
+import type { CheckRequest, CheckResponse, Extraction, Flag, LinkCheck, Source } from './types.js';
 import { findUrls, mergeUrls } from './urls.js';
 
 export type Stage = 'extract' | 'links' | 'ground' | 'intel';
@@ -27,8 +29,17 @@ export interface Pipeline {
   run(req: CheckRequest, opts?: RunOptions): Promise<CheckResponse>;
 }
 
+export interface LanguageStats {
+  lang: string;
+  before: number;
+  rewrites: number;
+  reasked: boolean;
+  after: number;
+}
+
 const SAFETY_MARGIN_MS = 500;
-const RECORD_TIMEOUT_MS = 1500;
+const RECORD_TIMEOUT_MS = 2500;
+const REASK_MIN_MS = 5000;
 const DANGER_SCORE = 80;
 
 const settle = <T>(p: Promise<T>, ms: number, fallback: T, onTimeout?: () => void): Promise<T> =>
@@ -47,6 +58,7 @@ const settle = <T>(p: Promise<T>, ms: number, fallback: T, onTimeout?: () => voi
 
 const unknownLinks = (urls: string[]): LinkCheck[] => urls.map((url) => ({ url, webRisk: 'unknown' as const }));
 const sha = (s: string) => createHash('sha256').update(s).digest('hex');
+const newId = () => `chk_${randomUUID().replaceAll('-', '').slice(0, 20)}`;
 
 export function cacheKey(req: CheckRequest): string {
   return sha(
@@ -60,6 +72,7 @@ export function cacheKey(req: CheckRequest): string {
       req.context?.route ?? '',
       req.context?.home ?? '',
       req.shareSignals !== false,
+      req.reported === true,
     ]),
   );
 }
@@ -71,13 +84,15 @@ export interface PipelineDeps {
   model: string;
   budgetMs?: number;
   intel?: Intel;
+  onLanguage?: (s: LanguageStats) => void;
+  feedback?: Pick<Feedback, 'remember' | 'noteReport'>;
   /** Cap for grounding when extraction and rules already say danger. 0 disables the cap. */
   dangerGroundCapMs?: number;
   /** Start link checks on regex-found URLs before extraction ends. */
   earlyLinks?: boolean;
   /** Write the intel signal after the response instead of before it. */
   recordAfterResponse?: boolean;
-  /** Identical-check cache. Both unset or 0 disable it. */
+  /** Identical-check cache. 0 or unset disables it. */
   resultCacheTtlMs?: number;
   resultCacheMax?: number;
 }
@@ -99,11 +114,11 @@ export function createPipeline(deps: PipelineDeps): Pipeline {
         degraded = true;
       };
 
-      const key = caching ? cacheKey(req) : undefined;
+      const key = caching && !req.reported ? cacheKey(req) : undefined;
       const hit = key ? results.get(key) : undefined;
       if (hit) {
         tm.meta.cache = 'hit';
-        const fresh = { ...hit, id: newId(), createdAt: new Date().toISOString() };
+        const fresh = { ...hit, createdAt: new Date().toISOString() };
         emit?.({ type: 'verdict', response: fresh });
         return fresh;
       }
@@ -118,11 +133,21 @@ export function createPipeline(deps: PipelineDeps): Pipeline {
         : undefined;
 
       stage('extract', 'start');
-      const extraction = await tm.span('extract', () => deps.extractor.extract(req));
+      const first = await tm.span('extract', () => deps.extractor.extract(req));
       stage('extract', 'done');
+      let guarded = guardExtraction(first, req.language);
+      const before0 = guarded.stats.before;
+      let reasked = false;
+      if (isHeavy(before0) && left() > REASK_MIN_MS) {
+        reasked = true;
+        const again = await tm.span('reask', () => settle(deps.extractor.extract(req, { hedgeRetry: true }), left(), undefined));
+        if (again) guarded = guardExtraction(again, req.language);
+      }
+      tm.meta.reasked = reasked;
+      const extraction = guarded.extraction;
 
       const prepared = deps.intel?.prepare(req, extraction);
-      const ownScore = (flags: Extraction['flags'], linkChecks: LinkCheck[]) =>
+      const ownScore = (flags: Flag[], linkChecks: LinkCheck[]) =>
         score({
           flags,
           linkChecks,
@@ -148,6 +173,7 @@ export function createPipeline(deps: PipelineDeps): Pipeline {
 
       stage('links', 'start');
       stage('ground', 'start');
+      stage('intel', 'start');
       const linksP = tm
         .span('links', () => settle(fetchLinks(), left(), unknownLinks(extraction.urls), markDegraded))
         .then((l) => {
@@ -157,13 +183,12 @@ export function createPipeline(deps: PipelineDeps): Pipeline {
         });
       const groundP = tm
         .span('ground', () =>
-          settle(deps.grounder.ground(req, extraction, groundMs()), groundMs() + 50, { flags: [], sources: [] as Source[] }),
+          settle(deps.grounder.ground(req, extraction, groundMs()), groundMs() + 50, { flags: [] as Flag[], sources: [] as Source[] }),
         )
         .then((g) => {
           stage('ground', 'done');
           return g;
         });
-      stage('intel', 'start');
       const networkP = tm
         .span('intel', () =>
           deps.intel && prepared
@@ -210,40 +235,63 @@ export function createPipeline(deps: PipelineDeps): Pipeline {
 
       const [linkChecks, grounded, network] = await Promise.all([linksP, groundP, networkP]);
       const scoreStart = performance.now();
-      const ownFlags = [...extraction.flags, ...grounded.flags];
+      const groundedGuard = guardFlags(grounded.flags, req.language);
+      const ownFlags = [...extraction.flags, ...groundedGuard.flags];
       const scored = network.flags.length ? ownScore([...ownFlags, ...network.flags], linkChecks) : ownScore(ownFlags, linkChecks);
       const response = respond(scored, linkChecks, grounded.sources, network);
+
+      const rewrites = guarded.stats.rewrites + groundedGuard.stats.rewrites;
+      const stats: LanguageStats = {
+        lang: req.language,
+        before: before0 + groundedGuard.stats.before,
+        rewrites,
+        reasked,
+        after: countCertainty(response, req.language),
+      };
+      if (stats.before > 0) log('INFO', 'certainty_rewrite', { ...stats });
+      deps.onLanguage?.(stats);
       tm.meta.scoreExplainMs = Math.round((performance.now() - scoreStart) * 100) / 100;
 
-      const recordP =
-        deps.intel && prepared && req.shareSignals !== false
-          ? (() => {
-              const intel = deps.intel;
-              const own = network.flags.length ? ownScore(ownFlags, linkChecks) : scored;
-              const outcome = {
+      const intel = deps.intel;
+      if (intel && prepared && req.shareSignals !== false) {
+        const own = network.flags.length ? ownScore(ownFlags, linkChecks) : scored;
+        const reported = req.reported === true;
+        const ownType = own.flags.length === 0 ? 'none' : extraction.scamType;
+        const outcome = {
+          verdict: reported && own.verdict === 'safe' ? ('careful' as const) : own.verdict,
+          score: own.score,
+          scamType: reported ? (req.reportedType ?? ownType) : ownType,
+          flags: own.flags,
+        };
+        const write = () =>
+          settle(
+            (async () => {
+              const rec = await intel.recordSignal(prepared, outcome, {
+                uid: req.uid,
+                ...(reported ? { confirmed: true, src: 'reported' as const } : {}),
+              });
+              if (reported) {
+                await deps.feedback?.noteReport({ scamType: outcome.scamType, language: prepared.language, lostMoney: req.lostMoney });
+                return;
+              }
+              await deps.feedback?.remember({
+                checkId: id,
                 verdict: own.verdict,
+                scamType: ownType,
                 score: own.score,
-                scamType: own.flags.length === 0 ? ('none' as const) : extraction.scamType,
-                flags: own.flags,
-              };
-              return () =>
-                settle(
-                  intel
-                    .record(prepared, outcome, { uid: req.uid })
-                    .catch((err: Error) => log('WARNING', 'intel_record_failed', { error: err.message })),
-                  RECORD_TIMEOUT_MS,
-                  undefined,
-                );
-            })()
-          : undefined;
-
-      if (recordP) {
+                kind: req.kind,
+                language: prepared.language,
+                sigId: rec.status === 'skipped' ? undefined : rec.signalId,
+                prepared,
+              });
+            })().catch((err: Error) => log('WARNING', 'intel_record_failed', { error: err.message })),
+            RECORD_TIMEOUT_MS,
+            undefined,
+          );
         if (deps.recordAfterResponse) {
-          const bg = recordP();
-          opts.afterResponse?.(bg);
-        } else {
-          await tm.span('record', recordP);
-        }
+          const pending = write();
+          opts.afterResponse?.(pending);
+        } else await tm.span('record', write);
       }
 
       if (key && !degraded) results.set(key, response);
@@ -251,5 +299,3 @@ export function createPipeline(deps: PipelineDeps): Pipeline {
     },
   };
 }
-
-const newId = () => `chk_${randomUUID().replaceAll('-', '').slice(0, 20)}`;

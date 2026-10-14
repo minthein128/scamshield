@@ -14,6 +14,7 @@ export interface Config {
   firebaseProjectId: string;
   anonPerHour: number;
   userPerHour: number;
+  feedbackPerHour: number;
   maxBodyBytes: number;
   upstreamTimeoutMs: number;
   linkTimeoutMs: number;
@@ -62,6 +63,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     firebaseProjectId: env.FIREBASE_PROJECT_ID || 'saferoute-aibc',
     anonPerHour: Number(env.ANON_LIMIT_PER_HOUR ?? 20),
     userPerHour: Number(env.USER_LIMIT_PER_HOUR ?? 60),
+    feedbackPerHour: Number(env.FEEDBACK_LIMIT_PER_HOUR ?? 30),
     maxBodyBytes: Number(env.MAX_BODY_BYTES ?? 6 * 1024 * 1024),
     upstreamTimeoutMs: Number(env.UPSTREAM_TIMEOUT_MS ?? 12000),
     linkTimeoutMs: Number(env.LINK_TIMEOUT_MS ?? 4000),

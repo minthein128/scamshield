@@ -4,6 +4,7 @@ import { createFirebaseVerifier } from './auth.js';
 import { loadConfig, pipelineOptions } from './config.js';
 import { createCorrelator } from './correlate.js';
 import { createClient, createGeminiExtractor } from './extract.js';
+import { createFeedbackFromConfig } from './feedback/factory.js';
 import { createGrounder } from './ground.js';
 import { createIntelFromConfig } from './intel/factory.js';
 import { log } from './log.js';
@@ -16,12 +17,14 @@ const bootStart = performance.now();
 const cfg = loadConfig();
 const client = cfg.mock ? undefined : instrumentClient(createClient(cfg));
 const intel = await createIntelFromConfig(cfg);
+const feedback = createFeedbackFromConfig(cfg, intel);
 const pipeline = createPipeline({
   extractor: client ? createGeminiExtractor(cfg, client) : createMockExtractor(),
   correlator: cfg.mock ? createMockCorrelator() : createCorrelator(cfg),
   grounder: client ? createGrounder(cfg, client) : createMockGrounder(),
   ...pipelineOptions(cfg),
   intel,
+  feedback,
 });
 
 serve(
@@ -32,6 +35,7 @@ serve(
       client ? createGeminiSpeaker(cfg, client) : createMockSpeaker(cfg),
       intel,
       createFirebaseVerifier(cfg.firebaseProjectId),
+      feedback,
     ).fetch,
     port: cfg.port,
     hostname: '0.0.0.0',

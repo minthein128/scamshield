@@ -99,7 +99,7 @@ const parsed = z.object({
 });
 
 export interface Extractor {
-  extract(req: CheckRequest): Promise<Extraction>;
+  extract(req: CheckRequest, opts?: { hedgeRetry?: boolean }): Promise<Extraction>;
 }
 
 export function createClient(cfg: Config): GoogleGenAI {
@@ -113,8 +113,10 @@ type GenClient = Pick<GoogleGenAI, 'models'>;
 
 export function createGeminiExtractor(cfg: Config, client: GenClient = createClient(cfg)): Extractor {
   return {
-    async extract(req) {
-      const parts: Array<{ text: string } | { inlineData: { data: string; mimeType: string } }> = [{ text: buildUserParts(req) }];
+    async extract(req, opts) {
+      const parts: Array<{ text: string } | { inlineData: { data: string; mimeType: string } }> = [
+        { text: buildUserParts(req, opts?.hedgeRetry) },
+      ];
       if (req.imageBase64) {
         parts.push({ inlineData: { data: req.imageBase64, mimeType: req.imageMimeType ?? 'image/jpeg' } });
       }

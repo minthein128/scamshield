@@ -31,7 +31,7 @@ Request:
 }
 ```
 
-`context.home` is an optional home country. `shareSignals: false` keeps this check out of the anonymous network signals (default true). See `docs/intel-design.md`.
+`context.home` is an optional home country. `reported`, `reportedType` and `lostMoney` are optional and belong to the report-a-scam flow. They are described below. `shareSignals: false` keeps this check out of the anonymous network signals (default true). See `docs/intel-design.md`.
 
 At least one of `text`, `url`, `imageBase64` is required.
 
@@ -75,7 +75,36 @@ Response 200:
 
 `score` is 0-100 (higher = riskier). `safe` < 35 <= `careful` < 70 <= `danger`.
 
-Errors: `{ "error": { "code": "bad_request" | "too_large" | "upstream" | "rate_limited", "message": "..." } }` with 4xx/5xx.
+Errors: `{ "error": { "code": "bad_request" | "not_found" | "too_large" | "upstream" | "rate_limited", "message": "..." } }` with 4xx/5xx.
+
+### Report a scam (`reported: true`)
+
+The same request, with these extra fields:
+
+```json
+{ "kind": "message", "text": "...", "language": "en", "reported": true, "reportedType": "parcel_phishing", "lostMoney": false }
+```
+
+`reportedType` is one of the scam types except `none`, and is required when `reported` is true. `lostMoney` is optional and only yes or no; there is no amount. The check runs through the same pipeline and returns the normal response (the verdict is the model's own). The server records a confirmed signal with the user's `reportedType`, even if the verdict was `safe`. The text still goes through both redaction passes first. `lostMoney` is counted in an admin-only tally and is not stored on the signal. A report counts once per reporter, day and counter like any signal, and `shareSignals: false` still keeps it out of the network. See the weighting in `docs/intel-design.md`.
+
+## POST /v1/feedback
+
+Verdict feedback for a check the user got. The same optional `Authorization: Bearer <Firebase ID token>` as `/v1/check`.
+
+```json
+{ "checkId": "chk_...", "correct": false, "actualVerdict": "safe" | "careful" | "danger", "actualScamType": "<scam type>" }
+```
+
+`correct` is required. `actualVerdict` and `actualScamType` are optional and are ignored when `correct` is true. Unknown keys are rejected, so there is no free text.
+
+| Check verdict | Answer | `actualVerdict` / `actualScamType` | Effect |
+| --- | --- | --- | --- |
+| careful or danger | It was safe | `safe` | Signal weight drops to 0.25 |
+| careful or danger | A different scam | a type other than the model's | Type count moves to the named type; indicators stay |
+| safe | It was a scam | `danger` and/or a type | New confirmed signal at weight 1 |
+| any | Right, or wrong with no detail | none | Tally only |
+
+Response 200: `{ "ok": true }`. The first feedback for a check wins; later ones are accepted and ignored. Errors: `400 bad_request`, `404 not_found` when the check is older than 7 days, was made with `shareSignals: false`, or the server has no network storage, `429 rate_limited`. Limits: per uid 30 per hour (`FEEDBACK_LIMIT_PER_HOUR`), plus the per-IP limit. In mock mode the in-memory network answers the same way. When the server has no network storage at all it answers `{ "ok": true }` and keeps nothing.
 
 ## POST /v1/check?stream=1 (progressive result)
 
@@ -94,7 +123,7 @@ Rules for clients:
 - `final` always arrives unless `error` does. It is the response to store in history.
 - Unknown events and unknown fields must be ignored.
 - Time to `verdict` is the extraction time (about 1.5 to 2.5 s); `final` adds the verification time that is not already hidden by it.
-- A repeat of an identical check inside 10 minutes is answered from the server cache. `verdict` and `final` then arrive together, with a new `id`.
+- A repeat of an identical check inside 10 minutes is answered from the server cache. `verdict` and `final` then arrive together, with the same `id`.
 
 Add `debug=1` to get a `timings` object in the response (`final` event or JSON body). It lists per-stage durations and token counts. It is off by default.
 

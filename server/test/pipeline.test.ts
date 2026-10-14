@@ -14,7 +14,7 @@ describe('pipeline', () => {
     });
     const r = await p.run({ kind: 'agency', language: 'en', text: 'Sunrise Overseas Agency, deposit 5000' });
     expect(r.sources).toHaveLength(2);
-    expect(r.flags.some((f) => f.label.includes('No licence found'))).toBe(true);
+    expect(r.flags.some((f) => f.label.includes('could not find a licence record'))).toBe(true);
   });
 
   it('degrades when grounding and link checks hang past the budget', async () => {
@@ -63,7 +63,7 @@ describe('pipeline latency features', () => {
     expect(r.linkChecks.map((l) => l.url)).toContain('https://a.example.com/');
   });
 
-  it('serves an identical check from the cache with a fresh id', async () => {
+  it('serves an identical check from the cache and keeps the id so feedback still resolves', async () => {
     let extracts = 0;
     const mock = createMockExtractor();
     const p = createPipeline({
@@ -82,8 +82,8 @@ describe('pipeline latency features', () => {
     const b = await p.run({ ...req, text: 'hello there' });
     const c = await p.run({ ...req, language: 'id' });
     expect(extracts).toBe(2);
-    expect(b.id).not.toBe(a.id);
-    expect({ ...b, id: '', createdAt: '' }).toEqual({ ...a, id: '', createdAt: '' });
+    expect(b.id).toBe(a.id);
+    expect({ ...b, createdAt: '' }).toEqual({ ...a, createdAt: '' });
     expect(c.id).not.toBe(a.id);
   });
 
@@ -138,10 +138,10 @@ describe('pipeline latency features', () => {
     const intel = {
       prepare: () => ({ kind: 'job', language: 'en', ind: [], domains: [] }),
       lookup: async () => ({ flags: [] }),
-      record: async () => {
+      recordSignal: async () => {
         await new Promise((r) => setTimeout(r, 100));
         recorded.push('done');
-        return 'recorded' as const;
+        return { status: 'recorded' as const, signalId: 's1' };
       },
     };
     const p = createPipeline({ ...base(), correlator: createMockCorrelator(), intel: intel as never, recordAfterResponse: true });
@@ -150,5 +150,58 @@ describe('pipeline latency features', () => {
     expect(recorded).toEqual([]);
     await deferred;
     expect(recorded).toEqual(['done']);
+  });
+});
+
+describe('pipeline language guard', () => {
+  it('re-asks once when certainty is heavy and reports stats', async () => {
+    const mock = createMockExtractor();
+    const heavy = async () => {
+      const x = await mock.extract({ kind: 'job', language: 'en', text: 'job' });
+      return { ...x, summary: 'This is a scam and definitely fake. It is a trap.', spokenWarning: 'It is a scam.' };
+    };
+    let calls = 0;
+    const extractor = {
+      extract: async (_r: unknown, opts?: { hedgeRetry?: boolean }) => {
+        calls++;
+        return opts?.hedgeRetry ? mock.extract({ kind: 'job', language: 'en', text: 'job' }) : heavy();
+      },
+    };
+    let stats: unknown;
+    const p = createPipeline({
+      extractor: extractor as never,
+      correlator: createMockCorrelator(),
+      grounder: createMockGrounder(),
+      model: 'm',
+      onLanguage: (s) => {
+        stats = s;
+      },
+    });
+    const r = await p.run({ kind: 'job', language: 'en', text: 'job' });
+    expect(calls).toBe(2);
+    expect(stats).toMatchObject({ reasked: true, after: 0 });
+    expect((stats as { before: number }).before).toBeGreaterThanOrEqual(3);
+    expect(r.summary).not.toMatch(/is a scam/i);
+  });
+
+  it('rewrites light certainty without a second call', async () => {
+    const mock = createMockExtractor();
+    let calls = 0;
+    const extractor = {
+      extract: async () => {
+        calls++;
+        const x = await mock.extract({ kind: 'job', language: 'en', text: 'job' });
+        return { ...x, spokenWarning: 'This is a scam.' };
+      },
+    };
+    const p = createPipeline({
+      extractor: extractor as never,
+      correlator: createMockCorrelator(),
+      grounder: createMockGrounder(),
+      model: 'm',
+    });
+    const r = await p.run({ kind: 'job', language: 'en', text: 'job' });
+    expect(calls).toBe(1);
+    expect(r.spokenWarning).toBe('This looks like a scam.');
   });
 });

@@ -26,7 +26,7 @@ const STEP_MS = 900;
 const VERDICT_TITLES: Record<Verdict, string> = { safe: 'Looks safe', careful: 'Hmm, be careful', danger: 'Warning' };
 
 export const CheckingScreen: React.FC<RootScreenProps<'Checking'>> = ({ navigation, route }) => {
-  const { request, source } = route.params;
+  const { request, source, reported } = route.params;
   const { saveCheck } = useAppState();
   const [step, setStep] = useState(0);
   const [verdict, setVerdict] = useState<Verdict | null>(null);
@@ -46,12 +46,12 @@ export const CheckingScreen: React.FC<RootScreenProps<'Checking'>> = ({ navigati
       setVerdict(result.verdict);
       if (!reduceMotion) await new Promise(resolve => setTimeout(resolve, 1100));
       if (controller.signal.aborted) return;
-      navigation.replace('Report', { result, language: request.language, fresh: true });
+      navigation.replace('Report', { result, language: request.language, fresh: true, ...(reported ? { reported } : {}) });
     } catch (e) {
       if (e instanceof ApiError && e.code === 'cancelled') return;
       setError({ ...errorCopy(e), code: e instanceof ApiError ? e.code : undefined });
     }
-  }, [navigation, request, saveCheck, source, reduceMotion]);
+  }, [navigation, request, saveCheck, source, reported, reduceMotion]);
 
   useEffect(() => {
     run();

@@ -84,7 +84,7 @@ export function publicHost(raw: string): string | null {
 }
 
 export interface Hasher {
-  hash(type: IndicatorType | 'dom' | 'day' | 'sig' | 'rk' | 'seen', value: string): string;
+  hash(type: IndicatorType | 'dom' | 'day' | 'sig' | 'rk' | 'seen' | 'chk' | 'fb', value: string): string;
 }
 
 export function createHasher(pepper: string): Hasher {

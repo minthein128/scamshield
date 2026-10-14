@@ -39,12 +39,12 @@ export function reportedEvidence(lang: Lang, n: number): string {
 export function campaignLabel(lang: Lang, name: string, n: number): string {
   switch (lang) {
     case 'id':
-      return `Cocok dengan kampanye aktif "${name}", terlihat ${n} kali minggu ini`;
+      return `Mirip dengan kampanye "${name}" yang dilaporkan ${n} kali minggu ini`;
     case 'tl':
-      return `Tugma sa aktibong kampanyang "${name}", nakita nang ${n} beses ngayong linggo`;
+      return `Kahawig ng kampanyang "${name}" na iniulat nang ${n} beses ngayong linggo`;
     case 'my':
-      return `လက်ရှိ လိမ်လည်မှု "${name}" နှင့် တူညီသည်၊ ဤအပတ်အတွင်း ${n} ကြိမ် တွေ့ရှိထားသည်`;
+      return `"${name}" ဟု တိုင်ကြားထားသော လိမ်လည်မှုပုံစံနှင့် ဆင်တူသည်၊ ဤအပတ်အတွင်း ${n} ကြိမ် တိုင်ကြားထားသည်`;
     default:
-      return `Matches an active "${name}" campaign seen ${n} times this week`;
+      return `Looks similar to the "${name}" pattern reported ${n} times this week`;
   }
 }
