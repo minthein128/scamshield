@@ -25,7 +25,7 @@ const post = (app: ReturnType<typeof make>, body: unknown, headers: Record<strin
 describe('app', () => {
   it('healthz reports mock mode', async () => {
     const res = await make().request('/healthz');
-    expect(await res.json()).toEqual({ ok: true, model: 'gemini-2.5-flash', mock: true });
+    expect(await res.json()).toEqual({ ok: true, model: 'gemini-3.5-flash-lite', mock: true });
   });
 
   it('is mock when no credentials exist', () => {

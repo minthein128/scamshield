@@ -8,6 +8,7 @@ Hono + TypeScript service implementing `docs/api-contract.md`. Pipeline: Extract
 - `npm run format`: apply biome fixes.
 - `MOCK=1 npm run dev`: server on :8080 with canned responses. Mock is also on when no credentials are set.
 - `npm run smoke`: one real Gemini + Web Risk + RDAP call. Needs `GEMINI_API_KEY` (or Vertex env). Exits 2 if unconfigured.
+- `npm run eval`: 19 labelled cases (en/my/id/tl) through the real pipeline, sequential, prints a verdict table, accuracy and p50/p95. Needs a key; never part of `npm test`. Env: `GEMINI_MODEL`, `EVAL_ONLY=id,id`, `EVAL_DELAY_MS`, `EVAL_JSON=path`.
 - `./deploy.sh`: needs `GOOGLE_CLOUD_PROJECT` and an authenticated gcloud. Deploys with `gcloud run deploy --source`.
 
 ## Layout
@@ -25,5 +26,7 @@ Hono + TypeScript service implementing `docs/api-contract.md`. Pipeline: Extract
 - Errors use `ApiError(status, code, message)` and the contract error body.
 - Logs are one JSON object per line via `log()`. Do not log request text or images.
 - Change the API shape only together with `docs/api-contract.md`.
-- The TTS model id and the AUDIO-modality `generateContent` call shape are unverified against a live key. Run `npm run smoke`, then curl `/v1/speak`, when a key exists.
+- Verified live: extraction schema, Search grounding, and `gemini-3.8-flash-tts` through `generateContent` with AUDIO modality (returns 24 kHz PCM, wrapped to WAV). Web Risk rejects API keys: it needs ADC.
+- Default model is `gemini-3.5-flash-lite` (measured: see README). `THINKING_LEVEL` defaults to LOW; set it empty to use the model default.
+- Grounding must not report brand-impersonation advisories as `known_bad`; the eval case `legit-sms-en` guards this.
 - Grounding cannot share a call with `responseSchema`, so `ground.ts` asks for JSON in plain text and parses leniently.

@@ -1,3 +1,5 @@
+import type { ThinkingLevel } from '@google/genai';
+
 export interface Config {
   port: number;
   model: string;
@@ -16,9 +18,15 @@ export interface Config {
   grounding: boolean;
   ttsModel: string;
   ttsVoice: string;
+  thinkingLevel?: 'MINIMAL' | 'LOW' | 'MEDIUM' | 'HIGH';
 }
 
 const bool = (v?: string) => v === '1' || v?.toLowerCase() === 'true';
+
+function thinking(v?: string): Config['thinkingLevel'] {
+  const u = (v ?? 'LOW').toUpperCase();
+  return u === 'MINIMAL' || u === 'LOW' || u === 'MEDIUM' || u === 'HIGH' ? u : undefined;
+}
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   const useVertex = bool(env.GOOGLE_GENAI_USE_VERTEXAI);
@@ -27,7 +35,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   const hasCreds = useVertex ? Boolean(project) : Boolean(geminiApiKey);
   return {
     port: Number(env.PORT ?? 8080),
-    model: env.GEMINI_MODEL || 'gemini-2.5-flash',
+    model: env.GEMINI_MODEL || 'gemini-3.5-flash-lite',
     mock: bool(env.MOCK) || !hasCreds,
     useVertex,
     project,
@@ -46,5 +54,10 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     grounding: env.GROUNDING !== '0',
     ttsModel: env.TTS_MODEL || 'gemini-3.8-flash-tts',
     ttsVoice: env.TTS_VOICE || 'Kore',
+    thinkingLevel: thinking(env.THINKING_LEVEL),
   };
+}
+
+export function thinkingOf(cfg: Config) {
+  return cfg.thinkingLevel ? { thinkingConfig: { thinkingLevel: cfg.thinkingLevel as ThinkingLevel } } : {};
 }
