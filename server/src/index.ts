@@ -1,5 +1,6 @@
 import { serve } from '@hono/node-server';
 import { createApp } from './app.js';
+import { createFirebaseVerifier } from './auth.js';
 import { loadConfig } from './config.js';
 import { createCorrelator } from './correlate.js';
 import { createClient, createGeminiExtractor } from './extract.js';
@@ -21,7 +22,12 @@ const pipeline = createPipeline({
 
 serve(
   {
-    fetch: createApp(cfg, pipeline, client ? createGeminiSpeaker(cfg, client) : createMockSpeaker(cfg)).fetch,
+    fetch: createApp(
+      cfg,
+      pipeline,
+      client ? createGeminiSpeaker(cfg, client) : createMockSpeaker(cfg),
+      createFirebaseVerifier(cfg.firebaseProjectId),
+    ).fetch,
     port: cfg.port,
     hostname: '0.0.0.0',
   },
