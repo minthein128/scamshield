@@ -77,6 +77,51 @@ Response 200:
 
 Errors: `{ "error": { "code": "bad_request" | "too_large" | "upstream" | "rate_limited", "message": "..." } }` with 4xx/5xx.
 
+## POST /v1/check?stream=1 (progressive result)
+
+Same request, auth and limits as `/v1/check`. The reply is `text/event-stream` (Server-Sent Events). Request errors that are found before the stream starts (bad JSON, bad fields, 413, 429) are plain JSON errors with the usual status. A client that cannot read a stream sends the normal POST and gets one JSON reply.
+
+| Event | Data | When |
+| --- | --- | --- |
+| `stage` | `{ "stage": "extract" \| "links" \| "ground" \| "intel", "status": "start" \| "done", "ms": 1520 }` | A stage starts or ends. `ms` is time since the request began. |
+| `verdict` | A full check response (shape above) | Once, right after extraction and the rules. `sources` is `[]`, and `linkChecks` holds only the results that were ready. |
+| `final` | The full check response | Once, after verification and the network lookup. Same `id` as `verdict`. |
+| `error` | `{ "error": { "code", "message" } }` | The check failed after the stream started. The stream ends. |
+
+Rules for clients:
+
+- The `verdict` response is provisional. Later evidence only adds flags, so `final.score >= verdict.score` and the verdict never goes down. A `safe` verdict can rise to `careful` or `danger`.
+- `final` always arrives unless `error` does. It is the response to store in history.
+- Unknown events and unknown fields must be ignored.
+- Time to `verdict` is the extraction time (about 1.5 to 2.5 s); `final` adds the verification time that is not already hidden by it.
+- A repeat of an identical check inside 10 minutes is answered from the server cache. `verdict` and `final` then arrive together, with a new `id`.
+
+Add `debug=1` to get a `timings` object in the response (`final` event or JSON body). It lists per-stage durations and token counts. It is off by default.
+
+### Client use (`src/api`)
+
+`getApiClient().check(request, { signal, onUpdate })` streams when `onUpdate` is set. It resolves with the `final` response, like the plain call. When the server or the runtime cannot stream, it falls back to one plain reply and never calls `onUpdate`, so the screen must work without any update.
+
+```ts
+const result = await getApiClient().check(request, {
+  signal: controller.signal,
+  onUpdate: (u) => {
+    if (u.type === 'stage') setStep(STAGE_STEP[u.stage]);          // drive the step list
+    if (u.type === 'verdict') setVerdict(u.response.verdict);      // show the verdict early
+    if (u.type === 'final') setSources(u.response.sources ?? []);  // add sources and network data
+  },
+});
+```
+
+How the Checking screen should use it:
+
+1. Map `stage` events to the existing step list: `extract` to "Reading", `links` to "Checking links", `ground` to "Verifying claims". Keep the timer-based steps when no `stage` event arrives.
+2. On `verdict`, call the existing `setVerdict(response.verdict)` so the loader shows the result about 1.5 to 3 s sooner. Do not navigate yet.
+3. Navigate to the Report with the resolved `final` result, as today, and save that result to history. Never save the `verdict` response.
+4. If the user leaves the screen, abort with the `AbortController`, as today.
+
+The native fetch in React Native does not expose a response stream, so on Android the app reads the whole reply at the end and the result is the same as the plain call. Use `expo/fetch` (SDK 52) as `fetchImpl` in `createHttpClient` to get early events on devices.
+
 ## POST /v1/speak
 
 Spoken warning audio from a Gemini text-to-speech model, for phones with no voice for the language (for example Burmese).

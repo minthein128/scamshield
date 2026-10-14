@@ -20,6 +20,12 @@ export interface Config {
   requestBudgetMs: number;
   grounding: boolean;
   debugTimings: boolean;
+  cacheEnabled: boolean;
+  earlyLinks: boolean;
+  dangerGroundCapMs: number;
+  recordAfterResponse: boolean;
+  resultCacheTtlMs: number;
+  linkCacheTtlMs: number;
   ttsModel: string;
   ttsVoice: string;
   intelPepper?: string;
@@ -62,6 +68,12 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     requestBudgetMs: Number(env.REQUEST_BUDGET_MS ?? 15000),
     grounding: env.GROUNDING !== '0',
     debugTimings: bool(env.DEBUG_TIMINGS),
+    cacheEnabled: env.CACHE !== '0',
+    earlyLinks: env.EARLY_LINKS !== '0',
+    dangerGroundCapMs: Number(env.GROUND_DANGER_CAP_MS ?? 0),
+    recordAfterResponse: bool(env.RECORD_AFTER_RESPONSE),
+    resultCacheTtlMs: Number(env.RESULT_CACHE_TTL_MS ?? 600_000),
+    linkCacheTtlMs: Number(env.LINK_CACHE_TTL_MS ?? 3_600_000),
     ttsModel: env.TTS_MODEL || 'gemini-3.8-flash-tts',
     ttsVoice: env.TTS_VOICE || 'Kore',
     intelPepper: env.INTEL_PEPPER || undefined,
@@ -72,4 +84,15 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
 
 export function thinkingOf(cfg: Config) {
   return cfg.thinkingLevel ? { thinkingConfig: { thinkingLevel: cfg.thinkingLevel as ThinkingLevel } } : {};
+}
+
+export function pipelineOptions(cfg: Config) {
+  return {
+    budgetMs: cfg.requestBudgetMs,
+    model: cfg.model,
+    earlyLinks: cfg.earlyLinks,
+    dangerGroundCapMs: cfg.dangerGroundCapMs,
+    recordAfterResponse: cfg.recordAfterResponse,
+    resultCacheTtlMs: cfg.cacheEnabled ? cfg.resultCacheTtlMs : 0,
+  };
 }

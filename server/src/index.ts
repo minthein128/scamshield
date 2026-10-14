@@ -1,7 +1,7 @@
 import { serve } from '@hono/node-server';
 import { createApp } from './app.js';
 import { createFirebaseVerifier } from './auth.js';
-import { loadConfig } from './config.js';
+import { loadConfig, pipelineOptions } from './config.js';
 import { createCorrelator } from './correlate.js';
 import { createClient, createGeminiExtractor } from './extract.js';
 import { createGrounder } from './ground.js';
@@ -20,8 +20,7 @@ const pipeline = createPipeline({
   extractor: client ? createGeminiExtractor(cfg, client) : createMockExtractor(),
   correlator: cfg.mock ? createMockCorrelator() : createCorrelator(cfg),
   grounder: client ? createGrounder(cfg, client) : createMockGrounder(),
-  budgetMs: cfg.requestBudgetMs,
-  model: cfg.model,
+  ...pipelineOptions(cfg),
   intel,
 });
 

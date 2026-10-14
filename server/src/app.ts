@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { bodyLimit } from 'hono/body-limit';
 import { cors } from 'hono/cors';
+import { streamSSE } from 'hono/streaming';
 import { bearerToken, type TokenVerifier } from './auth.js';
 import type { Config } from './config.js';
 import { type Intel, isCountry } from './intel/service.js';
@@ -9,7 +10,7 @@ import type { Pipeline } from './pipeline.js';
 import { createRateLimiter } from './ratelimit.js';
 import type { Speaker } from './speak.js';
 import { Timings, timingStore } from './timing.js';
-import { ApiError } from './types.js';
+import { ApiError, type CheckResponse } from './types.js';
 import { parseRequest, parseSpeakRequest } from './validate.js';
 
 const clientIp = (forwarded?: string, real?: string) => forwarded?.split(',')[0]?.trim() || real || 'local';
@@ -61,21 +62,65 @@ export function createApp(cfg: Config, pipeline: Pipeline, speaker: Speaker, int
       tm.meta.imageBytes = req.imageBase64 ? Math.floor((req.imageBase64.length * 3) / 4) : 0;
       tm.meta.textChars = req.text?.length ?? 0;
       const uid = c.get('uid' as never) as string | undefined;
-      const res = await timingStore.run(tm, () => pipeline.run(uid ? { ...req, uid } : req));
-      log('INFO', 'check_done', {
-        id: res.id,
-        kind: res.kind,
-        verdict: res.verdict,
-        score: res.score,
-        language: req.language,
-        flagCount: res.flags.length,
-        linkCount: res.linkChecks.length,
-        sourceCount: res.sources.length,
-        hasImage: Boolean(req.imageBase64),
-        latencyMs: Date.now() - started,
-        timings: tm.toJSON(),
-      });
-      return c.json(cfg.debugTimings || c.req.query('debug') === '1' ? { ...res, timings: tm.toJSON() } : res);
+      const full = uid ? { ...req, uid } : req;
+      const debug = cfg.debugTimings || c.req.query('debug') === '1';
+      const done = (res: CheckResponse) =>
+        log('INFO', 'check_done', {
+          id: res.id,
+          kind: res.kind,
+          verdict: res.verdict,
+          score: res.score,
+          language: req.language,
+          flagCount: res.flags.length,
+          linkCount: res.linkChecks.length,
+          sourceCount: res.sources.length,
+          hasImage: Boolean(req.imageBase64),
+          latencyMs: Date.now() - started,
+          timings: tm.toJSON(),
+        });
+
+      if (c.req.query('stream') === '1') {
+        return streamSSE(c, async (stream) => {
+          let firstVerdictMs: number | undefined;
+          let deferred: Promise<unknown> | undefined;
+          try {
+            const res = await timingStore.run(tm, () =>
+              pipeline.run(full, {
+                afterResponse: (p) => {
+                  deferred = p;
+                },
+                onEvent: (e) => {
+                  if (e.type === 'verdict' && firstVerdictMs === undefined) {
+                    firstVerdictMs = Math.round(tm.now());
+                    tm.meta.firstVerdictMs = firstVerdictMs;
+                  }
+                  void stream.writeSSE({
+                    event: e.type,
+                    data: JSON.stringify(e.type === 'stage' ? { stage: e.stage, status: e.status, ms: e.ms } : e.response),
+                  });
+                },
+              }),
+            );
+            await stream.writeSSE({ event: 'final', data: JSON.stringify(debug ? { ...res, timings: tm.toJSON() } : res) });
+            done(res);
+          } catch (err) {
+            const known = err instanceof ApiError;
+            log(known && err.status < 500 ? 'WARNING' : 'ERROR', known ? 'api_error' : 'unhandled', {
+              code: known ? err.code : 'upstream',
+              error: (err as Error).message,
+            });
+            await stream.writeSSE({
+              event: 'error',
+              data: JSON.stringify(errorBody(known ? err.code : 'upstream', known ? err.message : 'Internal error')),
+            });
+          }
+          await deferred;
+        });
+      }
+
+      const res = await timingStore.run(tm, () => pipeline.run(full));
+      done(res);
+      return c.json(debug ? { ...res, timings: tm.toJSON() } : res);
     },
   );
 

@@ -1,4 +1,4 @@
-import { loadConfig } from '../src/config.js';
+import { loadConfig, pipelineOptions } from '../src/config.js';
 import { createCorrelator } from '../src/correlate.js';
 import { createClient, createGeminiExtractor } from '../src/extract.js';
 import { createGrounder } from '../src/ground.js';
@@ -18,8 +18,9 @@ const pipeline = createPipeline({
   extractor: createGeminiExtractor(cfg, client),
   correlator: createCorrelator(cfg, { getToken: async () => undefined }),
   grounder: createGrounder(cfg, client),
-  model: cfg.model,
+  ...pipelineOptions(cfg),
   budgetMs: Number(process.env.EVAL_BUDGET_MS ?? cfg.requestBudgetMs),
+  resultCacheTtlMs: 0,
 });
 
 const pct = (xs: number[], p: number) => {
