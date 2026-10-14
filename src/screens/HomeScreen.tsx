@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { BrandLockup } from '../components/BrandMark';
 import { Icon, type IconName } from '../components/Icon';
 import { Text } from '../components/Text';
 import { Screen } from '../components/Screen';
@@ -23,8 +24,9 @@ export const HomeScreen: React.FC<TabScreenProps<'Home'>> = ({ navigation }) => 
   return (
     <Screen>
       <View style={styles.brandRow}>
-        <Icon name="shieldCheck" size={28} color={colors.accent} />
-        <Text accessibilityRole="header" style={styles.brand}>SafeRoute</Text>
+        <View style={{ flex: 1 }}>
+          <BrandLockup header />
+        </View>
         <TouchableOpacity testID="open-settings" accessibilityRole="button" accessibilityLabel={t('settingsA11y')} activeOpacity={0.7} onPress={() => navigation.navigate('Settings')} style={styles.iconButton}>
           <Icon name="settings" size={24} />
         </TouchableOpacity>
@@ -116,13 +118,12 @@ const QuickAction: React.FC<{ label: string; icon: IconName; onPress: () => void
 
 const styles = StyleSheet.create({
   brandRow: { flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 48 },
-  brand: { flex: 1, color: colors.textPrimary, fontSize: 18, fontFamily: fonts.bold, letterSpacing: -0.2, lineHeight: 24, includeFontPadding: false },
   iconButton: { width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center' },
   cardTitle: { color: colors.textPrimary, fontSize: 18, lineHeight: 24, fontFamily: fonts.bold, includeFontPadding: false },
   cardBody: { color: colors.textSecondary, fontSize: 14, lineHeight: 20, fontFamily: fonts.regular, includeFontPadding: false },
   quickRow: { flexDirection: 'row', gap: 8 },
-  quick: { flex: 1, minHeight: 72, borderRadius: 12, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.background, alignItems: 'center', justifyContent: 'center', gap: 4 },
-  quickText: { color: colors.textPrimary, fontSize: 13, lineHeight: 18, fontFamily: fonts.semiBold, includeFontPadding: false },
+  quick: { flex: 1, paddingHorizontal: 4, minHeight: 72, borderRadius: 12, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.background, alignItems: 'center', justifyContent: 'center', gap: 4 },
+  quickText: { textAlign: 'center', color: colors.textPrimary, fontSize: 13, lineHeight: 18, fontFamily: fonts.semiBold, includeFontPadding: false },
   recent: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 64, paddingVertical: 12, paddingHorizontal: 16, borderRadius: 12, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.border },
   recentTitle: { color: colors.textPrimary, fontSize: 15, lineHeight: 22, fontFamily: fonts.semiBold, includeFontPadding: false },
   recentMeta: { color: colors.textSecondary, fontSize: 13, lineHeight: 18, fontFamily: fonts.regular, includeFontPadding: false },

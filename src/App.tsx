@@ -5,6 +5,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { restoreUiLanguage } from './i18n';
+import { BrandMark } from './components/BrandMark';
 import { Text } from './components/Text';
 import RootNavigator from './navigation/RootNavigator';
 import { AppStateProvider } from './state/AppState';
@@ -36,7 +37,8 @@ export default function App() {
   if (!fontsLoaded || !languageReady) {
     return (
       <View style={styles.loading}>
-        <Text style={styles.loadingText}>{t('loading')}</Text>
+        <BrandMark size={56} />
+        <Text style={[styles.loadingText, { marginTop: 12 }]}>{t('loading')}</Text>
       </View>
     );
   }
