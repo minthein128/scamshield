@@ -1,4 +1,4 @@
-# SafeRoute — Anti-Fraud & Scam Shield App
+# SafeRoute: Anti-Fraud & Scam Shield App
 
 A mobile anti-fraud and anti-trafficking application built in **React + Tailwind CSS** and configured for **Android Studio** via **Capacitor Android**.
 
