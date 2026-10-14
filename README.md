@@ -9,6 +9,15 @@ An anti-scam and anti-trafficking app built with **Expo SDK 52 (React Native)**.
 
 The demo calls the live SafeRoute API (Gemini with Google Search grounding, plus RDAP and Web Risk link checks). Install the APK by opening the link on an Android phone and allowing "install unknown apps" for your browser. The APK is signed with a debug key, so Play Protect may ask for confirmation. The floating Shield overlay needs the notification and screen capture permissions.
 
+## Install as a tester
+
+Testers get builds through Firebase App Distribution, with update notices.
+
+1. Open the invite email from Firebase App Distribution and tap **Get started** on your Android phone. Sign in with the Google account the invite went to.
+2. Accept the invite. Firebase App Tester opens in the browser; tap **Download App Tester** and install it (allow installs from your browser if asked).
+3. Open App Tester, choose SafeRoute, and tap **Download** on the latest release. Install it.
+4. App Tester shows a notification when a new build is ready. Open it and tap **Update**.
+
 ## Development
 
 ```bash

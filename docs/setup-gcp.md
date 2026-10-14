@@ -83,3 +83,21 @@ Web Risk has no IAM role. It needs the API enabled and billing linked; the runti
 ```bash
 curl -s "$(gcloud run services describe saferoute-api --region asia-southeast1 --format='value(status.url)')/healthz"
 ```
+
+## Temporary backend
+
+Until the Cloud Run API is live, a quick Cloudflare tunnel serves the backend from a dev host. The files live outside the repo in `~/work/scamshield-run`.
+
+| Piece | Role |
+|---|---|
+| `start.sh` | Starts the server on port 18080 and a `cloudflared` quick tunnel, writes the URL to `tunnel-url.txt`, then calls `publish-config.sh` |
+| `publish-config.sh` | Writes `{ "apiUrl": "<tunnel>" }` to `dist/config.json` and runs `firebase deploy --only hosting` when the URL differs from the live file |
+| `watchdog.sh` | Checks `/healthz` locally and through the tunnel; reruns `start.sh` on failure |
+| `scamshield-backend.service` | `systemd --user` oneshot unit that runs `start.sh` at boot (user linger enabled) |
+| `scamshield-watchdog.timer` | Runs `watchdog.sh` every minute |
+
+A quick tunnel gets a new URL on every start. The app is to read `https://saferoute-aibc.web.app/config.json` (served with `Cache-Control: no-cache`, see `firebase.json`) so builds need no baked URL. The GitHub variable `EXPO_PUBLIC_API_URL` must match the current tunnel for builds that still bake it.
+
+## Firebase App Distribution
+
+The `Android` workflow uploads the signed APK to the `dev-testers` group on pushes to `main` and `feat/production`, or on a manual run with `force_distribute` set. It needs the variables `FIREBASE_ANDROID_APP_ID`, `GCP_WORKLOAD_IDENTITY_PROVIDER` and `GCP_SERVICE_ACCOUNT`, and `roles/firebaseappdistro.admin` on the deployer account. Each build sets `versionCode` to the run number so testers see an update. Add testers with `firebase appdistribution:testers:add --group-alias dev-testers <email>`.
