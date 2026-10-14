@@ -135,7 +135,7 @@ class ShieldService : Service(), ShieldOverlay.Listener {
                 val jpeg = currentCapturer.captureJpeg(hiddenAt + FRAME_AFTER_HIDE_MS, FRAME_WAIT_MS)
                     ?: throw CheckException("Could not read the screen. Tap the shield to try again.")
                 main.post { overlay?.setChecking() }
-                val result = CheckClient.checkScreen(apiUrl, language, jpeg)
+                val result = CheckClient.checkScreen(apiUrl, language, jpeg, ShieldBridge.authToken)
                 main.post { onResult(result) }
             } catch (e: CheckException) {
                 main.post { onFailure(e.message ?: "The check failed.") }

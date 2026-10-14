@@ -31,6 +31,8 @@ export interface ShieldStartOptions {
   /** Defaults to EXPO_PUBLIC_API_URL. */
   apiUrl?: string;
   language?: 'en' | 'id' | 'tl' | 'my';
+  /** Firebase ID token sent as a Bearer header. Optional; without it the server limits by IP. */
+  authToken?: string;
 }
 
 export interface ShieldSubscription {
@@ -42,6 +44,7 @@ interface ShieldModuleType {
   requestOverlayPermission(): Promise<boolean>;
   requestScreenCapturePermission(): Promise<boolean>;
   startShield(options?: ShieldStartOptions): Promise<boolean>;
+  setAuthToken(token: string | null): Promise<boolean>;
   stopShield(): Promise<boolean>;
   isShieldRunning(): Promise<boolean>;
   checkScreenNow(): Promise<void>;
@@ -136,6 +139,16 @@ export async function startShield(options?: ShieldStartOptions): Promise<boolean
   return true;
 }
 
+/** Replaces the token used by the running shield. Call it when the ID token refreshes. */
+export async function setShieldAuthToken(token: string | null): Promise<boolean> {
+  if (!nativeShieldModule) return true;
+  try {
+    return await nativeShieldModule.setAuthToken(token);
+  } catch {
+    return false;
+  }
+}
+
 export async function stopShield(): Promise<boolean> {
   if (nativeShieldModule) {
     try {
@@ -218,6 +231,7 @@ export default {
   requestOverlayPermission,
   requestScreenCapturePermission,
   startShield,
+  setShieldAuthToken,
   stopShield,
   isShieldRunning,
   checkScreenNow,
