@@ -1,0 +1,8 @@
+{
+  "name": "shield-module",
+  "platforms": ["android", "web", "ios"],
+  "android": {
+    "package": "com.saferoute.shield",
+    "modules": ["com.saferoute.shield.ShieldModule"]
+  }
+}

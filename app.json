@@ -1,0 +1,46 @@
+{
+  "expo": {
+    "name": "SafeRoute",
+    "slug": "saferoute",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#F4F6F8"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.saferoute.antifraud"
+    },
+    "android": {
+      "package": "com.saferoute.antifraud",
+      "adaptiveIcon": {
+        "backgroundColor": "#F4F6F8"
+      },
+      "permissions": [
+        "SYSTEM_ALERT_WINDOW",
+        "FOREGROUND_SERVICE",
+        "FOREGROUND_SERVICE_MEDIA_PROJECTION"
+      ]
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single"
+    },
+    "plugins": [
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./assets/fonts/PlusJakartaSans-Regular.ttf",
+            "./assets/fonts/PlusJakartaSans-Medium.ttf",
+            "./assets/fonts/PlusJakartaSans-SemiBold.ttf",
+            "./assets/fonts/PlusJakartaSans-Bold.ttf",
+            "./assets/fonts/PlusJakartaSans-ExtraBold.ttf",
+            "./assets/fonts/IBMPlexMono-Medium.ttf"
+          ]
+        }
+      ]
+    ]
+  }
+}

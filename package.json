@@ -1,29 +1,38 @@
 {
-  "name": "scamshield-react-app",
-  "private": true,
+  "name": "saferoute-react-native",
   "version": "1.0.0",
-  "type": "module",
+  "main": "index.js",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "build:android": "vite build && cap sync android",
-    "open:android": "cap open android",
-    "preview": "vite preview"
+    "start": "expo start",
+    "android": "expo run:android",
+    "web": "expo start --web",
+    "build:web": "expo export -p web",
+    "typecheck": "tsc --noEmit",
+    "ios": "expo run:ios"
   },
   "dependencies": {
-    "@capacitor/android": "^8.5.3",
-    "@capacitor/core": "^8.5.3",
-    "clsx": "^2.1.1",
-    "lucide-react": "^1.16.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "@expo/metro-runtime": "~4.0.1",
+    "expo": "~52.0.0",
+    "expo-font": "~13.0.4",
+    "expo-modules-core": "~2.2.3",
+    "expo-status-bar": "~2.0.1",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-native": "0.76.7",
+    "react-native-safe-area-context": "4.12.0",
+    "react-native-screens": "~4.4.0",
+    "react-native-svg": "15.8.0",
+    "react-native-web": "~0.19.13",
+    "shield-module": "file:./modules/shield-module"
   },
   "devDependencies": {
-    "@capacitor/cli": "^8.5.3",
-    "@vitejs/plugin-react": "^4.3.4",
-    "autoprefixer": "^10.4.20",
-    "postcss": "^8.4.49",
-    "tailwindcss": "^3.4.17",
-    "vite": "^5.4.11"
+    "@babel/core": "^7.25.2",
+    "@babel/runtime": "^8.0.7",
+    "@types/react": "~18.3.12",
+    "htmlparser2": "^12.0.0",
+    "pixelmatch": "^8.0.0",
+    "pngjs": "^7.0.0",
+    "puppeteer-core": "^25.13.0",
+    "typescript": "^5.3.3"
   }
 }
