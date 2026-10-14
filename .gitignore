@@ -18,3 +18,8 @@ android/local.properties
 *.keystore
 !android/app/debug.keystore
 dist-apk/
+
+/node_modules/
+/android/
+/dist/
+.idea/
