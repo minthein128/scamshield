@@ -17,3 +17,20 @@ export async function shareText(message: string): Promise<void> {
     notify('Copied', 'The warning is copied. Paste it into any chat to share it.');
   }
 }
+
+export function confirmAction(title: string, message: string, confirmLabel: string): Promise<boolean> {
+  if (Platform.OS === 'web') {
+    return Promise.resolve(typeof window !== 'undefined' && window.confirm(`${title}\n\n${message}`));
+  }
+  return new Promise(resolve => {
+    Alert.alert(
+      title,
+      message,
+      [
+        { text: 'Cancel', style: 'cancel', onPress: () => resolve(false) },
+        { text: confirmLabel, style: 'destructive', onPress: () => resolve(true) },
+      ],
+      { cancelable: true, onDismiss: () => resolve(false) },
+    );
+  });
+}

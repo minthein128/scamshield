@@ -1,5 +1,5 @@
 import { createHttpClient } from '../api/http';
-import { ApiError, userMessage } from '../api/errors';
+import { ApiError, errorCopy, userMessage } from '../api/errors';
 import { createClientFromEnv } from '../api';
 import { createMockClient } from '../api/mock';
 import type { CheckRequest } from '../api/types';
@@ -66,15 +66,52 @@ describe('http client', () => {
 
   it('gives a user message for every error', () => {
     expect(userMessage(new ApiError('network', 'x'))).toMatch(/connection/i);
-    expect(userMessage(new Error('x'))).toMatch(/went wrong/i);
+    expect(errorCopy(new Error('x')).title).toMatch(/went wrong/i);
+  });
+
+  it('separates offline, rate-limited and server-down states', () => {
+    expect(errorCopy(new ApiError('network', 'x')).title).toMatch(/offline/i);
+    expect(errorCopy(new ApiError('upstream', 'x')).title).toMatch(/down/i);
+    expect(errorCopy(new ApiError('rate_limited', 'x', 429, 1800)).message).toMatch(/30 minutes/);
+    expect(errorCopy(new ApiError('rate_limited', 'x', 429)).message).toMatch(/free account/i);
+  });
+
+  it('sends the auth token when there is one and keeps working without', async () => {
+    const withToken = reply(200, okBody);
+    await createHttpClient({ baseUrl: 'https://api.test', fetchImpl: withToken, getToken: async () => 'tok' }).check(request);
+    expect((withToken.mock.calls[0][1] as RequestInit).headers).toMatchObject({ Authorization: 'Bearer tok' });
+
+    const without = reply(200, okBody);
+    await createHttpClient({ baseUrl: 'https://api.test', fetchImpl: without, getToken: async () => null }).check(request);
+    expect((without.mock.calls[0][1] as RequestInit).headers).not.toHaveProperty('Authorization');
+
+    const broken = reply(200, okBody);
+    await createHttpClient({ baseUrl: 'https://api.test', fetchImpl: broken, getToken: async () => { throw new Error('offline'); } }).check(request);
+    expect(broken).toHaveBeenCalled();
+  });
+
+  it('reads Retry-After from a 429', async () => {
+    const fetchImpl = jest.fn().mockResolvedValue({
+      ok: false,
+      status: 429,
+      headers: { get: () => '1200' },
+      json: async () => ({ error: { code: 'rate_limited', message: 'm' } }),
+    });
+    await expect(createHttpClient({ baseUrl: 'https://api.test', fetchImpl }).check(request)).rejects.toMatchObject({ code: 'rate_limited', retryAfterSec: 1200 });
   });
 });
 
 describe('client selection', () => {
-  it('uses the mock when the API URL is unset', () => {
-    expect(createClientFromEnv(undefined).isMock).toBe(true);
-    expect(createClientFromEnv('  ').isMock).toBe(true);
-    expect(createClientFromEnv('https://api.test').isMock).toBe(false);
+  it('uses the mock only as a development fallback when the API URL is unset', () => {
+    expect(createClientFromEnv(undefined, true).isMock).toBe(true);
+    expect(createClientFromEnv('  ', true).isMock).toBe(true);
+    expect(createClientFromEnv('https://api.test', true).isMock).toBe(false);
+  });
+
+  it('never uses the mock in a release build', async () => {
+    const client = createClientFromEnv(undefined, false);
+    expect(client.isMock).toBe(false);
+    await expect(client.check(request)).rejects.toMatchObject({ code: 'unavailable' });
   });
 });
 

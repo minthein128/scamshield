@@ -6,6 +6,7 @@ export interface HttpClientConfig {
   baseUrl: string;
   timeoutMs?: number;
   fetchImpl?: typeof fetch;
+  getToken?: () => Promise<string | null>;
 }
 
 export const DEFAULT_TIMEOUT_MS = 30000;
@@ -30,9 +31,14 @@ export function createHttpClient(config: HttpClientConfig): CheckClient {
     options?.signal?.addEventListener('abort', onAbort);
 
     try {
+      const token = (await config.getToken?.().catch(() => null)) ?? null;
       const response = await fetchImpl(`${baseUrl}${path}`, {
         ...init,
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         signal: controller.signal,
       });
       let body: unknown = null;
@@ -42,8 +48,10 @@ export function createHttpClient(config: HttpClientConfig): CheckClient {
         body = null;
       }
       if (!response.ok) {
-        if (isErrorBody(body)) throw new ApiError(body.error.code, body.error.message, response.status);
-        throw new ApiError(codeFromStatus(response.status), `HTTP ${response.status}`, response.status);
+        const retryAfter = Number(response.headers?.get?.('retry-after'));
+        const retryAfterSec = Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter : undefined;
+        if (isErrorBody(body)) throw new ApiError(body.error.code, body.error.message, response.status, retryAfterSec);
+        throw new ApiError(codeFromStatus(response.status), `HTTP ${response.status}`, response.status, retryAfterSec);
       }
       return body;
     } catch (e) {

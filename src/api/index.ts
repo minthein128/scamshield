@@ -1,3 +1,6 @@
+import { API_URL } from '../config/env';
+import { getAuthToken } from '../services/token';
+import { ApiError } from './errors';
 import { createHttpClient } from './http';
 import { createMockClient } from './mock';
 import type { CheckClient } from './types';
@@ -8,14 +11,22 @@ export { hasInput } from './validate';
 export { createHttpClient } from './http';
 export { createMockClient } from './mock';
 
-export function createClientFromEnv(apiUrl: string | undefined): CheckClient {
+export function createClientFromEnv(apiUrl: string | undefined, allowMock: boolean = __DEV__): CheckClient {
   const url = apiUrl?.trim();
-  return url ? createHttpClient({ baseUrl: url }) : createMockClient();
+  if (url) return createHttpClient({ baseUrl: url, getToken: getAuthToken });
+  return allowMock ? createMockClient() : createUnavailableClient();
 }
 
 let singleton: CheckClient | null = null;
 
 export function getApiClient(): CheckClient {
-  singleton ??= createClientFromEnv(process.env.EXPO_PUBLIC_API_URL);
+  singleton ??= createClientFromEnv(API_URL);
   return singleton;
+}
+
+function createUnavailableClient(): CheckClient {
+  const fail = async (): Promise<never> => {
+    throw new ApiError('unavailable', 'No check service address in this build');
+  };
+  return { isMock: false, check: fail, speak: fail, health: fail };
 }
