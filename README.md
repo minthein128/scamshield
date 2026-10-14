@@ -29,7 +29,7 @@ Team: TBD
 ```mermaid
 flowchart LR
   A[App or web] --> B[Cloud Run API]
-  B --> C[Extract: Gemini on Vertex AI]
+  B --> C[Extract: Gemini API]
   C --> D[Detect: Search grounding]
   C --> E[Correlate: Web Risk, RDAP]
   D --> F[Score: rules engine]
