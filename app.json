@@ -6,6 +6,8 @@
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
       "backgroundColor": "#F4F6F8"
     },
     "ios": {
@@ -15,7 +17,10 @@
     "android": {
       "package": "com.saferoute.antifraud",
       "adaptiveIcon": {
-        "backgroundColor": "#F4F6F8"
+        "foregroundImage": "./assets/adaptive-foreground.png",
+        "backgroundImage": "./assets/adaptive-background.png",
+        "monochromeImage": "./assets/adaptive-monochrome.png",
+        "backgroundColor": "#1D4ED8"
       },
       "permissions": [
         "SYSTEM_ALERT_WINDOW",
@@ -27,7 +32,8 @@
     },
     "web": {
       "bundler": "metro",
-      "output": "single"
+      "output": "single",
+      "favicon": "./assets/favicon.png"
     },
     "plugins": [
       [
@@ -39,7 +45,11 @@
             "./assets/fonts/PlusJakartaSans-SemiBold.ttf",
             "./assets/fonts/PlusJakartaSans-Bold.ttf",
             "./assets/fonts/PlusJakartaSans-ExtraBold.ttf",
-            "./assets/fonts/IBMPlexMono-Medium.ttf"
+            "./assets/fonts/IBMPlexMono-Medium.ttf",
+            "./assets/fonts/NotoSansMyanmar-Regular.ttf",
+            "./assets/fonts/NotoSansMyanmar-Bold.ttf",
+            "./assets/fonts/NotoSansThai-Regular.ttf",
+            "./assets/fonts/NotoSansThai-Bold.ttf"
           ]
         }
       ],
@@ -55,6 +65,7 @@
       ],
       "@react-native-google-signin/google-signin"
     ],
-    "scheme": "saferoute"
+    "scheme": "saferoute",
+    "icon": "./assets/icon.png"
   }
 }

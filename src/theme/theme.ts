@@ -74,6 +74,10 @@ export const fonts = {
   bold: 'PlusJakartaSans-Bold',
   extraBold: 'PlusJakartaSans-ExtraBold',
   mono: 'IBMPlexMono-Medium',
+  myanmar: 'NotoSansMyanmar-Regular',
+  myanmarBold: 'NotoSansMyanmar-Bold',
+  thai: 'NotoSansThai-Regular',
+  thaiBold: 'NotoSansThai-Bold',
 } as const;
 
 export const fontWeights = {
