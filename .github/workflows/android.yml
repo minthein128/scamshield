@@ -5,6 +5,11 @@ on:
     branches: [main, "feat/**"]
     tags: ["v*"]
   workflow_dispatch:
+    inputs:
+      force_distribute:
+        description: Upload to Firebase App Distribution from any branch
+        type: boolean
+        default: false
 
 concurrency:
   group: android-${{ github.ref }}
@@ -19,7 +24,9 @@ jobs:
     timeout-minutes: 60
     permissions:
       contents: write
+      id-token: write
     env:
+      DISTRIBUTE: ${{ vars.FIREBASE_ANDROID_APP_ID != '' && vars.GCP_WORKLOAD_IDENTITY_PROVIDER != '' && vars.GCP_SERVICE_ACCOUNT != '' && ((github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/feat/production')) || (github.event_name == 'workflow_dispatch' && inputs.force_distribute)) }}
       EXPO_PUBLIC_API_URL: ${{ vars.EXPO_PUBLIC_API_URL }}
       EXPO_NO_TELEMETRY: "1"
       CI: "true"
@@ -78,3 +85,23 @@ jobs:
         with:
           files: dist-apk/*.apk
           generate_release_notes: true
+
+      - name: Authenticate to Google Cloud
+        if: env.DISTRIBUTE == 'true'
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+
+      - name: Distribute to Firebase App Distribution
+        if: env.DISTRIBUTE == 'true'
+        env:
+          APP_ID: ${{ vars.FIREBASE_ANDROID_APP_ID }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+        run: |
+          printf 'Build %s (%s)\n%s\n' "$GITHUB_RUN_NUMBER" "${GITHUB_SHA::7}" "${COMMIT_MESSAGE:-manual run}" > release-notes.txt
+          npx -y firebase-tools@latest appdistribution:distribute dist-apk/saferoute-${{ github.run_number }}.apk \
+            --app "$APP_ID" \
+            --project "${{ vars.GCP_PROJECT_ID }}" \
+            --groups dev-testers \
+            --release-notes-file release-notes.txt
