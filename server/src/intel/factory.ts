@@ -17,5 +17,13 @@ export async function createIntelFromConfig(cfg: Config): Promise<Intel | undefi
     log('WARNING', 'intel_disabled', { reason: 'INTEL_PEPPER is not set' });
     return undefined;
   }
-  return createIntel({ store: createFirestoreStore({ projectId: cfg.intelProject }), pepper: cfg.intelPepper });
+  const store = createFirestoreStore({ projectId: cfg.intelProject });
+  const sweep = () =>
+    store
+      .sweepExpired(new Date())
+      .then((n) => n > 0 && log('INFO', 'intel_swept', { removed: n }))
+      .catch((e: Error) => log('WARNING', 'intel_sweep_failed', { error: e.message }));
+  setTimeout(sweep, 30_000).unref();
+  setInterval(sweep, 6 * 3_600_000).unref();
+  return createIntel({ store, pepper: cfg.intelPepper });
 }

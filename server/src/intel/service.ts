@@ -3,7 +3,7 @@ import { COUNTRY_CODES } from './countries.js';
 import { createHasher, type Hasher } from './indicators.js';
 import { buildInsights } from './insights.js';
 import { campaignLabel, reportedEvidence, reportedLabel } from './messages.js';
-import { nearest } from './minhash.js';
+import { matchCluster } from './minhash.js';
 import { countIn, sumDays } from './rank.js';
 import { aggId, aggregateWrites, buildSignal, isRecordable, type Outcome, type Prepared, prepare, scopesOf } from './signal.js';
 import { type AggDoc, type ClusterMeta, GLOBAL, type Insights, type IntelStore, K_ANON, type NetworkInfo } from './types.js';
@@ -86,8 +86,8 @@ export function createIntel(opts: { store: IntelStore; pepper: string; cacheMs?:
       }
 
       let campaign: NetworkInfo['campaign'];
-      if (p.sig) {
-        const m = nearest(p.sig, await clusters());
+      if (p.sig || p.campaign) {
+        const m = matchCluster(p.sig, p.campaign, await clusters());
         if (m) {
           const days = sumDays(m.real.days, m.seed.days);
           const week = countIn(days, now, 7);
@@ -119,8 +119,9 @@ export function createIntel(opts: { store: IntelStore; pepper: string; cacheMs?:
       let clusterId: string | undefined;
       let metas: ClusterMeta[] | undefined;
       if (p.sig && p.template) {
-        const match = nearest(
+        const match = matchCluster(
           p.sig,
+          p.campaign,
           (await clusters()).filter((c) => c.scamType === o.scamType),
         );
         const meta = match

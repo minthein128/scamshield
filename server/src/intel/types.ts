@@ -78,6 +78,8 @@ export interface IntelStore {
   getAggs(ids: string[]): Promise<AggDoc[]>;
   listAggs(kind: AggKind, scope: string, limit: number): Promise<AggDoc[]>;
   purgeSeed(): Promise<{ signals: number; aggregates: number }>;
+  /** Retention fallback when no Firestore TTL policy exists: delete docs past expireAt. */
+  sweepExpired(now: Date): Promise<number>;
 }
 
 export interface NetworkInfo {

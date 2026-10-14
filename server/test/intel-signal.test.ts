@@ -158,9 +158,11 @@ describe('seed data', () => {
     expect(r.recorded).toBeGreaterThan(120);
     expect([...store.signals.values()].every((s) => s.seed === true)).toBe(true);
     const persisted = JSON.stringify({ s: [...store.signals.values()], a: [...store.aggs.values()] });
+    const compact = persisted.replace(/[\s-]/g, '');
     for (const v of new Set(r.fictional)) {
       expect(persisted.toLowerCase(), v).not.toContain(v.toLowerCase());
-      if (/\d{6}/.test(v)) expect(leaks(v, persisted), v).toBe(false);
+      const digits = v.replace(/\D/g, '');
+      if (digits.length >= 6) expect(compact, v).not.toContain(digits);
     }
   });
 
@@ -172,5 +174,18 @@ describe('seed data', () => {
     expect(out.signals).toBeGreaterThan(0);
     expect(store.signals.size).toBe(0);
     expect(store.aggs.size).toBe(0);
+  });
+});
+
+describe('retention sweep', () => {
+  it('removes signals past expireAt', async () => {
+    const store = createMemoryStore();
+    const intel = createIntel({ store, pepper: 'p' });
+    const ex = extractionFor('Send passport photo and call 0812345678 today', [{ type: 'phone', value: '0812345678' }]);
+    const p = intel.prepare({ kind: 'job', language: 'en' }, ex);
+    const o = { verdict: 'danger' as const, score: 80, scamType: 'job_trafficking' as const, flags: ex.flags };
+    await intel.record(p, o, { now: new Date(Date.now() - 100 * 86_400_000) });
+    expect(await store.sweepExpired(new Date())).toBe(1);
+    expect(store.signals.size).toBe(0);
   });
 });

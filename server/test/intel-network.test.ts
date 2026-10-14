@@ -18,7 +18,7 @@ const daysAgo = (n: number) => new Date(NOW.getTime() - n * 86_400_000);
 
 const flags: Flag[] = [{ family: 'trafficking', label: 'x', evidence: 'x', severity: 'high' }];
 
-function extraction(phone: string, text: string): Extraction {
+function extraction(phone: string, text: string, campaign = 'Mae Sot data-entry job'): Extraction {
   return {
     entities: { companies: [], phones: [], domains: [] },
     flags,
@@ -30,7 +30,7 @@ function extraction(phone: string, text: string): Extraction {
     urls: [],
     template: text,
     templateSafe: true,
-    campaign: 'Mae Sot data-entry job',
+    campaign,
     sender: { phones: [phone], handles: [], accounts: [] },
   };
 }
@@ -45,19 +45,24 @@ async function reportPhone(intel: Intel, phone: string, ages: number[]) {
   }
 }
 
-
 describe('network lookup', () => {
   it('stays silent below k=3 reports', async () => {
     const intel = createIntel({ store: createMemoryStore(), pepper: 'p', now: () => NOW });
     await reportPhone(intel, '+66 81 234 5678', [1, 2]);
-    const p = intel.prepare({ kind: 'job', language: 'en' }, extraction('081-234-5678', 'something else entirely different'));
+    const p = intel.prepare(
+      { kind: 'job', language: 'en' },
+      extraction('081-234-5678', 'something else entirely different', 'Courier parcel fee link'),
+    );
     expect((await intel.lookup(p, 'en')).flags).toEqual([]);
   });
 
   it('flags a number reported by 3 or more separate checks, whatever the format', async () => {
     const intel = createIntel({ store: createMemoryStore(), pepper: 'p', now: () => NOW });
     await reportPhone(intel, '+66 81 234 5678', [1, 2, 3, 4]);
-    const p = intel.prepare({ kind: 'job', language: 'en' }, extraction('081-234-5678', 'something else entirely different'));
+    const p = intel.prepare(
+      { kind: 'job', language: 'en' },
+      extraction('081-234-5678', 'something else entirely different', 'Courier parcel fee link'),
+    );
     const r = await intel.lookup(p, 'en');
     expect(r.flags).toHaveLength(1);
     expect(r.flags[0]).toMatchObject({ family: 'known_bad', severity: 'low' });
@@ -94,12 +99,22 @@ describe('network lookup', () => {
     expect(r.flags[0]).toMatchObject({ family: 'known_bad', severity: 'low' });
   });
 
+  it('matches a campaign by the model campaign name when the wording differs', async () => {
+    const intel = createIntel({ store: createMemoryStore(), pepper: 'p', now: () => NOW });
+    for (const [i, phone] of ['0811111111', '0822222222', '0833333333'].entries()) await reportPhone(intel, phone, [i]);
+    const p = intel.prepare(
+      { kind: 'job', language: 'en' },
+      extraction('0899999999', 'Totally different phrasing about clerical work abroad, nothing alike', 'Data entry job in Mae Sot'),
+    );
+    expect((await intel.lookup(p, 'en')).network?.campaign?.name).toBe('Mae Sot data-entry job');
+  });
+
   it('does not match an unrelated template', async () => {
     const intel = createIntel({ store: createMemoryStore(), pepper: 'p', now: () => NOW });
     await reportPhone(intel, '0812345678', [0, 1, 2, 3]);
     const p = intel.prepare(
       { kind: 'message', language: 'en' },
-      extraction('0899999999', 'Your parcel is held at customs, pay a small release fee at the link'),
+      extraction('0899999999', 'Your parcel is held at customs, pay a small release fee at the link', 'Courier parcel fee link'),
     );
     expect((await intel.lookup(p, 'en')).network).toBeUndefined();
   });

@@ -16,6 +16,23 @@ export const SCAM_LABELS: Record<ScamType, string> = {
 export const daysOf = (a: AggDoc) => sumDays(a.real.days, a.seed.days);
 const famsOf = (a: AggDoc) => sumDays(a.real.fam, a.seed.fam);
 
+/** Several template clusters can carry one campaign name; report them as one. */
+function mergeByLabel(docs: AggDoc[]): AggDoc[] {
+  const byName = new Map<string, AggDoc>();
+  for (const d of docs) {
+    const k = d.label ? `${d.scamType}|${d.label.toLowerCase()}` : d.id;
+    const cur = byName.get(k);
+    if (!cur) {
+      byName.set(k, structuredClone(d));
+      continue;
+    }
+    cur.real.days = sumDays(cur.real.days, d.real.days);
+    cur.seed.days = sumDays(cur.seed.days, d.seed.days);
+    cur.example ??= d.example;
+  }
+  return [...byName.values()];
+}
+
 export interface InsightInput {
   types: AggDoc[];
   clusters: AggDoc[];
@@ -30,7 +47,7 @@ export function buildInsights(input: InsightInput, country: string, days: number
       .filter((x) => x.r.count >= K_ANON)
       .sort((x, y) => y.r.rank - x.r.rank);
 
-  const clusters = surfaced(input.clusters);
+  const clusters = surfaced(mergeByLabel(input.clusters));
   const risks = surfaced(input.types)
     .filter((x) => x.a.key !== 'none')
     .map(({ a, r }) => {

@@ -99,6 +99,21 @@ export function createFirestoreStore(opts: { projectId?: string; db?: Firestore 
       return q.docs.map(toAgg);
     },
 
+    async sweepExpired(now) {
+      let removed = 0;
+      for (const name of [SIGNALS, AGGREGATES]) {
+        for (let round = 0; round < 10; round++) {
+          const q = await db.collection(name).where('expireAt', '<', Timestamp.fromDate(now)).limit(400).get();
+          if (q.empty) break;
+          const batch = db.batch();
+          for (const d of q.docs) batch.delete(d.ref);
+          await batch.commit();
+          removed += q.size;
+        }
+      }
+      return removed;
+    },
+
     async purgeSeed() {
       let signals = 0;
       for (;;) {

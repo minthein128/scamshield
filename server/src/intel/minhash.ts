@@ -67,3 +67,44 @@ export function nearest<T extends { sig?: number[] }>(sig: number[], candidates:
   }
   return best;
 }
+
+const tokens = (label: string) =>
+  new Set(
+    label
+      .toLowerCase()
+      .split(/[^\p{L}\p{N}]+/u)
+      .filter((t) => [...t].length >= 3),
+  );
+
+export function labelSimilarity(a: string, b: string): number {
+  const x = tokens(a);
+  const y = tokens(b);
+  let both = 0;
+  for (const t of x) if (y.has(t)) both++;
+  const union = x.size + y.size - both;
+  return union === 0 ? 0 : both / union;
+}
+
+export const LABEL_THRESHOLD = 0.6;
+
+/** Nearest cluster by MinHash of the template, else by overlap of the model's campaign name. */
+export function matchCluster<T extends { sig?: number[]; label?: string }>(
+  sig: number[] | undefined,
+  label: string | undefined,
+  candidates: T[],
+): T | undefined {
+  const byTemplate = sig ? nearest(sig, candidates) : undefined;
+  if (byTemplate) return byTemplate;
+  if (!label) return undefined;
+  let best: T | undefined;
+  let bestSim = LABEL_THRESHOLD;
+  for (const c of candidates) {
+    if (!c.label) continue;
+    const s = labelSimilarity(label, c.label);
+    if (s >= bestSim) {
+      best = c;
+      bestSim = s;
+    }
+  }
+  return best;
+}

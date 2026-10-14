@@ -19,7 +19,8 @@
     "eval": "tsx eval/run.ts",
     "eval:redaction": "tsx eval/redaction.ts",
     "intel:seed": "tsx src/intel/seed.ts",
-    "intel:purge-seed": "tsx src/intel/purge-seed.ts"
+    "intel:purge-seed": "tsx src/intel/purge-seed.ts",
+    "intel:sweep": "tsx src/intel/sweep.ts"
   },
   "dependencies": {
     "@google/genai": "^2.29.1",

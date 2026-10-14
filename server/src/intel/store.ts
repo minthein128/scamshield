@@ -52,6 +52,16 @@ export function createMemoryStore(): MemoryStore {
         .slice(0, limit)
         .map((a) => structuredClone(a));
     },
+    async sweepExpired(now) {
+      let removed = 0;
+      for (const [id, s] of signals) {
+        if (s.expireAt < now) {
+          signals.delete(id);
+          removed++;
+        }
+      }
+      return removed;
+    },
     async purgeSeed() {
       let removedSignals = 0;
       for (const [id, s] of signals) {
