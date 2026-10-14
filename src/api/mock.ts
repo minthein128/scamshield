@@ -68,8 +68,9 @@ function checkLink(url: string): LinkCheck {
 function snippet(text: string, pattern: RegExp): string {
   const match = pattern.exec(text);
   if (!match) return text.slice(0, 80);
-  const start = Math.max(0, match.index - 20);
-  return `"${text.slice(start, match.index + match[0].length + 30).trim()}"`;
+  const before = text.slice(0, match.index).split(/\s+/).slice(-4).join(' ');
+  const after = text.slice(match.index + match[0].length).split(/\s+/).slice(0, 4).join(' ');
+  return `"${`${before} ${match[0]} ${after}`.trim()}"`;
 }
 
 export function buildMockResponse(request: CheckRequest, now: Date = new Date()): CheckResponse {

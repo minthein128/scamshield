@@ -35,7 +35,10 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
   const [speaking, setSpeaking] = useState(false);
 
   useEffect(() => {
-    if (fresh && result.verdict !== 'safe') speak(result.spokenWarning, language).then(() => setSpeaking(true)).catch(() => undefined);
+    if (fresh && result.verdict !== 'safe') {
+      setSpeaking(true);
+      speak(result.spokenWarning, language, () => setSpeaking(false)).catch(() => setSpeaking(false));
+    }
     return () => stopSpeaking();
   }, [fresh, result, language]);
 
@@ -46,7 +49,7 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
       return;
     }
     setSpeaking(true);
-    await speak(result.spokenWarning, language).catch(() => undefined);
+    await speak(result.spokenWarning, language, () => setSpeaking(false)).catch(() => setSpeaking(false));
   };
 
   const callAction = result.actions.find(a => a.type === 'call');

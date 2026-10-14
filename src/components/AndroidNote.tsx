@@ -5,12 +5,12 @@ import theme from '../theme/theme';
 
 const { colors, fonts } = theme;
 
-export const AndroidNote: React.FC<{ feature: string }> = ({ feature }) => {
+export const AndroidNote: React.FC<{ text: string }> = ({ text }) => {
   if (Platform.OS !== 'web') return null;
   const apkUrl = process.env.EXPO_PUBLIC_APK_URL?.trim();
   return (
     <Card style={styles.card}>
-      <Text style={styles.text}>{feature} is available in the SafeRoute Android app.</Text>
+      <Text style={styles.text}>{text}</Text>
       {apkUrl ? (
         <TouchableOpacity accessibilityRole="link" onPress={() => Linking.openURL(apkUrl)}>
           <Text style={styles.link}>Download the Android app</Text>

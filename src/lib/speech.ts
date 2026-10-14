@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import * as Speech from 'expo-speech';
 import type { LanguageCode } from '../api/types';
 import { languageOption } from './languages';
@@ -12,7 +13,7 @@ export function pickSpeechLocale(voiceLanguages: string[], code: LanguageCode): 
   return loose ?? languageOption('en').speechLocale;
 }
 
-export async function speak(text: string, code: LanguageCode): Promise<void> {
+export async function speak(text: string, code: LanguageCode, onEnd?: () => void): Promise<void> {
   let locale = languageOption('en').speechLocale;
   try {
     const voices = await Speech.getAvailableVoicesAsync();
@@ -20,10 +21,14 @@ export async function speak(text: string, code: LanguageCode): Promise<void> {
   } catch {
     locale = languageOption(code).speechLocale;
   }
-  Speech.stop();
-  Speech.speak(text, { language: locale });
+  stopSpeaking();
+  Speech.speak(text, { language: locale, onDone: onEnd, onStopped: onEnd, onError: onEnd });
 }
 
 export function stopSpeaking(): void {
-  Speech.stop();
+  if (Platform.OS === 'web') {
+    if (typeof window !== 'undefined') window.speechSynthesis?.cancel();
+    return;
+  }
+  Promise.resolve(Speech.stop()).catch(() => undefined);
 }

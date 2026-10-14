@@ -58,7 +58,7 @@ export const ShieldScreen: React.FC<RootScreenProps<'Shield'>> = ({ navigation }
         <Text style={styles.body}>It sits on the side of your screen. Tap it on anything that looks strange and SafeRoute checks what is on screen.</Text>
       </Card>
 
-      <AndroidNote feature="The screen shield" />
+      <AndroidNote text="The screen shield is in the SafeRoute Android app." />
 
       {isAndroid ? (
         <>

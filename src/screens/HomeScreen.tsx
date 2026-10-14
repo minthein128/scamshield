@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Svg, { Path, Rect, Circle } from 'react-native-svg';
+import { AndroidNote } from '../components/AndroidNote';
 import { Screen } from '../components/Screen';
 import { Button, Card, Pill, SectionTitle } from '../components/ui';
 import type { TabScreenProps } from '../navigation/types';
@@ -99,6 +100,8 @@ export const HomeScreen: React.FC<TabScreenProps<'Home'>> = ({ navigation }) => 
           })
         )}
       </View>
+
+      <AndroidNote text="Sharing a post or screenshot into SafeRoute from other apps, and the screen shield, are in the Android app." />
     </Screen>
   );
 };
