@@ -16,12 +16,13 @@ export function pickSpeechLocale(voiceLanguages: string[], code: LanguageCode): 
   return findVoiceLocale(voiceLanguages, code) ?? languageOption('en').speechLocale;
 }
 
-async function availableVoiceLanguages(): Promise<string[] | null> {
+async function availableVoiceLanguages(): Promise<string[]> {
+  const timeout = new Promise<never>((_, reject) => setTimeout(() => reject(new Error('voice list timeout')), 1500));
   try {
-    const voices = await Speech.getAvailableVoicesAsync();
+    const voices = await Promise.race([Speech.getAvailableVoicesAsync(), timeout]);
     return voices.map(v => v.language);
   } catch {
-    return null;
+    return [];
   }
 }
 
@@ -32,7 +33,7 @@ function speakLocally(text: string, locale: string, onEnd?: () => void): void {
 
 export async function speak(text: string, code: LanguageCode, onEnd?: () => void, client?: CheckClient): Promise<void> {
   const voices = await availableVoiceLanguages();
-  const local = voices ? findVoiceLocale(voices, code) : languageOption(code).speechLocale;
+  const local = findVoiceLocale(voices, code);
   if (code === 'en' || local) {
     speakLocally(text, local ?? languageOption('en').speechLocale, onEnd);
     return;

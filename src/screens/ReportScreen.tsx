@@ -81,7 +81,7 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
     }
   };
 
-  const otherActions = result.actions.filter(a => a.type !== 'call' && a.type !== 'share');
+  const otherActions = result.actions.filter(a => a.type !== 'call' && a.type !== 'share' && !(result.verdict === 'safe' && a.type === 'learn'));
 
   return (
     <Screen
@@ -100,9 +100,18 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
       <View style={[styles.banner, { backgroundColor: style.background }]} testID={`verdict-${result.verdict}`}>
         <View style={styles.bannerHeader}>
           <Svg width={28} height={28} viewBox="0 0 24 24" fill="none" stroke={colors.white} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-            <Path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" />
-            <Path d="M12 9v4" />
-            <Path d="M12 17h.01" />
+            {result.verdict === 'safe' ? (
+              <>
+                <Path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z" />
+                <Path d="M9 12l2 2 4-4" />
+              </>
+            ) : (
+              <>
+                <Path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" />
+                <Path d="M12 9v4" />
+                <Path d="M12 17h.01" />
+              </>
+            )}
           </Svg>
           <View style={{ flex: 1 }}>
             <Text style={styles.bannerTitle}>{style.label}</Text>
@@ -133,7 +142,7 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
 
       {groups.length > 0 ? (
         <View style={{ gap: 12 }}>
-          <SectionTitle>Why we flagged this</SectionTitle>
+          <SectionTitle>{result.verdict === 'safe' ? 'What we noticed' : 'Why we flagged this'}</SectionTitle>
           {groups.map(group => (
             <View key={group.family} style={{ gap: 8 }}>
               <Text style={styles.family}>{group.label}</Text>
