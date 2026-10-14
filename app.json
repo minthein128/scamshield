@@ -22,7 +22,8 @@
         "FOREGROUND_SERVICE",
         "FOREGROUND_SERVICE_MEDIA_PROJECTION",
         "POST_NOTIFICATIONS"
-      ]
+      ],
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "bundler": "metro",
@@ -51,7 +52,8 @@
             "image/*"
           ]
         }
-      ]
+      ],
+      "@react-native-google-signin/google-signin"
     ],
     "scheme": "saferoute"
   }

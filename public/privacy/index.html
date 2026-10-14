@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SafeRoute privacy policy</title><style>body{font:16px/1.6 system-ui,sans-serif;max-width:720px;margin:0 auto;padding:24px;color:#0F1B2D;background:#F4F6F8}h1{font-size:26px}h2{font-size:18px;margin-top:28px}a{color:#1D4ED8}code{background:#EEF2F6;padding:1px 4px;border-radius:4px}</style></head><body>
+<h1>SafeRoute privacy policy</h1>
+<p>Last updated: 14 October 2026. SafeRoute helps people check job offers, messages and links for scams and trafficking. This page lists what we store and why.</p>
+
+<h2>Using SafeRoute without an account</h2>
+<p>Each install gets an anonymous Firebase ID (a random uid). We use it only to limit how many checks one install can run per hour. Your check history, trusted contacts and settings stay on your device.</p>
+
+<h2>If you create an account</h2>
+<p>You can sign up with an email and password, or with Google or Facebook. We then store your email address and sign-in provider (in Firebase Authentication), and we sync three things to our database (Firebase Firestore, region asia-southeast1):</p>
+<ul>
+<li>your check history as report JSON (verdict, score, flags, evidence quotes and summary text from the report). We never store the screenshot image;</li>
+<li>your trusted contacts (name and phone number you typed or picked);</li>
+<li>your profile (language, home country, destination country).</li>
+</ul>
+<p>Only you can read this data. It is protected by security rules that allow each signed-in user to access only their own documents.</p>
+
+<h2>What happens to what you check</h2>
+<p>To check something, the app sends the text, link or screenshot to our check service. The service uses Google Gemini models, Google Search grounding, Google Web Risk and public domain records (RDAP) to assess it. We do not log the content of your checks. Screenshots are processed in memory and are not saved.</p>
+
+<h2>Anonymous scam signals (optional, on by default)</h2>
+<p>If "Help others: share anonymous scam patterns" is on in Settings, a finished check can add an anonymous signal to a shared scam radar. A signal holds the scam type, verdict, score bucket, flag types, country and language, a redacted message template with personal details removed, and phone numbers, accounts and domains stored only as one-way hashes. It holds no screenshot, no raw text and no name or email. A reporter key made from a one-way hash of your uid and the date is used to count each person once per day. Signals expire after 90 days. You can turn sharing off at any time in Settings, and it is not sent for checks made while it is off.</p>
+
+<h2>Who we share data with</h2>
+<p>We use Google Firebase and Google Cloud to run the service. If you sign in with Google or Facebook, that provider gives us your name, email and a sign-in token. We do not sell data and we do not show ads.</p>
+
+<h2>Your choices</h2>
+<ul>
+<li>Delete the data on your device: Settings, "Delete data on this device".</li>
+<li>Delete your account and everything synced to it: Settings, "Delete account". See <a href="/delete-account">how to delete your data</a>.</li>
+<li>Turn off anonymous signals: Settings, "Help others: share anonymous scam patterns".</li>
+</ul>
+
+</body></html>

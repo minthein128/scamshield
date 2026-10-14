@@ -1,7 +1,6 @@
 import {
   EmailAuthProvider,
   createUserWithEmailAndPassword,
-  GoogleAuthProvider,
   deleteUser,
   linkWithCredential,
   linkWithPopup,
@@ -12,6 +11,8 @@ import {
   signInWithPopup,
   signOut,
   type Auth,
+  type AuthCredential,
+  type AuthProvider,
   type User,
 } from 'firebase/auth';
 
@@ -39,6 +40,8 @@ const MESSAGES: Record<string, string> = {
   'auth/too-many-requests': 'Too many attempts. Wait a few minutes and try again.',
   'auth/network-request-failed': 'No connection. Check your internet and try again.',
   'auth/popup-closed-by-user': 'The Google window was closed before sign-in finished.',
+  'auth/account-exists-with-different-credential': 'That email already has an account with another sign-in method. Use that method.',
+  'auth/unauthorized-domain': 'Sign-in is not allowed from this web address.',
   'auth/popup-blocked': 'Your browser blocked the Google window. Allow pop-ups and try again.',
   'auth/requires-recent-login': 'For your safety, sign in again and then repeat this step.',
   'auth/operation-not-allowed': 'This sign-in method is not available yet.',
@@ -68,23 +71,41 @@ export async function signInWithEmail(auth: Auth, email: string, password: strin
   await signInWithEmailAndPassword(auth, email.trim(), password);
 }
 
-export async function signInWithGoogle(auth: Auth): Promise<void> {
-  const provider = new GoogleAuthProvider();
+const EXISTS = ['auth/credential-already-in-use', 'auth/email-already-in-use'];
+
+export async function linkOrSignIn(auth: Auth, credential: AuthCredential): Promise<void> {
   const user = auth.currentUser;
   if (user?.isAnonymous) {
     try {
-      await linkWithPopup(user, provider);
+      await linkWithCredential(user, credential);
+      await user.getIdToken(true);
+      return;
+    } catch (e) {
+      const code = (e as { code?: string }).code ?? '';
+      if (!EXISTS.includes(code)) throw e;
+      await signInWithCredential(auth, credential);
+      return;
+    }
+  }
+  await signInWithCredential(auth, credential);
+}
+
+export async function popupLinkOrSignIn(auth: Auth, provider: AuthProvider, credentialFromError: (e: never) => AuthCredential | null): Promise<void> {
+  const user = auth.currentUser;
+  if (user?.isAnonymous) {
+    try {
+      await linkWithPopup(user, provider as never);
       await user.getIdToken(true);
       return;
     } catch (e) {
       if ((e as { code?: string }).code !== 'auth/credential-already-in-use') throw e;
-      const credential = GoogleAuthProvider.credentialFromError(e as never);
+      const credential = credentialFromError(e as never);
       if (!credential) throw e;
       await signInWithCredential(auth, credential);
       return;
     }
   }
-  await signInWithPopup(auth, provider);
+  await signInWithPopup(auth, provider as never);
 }
 
 export async function resetPassword(auth: Auth, email: string): Promise<void> {

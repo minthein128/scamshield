@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Switch, Text, StyleSheet, View } from 'react-native';
+import { Linking, Switch, Text, StyleSheet, View } from 'react-native';
+import { SITE_URL } from '../config/env';
 import Constants from 'expo-constants';
 import { Screen } from '../components/Screen';
 import { Button, Card, Chip, LinkButton, Notice, ScreenHeader, SectionTitle } from '../components/ui';
@@ -159,6 +160,8 @@ export const SettingsScreen: React.FC<RootScreenProps<'Settings'>> = ({ navigati
             <Text key={p} style={styles.body}>{p}</Text>
           ))}
         </Card>
+        <LinkButton testID="settings-privacy-policy" label="Privacy policy" onPress={() => Linking.openURL(`${SITE_URL}/privacy`).catch(() => undefined)} />
+        <LinkButton testID="settings-delete-info" label="How to delete your data" onPress={() => Linking.openURL(`${SITE_URL}/delete-account`).catch(() => undefined)} />
         <Button testID="settings-delete-local" label="Delete data on this device" variant="secondary" onPress={onDeleteLocal} disabled={busy} />
       </View>
 
