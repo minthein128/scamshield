@@ -88,6 +88,18 @@ const ms = rows.map((r) => r.ms);
 console.log(
   `\naccuracy ${ok}/${rows.length} (${Math.round((100 * ok) / rows.length)}%)  latency p50=${pct(ms, 50)}ms p95=${pct(ms, 95)}ms max=${Math.max(...ms)}ms`,
 );
-if (process.env.EVAL_JSON)
-  await import('node:fs').then((fs) => fs.writeFileSync(process.env.EVAL_JSON as string, JSON.stringify(rows, null, 2)));
+if (process.env.EVAL_JSON) {
+  const slim = rows.map(({ res, ...r }) => ({ ...r, flags: res?.flags.length ?? 0, sources: res?.sources.length ?? 0 }));
+  const doc = {
+    kind: 'text-eval',
+    date: new Date().toISOString().slice(0, 10),
+    model: cfg.model,
+    cases: rows.length,
+    correct: ok,
+    p50: pct(ms, 50),
+    p95: pct(ms, 95),
+    rows: slim,
+  };
+  await import('node:fs').then((fs) => fs.writeFileSync(process.env.EVAL_JSON as string, `${JSON.stringify(doc, null, 2)}\n`));
+}
 process.exit(ok === rows.length ? 0 : 1);
