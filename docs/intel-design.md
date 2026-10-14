@@ -33,7 +33,7 @@ Written by firebase-admin only. `firestore.rules` denies all client access.
 | --- | --- |
 | scamType, flag family + severity, verdict, score bucket (20 wide), kind, language, home and destination country, redacted template (max 300 chars), campaign label, cluster id, hashed indicators, public domains, UTC day, `expireAt` | uid, IP, image, raw text, flag evidence, victim PII, clear phone/handle/account |
 
-Retention is 90 days, enforced on `expireAt`. A request with `shareSignals: false` writes nothing. Safe verdicts write nothing. The document id is a keyed hash of day, scam type and indicators (or template), so the same person re-checking the same scam on the same day counts once.
+Retention is 90 days, enforced on `expireAt`. A request with `shareSignals: false` writes nothing. Safe verdicts write nothing. With a verified uid (`req.uid`, set by the auth layer, never read from the body) each signal carries `rk = HMAC(pepper, uid + day)`. It changes every day, so it cannot be linked across days or reversed. Every counter (type, indicator, domain, campaign) counts one `rk` once per day, using marker docs in `intel_seen` (2 day expiry). Without a uid the document id is a keyed hash of day, scam type and indicators, so the same scam re-checked on the same day counts once.
 
 ## Aggregation: `intel_aggregates`
 
@@ -55,7 +55,7 @@ The network lookup runs in parallel with Web Risk and RDAP, bounded by the reque
 | 6 to 14 | medium |
 | 15 or more | high |
 
-A campaign match is capped at low. The response gains `network: { seenCount, firstSeen, campaign? }`. The count is real; the value is never shown.
+A campaign match is capped at low. A campaign sums every template cluster that matches by MinHash or by campaign name. The response gains `network: { seenCount, firstSeen, campaign? }`. The count is real; the value is never shown.
 
 Poisoning is limited by: k=3, same-day dedupe, no signal from safe verdicts, and campaign matches capped at low.
 

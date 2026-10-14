@@ -3,7 +3,7 @@ import { COUNTRY_CODES } from './countries.js';
 import { createHasher, type Hasher } from './indicators.js';
 import { buildInsights } from './insights.js';
 import { campaignLabel, reportedEvidence, reportedLabel } from './messages.js';
-import { matchCluster } from './minhash.js';
+import { matchCluster, matchClusters } from './minhash.js';
 import { countIn, sumDays } from './rank.js';
 import { aggId, aggregateWrites, buildSignal, isRecordable, type Outcome, type Prepared, prepare, scopesOf } from './signal.js';
 import { type AggDoc, type ClusterMeta, GLOBAL, type Insights, type IntelStore, K_ANON, type NetworkInfo } from './types.js';
@@ -16,7 +16,7 @@ export interface Lookup {
 export interface Intel {
   prepare(req: Pick<CheckRequest, 'kind' | 'language' | 'url' | 'context'>, ex: Extraction): Prepared;
   lookup(p: Prepared, lang: Lang): Promise<Lookup>;
-  record(p: Prepared, o: Outcome, opts?: { now?: Date; seed?: boolean }): Promise<'recorded' | 'duplicate' | 'skipped'>;
+  record(p: Prepared, o: Outcome, opts?: { now?: Date; seed?: boolean; uid?: string }): Promise<'recorded' | 'duplicate' | 'skipped'>;
   insights(country?: string, days?: number): Promise<Insights>;
   readonly store: IntelStore;
 }
@@ -87,16 +87,19 @@ export function createIntel(opts: { store: IntelStore; pepper: string; cacheMs?:
 
       let campaign: NetworkInfo['campaign'];
       if (p.sig || p.campaign) {
-        const m = matchCluster(p.sig, p.campaign, await clusters());
-        if (m) {
-          const days = sumDays(m.real.days, m.seed.days);
+        const matches = matchClusters(p.sig, p.campaign, await clusters());
+        if (matches.length > 0) {
+          const days = sumDays(...matches.flatMap((m) => [m.real.days, m.seed.days]));
           const week = countIn(days, now, 7);
-          if (week >= K_ANON && m.label) {
-            campaign = { name: m.label, seenThisWeek: week };
+          const top = [...matches].sort(
+            (x, y) => countIn(sumDays(y.real.days, y.seed.days), now, 30) - countIn(sumDays(x.real.days, x.seed.days), now, 30),
+          )[0];
+          if (week >= K_ANON && top?.label) {
+            campaign = { name: top.label, seenThisWeek: week };
             seen.push({ n: countIn(days, now, 30), first: firstDay(days) });
             flags.push({
               family: 'known_bad',
-              label: campaignLabel(lang, m.label, week),
+              label: campaignLabel(lang, top.label, week),
               evidence: reportedEvidence(lang, week),
               severity: 'low',
             });
@@ -142,6 +145,7 @@ export function createIntel(opts: { store: IntelStore; pepper: string; cacheMs?:
         now,
         clusterId,
         seed: ropts.seed,
+        uid: ropts.uid,
         expireBase: ropts.seed ? new Date() : undefined,
       });
       const result = await store.record(id, doc, aggregateWrites(doc, hasher), metas);

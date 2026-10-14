@@ -108,3 +108,24 @@ export function matchCluster<T extends { sig?: number[]; label?: string }>(
   }
   return best;
 }
+
+/** Every cluster that matches by template similarity or by campaign name (a campaign spans clusters). */
+export function matchClusters<T extends { sig?: number[]; label?: string }>(
+  sig: number[] | undefined,
+  label: string | undefined,
+  candidates: T[],
+): T[] {
+  const seeds = new Set<string>();
+  if (label) seeds.add(label);
+  const hit = new Set<T>();
+  for (const c of candidates) {
+    if (sig && c.sig && similarity(sig, c.sig) >= MATCH_THRESHOLD) {
+      hit.add(c);
+      if (c.label) seeds.add(c.label);
+    }
+  }
+  for (const c of candidates) {
+    if (c.label && [...seeds].some((l) => labelSimilarity(l, c.label as string) >= LABEL_THRESHOLD)) hit.add(c);
+  }
+  return [...hit];
+}
