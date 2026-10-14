@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -24,6 +25,7 @@ import ShieldScreen from '../screens/ShieldScreen';
 import DemoBoardScreen from '../screens/DemoBoardScreen';
 import { useSharedDraft } from '../hooks/useSharedDraft';
 import { useShieldDeepLink } from '../hooks/useShieldDeepLink';
+import { Text } from '../components/Text';
 import theme from '../theme/theme';
 
 const Tab = createBottomTabNavigator<TabParamList>();
@@ -31,24 +33,28 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const navTheme = { ...DefaultTheme, colors: { ...DefaultTheme.colors, background: theme.colors.background, card: theme.colors.white, border: theme.colors.border, primary: theme.colors.accent } };
 
-const Tabs: React.FC = () => (
+const Tabs: React.FC = () => {
+  const { t, i18n } = useTranslation();
+  const tall = i18n.language === 'my' || i18n.language === 'th';
+  return (
   <Tab.Navigator
     screenOptions={({ route }) => ({
       headerShown: false,
       tabBarActiveTintColor: theme.colors.accent,
       tabBarInactiveTintColor: theme.colors.textSecondary,
-      tabBarLabelStyle: { fontFamily: theme.fonts.semiBold, fontSize: 12, lineHeight: 18 },
-      tabBarStyle: { height: 72, paddingTop: 8, paddingBottom: 12 },
-      tabBarItemStyle: { height: 52 },
+      tabBarLabel: ({ color, children }) => <Text style={{ color, fontFamily: theme.fonts.semiBold, fontSize: 12, lineHeight: 18, textAlign: 'center' }}>{children}</Text>,
+      tabBarStyle: { height: tall ? 88 : 72, paddingTop: 8, paddingBottom: 12 },
+      tabBarItemStyle: { minHeight: tall ? 68 : 52 },
       tabBarIcon: ({ color }) => <TabIcon name={route.name} color={color} />,
     })}
   >
-    <Tab.Screen name="Home" component={HomeScreen} />
-    <Tab.Screen name="Check" component={CheckScreen} />
-    <Tab.Screen name="Contacts" component={ContactsScreen} options={{ title: 'Contacts', tabBarAccessibilityLabel: 'Trusted contacts' }} />
-    <Tab.Screen name="Learn" component={LearnScreen} />
+    <Tab.Screen name="Home" component={HomeScreen} options={{ title: t('tabs.home') }} />
+    <Tab.Screen name="Check" component={CheckScreen} options={{ title: t('tabs.check') }} />
+    <Tab.Screen name="Contacts" component={ContactsScreen} options={{ title: t('tabs.contacts'), tabBarAccessibilityLabel: t('tabs.contactsA11y') }} />
+    <Tab.Screen name="Learn" component={LearnScreen} options={{ title: t('tabs.learn') }} />
   </Tab.Navigator>
-);
+  );
+};
 
 const ShareIntentBridge: React.FC<{ ready: boolean }> = ({ ready }) => {
   const { draft, clear } = useSharedDraft();

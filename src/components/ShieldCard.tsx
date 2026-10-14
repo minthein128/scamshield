@@ -1,7 +1,9 @@
 import React from 'react';
-import { Linking, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
+import { Linking, StyleSheet, Switch, TouchableOpacity, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { Text } from './Text';
 import { Icon } from './Icon';
-import { STEP_TEXT, useShieldControl, type ShieldControl } from '../hooks/useShieldControl';
+import { stepText, useShieldControl, type ShieldControl } from '../hooks/useShieldControl';
 import theme from '../theme/theme';
 
 const { colors, fonts } = theme;
@@ -9,6 +11,7 @@ const { colors, fonts } = theme;
 export const ShieldCard: React.FC<{ onDetails?: () => void }> = ({ onDetails }) => <ShieldCardView control={useShieldControl()} onDetails={onDetails} />;
 
 export const ShieldCardView: React.FC<{ control: ShieldControl; onDetails?: () => void }> = ({ control, onDetails }) => {
+  const { t } = useTranslation('shield');
   const { support, running, step, error, setEnabled } = control;
   const apkUrl = process.env.EXPO_PUBLIC_APK_URL?.trim();
 
@@ -18,15 +21,15 @@ export const ShieldCardView: React.FC<{ control: ShieldControl; onDetails?: () =
   const working = step !== 'idle';
   const status = unavailable
     ? support === 'web'
-      ? 'Works in the SafeRoute Android app.'
+      ? t('status.web')
       : support === 'insecure-service'
-        ? 'This build uses an insecure service address, so the shield is off.'
-        : 'Not available in this build.'
+        ? t('status.insecure')
+        : t('status.unavailable')
     : working
-      ? STEP_TEXT[step]
+      ? stepText(step)
       : running
-        ? 'On. Tap the bubble on anything suspicious.'
-        : 'Off. Turn it on to check what is on your screen.';
+        ? t('status.on')
+        : t('status.off');
 
   return (
     <View testID="shield-card" style={[styles.card, unavailable && styles.cardOff]}>
@@ -35,12 +38,12 @@ export const ShieldCardView: React.FC<{ control: ShieldControl; onDetails?: () =
           <Icon name="shieldCheck" size={28} color={colors.white} />
         </View>
         <View style={styles.text}>
-          <Text style={styles.title}>Screen shield</Text>
+          <Text style={styles.title}>{t('title')}</Text>
           <Text testID="shield-status" style={styles.status}>{status}</Text>
         </View>
         {unavailable ? null : <Switch
           testID="shield-switch"
-          accessibilityLabel="Screen shield"
+          accessibilityLabel={t('title')}
           value={running || working}
           disabled={unavailable || working}
           onValueChange={setEnabled}
@@ -48,16 +51,16 @@ export const ShieldCardView: React.FC<{ control: ShieldControl; onDetails?: () =
           thumbColor={colors.white}
         />}
       </View>
-      <Text style={styles.body}>A small button floats over other apps. Tap it on a job post, chat or listing and SafeRoute checks what is on your screen.</Text>
+      <Text style={styles.body}>{t('body')}</Text>
       {error ? <Text style={styles.error}>{error}</Text> : null}
       {support === 'web' && apkUrl ? (
-        <TouchableOpacity testID="shield-apk" accessibilityRole="link" accessibilityLabel="Download the Android app" onPress={() => Linking.openURL(apkUrl)} style={styles.link}>
-          <Text style={styles.linkText}>Download the Android app</Text>
+        <TouchableOpacity testID="shield-apk" accessibilityRole="link" accessibilityLabel={t('download')} onPress={() => Linking.openURL(apkUrl)} style={styles.link}>
+          <Text style={styles.linkText}>{t('download')}</Text>
         </TouchableOpacity>
       ) : null}
       {onDetails && !unavailable ? (
-        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Shield details" onPress={onDetails} style={styles.link}>
-          <Text style={styles.linkText}>Details and permissions</Text>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel={t('detailsA11y')} onPress={onDetails} style={styles.link}>
+          <Text style={styles.linkText}>{t('details')}</Text>
         </TouchableOpacity>
       ) : null}
     </View>

@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { Platform, StyleSheet, Text, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import * as Contacts from 'expo-contacts';
 import { Screen } from '../components/Screen';
+import { Text } from '../components/Text';
 import { Button, Card, EmptyState, Field, LinkButton, Notice, ScreenHeader } from '../components/ui';
 import { callNumber } from '../lib/warn';
 import { useAppState } from '../state/AppState';
@@ -11,6 +13,7 @@ import theme from '../theme/theme';
 const { colors, fonts } = theme;
 
 export const ContactsScreen: React.FC = () => {
+  const { t } = useTranslation('contacts');
   const { contacts, addContact, removeContact } = useAppState();
   const { status } = useAuth();
   const [name, setName] = useState('');
@@ -31,32 +34,30 @@ export const ContactsScreen: React.FC = () => {
     try {
       const { granted } = await Contacts.requestPermissionsAsync();
       if (!granted) {
-        setError('Allow access to contacts to pick someone, or type their number below.');
+        setError(t('errors.permission'));
         return;
       }
       const picked = await Contacts.presentContactPickerAsync();
       const number = picked?.phoneNumbers?.[0]?.number;
       if (!picked) return;
       if (!number) {
-        setError('That contact has no phone number.');
+        setError(t('errors.noNumber'));
         return;
       }
       setName(picked.name ?? '');
       setPhone(number);
     } catch {
-      setError('We could not open your contacts. Type the number below instead.');
+      setError(t('errors.openFailed'));
     }
   };
 
   return (
     <Screen>
-      <ScreenHeader title="Trusted contacts" />
-      <Text style={styles.body}>
-        People you trust. When a check looks risky, warn them with one tap, or call them first.
-      </Text>
+      <ScreenHeader title={t('title')} />
+      <Text style={styles.body}>{t('intro')}</Text>
 
       {contacts.length === 0 ? (
-        <EmptyState testID="contacts-empty" icon="people" title="No trusted contacts yet" body="Add a family member or friend below. Their number is saved only on your device unless you sign in." />
+        <EmptyState testID="contacts-empty" icon="people" title={t('emptyTitle')} body={t('emptyBody')} />
       ) : (
         contacts.map(c => (
           <Card key={c.id} style={styles.contact}>
@@ -64,23 +65,23 @@ export const ContactsScreen: React.FC = () => {
               <Text testID="contact-name" style={styles.name}>{c.name}</Text>
               <Text style={styles.phone}>{c.phone}</Text>
             </View>
-            <Button testID={`call-${c.id}`} label="Call" variant="secondary" style={styles.small} onPress={() => callNumber(c.phone)} />
-            <LinkButton label="Remove" color={colors.danger} onPress={() => removeContact(c.id)} />
+            <Button testID={`call-${c.id}`} label={t('call')} variant="secondary" style={styles.small} onPress={() => callNumber(c.phone)} />
+            <LinkButton label={t('remove')} color={colors.danger} onPress={() => removeContact(c.id)} />
           </Card>
         ))
       )}
 
       <Card style={{ gap: 12 }}>
-        <Text style={styles.name}>Add a contact</Text>
-        <Field testID="contact-name-input" label="Name" value={name} onChangeText={setName} autoComplete="name" />
-        <Field testID="contact-phone-input" label="Phone number" value={phone} onChangeText={setPhone} keyboardType="phone-pad" autoComplete="tel" hint="Include the country code, for example +95." />
+        <Text style={styles.name}>{t('add.title')}</Text>
+        <Field testID="contact-name-input" label={t('add.name')} value={name} onChangeText={setName} autoComplete="name" />
+        <Field testID="contact-phone-input" label={t('add.phone')} value={phone} onChangeText={setPhone} keyboardType="phone-pad" autoComplete="tel" hint={t('add.phoneHint')} />
         {error ? <Notice testID="contact-error" message={error} /> : null}
-        <Button testID="contact-add" label="Add contact" onPress={() => save(name, phone)} />
-        {Platform.OS !== 'web' ? <Button testID="contact-pick" label="Pick from my contacts" variant="secondary" onPress={pick} /> : null}
+        <Button testID="contact-add" label={t('add.submit')} onPress={() => save(name, phone)} />
+        {Platform.OS !== 'web' ? <Button testID="contact-pick" label={t('add.pick')} variant="secondary" onPress={pick} /> : null}
       </Card>
 
       <Text style={styles.footnote}>
-        {status.kind === 'account' ? 'Your contacts are synced to your account.' : 'Your contacts are saved on this device. Sign in to keep them if you change phone.'}
+        {status.kind === 'account' ? t('footnote.synced') : t('footnote.local')}
       </Text>
     </Screen>
   );

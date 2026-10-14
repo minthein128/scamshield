@@ -1,11 +1,13 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { errorCopy, getApiClient } from '../api';
 import type { Insights } from '../api/types';
 import { Screen } from '../components/Screen';
+import { Text } from '../components/Text';
 import { Card, Chip, EmptyState, Notice, ScreenHeader, SectionTitle } from '../components/ui';
-import { COUNTRIES } from '../lib/countries';
-import { TREND_LABEL, TREND_SYMBOL, defaultScope, reportCountText, type RadarScope } from '../lib/radar';
+import { COUNTRIES, countryLabel } from '../lib/countries';
+import { TREND_SYMBOL, trendLabel, defaultScope, reportCountText, type RadarScope } from '../lib/radar';
 import type { RootScreenProps } from '../navigation/types';
 import { useAppState } from '../state/AppState';
 import theme from '../theme/theme';
@@ -13,6 +15,7 @@ import theme from '../theme/theme';
 const { colors, fonts } = theme;
 
 export const RadarScreen: React.FC<RootScreenProps<'Radar'>> = ({ navigation }) => {
+  const { t } = useTranslation(['radar', 'common']);
   const { profile } = useAppState();
   const [scope, setScope] = useState<RadarScope>(defaultScope(profile.destinationCountry, profile.homeCountry));
   const [data, setData] = useState<Insights | null>(null);
@@ -41,29 +44,29 @@ export const RadarScreen: React.FC<RootScreenProps<'Radar'>> = ({ navigation }) 
 
   return (
     <Screen>
-      <ScreenHeader title="Scam radar" onBack={() => navigation.goBack()} />
-      <Text style={styles.body}>What other SafeRoute users reported in the last 30 days. Only patterns seen at least {data?.k ?? 3} times are shown.</Text>
+      <ScreenHeader title={t('title')} onBack={() => navigation.goBack()} />
+      <Text style={styles.body}>{t('intro', { count: data?.k ?? 3 })}</Text>
 
       <View style={styles.wrap}>
-        <Chip label="Global" selected={scope === 'GLOBAL'} onPress={() => setScope('GLOBAL')} />
+        <Chip label={t('global')} selected={scope === 'GLOBAL'} onPress={() => setScope('GLOBAL')} />
         {COUNTRIES.map(c => (
-          <Chip key={c.code} label={c.name} selected={scope === c.code} onPress={() => setScope(c.code)} />
+          <Chip key={c.code} label={countryLabel(c.code)} selected={scope === c.code} onPress={() => setScope(c.code)} />
         ))}
       </View>
 
       {loading ? <ActivityIndicator testID="radar-loading" color={colors.accent} style={{ marginVertical: 24 }} /> : null}
 
-      {error ? <Notice testID="radar-error" title={error.title} message={error.message} actionLabel="Try again" onAction={() => load(scope)} /> : null}
+      {error ? <Notice testID="radar-error" title={error.title} message={error.message} actionLabel={t('common:actions.tryAgain')} onAction={() => load(scope)} /> : null}
 
       {!loading && !error && risks.length === 0 && domains.length === 0 ? (
-        <EmptyState icon="radar" testID="radar-empty" title="Not enough reports yet" body="When enough people report the same kind of scam here, it shows up on the radar. Your checks help, and nothing personal is shared." />
+        <EmptyState icon="radar" testID="radar-empty" title={t('empty.title')} body={t('empty.body')} />
       ) : null}
 
       {risks.map(r => (
         <Card key={r.scamType} testID={`radar-risk-${r.scamType}`} style={{ gap: 6 }}>
           <View style={styles.row}>
             <Text style={styles.label}>{r.label}</Text>
-            <Text accessibilityLabel={TREND_LABEL[r.trend]} style={[styles.trend, r.trend === 'up' && { color: colors.danger }]}>{TREND_SYMBOL[r.trend]}</Text>
+            <Text accessibilityLabel={trendLabel(r.trend)} style={[styles.trend, r.trend === 'up' && { color: colors.danger }]}>{TREND_SYMBOL[r.trend]}</Text>
           </View>
           <Text style={styles.count}>{reportCountText(r.count, data?.days)}</Text>
           {r.example ? <Text style={styles.quote}>{`“${r.example}”`}</Text> : null}
@@ -72,13 +75,13 @@ export const RadarScreen: React.FC<RootScreenProps<'Radar'>> = ({ navigation }) 
 
       {domains.length > 0 ? (
         <View style={{ gap: 8 }}>
-          <SectionTitle>Top scam domains</SectionTitle>
+          <SectionTitle>{t('domains')}</SectionTitle>
           <Card style={{ gap: 10 }}>
             {domains.map(d => (
               <View key={d.domain} style={styles.row}>
                 <Text style={styles.domain}>{d.domain}</Text>
                 <Text style={styles.count}>{d.count}</Text>
-                <Text accessibilityLabel={TREND_LABEL[d.trend]} style={[styles.trend, d.trend === 'up' && { color: colors.danger }]}>{TREND_SYMBOL[d.trend]}</Text>
+                <Text accessibilityLabel={trendLabel(d.trend)} style={[styles.trend, d.trend === 'up' && { color: colors.danger }]}>{TREND_SYMBOL[d.trend]}</Text>
               </View>
             ))}
           </Card>

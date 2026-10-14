@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useApiUrl } from '../config/runtime';
 import { Screen } from '../components/Screen';
+import { Text } from '../components/Text';
 import { ShieldCard } from '../components/ShieldCard';
 import { Button, Chip, LinkButton } from '../components/ui';
 import { shieldSupport } from '../hooks/useShieldControl';
-import { COUNTRIES, type CountryCode } from '../lib/countries';
-import { LANGUAGES } from '../lib/languages';
+import { COUNTRIES, countryLabel, type CountryCode } from '../lib/countries';
+import { UI_LANGUAGES, checkLanguageFor, type UiLanguage } from '../i18n/languages';
+import { useUiLanguage } from '../i18n/useUiLanguage';
 import { HELP_POINTS, onboardingSteps, type AfterOnboarding } from '../lib/onboarding';
 import type { LanguageCode } from '../api/types';
 import { useAppState } from '../state/AppState';
@@ -15,13 +18,20 @@ import theme from '../theme/theme';
 const { colors, fonts } = theme;
 
 export const OnboardingScreen: React.FC<{ onDone: (next?: AfterOnboarding) => void }> = ({ onDone }) => {
+  const { t } = useTranslation(['onboarding', 'common']);
+  const { uiLanguage, setUiLanguage } = useUiLanguage();
   const { profile, finishOnboarding } = useAppState();
   const steps = onboardingSteps(shieldSupport(Platform.OS, useApiUrl()) === 'ready');
   const [index, setIndex] = useState(0);
-  const [language, setLanguage] = useState<LanguageCode>(profile.language);
+  const [language, setLanguage] = useState<LanguageCode>(checkLanguageFor(uiLanguage));
   const [home, setHome] = useState<CountryCode | undefined>(profile.homeCountry);
   const [destination, setDestination] = useState<CountryCode | undefined>(profile.destinationCountry);
   const step = steps[index];
+
+  const chooseLanguage = (code: UiLanguage) => {
+    setUiLanguage(code).catch(() => undefined);
+    setLanguage(checkLanguageFor(code));
+  };
 
   const finish = (next?: AfterOnboarding) => {
     finishOnboarding({ language, homeCountry: home, destinationCountry: destination });
@@ -33,51 +43,52 @@ export const OnboardingScreen: React.FC<{ onDone: (next?: AfterOnboarding) => vo
       footer={
         step === 'account' ? (
           <>
-            <Button testID="onboarding-anonymous" label="Continue without an account" onPress={() => finish()} />
-            <Button testID="onboarding-signup" label="Create account" variant="secondary" onPress={() => finish('signUp')} />
-            <LinkButton testID="onboarding-signin" label="I already have an account" onPress={() => finish('signIn')} />
+            <Button testID="onboarding-anonymous" label={t('account.anonymous')} onPress={() => finish()} />
+            <Button testID="onboarding-signup" label={t('account.signUp')} variant="secondary" onPress={() => finish('signUp')} />
+            <LinkButton testID="onboarding-signin" label={t('account.signIn')} onPress={() => finish('signIn')} />
           </>
         ) : (
-          <Button testID="onboarding-next" label={step === 'shield' ? 'Continue' : 'Next'} onPress={() => setIndex(index + 1)} />
+          <Button testID="onboarding-next" label={step === 'shield' ? t('common:actions.continue') : t('common:actions.next')} onPress={() => setIndex(index + 1)} />
         )
       }
     >
       <View style={styles.top}>
-        <View style={styles.dots} accessibilityLabel={`Step ${index + 1} of ${steps.length}`}>
+        <View style={styles.dots} accessibilityLabel={t('step', { current: index + 1, total: steps.length })}>
           {steps.map((s, i) => (
             <View key={s} style={[styles.dot, i <= index && styles.dotOn]} />
           ))}
         </View>
         {step !== 'account' ? (
-          <TouchableOpacity testID="onboarding-skip" accessibilityRole="button" accessibilityLabel="Skip setup" onPress={() => finish()} style={styles.skip}>
-            <Text style={styles.skipText}>Skip</Text>
+          <TouchableOpacity testID="onboarding-skip" accessibilityRole="button" accessibilityLabel={t('skipA11y')} onPress={() => finish()} style={styles.skip}>
+            <Text style={styles.skipText}>{t('common:actions.skip')}</Text>
           </TouchableOpacity>
         ) : null}
       </View>
 
       {step === 'language' ? (
         <>
-          <Heading title="Choose your language" body="SafeRoute writes its reports and spoken warnings in this language. You can change it later." />
+          <Heading title={t('language.title')} body={t('language.body')} />
           <View style={styles.wrap}>
-            {LANGUAGES.map(l => (
-              <Chip key={l.code} label={l.label} nativeLabel={l.nativeLabel} selected={language === l.code} onPress={() => setLanguage(l.code)} />
+            {UI_LANGUAGES.map(l => (
+              <Chip key={l.code} testID={`onboarding-language-${l.code}`} label={l.label} nativeLabel={l.nativeLabel} selected={uiLanguage === l.code} onPress={() => chooseLanguage(l.code)} />
             ))}
           </View>
+          {uiLanguage === 'th' ? <Text style={styles.body}>{t('common:languageNote.reportsInEnglish')}</Text> : null}
         </>
       ) : null}
 
       {step === 'countries' ? (
         <>
-          <Heading title="Where are you from?" body="This shows the right hotlines first." />
+          <Heading title={t('countries.fromTitle')} body={t('countries.fromBody')} />
           <View style={styles.wrap}>
             {COUNTRIES.map(c => (
-              <Chip key={c.code} label={c.name} selected={home === c.code} onPress={() => setHome(home === c.code ? undefined : c.code)} />
+              <Chip key={c.code} label={countryLabel(c.code)} selected={home === c.code} onPress={() => setHome(home === c.code ? undefined : c.code)} />
             ))}
           </View>
-          <Heading title="Where will you work or travel?" body="Optional. Skip it if you do not know yet." small />
+          <Heading title={t('countries.toTitle')} body={t('countries.toBody')} small />
           <View style={styles.wrap}>
             {COUNTRIES.map(c => (
-              <Chip key={c.code} label={c.name} selected={destination === c.code} onPress={() => setDestination(destination === c.code ? undefined : c.code)} />
+              <Chip key={c.code} label={countryLabel(c.code)} selected={destination === c.code} onPress={() => setDestination(destination === c.code ? undefined : c.code)} />
             ))}
           </View>
         </>
@@ -85,15 +96,15 @@ export const OnboardingScreen: React.FC<{ onDone: (next?: AfterOnboarding) => vo
 
       {step === 'how' ? (
         <>
-          <Heading title="How SafeRoute helps" body="Three things, nothing to set up." />
+          <Heading title={t('how.title')} body={t('how.body')} />
           {HELP_POINTS.map((p, i) => (
-            <View key={p.title} style={styles.point}>
+            <View key={p} style={styles.point}>
               <View style={styles.pointNumber}>
                 <Text style={styles.pointNumberText}>{i + 1}</Text>
               </View>
               <View style={{ flex: 1, gap: 2 }}>
-                <Text style={styles.pointTitle}>{p.title}</Text>
-                <Text style={styles.pointBody}>{p.body}</Text>
+                <Text style={styles.pointTitle}>{t(`how.${p}.title`)}</Text>
+                <Text style={styles.pointBody}>{t(`how.${p}.body`)}</Text>
               </View>
             </View>
           ))}
@@ -102,18 +113,16 @@ export const OnboardingScreen: React.FC<{ onDone: (next?: AfterOnboarding) => vo
 
       {step === 'shield' ? (
         <>
-          <Heading title="Turn on the screen shield" body="Optional. You can also do this later from the home screen." />
+          <Heading title={t('shield.title')} body={t('shield.body')} />
           <ShieldCard />
         </>
       ) : null}
 
       {step === 'account' ? (
         <>
-          <Heading title="Use SafeRoute your way" body="Everything works without an account. Your checks stay on this device." />
+          <Heading title={t('account.title')} body={t('account.body')} />
           <View style={styles.accountNote}>
-            <Text style={styles.pointBody}>
-              An account is optional. It saves your history and trusted contacts so you can get them back on a new phone, and it raises your hourly check limit.
-            </Text>
+            <Text style={styles.pointBody}>{t('account.note')}</Text>
           </View>
         </>
       ) : null}

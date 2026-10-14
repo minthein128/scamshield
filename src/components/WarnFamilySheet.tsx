@@ -1,5 +1,7 @@
 import React from 'react';
-import { Modal, Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { Modal, Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { Text } from './Text';
 import { Button } from './ui';
 import { useAppState } from '../state/AppState';
 import { shareText } from '../lib/notify';
@@ -16,23 +18,24 @@ interface Props {
 }
 
 export const WarnFamilySheet: React.FC<Props> = ({ visible, message, onClose, onAddContact }) => {
+  const { t } = useTranslation(['contacts', 'common']);
   const { contacts } = useAppState();
   const { height } = useWindowDimensions();
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <View style={[styles.overlay, { height }]}>
-      <Pressable accessibilityLabel="Close" style={styles.backdrop} onPress={onClose} />
+      <Pressable accessibilityLabel={t('common:actions.close')} style={styles.backdrop} onPress={onClose} />
       <View style={styles.sheet} testID="warn-sheet">
-        <Text accessibilityRole="header" style={styles.title}>Warn someone you trust</Text>
-        <Text style={styles.body}>This opens a text message with the warning. You choose whether to send it.</Text>
+        <Text accessibilityRole="header" style={styles.title}>{t('warn.title')}</Text>
+        <Text style={styles.body}>{t('warn.body')}</Text>
         {contacts.length === 0 ? (
-          <Button label="Add a trusted contact" onPress={() => { onClose(); onAddContact(); }} />
+          <Button label={t('warn.addContact')} onPress={() => { onClose(); onAddContact(); }} />
         ) : (
           contacts.map(c => (
             <Button
               key={c.id}
               testID={`warn-${c.id}`}
-              label={`Text ${c.name}`}
+              label={t('warn.text', { name: c.name })}
               onPress={() => {
                 textContact(c, message).catch(() => undefined);
                 onClose();
@@ -40,8 +43,8 @@ export const WarnFamilySheet: React.FC<Props> = ({ visible, message, onClose, on
             />
           ))
         )}
-        <Button testID="warn-share" label="Share another way" variant="secondary" onPress={() => { shareText(message).catch(() => undefined); onClose(); }} />
-        <Button label="Cancel" variant="secondary" onPress={onClose} />
+        <Button testID="warn-share" label={t('warn.share')} variant="secondary" onPress={() => { shareText(message).catch(() => undefined); onClose(); }} />
+        <Button label={t('common:actions.cancel')} variant="secondary" onPress={onClose} />
       </View>
       </View>
     </Modal>

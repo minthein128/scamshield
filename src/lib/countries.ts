@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { COUNTRIES, type Country, type CountryCode } from '../data/countries';
 
 export { COUNTRIES };
@@ -9,6 +10,10 @@ export function isCountryCode(value: unknown): value is CountryCode {
 
 export function countryName(code: CountryCode | undefined): string {
   return COUNTRIES.find(c => c.code === code)?.name ?? '';
+}
+
+export function countryLabel(code: CountryCode | undefined): string {
+  return code ? t(`common:countries.${code}`) : '';
 }
 
 export function countryFromText(text: string | undefined): CountryCode | undefined {

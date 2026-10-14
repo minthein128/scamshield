@@ -1,6 +1,8 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { CheckResponse, LanguageCode } from '../api/types';
+import { t } from '../i18n';
+import { clearUiLanguage } from '../i18n/storage';
 import { useShieldSync } from '../hooks/useShieldSync';
 import {
   CONTACTS_KEY,
@@ -130,7 +132,7 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     if (problem) return problem;
     const contact = makeContact(input);
     const next = upsertContact(latest.current.contacts, contact);
-    if (next === latest.current.contacts) return 'That number is already in your list.';
+    if (next === latest.current.contacts) return t('contacts:errors.duplicate');
     setContacts(next);
     saveContacts(next).catch(() => undefined);
     const id = latest.current.uid;
@@ -156,6 +158,7 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const deleteLocalData = useCallback(async () => {
     await clearHistory();
     await AsyncStorage.multiRemove([CONTACTS_KEY, PROFILE_KEY]);
+    await clearUiLanguage();
     setHistory([]);
     setContacts([]);
     setProfile(DEFAULT_PROFILE);
