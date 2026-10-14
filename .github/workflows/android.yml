@@ -61,7 +61,7 @@ jobs:
 
       - name: Sign APK
         id: sign
-        run: scripts/sign-apk.sh android/app/build/outputs/apk/release dist-apk/saferoute-${{ github.ref_name }}.apk
+        run: scripts/sign-apk.sh android/app/build/outputs/apk/release dist-apk/saferoute-${{ github.run_number }}.apk
 
       - uses: actions/upload-artifact@v4
         with:
