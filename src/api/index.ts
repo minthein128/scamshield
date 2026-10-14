@@ -28,7 +28,7 @@ function createUnavailableClient(): CheckClient {
   const fail = async (): Promise<never> => {
     throw new ApiError('unavailable', 'No check service address in this build');
   };
-  return { isMock: false, check: fail, speak: fail, health: fail, insights: fail };
+  return { isMock: false, check: fail, speak: fail, health: fail, insights: fail, feedback: fail };
 }
 
 export function createRuntimeClient(resolve: () => Promise<string> = ensureApiUrl, allowMock: boolean = __DEV__): CheckClient {
@@ -42,5 +42,6 @@ export function createRuntimeClient(resolve: () => Promise<string> = ensureApiUr
     speak: async (r, o) => (await client()).speak(r, o),
     health: async o => (await client()).health(o),
     insights: async (c, o) => (await client()).insights(c, o),
+    feedback: async (r, o) => (await client()).feedback(r, o),
   };
 }

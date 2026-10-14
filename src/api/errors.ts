@@ -43,6 +43,7 @@ export function userMessage(error: unknown): string {
 }
 
 export function codeFromStatus(status: number): ClientErrorCode {
+  if (status === 404) return 'not_found';
   if (status === 413) return 'too_large';
   if (status === 429) return 'rate_limited';
   if (status >= 500) return 'upstream';

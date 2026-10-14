@@ -26,7 +26,7 @@ export const NotifVerdictScreen: React.FC<NotifVerdictScreenProps> = ({ onNaviga
           </View>
           <View style={{ flexDirection: 'column' }}>
             <Text style={{ color: '#9A3412', fontSize: 32, fontFamily: theme.fonts.extraBold, letterSpacing: -0.5, lineHeight: 35, includeFontPadding: false }}>Danger</Text>
-            <Text style={{ color: '#9A3412', fontSize: 15, fontFamily: theme.fonts.semiBold, lineHeight: 20, includeFontPadding: false }}>Fake delivery fee</Text>
+            <Text style={{ color: '#9A3412', fontSize: 15, fontFamily: theme.fonts.semiBold, lineHeight: 20, includeFontPadding: false }}>Delivery fee looks fake</Text>
           </View>
         </View>
         <Text style={{ color: '#0F1B2D', fontSize: 20, lineHeight: 28, fontFamily: theme.fonts.bold, includeFontPadding: false }}>Do not open the link. Check your parcel in the courier's own app.</Text>
@@ -58,7 +58,7 @@ export const NotifVerdictScreen: React.FC<NotifVerdictScreenProps> = ({ onNaviga
               <Path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1" />
               <Path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" />
             </Svg>
-            <Text style={{ flex: 1, color: '#7C2D12', fontSize: 15, fontFamily: theme.fonts.bold, lineHeight: 20, includeFontPadding: false }}>The link is a known trap</Text>
+            <Text style={{ flex: 1, color: '#7C2D12', fontSize: 15, fontFamily: theme.fonts.bold, lineHeight: 20, includeFontPadding: false }}>Link matches reported scams</Text>
             <Text style={{ backgroundColor: '#FFFFFF', paddingVertical: 3, paddingHorizontal: 7, borderRadius: 6, color: '#7C2D12', fontFamily: theme.fonts.mono, fontSize: 11, lineHeight: 15, includeFontPadding: false }}>Web Risk</Text>
           </View>
           <View style={{ alignItems: 'center', gap: 12, padding: 12, backgroundColor: '#FFF1E8', borderRadius: 14, flexDirection: 'row' }}>

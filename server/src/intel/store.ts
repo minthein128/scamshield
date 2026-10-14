@@ -1,4 +1,4 @@
-import type { AggDoc, AggKind, AggWrite, Bucket, ClusterMeta, IntelStore, SignalDoc } from './types.js';
+import type { AggDelta, AggDoc, AggKind, AggWrite, Bucket, ClusterMeta, IntelStore, SignalDoc } from './types.js';
 
 const emptyBucket = (): Bucket => ({ days: {}, fam: {} });
 
@@ -46,6 +46,34 @@ export function createMemoryStore(): MemoryStore {
         aggs.set(w.id, cur);
       }
       return 'recorded';
+    },
+    async getSignal(id) {
+      const s = signals.get(id);
+      return s ? structuredClone(s) : undefined;
+    },
+    async adjust(id, patch, deltas: AggDelta[]) {
+      const sig = signals.get(id);
+      if (!sig) return false;
+      Object.assign(sig, patch);
+      for (const d of deltas) {
+        const cur: AggDoc = aggs.get(d.id) ?? {
+          id: d.id,
+          kind: d.kind,
+          scope: d.scope,
+          key: d.key,
+          scamType: d.scamType,
+          real: emptyBucket(),
+          seed: emptyBucket(),
+        };
+        const b = sig.seed ? cur.seed : cur.real;
+        const bump = (m: Record<string, number>, k: string) => {
+          m[k] = Math.max(0, (m[k] ?? 0) + d.amount);
+        };
+        bump(b.days, d.day);
+        for (const f of d.fams) bump(b.fam, f);
+        aggs.set(d.id, cur);
+      }
+      return true;
     },
     async getAggs(ids) {
       return ids

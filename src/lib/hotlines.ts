@@ -5,7 +5,7 @@ import { COUNTRIES, type CountryCode } from '../data/countries';
 export { HOTLINES };
 export type { Hotline, HotlineCategory };
 
-export const CATEGORY_ORDER: HotlineCategory[] = ['trafficking', 'police', 'cybercrime', 'consular'];
+export const CATEGORY_ORDER: HotlineCategory[] = ['trafficking', 'police', 'cybercrime', 'consular', 'ngo'];
 
 export function categoryLabel(category: HotlineCategory): string {
   return t(`help:categories.${category}`);

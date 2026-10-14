@@ -14,6 +14,26 @@ describe('hotline data', () => {
       expect(COUNTRIES.some(c => c.code === h.country)).toBe(true);
     }
   });
+
+  it('keeps dial strings clean and an as-of date on every new source', () => {
+    for (const h of HOTLINES) {
+      if (h.dial) expect(h.dial).toMatch(/^\+?\d{3,15}$/);
+      if (h.asOf) expect(h.asOf).toMatch(/^\d{4}-\d{2}(-\d{2})?$/);
+    }
+  });
+
+  it('gives Myanmar workers labour attache lines in Thailand and Malaysia', () => {
+    const mm = hotlinesForCountry('MM').map(h => h.id);
+    expect(mm).toEqual(expect.arrayContaining(['mm-labour-attache-bangkok', 'mm-labour-attache-malaysia']));
+    expect(helpSections('TH', 'MM')[1].entries.some(h => h.id === 'mm-labour-attache-bangkok')).toBe(true);
+  });
+
+  it('shows a Cambodia reporting portal that has no phone number', () => {
+    const portal = HOTLINES.find(h => h.id === 'kh-police-scam-portal');
+    expect(portal?.reportUrl).toMatch(/^https:\/\//);
+    expect(portal?.dial).toBeUndefined();
+    expect(primaryHotline('KH', undefined)?.id).toBe('kh-ncct-1288');
+  });
 });
 
 describe('hotline filter', () => {

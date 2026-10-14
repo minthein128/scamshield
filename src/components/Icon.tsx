@@ -4,7 +4,8 @@ import theme from '../theme/theme';
 
 export type IconName =
   | 'shield' | 'shieldCheck' | 'alert' | 'chevron' | 'settings' | 'link' | 'image' | 'chat' | 'speaker' | 'stop'
-  | 'gift' | 'clock' | 'card' | 'user' | 'flag' | 'octagon' | 'radar' | 'phone' | 'people' | 'info';
+  | 'gift' | 'clock' | 'card' | 'user' | 'flag' | 'octagon' | 'radar' | 'phone' | 'people' | 'info'
+  | 'thumbUp' | 'thumbDown' | 'check';
 
 const SHAPES: Record<IconName, React.ReactNode> = {
   shield: <Path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z" />,
@@ -100,6 +101,9 @@ const SHAPES: Record<IconName, React.ReactNode> = {
       <Path d="M12 11v5M12 8h.01" />
     </>
   ),
+  thumbUp: <Path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.3a2 2 0 0 0 2-1.7l1.4-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" />,
+  thumbDown: <Path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.7a2 2 0 0 0-2 1.7l-1.4 9a2 2 0 0 0 2 2.3zM17 2h2.7A2.3 2.3 0 0 1 22 4v7a2.3 2.3 0 0 1-2.3 2H17" />,
+  check: <Path d="M5 12.5l4.5 4.5L19 7.5" />,
 };
 
 interface IconProps {

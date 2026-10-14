@@ -21,6 +21,8 @@
     "intel:seed": "tsx src/intel/seed.ts",
     "intel:purge-seed": "tsx src/intel/purge-seed.ts",
     "intel:sweep": "tsx src/intel/sweep.ts",
+    "feedback:report": "tsx src/feedback/report.ts",
+    "feedback:export": "tsx src/feedback/export.ts",
     "bench": "tsx ../bench/run.ts",
     "bench:labels": "tsx ../bench/labels.ts",
     "bench:report": "tsx ../bench/report.ts"
