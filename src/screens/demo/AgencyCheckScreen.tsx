@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, TextInput, ScrollView } from 'react-native';
 import Svg, { Path, Rect, Circle, Polygon, Ellipse, Line } from 'react-native-svg';
-import theme from '../theme/theme';
+import theme from '../../theme/theme';
 
 interface AgencyCheckScreenProps {
   onNavigate?: (route: string) => void;
@@ -77,10 +77,10 @@ export const AgencyCheckScreen: React.FC<AgencyCheckScreenProps> = ({ onNavigate
           </View>
         </View>
         <Text style={{ flex: 1, color: '#0F1B2D', includeFontPadding: false, fontSize: 14, lineHeight: 19, fontFamily: theme.fonts.regular }}></Text>
-        <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('action')} style={{ height: 58, borderRadius: 16, borderWidth: 0, backgroundColor: '#1D4ED8' }}>
+        <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('noop')} style={{ height: 58, borderRadius: 16, borderWidth: 0, backgroundColor: '#1D4ED8' }}>
           <Text style={{ color: '#FFFFFF', fontSize: 18, fontFamily: theme.fonts.extraBold, lineHeight: 24, includeFontPadding: false }}>{"Find licensed agencies"}</Text>
         </TouchableOpacity>
-        <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('Family.dc.html')} style={{ height: 54, borderRadius: 16, borderWidth: 1, borderColor: '#CBD5E1', alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
+        <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('exit')} style={{ height: 54, borderRadius: 16, borderWidth: 1, borderColor: '#CBD5E1', alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
           <Text style={{ color: '#0F1B2D', fontSize: 17, fontFamily: theme.fonts.bold, lineHeight: 23, includeFontPadding: false }}>{"Tell my family"}</Text>
         </TouchableOpacity>
       </View>

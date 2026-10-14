@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, TextInput, ScrollView } from 'react-native';
 import Svg, { Path, Rect, Circle, Polygon, Ellipse, Line } from 'react-native-svg';
-import theme from '../theme/theme';
+import theme from '../../theme/theme';
 
 interface AgencyPageScreenProps {
   onNavigate?: (route: string) => void;
@@ -53,7 +53,7 @@ export const AgencyPageScreen: React.FC<AgencyPageScreenProps> = ({ onNavigate }
       </View>
       <View style={{ position: 'absolute', right: 6, top: 194, width: 84, height: 84, borderRadius: 42, backgroundColor: '#DBE5FF', opacity: 0.9 }}>
       </View>
-      <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('AgencyVerdict.dc.html')} style={{ position: 'absolute', right: 16, top: 204, width: 64, height: 64, borderRadius: 32, backgroundColor: '#1D4ED8', alignItems: 'center', justifyContent: 'center', borderWidth: 3, borderColor: '#FFFFFF', flexDirection: 'row' }}>
+      <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('agency-verdict')} style={{ position: 'absolute', right: 16, top: 204, width: 64, height: 64, borderRadius: 32, backgroundColor: '#1D4ED8', alignItems: 'center', justifyContent: 'center', borderWidth: 3, borderColor: '#FFFFFF', flexDirection: 'row' }}>
         <Svg width={30} height={30} viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
           <Path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z" />
         </Svg>

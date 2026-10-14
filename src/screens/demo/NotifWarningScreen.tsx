@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, TextInput, ScrollView } from 'react-native';
 import Svg, { Path, Rect, Circle, Polygon, Ellipse, Line } from 'react-native-svg';
-import theme from '../theme/theme';
+import theme from '../../theme/theme';
 
 interface NotifWarningScreenProps {
   onNavigate?: (route: string) => void;
@@ -46,7 +46,7 @@ export const NotifWarningScreen: React.FC<NotifWarningScreenProps> = ({ onNaviga
           <Text style={{ color: '#0F1B2D', fontSize: 15, fontFamily: theme.fonts.bold, lineHeight: 20, includeFontPadding: false }}>+62 812 [NUMBER]</Text>
           <Text style={{ color: '#1E293B', fontSize: 14, lineHeight: 20, fontFamily: theme.fonts.regular, includeFontPadding: false }}>Your parcel is held at the warehouse. Pay the small delivery fee today or it will be returned: [SHORT LINK]</Text>
         </View>
-        <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('NotifVerdict.dc.html')} style={{ backgroundColor: '#C2410C', borderTopLeftRadius: 0, borderTopRightRadius: 0, borderBottomRightRadius: 20, borderBottomLeftRadius: 20, paddingVertical: 12, paddingHorizontal: 16, alignItems: 'center', gap: 12, flexDirection: 'row' }}>
+        <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('notif-verdict')} style={{ backgroundColor: '#C2410C', borderTopLeftRadius: 0, borderTopRightRadius: 0, borderBottomRightRadius: 20, borderBottomLeftRadius: 20, paddingVertical: 12, paddingHorizontal: 16, alignItems: 'center', gap: 12, flexDirection: 'row' }}>
           <Svg width={26} height={26} viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
             <Path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z" />
             <Path d="M12 8v4" />
@@ -63,7 +63,7 @@ export const NotifWarningScreen: React.FC<NotifWarningScreenProps> = ({ onNaviga
       </View>
       <View style={{ position: 'absolute', right: 6, top: 560, width: 84, height: 84, borderRadius: 42, backgroundColor: '#FDBA74', opacity: 0.55 }}>
       </View>
-      <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('NotifVerdict.dc.html')} style={{ position: 'absolute', right: 16, top: 570, width: 64, height: 64, borderRadius: 32, backgroundColor: '#C2410C', alignItems: 'center', justifyContent: 'center', borderWidth: 3, borderColor: '#FFFFFF', flexDirection: 'row' }}>
+      <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('notif-verdict')} style={{ position: 'absolute', right: 16, top: 570, width: 64, height: 64, borderRadius: 32, backgroundColor: '#C2410C', alignItems: 'center', justifyContent: 'center', borderWidth: 3, borderColor: '#FFFFFF', flexDirection: 'row' }}>
         <Svg width={30} height={30} viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
           <Path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z" />
         </Svg>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, TextInput, ScrollView } from 'react-native';
 import Svg, { Path, Rect, Circle, Polygon, Ellipse, Line } from 'react-native-svg';
-import theme from '../theme/theme';
+import theme from '../../theme/theme';
 
 interface ShopVerdictScreenProps {
   onNavigate?: (route: string) => void;
@@ -72,10 +72,10 @@ export const ShopVerdictScreen: React.FC<ShopVerdictScreenProps> = ({ onNavigate
         </View>
         <Text style={{ color: '#475569', fontFamily: theme.fonts.mono, fontSize: 11, lineHeight: 15, includeFontPadding: false }}>Sources: listing, seller page, SafeRoute reports</Text>
         <Text style={{ flex: 1, color: '#0F1B2D', includeFontPadding: false, fontSize: 14, lineHeight: 19, fontFamily: theme.fonts.regular }}></Text>
-        <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('action')} style={{ height: 58, borderRadius: 16, borderWidth: 0, backgroundColor: '#1D4ED8' }}>
+        <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('noop')} style={{ height: 58, borderRadius: 16, borderWidth: 0, backgroundColor: '#1D4ED8' }}>
           <Text style={{ color: '#FFFFFF', fontSize: 18, fontFamily: theme.fonts.extraBold, lineHeight: 24, includeFontPadding: false }}>{"Report this seller"}</Text>
         </TouchableOpacity>
-        <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('action')} style={{ height: 54, borderRadius: 16, borderWidth: 2, borderColor: '#C2410C', backgroundColor: '#FFFFFF' }}>
+        <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('noop')} style={{ height: 54, borderRadius: 16, borderWidth: 2, borderColor: '#C2410C', backgroundColor: '#FFFFFF' }}>
           <Text style={{ color: '#9A3412', fontSize: 17, fontFamily: theme.fonts.extraBold, lineHeight: 23, includeFontPadding: false }}>{"I already paid"}</Text>
         </TouchableOpacity>
       </View>

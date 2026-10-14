@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, TextInput, ScrollView } from 'react-native';
 import Svg, { Path, Rect, Circle, Polygon, Ellipse, Line } from 'react-native-svg';
-import theme from '../theme/theme';
+import theme from '../../theme/theme';
 
 interface JobVerdictScreenProps {
   onNavigate?: (route: string) => void;
@@ -44,7 +44,7 @@ export const JobVerdictScreen: React.FC<JobVerdictScreenProps> = ({ onNavigate }
         </View>
         <Text style={{ color: '#0F1B2D', fontSize: 20, lineHeight: 29, fontFamily: theme.fonts.bold, includeFontPadding: false }}>This job is likely a trap. Do not go. Keep your passport.</Text>
         {!playing ? (
-          <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('action')} style={{ height: 60, borderRadius: 16, borderWidth: 2, borderColor: '#0F1B2D', backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center', gap: 10, flexDirection: 'row' }}>
+          <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('noop')} style={{ height: 60, borderRadius: 16, borderWidth: 2, borderColor: '#0F1B2D', backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center', gap: 10, flexDirection: 'row' }}>
             <Svg width={26} height={26} viewBox="0 0 24 24" fill="none" stroke="#0F1B2D" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
               <Path d="M11 5L6 9H3v6h3l5 4z" />
               <Path d="M15.5 8.5a5 5 0 0 1 0 7" />
@@ -54,7 +54,7 @@ export const JobVerdictScreen: React.FC<JobVerdictScreenProps> = ({ onNavigate }
           </TouchableOpacity>
         ) : null}
         {playing ? (
-          <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('action')} style={{ height: 60, borderRadius: 16, borderWidth: 2, borderColor: '#0F1B2D', backgroundColor: '#0F1B2D', alignItems: 'center', justifyContent: 'center', gap: 10, flexDirection: 'row' }}>
+          <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('noop')} style={{ height: 60, borderRadius: 16, borderWidth: 2, borderColor: '#0F1B2D', backgroundColor: '#0F1B2D', alignItems: 'center', justifyContent: 'center', gap: 10, flexDirection: 'row' }}>
             <Svg width={26} height={26} viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth={2.4} strokeLinecap="round">
               <Path d="M4 10v4" />
               <Path d="M8 7v10" />
@@ -93,7 +93,7 @@ export const JobVerdictScreen: React.FC<JobVerdictScreenProps> = ({ onNavigate }
           </View>
         </View>
         <Text style={{ flex: 1, color: '#0F1B2D', includeFontPadding: false, fontSize: 14, lineHeight: 19, fontFamily: theme.fonts.regular }}></Text>
-        <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('Family.dc.html')} style={{ height: 60, borderRadius: 16, backgroundColor: '#1D4ED8', alignItems: 'center', justifyContent: 'center', gap: 10, flexDirection: 'row' }}>
+        <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('exit')} style={{ height: 60, borderRadius: 16, backgroundColor: '#1D4ED8', alignItems: 'center', justifyContent: 'center', gap: 10, flexDirection: 'row' }}>
           <Svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
             <Circle cx={9} cy={8} r={3.5} />
             <Path d="M2.5 20a6.5 6.5 0 0 1 13 0" />
@@ -102,7 +102,7 @@ export const JobVerdictScreen: React.FC<JobVerdictScreenProps> = ({ onNavigate }
           </Svg>
           <Text style={{ color: '#FFFFFF', fontSize: 18, fontFamily: theme.fonts.extraBold, lineHeight: 24, includeFontPadding: false }}>{"Tell my family"}</Text>
         </TouchableOpacity>
-        <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('action')} style={{ height: 56, borderRadius: 16, borderWidth: 1, borderColor: '#CBD5E1', backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center', gap: 10, flexDirection: 'row' }}>
+        <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('noop')} style={{ height: 56, borderRadius: 16, borderWidth: 1, borderColor: '#CBD5E1', backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center', gap: 10, flexDirection: 'row' }}>
           <Svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="#0F1B2D" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
             <Path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.9.6 2.8.7a2 2 0 0 1 1.7 2z" />
           </Svg>

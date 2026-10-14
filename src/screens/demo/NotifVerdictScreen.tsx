@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, TextInput, ScrollView } from 'react-native';
 import Svg, { Path, Rect, Circle, Polygon, Ellipse, Line } from 'react-native-svg';
-import theme from '../theme/theme';
+import theme from '../../theme/theme';
 
 interface NotifVerdictScreenProps {
   onNavigate?: (route: string) => void;
@@ -31,7 +31,7 @@ export const NotifVerdictScreen: React.FC<NotifVerdictScreenProps> = ({ onNaviga
         </View>
         <Text style={{ color: '#0F1B2D', fontSize: 20, lineHeight: 28, fontFamily: theme.fonts.bold, includeFontPadding: false }}>Do not open the link. Check your parcel in the courier's own app.</Text>
         {!playing ? (
-          <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('action')} style={{ height: 56, borderRadius: 16, borderWidth: 2, borderColor: '#0F1B2D', backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center', gap: 10, flexDirection: 'row' }}>
+          <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('noop')} style={{ height: 56, borderRadius: 16, borderWidth: 2, borderColor: '#0F1B2D', backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center', gap: 10, flexDirection: 'row' }}>
             <Svg width={26} height={26} viewBox="0 0 24 24" fill="none" stroke="#0F1B2D" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
               <Path d="M11 5L6 9H3v6h3l5 4z" />
               <Path d="M15.5 8.5a5 5 0 0 1 0 7" />
@@ -41,7 +41,7 @@ export const NotifVerdictScreen: React.FC<NotifVerdictScreenProps> = ({ onNaviga
           </TouchableOpacity>
         ) : null}
         {playing ? (
-          <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('action')} style={{ height: 56, borderRadius: 16, borderWidth: 2, borderColor: '#0F1B2D', backgroundColor: '#0F1B2D', alignItems: 'center', justifyContent: 'center', gap: 10, flexDirection: 'row' }}>
+          <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('noop')} style={{ height: 56, borderRadius: 16, borderWidth: 2, borderColor: '#0F1B2D', backgroundColor: '#0F1B2D', alignItems: 'center', justifyContent: 'center', gap: 10, flexDirection: 'row' }}>
             <Svg width={26} height={26} viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth={2.4} strokeLinecap="round">
               <Path d="M4 10v4" />
               <Path d="M8 7v10" />
@@ -82,10 +82,10 @@ export const NotifVerdictScreen: React.FC<NotifVerdictScreenProps> = ({ onNaviga
           </View>
         </View>
         <Text style={{ flex: 1, color: '#0F1B2D', includeFontPadding: false, fontSize: 14, lineHeight: 19, fontFamily: theme.fonts.regular }}></Text>
-        <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('action')} style={{ height: 58, borderRadius: 16, borderWidth: 0, backgroundColor: '#1D4ED8' }}>
+        <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('noop')} style={{ height: 58, borderRadius: 16, borderWidth: 0, backgroundColor: '#1D4ED8' }}>
           <Text style={{ color: '#FFFFFF', fontSize: 18, fontFamily: theme.fonts.extraBold, lineHeight: 24, includeFontPadding: false }}>{"Delete and block"}</Text>
         </TouchableOpacity>
-        <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('action')} style={{ height: 54, borderRadius: 16, borderWidth: 2, borderColor: '#C2410C', backgroundColor: '#FFFFFF' }}>
+        <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('noop')} style={{ height: 54, borderRadius: 16, borderWidth: 2, borderColor: '#C2410C', backgroundColor: '#FFFFFF' }}>
           <Text style={{ color: '#9A3412', fontSize: 17, fontFamily: theme.fonts.extraBold, lineHeight: 23, includeFontPadding: false }}>{"I already opened it or paid"}</Text>
         </TouchableOpacity>
       </View>

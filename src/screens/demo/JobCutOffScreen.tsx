@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, TextInput, ScrollView } from 'react-native';
 import Svg, { Path, Rect, Circle, Polygon, Ellipse, Line } from 'react-native-svg';
-import theme from '../theme/theme';
+import theme from '../../theme/theme';
 
 interface JobCutOffScreenProps {
   onNavigate?: (route: string) => void;
@@ -31,7 +31,7 @@ export const JobCutOffScreen: React.FC<JobCutOffScreenProps> = ({ onNavigate }) 
         </View>
         <View>
           <Text style={{ color: '#0F1B2D', fontSize: 15, lineHeight: 23, fontFamily: theme.fonts.regular, includeFontPadding: false }}>{"Work in Thailand! Big salary, free flight and visa. No experience needed. Leave this week..."}</Text>
-          <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('Expanded.dc.html')} style={{ backgroundColor: '#FFF1E8', borderWidth: 2, borderColor: '#C2410C', borderRadius: 8, paddingVertical: 2, paddingHorizontal: 8 }}>
+          <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('job-expand')} style={{ backgroundColor: '#FFF1E8', borderWidth: 2, borderColor: '#C2410C', borderRadius: 8, paddingVertical: 2, paddingHorizontal: 8 }}>
             <Text style={{ color: '#9A3412', fontSize: 15, lineHeight: 19, fontFamily: theme.fonts.extraBold, includeFontPadding: false }}>{"See more"}</Text>
           </TouchableOpacity>
         </View>
@@ -52,7 +52,7 @@ export const JobCutOffScreen: React.FC<JobCutOffScreenProps> = ({ onNavigate }) 
         </View>
         <View style={{ alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row' }}>
           <Text style={{ backgroundColor: '#1E293B', paddingVertical: 6, paddingHorizontal: 12, borderRadius: 999, color: '#FDBA74', lineHeight: 18, fontFamily: theme.fonts.bold, includeFontPadding: false, fontSize: 13 }}>Found: job offer abroad</Text>
-          <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('Listen')} style={{ width: 48, height: 48, borderRadius: 24, borderWidth: 1, borderColor: '#475569', backgroundColor: '#1E293B', alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
+          <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('noop')} style={{ width: 48, height: 48, borderRadius: 24, borderWidth: 1, borderColor: '#475569', backgroundColor: '#1E293B', alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
             <Svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
               <Path d="M11 5L6 9H3v6h3l5 4z" />
               <Path d="M15.5 8.5a5 5 0 0 1 0 7" />
@@ -75,7 +75,7 @@ export const JobCutOffScreen: React.FC<JobCutOffScreenProps> = ({ onNavigate }) 
             <Text style={{ color: '#FFFFFF', lineHeight: 23, fontFamily: theme.fonts.semiBold, includeFontPadding: false, fontSize: 17 }}>Tap the shield again</Text>
           </View>
         </View>
-        <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('Scanning.dc.html')} style={{ height: 52, borderRadius: 14, borderWidth: 1, borderColor: '#475569', alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
+        <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('job-scan')} style={{ height: 52, borderRadius: 14, borderWidth: 1, borderColor: '#475569', alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
           <Text style={{ color: '#E2E8F0', lineHeight: 22, fontFamily: theme.fonts.bold, includeFontPadding: false, fontSize: 16 }}>{"Check what I have now"}</Text>
         </TouchableOpacity>
       </View>

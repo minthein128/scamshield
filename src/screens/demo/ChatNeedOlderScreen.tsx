@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, TextInput, ScrollView } from 'react-native';
 import Svg, { Path, Rect, Circle, Polygon, Ellipse, Line } from 'react-native-svg';
-import theme from '../theme/theme';
+import theme from '../../theme/theme';
 
 interface ChatNeedOlderScreenProps {
   onNavigate?: (route: string) => void;
@@ -23,7 +23,7 @@ export const ChatNeedOlderScreen: React.FC<ChatNeedOlderScreenProps> = ({ onNavi
         </View>
       </View>
       <View style={{ flexDirection: 'column', alignItems: 'center', gap: 6, paddingTop: 18, paddingHorizontal: 0, paddingBottom: 10 }}>
-        <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('ChatOlder.dc.html')} style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: '#FFF1E8', borderWidth: 2, borderColor: '#C2410C', alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
+        <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('chat-older')} style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: '#FFF1E8', borderWidth: 2, borderColor: '#C2410C', alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
           <Svg width={28} height={28} viewBox="0 0 24 24" fill="none" stroke="#9A3412" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round">
             <Path d="M12 19V5" />
             <Path d="M5 12l7-7 7 7" />
@@ -49,7 +49,7 @@ export const ChatNeedOlderScreen: React.FC<ChatNeedOlderScreenProps> = ({ onNavi
         </View>
         <View style={{ alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row' }}>
           <Text style={{ backgroundColor: '#1E293B', paddingVertical: 6, paddingHorizontal: 12, borderRadius: 999, color: '#FDBA74', lineHeight: 18, fontFamily: theme.fonts.bold, includeFontPadding: false, fontSize: 13 }}>Found: chat with online friend</Text>
-          <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('Listen')} style={{ width: 48, height: 48, borderRadius: 24, borderWidth: 1, borderColor: '#475569', backgroundColor: '#1E293B', alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
+          <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('noop')} style={{ width: 48, height: 48, borderRadius: 24, borderWidth: 1, borderColor: '#475569', backgroundColor: '#1E293B', alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
             <Svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
               <Path d="M11 5L6 9H3v6h3l5 4z" />
               <Path d="M15.5 8.5a5 5 0 0 1 0 7" />
@@ -72,7 +72,7 @@ export const ChatNeedOlderScreen: React.FC<ChatNeedOlderScreenProps> = ({ onNavi
             <Text style={{ color: '#FFFFFF', lineHeight: 23, fontFamily: theme.fonts.semiBold, includeFontPadding: false, fontSize: 17 }}>Tap the shield again</Text>
           </View>
         </View>
-        <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('ChatVerdict.dc.html')} style={{ height: 52, borderRadius: 14, borderWidth: 1, borderColor: '#475569', alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
+        <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('chat-verdict')} style={{ height: 52, borderRadius: 14, borderWidth: 1, borderColor: '#475569', alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
           <Text style={{ color: '#E2E8F0', lineHeight: 22, fontFamily: theme.fonts.bold, includeFontPadding: false, fontSize: 16 }}>{"Check what I have now"}</Text>
         </TouchableOpacity>
       </View>

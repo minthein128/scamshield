@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, TextInput, ScrollView } from 'react-native';
 import Svg, { Path, Rect, Circle, Polygon, Ellipse, Line } from 'react-native-svg';
 import * as ShieldModule from 'shield-module';
-import theme from '../theme/theme';
+import theme from '../../theme/theme';
 
 interface ShieldIntroScreenProps {
   onNavigate?: (route: string) => void;
@@ -19,12 +19,12 @@ export const ShieldIntroScreen: React.FC<ShieldIntroScreenProps> = ({ onNavigate
     } catch (e) {
       console.warn('Shield activation:', e);
     }
-    onNavigate?.('Bubble.dc.html');
+    onNavigate?.('job-spot');
   };
   return (
     <View style={styles.container}>
       <View style={{ alignItems: 'center', justifyContent: 'space-between', paddingTop: 20, paddingHorizontal: 20, paddingBottom: 0, flexDirection: 'row' }}>
-        <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('action')} style={{ height: 44, paddingVertical: 0, paddingHorizontal: 14, borderRadius: 22, borderWidth: 1, borderColor: '#CBD5E1', backgroundColor: '#FFFFFF', alignItems: 'center', gap: 6, flexDirection: 'row' }}>
+        <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('noop')} style={{ height: 44, paddingVertical: 0, paddingHorizontal: 14, borderRadius: 22, borderWidth: 1, borderColor: '#CBD5E1', backgroundColor: '#FFFFFF', alignItems: 'center', gap: 6, flexDirection: 'row' }}>
           <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#0F1B2D" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
             <Circle cx={12} cy={12} r={9} />
             <Path d="M3 12h18" />
@@ -32,7 +32,7 @@ export const ShieldIntroScreen: React.FC<ShieldIntroScreenProps> = ({ onNavigate
           </Svg>
           <Text style={{ color: '#0F1B2D', fontSize: 15, fontFamily: theme.fonts.semiBold, lineHeight: 20, includeFontPadding: false }}>{"Bahasa Indonesia"}</Text>
         </TouchableOpacity>
-        <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('Listen to instructions')} style={{ width: 52, height: 52, borderRadius: 26, borderWidth: 0, backgroundColor: '#0F1B2D', alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
+        <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('noop')} style={{ width: 52, height: 52, borderRadius: 26, borderWidth: 0, backgroundColor: '#0F1B2D', alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
           <Svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
             <Path d="M11 5L6 9H3v6h3l5 4z" />
             <Path d="M15.5 8.5a5 5 0 0 1 0 7" />
@@ -92,7 +92,7 @@ export const ShieldIntroScreen: React.FC<ShieldIntroScreenProps> = ({ onNavigate
         <TouchableOpacity activeOpacity={0.7} onPress={handleTurnOnShield} style={{ height: 60, borderRadius: 16, backgroundColor: '#1D4ED8', alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
           <Text style={{ color: '#FFFFFF', fontSize: 18, fontFamily: theme.fonts.extraBold, lineHeight: 24, includeFontPadding: false }}>{"Turn on shield"}</Text>
         </TouchableOpacity>
-        <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('action')} style={{ height: 52, borderRadius: 14, borderWidth: 1, borderColor: '#CBD5E1', backgroundColor: '#FFFFFF' }}>
+        <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('noop')} style={{ height: 52, borderRadius: 14, borderWidth: 1, borderColor: '#CBD5E1', backgroundColor: '#FFFFFF' }}>
           <Text style={{ color: '#0F1B2D', fontSize: 16, fontFamily: theme.fonts.bold, lineHeight: 22, includeFontPadding: false }}>{"Add a family member"}</Text>
         </TouchableOpacity>
       </View>
