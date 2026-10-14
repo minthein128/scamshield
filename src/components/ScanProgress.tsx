@@ -1,0 +1,190 @@
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import Svg, { Path, Rect } from 'react-native-svg';
+import theme from '../theme/theme';
+
+interface ScanProgressProps {
+  steps: string[];
+  step: number;
+  title: string;
+  foundLabel?: string;
+}
+
+const SCAN_TOPS = [20, 110, 200, 270];
+
+export const ScanProgress: React.FC<ScanProgressProps> = ({ steps, step, title, foundLabel }) => {
+  const scanTop = SCAN_TOPS[Math.min(step, SCAN_TOPS.length - 1)];
+  return (
+    <View style={styles.root}>
+      <View style={styles.phoneGraphic}>
+        <View style={styles.phoneHeader}>
+          <View style={styles.avatarPlaceholder} />
+          <View style={styles.barSmall} />
+        </View>
+        <View style={styles.bar140} />
+        <View style={styles.bar120} />
+        <View style={styles.bar130} />
+        <View style={styles.barFill} />
+        <View style={[styles.scanLine, { top: scanTop }]} />
+      </View>
+
+      <View style={styles.statusSection}>
+        <Text style={styles.statusTitle}>{title}</Text>
+        {foundLabel ? (
+          <View style={styles.foundBadge}>
+            <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#FDBA74" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+              <Rect x={3} y={7} width={18} height={13} rx={2} />
+              <Path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2" />
+            </Svg>
+            <Text style={styles.foundText}>{foundLabel}</Text>
+          </View>
+        ) : null}
+      </View>
+
+      <View style={styles.stepsContainer}>
+        {steps.map((label, i) => (
+          <View key={label} style={styles.stepRow}>
+            {step > i ? (
+              <View style={styles.checkCircle}>
+                <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
+                  <Path d="M5 12l5 5L20 7" />
+                </Svg>
+              </View>
+            ) : (
+              <View style={styles.pendingCircle} />
+            )}
+            <Text style={styles.stepLabel}>{label}</Text>
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  root: { alignItems: 'center', gap: 22, alignSelf: 'stretch' },
+  phoneGraphic: {
+    width: 180,
+    height: 290,
+    borderRadius: 16,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 3,
+    borderColor: '#1D4ED8',
+    padding: 12,
+    gap: 8,
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  phoneHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  avatarPlaceholder: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: '#FDE68A',
+  },
+  barSmall: {
+    width: 70,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#D1D5DB',
+  },
+  bar140: {
+    width: 140,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#D1D5DB',
+  },
+  bar120: {
+    width: 120,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#D1D5DB',
+  },
+  bar130: {
+    width: 130,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#D1D5DB',
+  },
+  barFill: {
+    flex: 1,
+    borderRadius: 8,
+    backgroundColor: '#E5E7EB',
+  },
+  scanLine: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    height: 4,
+    backgroundColor: '#1D4ED8',
+    opacity: 0.85,
+  },
+  statusSection: {
+    alignItems: 'center',
+    gap: 10,
+  },
+  statusTitle: {
+    fontSize: 28,
+    lineHeight: 36,
+    fontFamily: theme.fonts.extraBold,
+    color: '#FFFFFF',
+    includeFontPadding: false,
+  },
+  foundBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: '#1E293B',
+    borderWidth: 1,
+    borderColor: '#334155',
+    borderRadius: 999,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+  },
+  foundText: {
+    fontSize: 15,
+    lineHeight: 20,
+    fontFamily: theme.fonts.bold,
+    color: '#FFFFFF',
+    includeFontPadding: false,
+  },
+  stepsContainer: {
+    width: '100%',
+    gap: 12,
+  },
+  stepRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+  },
+  checkCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#1D4ED8',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  pendingCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    borderWidth: 2,
+    borderColor: '#475569',
+    flexShrink: 0,
+  },
+  stepLabel: {
+    fontSize: 17,
+    lineHeight: 23,
+    fontFamily: theme.fonts.semiBold,
+    color: '#E2E8F0',
+    includeFontPadding: false,
+  },
+});
+
+export default ScanProgress;

@@ -40,7 +40,18 @@
             "./assets/fonts/IBMPlexMono-Medium.ttf"
           ]
         }
+      ],
+      [
+        "expo-share-intent",
+        {
+          "disableIOS": true,
+          "androidIntentFilters": [
+            "text/*",
+            "image/*"
+          ]
+        }
       ]
-    ]
+    ],
+    "scheme": "saferoute"
   }
 }
