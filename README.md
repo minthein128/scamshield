@@ -1,69 +1,105 @@
-# SafeRoute: Anti-Fraud & Scam Shield App
+# SafeRoute
 
-An anti-scam and anti-trafficking app built with **Expo SDK 52 (React Native)**. Paste text, a link or a screenshot, get a risk report from the Gemini-backed Check API, and hear the warning in your language. The same code runs on Android and in the browser.
+An Android app and web demo that checks a job offer, message, link or screenshot for scams and human trafficking, and explains the result in the user's language. Built for the Google Cloud AI Builder Cup 2026.
+
+<p align="center">
+  <img src="pitch/e2e/prod-16-history-after-signin.png" width="230" alt="Home">
+  <img src="pitch/e2e/prod-08-check-form.png" width="230" alt="Check form">
+  <img src="pitch/e2e/prod-20-loader-verdict.png" width="230" alt="Risk report">
+</p>
+
+Team: TBD
 
 ## Try it
 
-- Web demo: https://saferoute-aibc.web.app (open it, tap Check, paste a job post or SMS)
-- Android APK: https://saferoute-aibc.web.app/saferoute.apk
+- Web demo: https://saferoute-aibc.web.app
+- Android APK: https://saferoute-aibc.web.app/saferoute.apk (allow installs from your browser)
+- Testers: accept the Firebase App Distribution invite email, install Firebase App Tester, then download SafeRoute from it. New builds arrive as notifications.
 
-The demo calls the live SafeRoute API (Gemini with Google Search grounding, plus RDAP and Web Risk link checks). Install the APK by opening the link on an Android phone and allowing "install unknown apps" for your browser. The APK is signed with a debug key, so Play Protect may ask for confirmation. The floating Shield overlay needs the notification and screen capture permissions.
+## Demo video
 
-## Install as a tester
+[media/demo.mp4](media/demo.mp4), under 3 minutes. See [media/README.md](media/README.md).
 
-Testers get builds through Firebase App Distribution, with update notices.
+## Pitch deck
 
-1. Open the invite email from Firebase App Distribution and tap **Get started** on your Android phone. Sign in with the Google account the invite went to.
-2. Accept the invite. Firebase App Tester opens in the browser; tap **Download App Tester** and install it (allow installs from your browser if asked).
-3. Open App Tester, choose SafeRoute, and tap **Download** on the latest release. Install it.
-4. App Tester shows a notification when a new build is ready. Open it and tap **Update**.
+[media/SafeRoute-deck.pdf](media/SafeRoute-deck.pdf)
 
-## Development
+## How it works
 
-```bash
-pnpm install
-pnpm check            # typecheck + lint + tests
-pnpm web              # browser, offline demo mode (dev only) when no API URL is set
-EXPO_PUBLIC_API_URL=https://your-cloud-run-url pnpm web   # real backend
-pnpm build:web && firebase deploy --only hosting
+```mermaid
+flowchart LR
+  A[App or web] --> B[Cloud Run API]
+  B --> C[Extract: Gemini on Vertex AI]
+  C --> D[Detect: Search grounding]
+  C --> E[Correlate: Web Risk, RDAP]
+  D --> F[Score: rules engine]
+  E --> F
+  F --> G[Explain: Gemini TTS]
 ```
 
-Accounts and sync need the Firebase web config in env (`EXPO_PUBLIC_FIREBASE_API_KEY`, `_PROJECT_ID`, `_APP_ID`, optionally `_AUTH_DOMAIN`, `_MESSAGING_SENDER_ID`). Without it the app runs fully anonymous with no account screens. `EXPO_PUBLIC_CONFIG_URL` overrides where the app reads the live API address (`config.json`). `pnpm test:rules` runs the Firestore rules test in the emulator. After editing `src/data/hotlines.ts`, run `pnpm sync:hotlines`.
+1. The app sends text, a link or a screenshot to one Cloud Run service.
+2. One Gemini call reads the input, including image text, and returns red flags as JSON.
+3. Gemini with Google Search grounding checks that named agencies and companies exist.
+4. Google Web Risk and RDAP check each link and the domain age.
+5. A deterministic rules engine sets the score and verdict: safe, careful or danger.
+6. The report and a spoken warning come back in English, Bahasa Indonesia, Tagalog or Burmese.
 
-See `CLAUDE.md` for the code layout and the mock/real API switch.
+Details: [docs/architecture.md](docs/architecture.md) and [docs/api-contract.md](docs/api-contract.md).
 
----
+## Benchmarks
 
-## 📱 Features & Implemented Designs
+Both benchmarks run the real pipeline with `gemini-3.5-flash-lite`. Full results and history: [bench/RESULTS.md](bench/RESULTS.md).
 
-This application reproduces all **24 design screens and flows**:
+**Text eval (27 cases)**, 2026-10-14. Four languages: en, id, tl, my. Source: `bench/results/2026-10-14-gemini-3.5-flash-lite-text-eval.json`.
 
-1. **Core SafeRoute Screens**:
-   - **Home**: screen shield switch, check a link, screenshot or chat, recent checks, Get help.
-   - **Board 2 · Check a Job Offer**: TikTok video ad review, destination/travel route, language selector (English, Bahasa, Tagalog, Myanmar), and 4-step check preview.
-   - **Board 3 · Risk Report (Verdict)**: High-risk trafficking verdict, 5-point evidence breakdown (salary anomalies, visa omission, anonymous recruiter, company registry absence, border route pickup), and emergency hotline integration.
-   - **Trusted contacts**: add people from the phone or by typing, warn them from any report by SMS or share, call them.
+| Accuracy | p50 | p95 |
+| --- | --- | --- |
+| 27/27 | 3.1 s | 4.8 s |
 
-2. **Interactive Floating Shield Overlay Flows**:
-   - **Board A · Turn on Shield**: Edge floating bubble interactive demo and 3-level threat indicator (Safe, Careful, Danger).
-   - **Boards B to F · Job Scam Flow**: Simulated social feed -> truncated job post detection -> expand post to reveal passport seizure -> auto-check analysis -> picture verdict with voice warning.
-   - **Boards G to J · Romance / Pig Butchering Scam Flow**: Online friend chat with trading profit lure -> scroll-up prompt -> 3-week grooming timeline analysis -> love & money trap verdict.
-   - **Boards K & L · SMS Parcel Phishing Flow**: Warehouse fee delivery SMS -> on-device heuristic warning -> known Web Risk trap verdict.
-   - **Boards M & N · Recruitment Agency Verification**: Fake overseas agency profile -> official license registry check -> Careful verdict.
-   - **Boards O to R · Cheap Tech Marketplace Scam**: 80% discounted smartphone listing -> seller profile inspection (Toko Murah88) -> direct bank transfer trap verdict.
+**Screenshot bench (N screenshots)**
 
-3. **Taxonomy & Architecture Guides**:
-   - **Board 23 · Scam Types by Shield**: Matrix mapping all fraud categories across Job Shield, Message Shield, and E-commerce Shield to the 7 Red-Flag Families (*Too good, Pressure, Payment route, Identity, Link risk, Known bad, Trafficking*).
-   - **Board 24 · Case Study: 6-Stage Detection Pipeline**: Complete architectural breakdown of the Viber gambling lure through Capture, Extract (OCR + Gemini), Detect, Correlate (Web Risk & RDAP), Score (Rules engine), and Explain (Voice synthesis).
+| Status | Accuracy | False positives | p50 | p95 | PII leaks |
+| --- | --- | --- | --- | --- | --- |
+| pending: screenshots being collected | - | - | - | - | - |
 
----
+The harness is checked on 6 synthetic screenshots (6/6 risky or safe matched). How to run it and the label format: [bench/README.md](bench/README.md).
 
-## Install and run
+## Privacy
 
-| Goal | Steps |
-|---|---|
-| Use the app | Open the APK link above on an Android phone |
-| Run the web app locally | `pnpm install --frozen-lockfile && pnpm web` (offline mock API unless `EXPO_PUBLIC_API_URL` is set) |
-| Run the backend locally | `cd server && npm ci && MOCK=1 npm run dev`, or set `GEMINI_API_KEY` for the real model |
-| Build the APK | Push a `feat/**` branch; the Android workflow uploads the `saferoute-apk` artifact |
-| Deploy to Google Cloud | `scripts/deploy-cloudrun.sh` (see `docs/setup-gcp.md`) |
+- Screenshots and text are used for the check only. They are not stored and not logged.
+- A risky check adds one anonymous, redacted signal to a shared scam radar. Phones and handles are stored as keyed hashes. Users can opt out in Settings. See [docs/intel-design.md](docs/intel-design.md).
+- History and trusted contacts stay on the device unless the user signs in. Account deletion is in Settings and at `/delete-account`.
+
+## Repo layout
+
+| Path | Contents |
+| --- | --- |
+| `src/` | Expo (React Native) app: screens, API client, state |
+| `modules/shield-module/` | Android overlay that checks the current screen |
+| `server/` | Hono and TypeScript API on Gemini, Web Risk and RDAP |
+| `server/eval/` | Text eval with 27 labelled cases |
+| `bench/` | Screenshot benchmark, results and synthetic images |
+| `docs/` | Architecture, API contract, GCP setup |
+| `pitch/` | Deck source, demo inputs and video script |
+| `media/` | Deck PDF and demo video |
+| `scripts/` | Cloud Run deploy and APK signing |
+
+## Run locally
+
+```bash
+pnpm install --frozen-lockfile
+pnpm web                                  # web app, offline mock API
+pnpm check                                # typecheck, lint, tests
+cd server && npm ci && MOCK=1 npm run dev # API on :8080 with canned answers
+GEMINI_API_KEY=... npm run dev            # same API with the real model
+```
+
+Point the app at an API with `EXPO_PUBLIC_API_URL=http://localhost:8080 pnpm web`. Code layout notes for contributors are in `CLAUDE.md`.
+
+## Deploy
+
+See [docs/setup-gcp.md](docs/setup-gcp.md).
+
+## License
+
+[MIT](LICENSE)
