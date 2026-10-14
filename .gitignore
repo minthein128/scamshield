@@ -11,3 +11,10 @@ android/app/build/
 android/.gradle/
 android/local.properties
 *.log
+
+.env
+.env.*
+*.jks
+*.keystore
+!android/app/debug.keystore
+dist-apk/
