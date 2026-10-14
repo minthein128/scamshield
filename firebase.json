@@ -8,6 +8,10 @@
     ],
     "rewrites": [
       {
+        "source": "/saferoute.apk",
+        "destination": "/dl/saferoute.pkg"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }
