@@ -1,4 +1,4 @@
-import { MAX_HISTORY, addHistory, clearHistory, loadHistory, loadLanguage, saveLanguage } from '../lib/history';
+import { MAX_HISTORY, addHistory, clearHistory, loadHistory } from '../lib/history';
 import { buildMockResponse } from '../api/mock';
 
 const entry = (n: number) => {
@@ -20,11 +20,5 @@ describe('history storage', () => {
   it('caps the list', async () => {
     for (let i = 0; i < MAX_HISTORY + 5; i++) await addHistory(entry(i));
     expect((await loadHistory()).length).toBe(MAX_HISTORY);
-  });
-
-  it('persists the language choice', async () => {
-    expect(await loadLanguage()).toBe('en');
-    await saveLanguage('my');
-    expect(await loadLanguage()).toBe('my');
   });
 });

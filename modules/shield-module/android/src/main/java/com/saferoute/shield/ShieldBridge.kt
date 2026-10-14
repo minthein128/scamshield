@@ -11,6 +11,7 @@ object ShieldBridge {
     @Volatile var pendingConsent: Consent? = null
     @Volatile var consentCallback: ((Boolean) -> Unit)? = null
     @Volatile var eventSink: ((String, String) -> Unit)? = null
+    @Volatile var authToken: String = ""
 
     private val unsynced = ArrayList<String>()
     private val recent = LinkedHashMap<String, String>()

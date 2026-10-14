@@ -12,7 +12,7 @@ object CheckClient {
     private const val CONNECT_TIMEOUT_MS = 10_000
     private const val READ_TIMEOUT_MS = 60_000
 
-    fun checkScreen(apiUrl: String, language: String, jpeg: ByteArray): JSONObject {
+    fun checkScreen(apiUrl: String, language: String, jpeg: ByteArray, authToken: String = ""): JSONObject {
         if (apiUrl.isBlank()) throw CheckException("Shield has no server address.")
         val body = JSONObject()
             .put("kind", "screen")
@@ -34,6 +34,7 @@ object CheckClient {
             connection.doOutput = true
             connection.setRequestProperty("Content-Type", "application/json")
             connection.setRequestProperty("Accept", "application/json")
+            if (authToken.isNotBlank()) connection.setRequestProperty("Authorization", "Bearer $authToken")
             connection.setFixedLengthStreamingMode(body.size)
             connection.outputStream.use { it.write(body) }
 

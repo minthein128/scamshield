@@ -5,9 +5,13 @@ import { useFonts } from 'expo-font';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import RootNavigator from './navigation/RootNavigator';
 import { AppStateProvider } from './state/AppState';
+import { AuthProvider } from './state/AuthState';
+import { useApiUrl } from './config/runtime';
 import theme from './theme/theme';
 
 export default function App() {
+  const apiUrl = useApiUrl();
+  const mockMode = __DEV__ && apiUrl === '';
   const [fontsLoaded] = useFonts({
     'PlusJakartaSans-Regular': require('../assets/fonts/PlusJakartaSans-Regular.ttf'),
     'PlusJakartaSans-Medium': require('../assets/fonts/PlusJakartaSans-Medium.ttf'),
@@ -30,9 +34,16 @@ export default function App() {
       <StatusBar style="dark" />
       <View style={styles.page}>
         <View style={styles.column}>
-          <AppStateProvider>
-            <RootNavigator />
-          </AppStateProvider>
+          {mockMode ? (
+            <View testID="mock-banner" accessibilityRole="alert" style={styles.mock}>
+              <Text style={styles.mockText}>Offline demo mode</Text>
+            </View>
+          ) : null}
+          <AuthProvider>
+            <AppStateProvider>
+              <RootNavigator />
+            </AppStateProvider>
+          </AuthProvider>
         </View>
       </View>
     </SafeAreaProvider>
@@ -48,6 +59,8 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background,
     ...(Platform.OS === 'web' ? { overflow: 'hidden' as const } : {}),
   },
+  mock: { backgroundColor: theme.colors.amberBadge, paddingVertical: 4, alignItems: 'center' },
+  mockText: { color: theme.colors.amberDark, fontSize: 12, lineHeight: 16, fontFamily: theme.fonts.bold },
   loading: { flex: 1, backgroundColor: theme.colors.darkBackground, alignItems: 'center', justifyContent: 'center' },
   loadingText: { color: theme.colors.white, fontSize: 16 },
 });

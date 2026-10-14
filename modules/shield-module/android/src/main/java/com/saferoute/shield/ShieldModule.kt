@@ -67,12 +67,18 @@ class ShieldModule : Module() {
         AsyncFunction("startShield") { options: Map<String, Any?>? ->
             val context = appContext.reactContext ?: return@AsyncFunction false
             if (!Settings.canDrawOverlays(context)) return@AsyncFunction false
+            ShieldBridge.authToken = (options?.get("authToken") as? String).orEmpty()
             val intent = Intent(context, ShieldService::class.java).apply {
                 action = ShieldService.ACTION_START
                 putExtra(ShieldService.EXTRA_API_URL, options?.get("apiUrl") as? String ?: "")
                 (options?.get("language") as? String)?.let { putExtra(ShieldService.EXTRA_LANGUAGE, it) }
             }
             ContextCompat.startForegroundService(context, intent)
+            true
+        }
+
+        AsyncFunction("setAuthToken") { token: String? ->
+            ShieldBridge.authToken = token.orEmpty()
             true
         }
 

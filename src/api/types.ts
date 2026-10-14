@@ -28,8 +28,9 @@ export interface CheckRequest {
   url?: string;
   imageBase64?: string;
   imageMimeType?: string;
-  context?: { destination?: string; route?: string };
+  context?: { destination?: string; route?: string; home?: string };
   language: LanguageCode;
+  shareSignals?: boolean;
 }
 
 export interface Flag {
@@ -69,6 +70,38 @@ export interface SpeakResponse {
   model: string;
 }
 
+export interface NetworkInfo {
+  seenCount: number;
+  firstSeen?: string;
+  campaign?: { name: string; seenThisWeek?: number };
+}
+
+export type Trend = 'up' | 'down' | 'flat';
+
+export interface InsightRisk {
+  scamType: ScamType;
+  label: string;
+  count: number;
+  trend: Trend;
+  example?: string;
+}
+
+export interface InsightDomain {
+  domain: string;
+  count: number;
+  trend: Trend;
+}
+
+export interface Insights {
+  country: string;
+  days: number;
+  generatedAt: string;
+  k: number;
+  risks: InsightRisk[];
+  domains: InsightDomain[];
+  campaigns?: { name: string; scamType: ScamType; count: number; trend: Trend; example?: string }[];
+}
+
 export interface CheckResponse {
   id: string;
   createdAt: string;
@@ -84,6 +117,7 @@ export interface CheckResponse {
   sources?: Source[];
   actions: CheckAction[];
   model: string;
+  network?: NetworkInfo;
 }
 
 export type ApiErrorCode = 'bad_request' | 'too_large' | 'upstream' | 'rate_limited';
@@ -106,5 +140,6 @@ export interface CheckClient {
   readonly isMock: boolean;
   check(request: CheckRequest, options?: RequestOptions): Promise<CheckResponse>;
   health(options?: RequestOptions): Promise<HealthResponse>;
+  insights(country: string, options?: RequestOptions): Promise<Insights>;
   speak(request: SpeakRequest, options?: RequestOptions): Promise<SpeakResponse>;
 }

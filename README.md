@@ -23,10 +23,12 @@ Testers get builds through Firebase App Distribution, with update notices.
 ```bash
 pnpm install
 pnpm check            # typecheck + lint + tests
-pnpm web              # browser, uses the local mock API
+pnpm web              # browser, offline demo mode (dev only) when no API URL is set
 EXPO_PUBLIC_API_URL=https://your-cloud-run-url pnpm web   # real backend
 pnpm build:web && firebase deploy --only hosting
 ```
+
+Accounts and sync need the Firebase web config in env (`EXPO_PUBLIC_FIREBASE_API_KEY`, `_PROJECT_ID`, `_APP_ID`, optionally `_AUTH_DOMAIN`, `_MESSAGING_SENDER_ID`). Without it the app runs fully anonymous with no account screens. `EXPO_PUBLIC_CONFIG_URL` overrides where the app reads the live API address (`config.json`). `pnpm test:rules` runs the Firestore rules test in the emulator. After editing `src/data/hotlines.ts`, run `pnpm sync:hotlines`.
 
 See `CLAUDE.md` for the code layout and the mock/real API switch.
 
@@ -37,10 +39,10 @@ See `CLAUDE.md` for the code layout and the mock/real API switch.
 This application reproduces all **24 design screens and flows**:
 
 1. **Core SafeRoute Screens**:
-   - **Board 1 · Home Screen**: Header, greeting, primary overseas job check CTA card, 3 quick actions (link, screenshot, chat), protection cards (romance scam, travel plan), family guardian circle badge, and recent checks list with severity badges.
+   - **Home**: screen shield switch, check a link, screenshot or chat, recent checks, Get help.
    - **Board 2 · Check a Job Offer**: TikTok video ad review, destination/travel route, language selector (English, Bahasa, Tagalog, Myanmar), and 4-step check preview.
    - **Board 3 · Risk Report (Verdict)**: High-risk trafficking verdict, 5-point evidence breakdown (salary anomalies, visa omission, anonymous recruiter, company registry absence, border route pickup), and emergency hotline integration.
-   - **Board 4 · Family Guardian (Ibu's View)**: Check-in timeline (airport departure, Bangkok arrival, company car pickup, missed check-in), emergency dialer, and one-tap consular SOS dispatch.
+   - **Trusted contacts**: add people from the phone or by typing, warn them from any report by SMS or share, call them.
 
 2. **Interactive Floating Shield Overlay Flows**:
    - **Board A · Turn on Shield**: Edge floating bubble interactive demo and 3-level threat indicator (Safe, Careful, Danger).

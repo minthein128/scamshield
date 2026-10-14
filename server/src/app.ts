@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { bodyLimit } from 'hono/body-limit';
 import { cors } from 'hono/cors';
+import { bearerToken, type TokenVerifier } from './auth.js';
 import type { Config } from './config.js';
 import { type Intel, isCountry } from './intel/service.js';
 import { log } from './log.js';
@@ -14,9 +15,10 @@ const clientIp = (forwarded?: string, real?: string) => forwarded?.split(',')[0]
 
 const errorBody = (code: string, message: string) => ({ error: { code, message } });
 
-export function createApp(cfg: Config, pipeline: Pipeline, speaker: Speaker, intel?: Intel) {
+export function createApp(cfg: Config, pipeline: Pipeline, speaker: Speaker, intel?: Intel, verifier?: TokenVerifier) {
   const app = new Hono();
   const limiter = createRateLimiter(cfg.rateLimitPerMin);
+  const hourly = createRateLimiter(0, 3_600_000);
 
   app.use('*', cors({ origin: cfg.allowedOrigins.includes('*') ? '*' : cfg.allowedOrigins }));
 
@@ -27,6 +29,17 @@ export function createApp(cfg: Config, pipeline: Pipeline, speaker: Speaker, int
     async (c, next) => {
       if (!limiter.allow(clientIp(c.req.header('x-forwarded-for'), c.req.header('x-real-ip')))) {
         return c.json(errorBody('rate_limited', 'Too many requests, retry in a minute'), 429, { 'retry-after': '60' });
+      }
+      const token = bearerToken(c.req.header('authorization'));
+      const identity = token && verifier ? await verifier(token) : null;
+      if (identity) {
+        c.set('uid' as never, identity.uid as never);
+        const max = identity.anonymous ? cfg.anonPerHour : cfg.userPerHour;
+        const decision = hourly.check(identity.uid, max);
+        if (!decision.allowed) {
+          log('WARNING', 'uid_rate_limited', { anonymous: identity.anonymous });
+          return c.json(errorBody('rate_limited', 'Hourly check limit reached'), 429, { 'retry-after': String(decision.retryAfterSec) });
+        }
       }
       await next();
     },

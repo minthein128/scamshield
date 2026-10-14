@@ -1,4 +1,4 @@
-import type { CheckAction, CheckResponse, FlagFamily, ScamType, Severity, Verdict, WebRisk, Flag } from '../api/types';
+import type { CheckResponse, FlagFamily, ScamType, Severity, Verdict, WebRisk, Flag } from '../api/types';
 import theme from '../theme/theme';
 
 export interface VerdictStyle {
@@ -76,9 +76,6 @@ export function groupFlags(flags: Flag[]): FlagGroup[] {
   }));
 }
 
-export function hotlineNumber(action?: CheckAction): string | undefined {
-  return action?.value?.trim() || process.env.EXPO_PUBLIC_HOTLINE_NUMBER?.trim() || undefined;
-}
 
 export function telUrl(number: string): string {
   return `tel:${number.replace(/[^\d+]/g, '')}`;
@@ -86,6 +83,11 @@ export function telUrl(number: string): string {
 
 export function shareMessage(result: CheckResponse): string {
   return `SafeRoute check: ${result.title}\n${result.summary}\nRisk score ${result.score}/100.`;
+}
+
+export function warnMessage(result: CheckResponse): string {
+  const summary = result.summary.length > 280 ? `${result.summary.slice(0, 277)}...` : result.summary;
+  return `SafeRoute warning (${VERDICT_STYLES[result.verdict].label.toLowerCase()}): ${result.title}. ${summary} Please do not pay money or send documents. Call me first.`;
 }
 
 export function entryLabel(result: CheckResponse, source?: string): string {

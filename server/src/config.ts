@@ -11,6 +11,9 @@ export interface Config {
   webRiskApiKey?: string;
   allowedOrigins: string[];
   rateLimitPerMin: number;
+  firebaseProjectId: string;
+  anonPerHour: number;
+  userPerHour: number;
   maxBodyBytes: number;
   upstreamTimeoutMs: number;
   linkTimeoutMs: number;
@@ -49,6 +52,9 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
       .map((s) => s.trim())
       .filter(Boolean),
     rateLimitPerMin: Number(env.RATE_LIMIT_PER_MIN ?? 30),
+    firebaseProjectId: env.FIREBASE_PROJECT_ID || 'saferoute-aibc',
+    anonPerHour: Number(env.ANON_LIMIT_PER_HOUR ?? 20),
+    userPerHour: Number(env.USER_LIMIT_PER_HOUR ?? 60),
     maxBodyBytes: Number(env.MAX_BODY_BYTES ?? 6 * 1024 * 1024),
     upstreamTimeoutMs: Number(env.UPSTREAM_TIMEOUT_MS ?? 12000),
     linkTimeoutMs: Number(env.LINK_TIMEOUT_MS ?? 4000),

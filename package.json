@@ -11,7 +11,10 @@
     "ios": "expo run:ios",
     "lint": "eslint . --ext .ts,.tsx --max-warnings 0",
     "test": "jest",
-    "check": "pnpm typecheck && pnpm lint && pnpm test"
+    "check": "pnpm typecheck && pnpm lint && pnpm test && pnpm check:hotlines",
+    "sync:hotlines": "node --no-warnings scripts/sync-hotlines.mjs",
+    "check:hotlines": "node --no-warnings scripts/sync-hotlines.mjs --check",
+    "test:rules": "npx -y firebase-tools@latest emulators:exec --only firestore --project saferoute-aibc \"node --test firestore-tests/rules.test.mjs\""
   },
   "dependencies": {
     "@expo/metro-runtime": "~4.0.1",
@@ -24,6 +27,7 @@
     "expo-av": "~15.0.2",
     "expo-clipboard": "~7.0.1",
     "expo-constants": "~17.0.8",
+    "expo-contacts": "~14.0.5",
     "expo-file-system": "~18.0.12",
     "expo-font": "~13.0.4",
     "expo-image-manipulator": "~13.0.6",
@@ -33,6 +37,7 @@
     "expo-share-intent": "^3.2.3",
     "expo-speech": "~13.0.1",
     "expo-status-bar": "~2.0.1",
+    "firebase": "^11.10.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-native": "0.76.7",
@@ -45,6 +50,7 @@
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@babel/runtime": "^8.0.7",
+    "@firebase/rules-unit-testing": "^6.0.0",
     "@testing-library/react-native": "^12.9.0",
     "@types/jest": "^29.5.14",
     "@types/react": "~18.3.12",

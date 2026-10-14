@@ -1,0 +1,49 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null && request.auth.token.firebase.sign_in_provider != 'anonymous';
+    }
+    function owns(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+    function text(value, max) {
+      return value is string && value.size() <= max;
+    }
+    function shortId(id) {
+      return id.size() <= 100;
+    }
+
+    match /users/{uid} {
+      allow read, delete: if owns(uid);
+      allow create, update: if owns(uid)
+        && request.resource.data.keys().hasOnly(['language', 'homeCountry', 'destinationCountry', 'updatedAt'])
+        && request.resource.data.keys().hasAll(['language', 'updatedAt'])
+        && text(request.resource.data.language, 8)
+        && text(request.resource.data.updatedAt, 40)
+        && (!('homeCountry' in request.resource.data) || text(request.resource.data.homeCountry, 8))
+        && (!('destinationCountry' in request.resource.data) || text(request.resource.data.destinationCountry, 8));
+
+      match /history/{id} {
+        allow read, delete: if owns(uid);
+        allow create, update: if owns(uid) && shortId(id)
+          && request.resource.data.keys().hasOnly(['createdAt', 'language', 'source', 'report'])
+          && request.resource.data.keys().hasAll(['createdAt', 'language', 'report'])
+          && text(request.resource.data.createdAt, 40)
+          && text(request.resource.data.language, 8)
+          && text(request.resource.data.report, 60000)
+          && (!('source' in request.resource.data) || text(request.resource.data.source, 200));
+      }
+
+      match /contacts/{id} {
+        allow read, delete: if owns(uid);
+        allow create, update: if owns(uid) && shortId(id)
+          && request.resource.data.keys().hasOnly(['name', 'phone', 'updatedAt'])
+          && request.resource.data.keys().hasAll(['name', 'phone', 'updatedAt'])
+          && text(request.resource.data.name, 80)
+          && text(request.resource.data.phone, 24)
+          && text(request.resource.data.updatedAt, 40);
+      }
+    }
+  }
+}

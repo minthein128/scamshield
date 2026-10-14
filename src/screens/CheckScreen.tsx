@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Platform } from 'react-native';
+import { View, Text, TextInput, Image, StyleSheet, Platform } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import { Screen } from '../components/Screen';
-import { Button, Card, Chip, ScreenHeader } from '../components/ui';
+import { Button, Card, Chip, LinkButton, Notice, ScreenHeader } from '../components/ui';
+import { countryName } from '../lib/countries';
 import { hasInput } from '../api';
 import type { CheckKind } from '../api/types';
 import { LANGUAGES } from '../lib/languages';
@@ -15,11 +16,11 @@ import theme from '../theme/theme';
 const { colors, fonts } = theme;
 
 export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, route }) => {
-  const { language, setLanguage } = useAppState();
+  const { language, setLanguage, profile } = useAppState();
   const [kind, setKind] = useState<CheckKind>('job');
   const [text, setText] = useState('');
   const [url, setUrl] = useState('');
-  const [destination, setDestination] = useState('');
+  const [destination, setDestination] = useState(countryName(profile.destinationCountry));
   const [image, setImage] = useState<PreparedImage | null>(null);
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
@@ -70,7 +71,7 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nonce]);
 
-  const form = { kind, text, url, destination, imageBase64: image?.base64, imageMimeType: image?.mimeType, language };
+  const form = { kind, text, url, destination, home: countryName(profile.homeCountry), shareSignals: profile.shareSignals, imageBase64: image?.base64, imageMimeType: image?.mimeType, language };
   const ready = hasInput({ text, url, imageBase64: image?.base64 });
 
   const submit = () => {
@@ -95,12 +96,11 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
       <View style={{ gap: 6 }}>
         <View style={styles.labelRow}>
           <Text style={styles.label}>Paste the text or chat</Text>
-          <TouchableOpacity onPress={() => pasteInto('text')} accessibilityRole="button">
-            <Text style={styles.linkText}>Paste</Text>
-          </TouchableOpacity>
+          <LinkButton label="Paste" onPress={() => pasteInto('text')} />
         </View>
         <TextInput
           testID="check-text"
+          accessibilityLabel="Text or chat to check"
           multiline
           value={text}
           onChangeText={setText}
@@ -113,12 +113,11 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
       <View style={{ gap: 6 }}>
         <View style={styles.labelRow}>
           <Text style={styles.label}>Link</Text>
-          <TouchableOpacity onPress={() => pasteInto('url')} accessibilityRole="button">
-            <Text style={styles.linkText}>Paste</Text>
-          </TouchableOpacity>
+          <LinkButton label="Paste" onPress={() => pasteInto('url')} />
         </View>
         <TextInput
           testID="check-url"
+          accessibilityLabel="Link to check"
           value={url}
           onChangeText={setUrl}
           autoCapitalize="none"
@@ -155,6 +154,7 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
         <Text style={styles.label}>Where will you work or travel? (optional)</Text>
         <TextInput
           testID="check-destination"
+          accessibilityLabel="Destination"
           value={destination}
           onChangeText={setDestination}
           placeholder="For example Bangkok, Thailand"
@@ -172,7 +172,7 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
         </View>
       </View>
 
-      {notice ? <Text style={styles.notice}>{notice}</Text> : null}
+      {notice ? <Notice message={notice} /> : null}
     </Screen>
   );
 };
@@ -180,7 +180,6 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
 const styles = StyleSheet.create({
   label: { color: colors.textPrimary, fontSize: 13, lineHeight: 18, fontFamily: fonts.semiBold, includeFontPadding: false },
   labelRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  linkText: { color: colors.accent, fontSize: 13, lineHeight: 18, fontFamily: fonts.bold },
   wrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   input: { minHeight: 46, borderRadius: 12, borderWidth: 1, borderColor: colors.borderLight, backgroundColor: colors.white, paddingHorizontal: 14, paddingVertical: 10, color: colors.textPrimary, fontSize: 14, lineHeight: 19, fontFamily: fonts.regular },
   textArea: { minHeight: 110, textAlignVertical: 'top' },
@@ -188,7 +187,6 @@ const styles = StyleSheet.create({
   thumb: { width: 80, height: 110, borderRadius: 10, backgroundColor: colors.codeBg },
   meta: { color: colors.textSecondary, fontSize: 12, lineHeight: 16, fontFamily: fonts.regular },
   small: { height: 38 },
-  notice: { color: colors.danger, fontSize: 13, lineHeight: 18, fontFamily: fonts.semiBold },
 });
 
 export default CheckScreen;

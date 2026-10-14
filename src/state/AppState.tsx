@@ -1,39 +1,187 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { CheckResponse, LanguageCode } from '../api/types';
 import { useShieldSync } from '../hooks/useShieldSync';
-import { HistoryEntry, addHistory, loadHistory, loadLanguage, saveLanguage } from '../lib/history';
+import {
+  CONTACTS_KEY,
+  loadContacts,
+  makeContact,
+  mergeContacts,
+  removeContact as removeFromList,
+  saveContacts,
+  upsertContact,
+  validateContact,
+  type TrustedContact,
+} from '../lib/contacts';
+import { HistoryEntry, addHistory, clearHistory, loadHistory, saveHistory } from '../lib/history';
+import {
+  DEFAULT_PROFILE,
+  PROFILE_KEY,
+  applyChoices,
+  finishOnboarding as finishProfile,
+  loadProfile,
+  saveProfile,
+  type Profile,
+  type ProfileChoices,
+} from '../lib/profile';
+import { historyMissingRemotely, mergeHistory } from '../lib/sync';
+import * as cloud from '../services/cloud';
+import { useAuth } from './AuthState';
+
+export type SyncState = 'off' | 'syncing' | 'done' | 'error';
 
 interface AppStateValue {
+  ready: boolean;
+  profile: Profile;
   language: LanguageCode;
   setLanguage: (code: LanguageCode) => void;
+  updateProfile: (choices: ProfileChoices) => void;
+  finishOnboarding: (choices?: ProfileChoices) => void;
   history: HistoryEntry[];
   saveCheck: (result: CheckResponse, language: LanguageCode, source?: string) => Promise<void>;
+  contacts: TrustedContact[];
+  addContact: (input: { name: string; phone: string }) => string | null;
+  removeContact: (id: string) => void;
+  syncState: SyncState;
+  clearSyncedCopies: () => Promise<void>;
+  deleteLocalData: () => Promise<void>;
 }
 
 const AppStateContext = createContext<AppStateValue | null>(null);
 
 export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [language, setLanguageState] = useState<LanguageCode>('en');
+  const { status } = useAuth();
+  const uid = status.kind === 'account' ? status.uid : null;
+  const [ready, setReady] = useState(false);
+  const [profile, setProfile] = useState<Profile>(DEFAULT_PROFILE);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
+  const [contacts, setContacts] = useState<TrustedContact[]>([]);
+  const [syncState, setSyncState] = useState<SyncState>('off');
+  const latest = useRef({ profile, history, contacts, uid });
+  latest.current = { profile, history, contacts, uid };
 
   useEffect(() => {
-    loadHistory().then(setHistory);
-    loadLanguage().then(setLanguageState);
+    Promise.all([loadProfile(), loadHistory(), loadContacts()]).then(([p, h, c]) => {
+      setProfile(p);
+      setHistory(h);
+      setContacts(c);
+      setReady(true);
+    });
   }, []);
 
-  const setLanguage = useCallback((code: LanguageCode) => {
-    setLanguageState(code);
-    saveLanguage(code).catch(() => undefined);
+  useEffect(() => {
+    if (!uid || !ready) {
+      setSyncState('off');
+      return;
+    }
+    let cancelled = false;
+    setSyncState('syncing');
+    (async () => {
+      try {
+        const snap = await cloud.pullAll(uid);
+        if (cancelled) return;
+        const { profile: localProfile, history: localHistory, contacts: localContacts } = latest.current;
+        if (snap.profile) {
+          const adopted = { ...snap.profile, shareSignals: localProfile.shareSignals };
+          setProfile(adopted);
+          await saveProfile(adopted);
+        } else if (localProfile.onboarded) {
+          await cloud.pushProfile(uid, localProfile);
+        }
+        const mergedHistory = mergeHistory(localHistory, snap.history);
+        setHistory(mergedHistory);
+        await saveHistory(mergedHistory);
+        await cloud.pushHistory(uid, historyMissingRemotely(mergedHistory, snap.history));
+        const mergedContacts = mergeContacts(localContacts, snap.contacts);
+        setContacts(mergedContacts);
+        await saveContacts(mergedContacts);
+        const remoteStamp = new Map(snap.contacts.map(c => [c.id, c.updatedAt]));
+        await Promise.all(mergedContacts.filter(c => (remoteStamp.get(c.id) ?? '') < c.updatedAt).map(c => cloud.pushContact(uid, c)));
+        if (!cancelled) setSyncState('done');
+      } catch {
+        if (!cancelled) setSyncState('error');
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [uid, ready]);
+
+  const persistProfile = useCallback((next: Profile) => {
+    setProfile(next);
+    saveProfile(next).catch(() => undefined);
+    const id = latest.current.uid;
+    if (id && next.onboarded) cloud.pushProfile(id, next).catch(() => setSyncState('error'));
   }, []);
+
+  const updateProfile = useCallback((choices: ProfileChoices) => persistProfile(applyChoices(latest.current.profile, choices)), [persistProfile]);
+  const setLanguage = useCallback((code: LanguageCode) => updateProfile({ language: code }), [updateProfile]);
+  const finishOnboarding = useCallback((choices?: ProfileChoices) => persistProfile(finishProfile(latest.current.profile, choices)), [persistProfile]);
 
   const saveCheck = useCallback(async (result: CheckResponse, lang: LanguageCode, source?: string) => {
-    const next = await addHistory({ id: result.id, createdAt: result.createdAt, language: lang, source, result });
-    setHistory(next);
+    const entry: HistoryEntry = { id: result.id, createdAt: result.createdAt, language: lang, source, result };
+    setHistory(await addHistory(entry));
+    const id = latest.current.uid;
+    if (id) cloud.pushHistory(id, [entry]).catch(() => setSyncState('error'));
   }, []);
 
-  useShieldSync(saveCheck, language);
+  const addContact = useCallback((input: { name: string; phone: string }) => {
+    const problem = validateContact(input);
+    if (problem) return problem;
+    const contact = makeContact(input);
+    const next = upsertContact(latest.current.contacts, contact);
+    if (next === latest.current.contacts) return 'That number is already in your list.';
+    setContacts(next);
+    saveContacts(next).catch(() => undefined);
+    const id = latest.current.uid;
+    if (id) cloud.pushContact(id, contact).catch(() => setSyncState('error'));
+    return null;
+  }, []);
 
-  const value = useMemo(() => ({ language, setLanguage, history, saveCheck }), [language, setLanguage, history, saveCheck]);
+  const removeContact = useCallback((contactId: string) => {
+    const next = removeFromList(latest.current.contacts, contactId);
+    setContacts(next);
+    saveContacts(next).catch(() => undefined);
+    const id = latest.current.uid;
+    if (id) cloud.deleteContactRemote(id, contactId).catch(() => setSyncState('error'));
+  }, []);
+
+  const clearSyncedCopies = useCallback(async () => {
+    await clearHistory();
+    await AsyncStorage.removeItem(CONTACTS_KEY);
+    setHistory([]);
+    setContacts([]);
+  }, []);
+
+  const deleteLocalData = useCallback(async () => {
+    await clearHistory();
+    await AsyncStorage.multiRemove([CONTACTS_KEY, PROFILE_KEY]);
+    setHistory([]);
+    setContacts([]);
+    setProfile(DEFAULT_PROFILE);
+  }, []);
+
+  useShieldSync(saveCheck, profile.language);
+
+  const value = useMemo(
+    () => ({
+      ready,
+      profile,
+      language: profile.language,
+      setLanguage,
+      updateProfile,
+      finishOnboarding,
+      history,
+      saveCheck,
+      contacts,
+      addContact,
+      removeContact,
+      syncState,
+      clearSyncedCopies,
+      deleteLocalData,
+    }),
+    [ready, profile, setLanguage, updateProfile, finishOnboarding, history, saveCheck, contacts, addContact, removeContact, syncState, clearSyncedCopies, deleteLocalData],
+  );
   return <AppStateContext.Provider value={value}>{children}</AppStateContext.Provider>;
 };
 

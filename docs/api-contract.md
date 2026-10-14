@@ -2,6 +2,18 @@
 
 Base URL comes from `EXPO_PUBLIC_API_URL` in the app. All bodies are JSON.
 
+## Authentication and limits
+
+`Authorization: Bearer <Firebase ID token>` is optional on `/v1/check`. The server verifies it with firebase-admin for project `saferoute-aibc` and limits per uid:
+
+| Caller | Limit |
+| --- | --- |
+| Anonymous Firebase user | 20 checks per hour |
+| Signed-in user (email or Google) | 60 checks per hour |
+| No token, or a token that fails verification | per-IP limit only (30 per minute by default) |
+
+The per-IP limit always applies as a backstop. Requests without a token keep working, so the web demo and old APKs are unaffected. A uid over its limit gets `429 rate_limited` with a `Retry-After` header in seconds. `/v1/speak` is limited per IP only.
+
 ## POST /v1/check
 
 Request:
@@ -58,6 +70,8 @@ Response 200:
 `sources` lists the Google Search pages used to verify the named company, phone number, domain or salary. It is `[]` when the input names no entity or verification did not finish in time. Flags from verification use the families `known_bad`, `identity` and `too_good`.
 
 `network` is present only when a phone, chat account, payment account or domain from the input was reported by at least 3 separate checks in the last 30 days, or the text matches an active campaign. `seenCount` is the 30 day count; the value itself is never returned. A match also adds a `known_bad` flag. `campaign` is optional.
+
+`actions[].value` for `type: "call"` is a dial string from the shared hotline data (`src/data/hotlines.ts`): the destination country's anti-trafficking line, else its police line. It is absent when `context.destination` names no known country. The app resolves the number against the same data.
 
 `score` is 0-100 (higher = riskier). `safe` < 35 <= `careful` < 70 <= `danger`.
 

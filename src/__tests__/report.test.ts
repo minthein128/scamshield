@@ -1,5 +1,5 @@
 import type { Flag } from '../api/types';
-import { VERDICT_STYLES, filledSegments, groupFlags, hotlineNumber, telUrl, verdictFromScore } from '../lib/report';
+import { VERDICT_STYLES, filledSegments, groupFlags, telUrl, verdictFromScore } from '../lib/report';
 import { draftFromShare } from '../lib/share';
 import { buildRequest } from '../lib/request';
 import { base64Bytes, prepareImage } from '../lib/image';
@@ -31,11 +31,17 @@ describe('report mapping', () => {
 
   it('builds tel urls and picks a hotline', () => {
     expect(telUrl('+66 (0) 2-123')).toBe('tel:+6602123');
-    expect(hotlineNumber({ label: 'x', type: 'call', value: ' 1300 ' })).toBe('1300');
   });
 });
 
 describe('request building', () => {
+  it('sends home country and opts out of signals only when asked', () => {
+    const base = { kind: 'job' as const, text: 'x', url: '', destination: '', language: 'en' as const };
+    expect(buildRequest({ ...base, home: 'Myanmar' })).toMatchObject({ context: { home: 'Myanmar' } });
+    expect(buildRequest({ ...base, shareSignals: true })).not.toHaveProperty('shareSignals');
+    expect(buildRequest({ ...base, shareSignals: false })).toMatchObject({ shareSignals: false });
+  });
+
   it('omits empty fields and adds context', () => {
     const r = buildRequest({ kind: 'job', text: ' hi ', url: '', destination: 'Bangkok', language: 'tl' });
     expect(r).toEqual({ kind: 'job', language: 'tl', text: 'hi', context: { destination: 'Bangkok' } });

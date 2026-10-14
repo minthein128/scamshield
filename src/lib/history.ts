@@ -2,7 +2,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { CheckResponse, LanguageCode } from '../api/types';
 
 const HISTORY_KEY = 'saferoute.history.v1';
-const LANGUAGE_KEY = 'saferoute.language.v1';
 export const MAX_HISTORY = 30;
 
 export interface HistoryEntry {
@@ -34,11 +33,6 @@ export async function clearHistory(): Promise<void> {
   await AsyncStorage.removeItem(HISTORY_KEY);
 }
 
-export async function loadLanguage(): Promise<LanguageCode> {
-  const value = await AsyncStorage.getItem(LANGUAGE_KEY);
-  return value === 'id' || value === 'tl' || value === 'my' ? value : 'en';
-}
-
-export async function saveLanguage(code: LanguageCode): Promise<void> {
-  await AsyncStorage.setItem(LANGUAGE_KEY, code);
+export async function saveHistory(list: HistoryEntry[]): Promise<void> {
+  await AsyncStorage.setItem(HISTORY_KEY, JSON.stringify(list.slice(0, MAX_HISTORY)));
 }
