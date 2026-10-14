@@ -31,6 +31,18 @@ export interface CheckRequest {
   context?: { destination?: string; route?: string; home?: string };
   language: LanguageCode;
   shareSignals?: boolean;
+  /** Report-a-scam flow: the server records a confirmed signal with `reportedType`. */
+  reported?: boolean;
+  reportedType?: Exclude<ScamType, 'none'>;
+  /** Yes or no only. Never an amount. */
+  lostMoney?: boolean;
+}
+
+export interface FeedbackRequest {
+  checkId: string;
+  correct: boolean;
+  actualVerdict?: Verdict;
+  actualScamType?: ScamType;
 }
 
 export interface Flag {
@@ -120,7 +132,7 @@ export interface CheckResponse {
   network?: NetworkInfo;
 }
 
-export type ApiErrorCode = 'bad_request' | 'too_large' | 'upstream' | 'rate_limited';
+export type ApiErrorCode = 'bad_request' | 'not_found' | 'too_large' | 'upstream' | 'rate_limited';
 
 export interface ApiErrorBody {
   error: { code: ApiErrorCode; message: string };
@@ -142,4 +154,5 @@ export interface CheckClient {
   health(options?: RequestOptions): Promise<HealthResponse>;
   insights(country: string, options?: RequestOptions): Promise<Insights>;
   speak(request: SpeakRequest, options?: RequestOptions): Promise<SpeakResponse>;
+  feedback(request: FeedbackRequest, options?: RequestOptions): Promise<void>;
 }

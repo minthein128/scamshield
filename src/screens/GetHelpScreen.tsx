@@ -43,6 +43,8 @@ export const GetHelpScreen: React.FC<RootScreenProps<'GetHelp'>> = ({ navigation
         Official hotlines and reporting lines. If someone is holding your passport, stopping you from leaving, or you feel in danger, call now.
       </Text>
 
+      <Button testID="help-report-scam" label="Report a scam" variant="secondary" icon="flag" onPress={() => navigation.navigate('ReportScam')} />
+
       {!chosen ? (
         <EmptyState
           testID="help-no-countries"

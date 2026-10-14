@@ -144,6 +144,9 @@ export function createMockClient(options: MockOptions = {}): CheckClient {
     async speak() {
       throw new ApiError('upstream', 'No speech service in mock mode');
     },
+    async feedback(request) {
+      if (!/^chk_\w{4,48}$/.test(request.checkId)) throw new ApiError('bad_request', 'Unknown check');
+    },
     async insights(country) {
       return { country, days: 30, generatedAt: new Date().toISOString(), k: 3, risks: [], domains: [] };
     },
