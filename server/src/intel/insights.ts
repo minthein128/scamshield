@@ -1,6 +1,7 @@
 import type { Family, ScamType } from '../types.js';
 import { rankOf, sumDays } from './rank.js';
 import { type AggDoc, type Insights, K_ANON } from './types.js';
+import { shown } from './weights.js';
 
 export const SCAM_LABELS: Record<ScamType, string> = {
   job_trafficking: 'Fake overseas job (trafficking)',
@@ -62,7 +63,7 @@ export function buildInsights(input: InsightInput, country: string, days: number
       return {
         scamType: a.key as ScamType,
         label: SCAM_LABELS[a.key as ScamType] ?? a.key,
-        count: r.count,
+        count: shown(r.count),
         trend: r.trend,
         ...(example ? { example } : {}),
         topFlagFamilies: top,
@@ -78,14 +79,14 @@ export function buildInsights(input: InsightInput, country: string, days: number
     domains: surfaced(input.domains)
       .filter((x) => x.a.value)
       .slice(0, 10)
-      .map(({ a, r }) => ({ domain: a.value as string, count: r.count, trend: r.trend })),
+      .map(({ a, r }) => ({ domain: a.value as string, count: shown(r.count), trend: r.trend })),
     campaigns: clusters
       .filter((x) => x.a.label)
       .slice(0, 5)
       .map(({ a, r }) => ({
         name: a.label as string,
         scamType: (a.scamType ?? 'other') as ScamType,
-        count: r.count,
+        count: shown(r.count),
         trend: r.trend,
         ...(a.example ? { example: a.example } : {}),
       })),
