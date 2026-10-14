@@ -2,7 +2,16 @@
 
 Backend for the SafeRoute Android app. Implements `docs/api-contract.md` on Node 22, Hono and `@google/genai`. Runs on Cloud Run.
 
-Default model: `gemini-2.5-flash` (set `GEMINI_MODEL` to change it, for example `gemini-flash-latest`).
+Default model: `gemini-3.5-flash-lite` (set `GEMINI_MODEL` to change it, for example `gemini-3.8-flash`, which was about 2x slower with no accuracy gain in our eval).
+
+## Model choice (measured 2026-10-14, 19 eval cases, grounding on, thinking LOW)
+
+| Model | Accuracy | p50 | p95 | Notes |
+| --- | --- | --- | --- | --- |
+| gemini-3.5-flash-lite | 19/19 (final prompts) | 4.4 s | 7.5 s | default |
+| gemini-3.8-flash | 16/19 (earlier prompts) | 9.4 s | 14.5 s | grounding and extraction often hit the 15 s budget |
+
+Run `npm run eval` to repeat the measurement. `/v1/speak` uses `gemini-3.8-flash-tts` and takes about 5-8 s for a sentence.
 
 ## Pipeline
 
@@ -39,7 +48,7 @@ Link results add flags: a Web Risk hit adds `known_bad` (high); a domain under 1
 | Variable | Meaning | Default |
 | --- | --- | --- |
 | `PORT` | listen port (Cloud Run sets it) | 8080 |
-| `GEMINI_MODEL` | model id | gemini-2.5-flash |
+| `GEMINI_MODEL` | model id | gemini-3.5-flash-lite |
 | `GOOGLE_GENAI_USE_VERTEXAI` | `true` for Vertex AI with the service account | unset |
 | `GOOGLE_CLOUD_PROJECT`, `GOOGLE_CLOUD_LOCATION` | Vertex project and region | -, us-central1 |
 | `GEMINI_API_KEY` | Gemini API key mode | unset |
@@ -51,6 +60,7 @@ Link results add flags: a Web Risk hit adds `known_bad` (high); a domain under 1
 | `UPSTREAM_TIMEOUT_MS`, `LINK_TIMEOUT_MS` | Gemini and link-check timeouts | 12000, 4000 |
 | `REQUEST_BUDGET_MS` | total budget per check; Detect and Correlate stop early when it runs out | 15000 |
 | `GROUNDING` | `0` disables the Google Search verification call | on |
+| `THINKING_LEVEL` | MINIMAL, LOW, MEDIUM or HIGH; empty uses the model default | LOW |
 | `TTS_MODEL`, `TTS_VOICE` | speech model and voice | gemini-3.8-flash-tts, Kore |
 | `HOTLINES_JSON`, `DEFAULT_HOTLINE` | hotline numbers by destination (confirm before launch) | Thailand 1300, Philippines 1343 |
 
