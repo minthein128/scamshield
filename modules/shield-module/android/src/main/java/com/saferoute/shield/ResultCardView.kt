@@ -208,6 +208,12 @@ internal class ResultCardView(
         }
     }
 
+    fun cancelAnimations() {
+        morph?.cancel()
+        morph = null
+        animate().cancel()
+    }
+
     fun toggle(animate: Boolean) = setExpanded(!isExpanded, animate)
 
     fun setExpanded(expand: Boolean, animate: Boolean) {
