@@ -35,6 +35,7 @@ Other fields:
 - unsolicited: true if the sender contacted the user without being asked (cold DM, SMS, group invite). false for a listing the user looked for or a neutral question.
 - verdictDraft: your own view: safe, careful or danger. It is advisory.
 - urls: every URL or domain visible in the text or in the image, as written. Include the user-supplied url field if present.
+- entities: names the input itself states, for later fact checking. companies = named employers, recruitment agencies, shops or brands; phones = phone numbers or chat ids; domains = bare domains; role, country and salaryClaim only if the input states them. Leave lists empty if the input names nothing.
 - summary: one or two plain sentences for a worker with limited reading skill. Say what is wrong and what to do next. No jargon.
 - spokenWarning: one short sentence (under 20 words) fit for text-to-speech. If the input is safe, a calm reassurance that still advises verifying.
 - Write summary, spokenWarning and each flag "label" in the requested language. Keep "evidence" in the original language of the input.

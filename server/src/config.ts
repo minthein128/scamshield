@@ -12,6 +12,10 @@ export interface Config {
   maxBodyBytes: number;
   upstreamTimeoutMs: number;
   linkTimeoutMs: number;
+  requestBudgetMs: number;
+  grounding: boolean;
+  ttsModel: string;
+  ttsVoice: string;
 }
 
 const bool = (v?: string) => v === '1' || v?.toLowerCase() === 'true';
@@ -36,7 +40,11 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
       .filter(Boolean),
     rateLimitPerMin: Number(env.RATE_LIMIT_PER_MIN ?? 30),
     maxBodyBytes: Number(env.MAX_BODY_BYTES ?? 6 * 1024 * 1024),
-    upstreamTimeoutMs: Number(env.UPSTREAM_TIMEOUT_MS ?? 25000),
+    upstreamTimeoutMs: Number(env.UPSTREAM_TIMEOUT_MS ?? 12000),
     linkTimeoutMs: Number(env.LINK_TIMEOUT_MS ?? 4000),
+    requestBudgetMs: Number(env.REQUEST_BUDGET_MS ?? 15000),
+    grounding: env.GROUNDING !== '0',
+    ttsModel: env.TTS_MODEL || 'gemini-3.8-flash-tts',
+    ttsVoice: env.TTS_VOICE || 'Kore',
   };
 }

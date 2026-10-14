@@ -52,7 +52,22 @@ export interface Action {
   value?: string;
 }
 
+export interface Entities {
+  companies: string[];
+  phones: string[];
+  domains: string[];
+  role?: string;
+  country?: string;
+  salaryClaim?: string;
+}
+
+export interface Source {
+  title: string;
+  url: string;
+}
+
 export interface Extraction {
+  entities: Entities;
   flags: Flag[];
   scamType: ScamType;
   verdictDraft: Verdict;
@@ -74,6 +89,7 @@ export interface CheckResponse {
   scamType: ScamType;
   flags: Flag[];
   linkChecks: LinkCheck[];
+  sources: Source[];
   actions: Action[];
   model: string;
 }
