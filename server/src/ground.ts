@@ -1,6 +1,6 @@
 import type { GoogleGenAI } from '@google/genai';
 import { z } from 'zod';
-import type { Config } from './config.js';
+import { type Config, thinkingOf } from './config.js';
 import { log } from './log.js';
 import type { CheckRequest, Extraction, Flag, Lang, Source } from './types.js';
 
@@ -50,7 +50,7 @@ export function buildGroundingPrompt(x: Extraction, lang: Lang): string {
     '3. Is the salary plausible for the role and country?',
     '',
     `Reply with ONLY a JSON object: {"findings":[{"family":"known_bad|identity|too_good","label":"...","evidence":"..."}]}`,
-    '- known_bad: you found scam or blacklist reports about the entity.',
+    '- known_bad: you found scam or blacklist reports that name this exact company, phone number or domain as the scammer. Reports that scammers impersonate a well-known brand (a courier, bank or marketplace) are NOT evidence against a message from that brand: do not report them.',
     '- identity: the entity cannot be found, has no licence, or the claimed identity does not match.',
     '- too_good: the salary is far above the market for that role and country.',
     '- Add a finding only when search results support it. If everything checks out, return {"findings":[]}.',
@@ -100,6 +100,7 @@ export function createGrounder(cfg: Config, client: Pick<GoogleGenAI, 'models'>)
           config: {
             tools: [{ googleSearch: {} }],
             temperature: 0.1,
+            ...thinkingOf(cfg),
             maxOutputTokens: 1024,
             abortSignal: AbortSignal.timeout(timeoutMs),
           },
