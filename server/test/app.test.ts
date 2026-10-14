@@ -42,7 +42,7 @@ describe('app', () => {
     expect(b.id).toMatch(/^chk_/);
     expect(b.score).toBeGreaterThanOrEqual(70);
     expect(Array.isArray(b.flags) && Array.isArray(b.linkChecks) && Array.isArray(b.actions)).toBe(true);
-    expect(b.title).toContain('Risiko');
+    expect(b.title).toContain('tanda bahaya');
   });
 
   it('flags a Web Risk link in mock mode', async () => {
