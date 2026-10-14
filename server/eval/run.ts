@@ -2,7 +2,7 @@ import { loadConfig } from '../src/config.js';
 import { createCorrelator } from '../src/correlate.js';
 import { createClient, createGeminiExtractor } from '../src/extract.js';
 import { createGrounder } from '../src/ground.js';
-import { createPipeline } from '../src/pipeline.js';
+import { createPipeline, type LanguageStats } from '../src/pipeline.js';
 import type { CheckResponse } from '../src/types.js';
 import { CASES } from './cases.js';
 
@@ -13,6 +13,7 @@ if (!cfg.geminiApiKey && !(cfg.useVertex && cfg.project)) {
 }
 const delayMs = Number(process.env.EVAL_DELAY_MS ?? 1500);
 const only = process.env.EVAL_ONLY?.split(',');
+let lastStats: LanguageStats | undefined;
 const client = createClient(cfg);
 const pipeline = createPipeline({
   extractor: createGeminiExtractor(cfg, client),
@@ -20,6 +21,9 @@ const pipeline = createPipeline({
   grounder: createGrounder(cfg, client),
   model: cfg.model,
   budgetMs: Number(process.env.EVAL_BUDGET_MS ?? cfg.requestBudgetMs),
+  onLanguage: (s) => {
+    lastStats = s;
+  },
 });
 
 const pct = (xs: number[], p: number) => {
@@ -38,6 +42,7 @@ interface Row {
   ms: number;
   ok: boolean;
   res?: CheckResponse;
+  langStats?: LanguageStats;
   error?: string;
 }
 
@@ -45,6 +50,7 @@ const rows: Row[] = [];
 for (const c of CASES.filter((x) => !only || only.includes(x.id))) {
   const t = Date.now();
   try {
+    lastStats = undefined;
     const res = await pipeline.run({ kind: c.kind, language: c.lang, text: c.text });
     const risky = res.verdict !== 'safe';
     rows.push({
@@ -57,6 +63,7 @@ for (const c of CASES.filter((x) => !only || only.includes(x.id))) {
       ms: Date.now() - t,
       ok: risky === (c.expect === 'risky'),
       res,
+      langStats: lastStats,
     });
   } catch (err) {
     rows.push({
@@ -88,8 +95,21 @@ const ms = rows.map((r) => r.ms);
 console.log(
   `\naccuracy ${ok}/${rows.length} (${Math.round((100 * ok) / rows.length)}%)  latency p50=${pct(ms, 50)}ms p95=${pct(ms, 95)}ms max=${Math.max(...ms)}ms`,
 );
+const withStats = rows.filter((r) => r.langStats);
+const share = (f: (x: LanguageStats) => boolean) =>
+  `${withStats.filter((r) => f(r.langStats as LanguageStats)).length}/${withStats.length}`;
+console.log(
+  `certainty language: before guard ${share((x) => x.before > 0)}  after guard ${share((x) => x.after > 0)}  rewritten ${share((x) => x.rewrites > 0)}  re-asked ${share((x) => x.reasked)}`,
+);
 if (process.env.EVAL_JSON) {
-  const slim = rows.map(({ res, ...r }) => ({ ...r, flags: res?.flags.length ?? 0, sources: res?.sources.length ?? 0 }));
+  const slim = rows.map(({ res, ...r }) => ({
+    ...r,
+    title: res?.title,
+    summary: res?.summary,
+    spokenWarning: res?.spokenWarning,
+    flags: res?.flags.length ?? 0,
+    sources: res?.sources.length ?? 0,
+  }));
   const doc = {
     kind: 'text-eval',
     date: new Date().toISOString().slice(0, 10),
@@ -98,6 +118,11 @@ if (process.env.EVAL_JSON) {
     correct: ok,
     p50: pct(ms, 50),
     p95: pct(ms, 95),
+    certainty: {
+      responses: withStats.length,
+      before: withStats.filter((r) => (r.langStats?.before ?? 0) > 0).length,
+      after: withStats.filter((r) => (r.langStats?.after ?? 0) > 0).length,
+    },
     rows: slim,
   };
   await import('node:fs').then((fs) => fs.writeFileSync(process.env.EVAL_JSON as string, `${JSON.stringify(doc, null, 2)}\n`));

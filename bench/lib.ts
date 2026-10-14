@@ -99,6 +99,8 @@ export interface Row {
   latencyMs: number;
   correct: boolean;
   piiHits: Record<string, number>;
+  certaintyBefore?: number | null;
+  certaintyAfter?: number | null;
   error?: string;
 }
 
@@ -115,6 +117,7 @@ export interface Summary {
   p50: number;
   p95: number;
   piiLeaks: number;
+  certainty: { measured: number; before: number | null; after: number };
   piiByType: Record<string, number>;
   confusion: Record<string, Record<string, number>>;
   perApp: Record<string, { n: number; correct: number }>;
@@ -184,6 +187,11 @@ export function summarize(rows: Row[]): Summary {
     p50: percentile(ms, 50),
     p95: percentile(ms, 95),
     piiLeaks,
+    certainty: {
+      measured: ok.length,
+      before: ok.some((r) => typeof r.certaintyBefore === 'number') ? ok.filter((r) => (r.certaintyBefore ?? 0) > 0).length : null,
+      after: ok.filter((r) => (r.certaintyAfter ?? 0) > 0).length,
+    },
     piiByType,
     confusion,
     perApp,
