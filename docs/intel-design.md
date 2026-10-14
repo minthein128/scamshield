@@ -33,7 +33,7 @@ Written by firebase-admin only. `firestore.rules` denies all client access.
 | --- | --- |
 | scamType, flag family + severity, verdict, score bucket (20 wide), kind, language, home and destination country, redacted template (max 300 chars), campaign label, cluster id, hashed indicators, public domains, UTC day, `expireAt` | uid, IP, image, raw text, flag evidence, victim PII, clear phone/handle/account |
 
-Retention is 90 days through a Firestore TTL policy on `expireAt`. A request with `shareSignals: false` writes nothing. Safe verdicts write nothing. The document id is a keyed hash of day, scam type and indicators (or template), so the same person re-checking the same scam on the same day counts once.
+Retention is 90 days, enforced on `expireAt`. A request with `shareSignals: false` writes nothing. Safe verdicts write nothing. The document id is a keyed hash of day, scam type and indicators (or template), so the same person re-checking the same scam on the same day counts once.
 
 ## Aggregation: `intel_aggregates`
 
@@ -65,4 +65,4 @@ Poisoning is limited by: k=3, same-day dedupe, no signal from safe verdicts, and
 
 ## Spark limits
 
-Only Firestore (free quota: 20k writes, 50k reads per day) and TTL are used. A signal costs about 10 writes. Insights reads are cached 60 s in memory.
+Only Firestore is used (free quota: 20k writes, 50k reads per day). Firestore TTL policies need billing, so `expireAt` is kept for when billing exists and a sweep (server timer and `npm run intel:sweep`) deletes expired documents. Existing rules deny every `intel_*` path to clients. Single-field indexes suffice; no composite index exists. A signal costs about 10 writes. Insights reads are cached 60 s in memory.
