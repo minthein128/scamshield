@@ -24,6 +24,14 @@ Expo SDK 52 / React Native, TypeScript strict. Android anti-scam app. The Expo w
 
 Other env vars: `EXPO_PUBLIC_HOTLINE_NUMBER` (fallback call target), `EXPO_PUBLIC_APK_URL` (download link on web).
 
+## Shield overlay (Android)
+
+- `src/screens/ShieldScreen.tsx` asks for POST_NOTIFICATIONS (Android 13+), then screen capture, then calls `startShield({ apiUrl, language })`. "Check this screen now" calls `checkScreenNow()`.
+- Overlay results are saved to recent checks by `useShieldSync` (listener plus `takeUnsyncedResults()` on start). `saferoute://report/<id>` opens the report through `useShieldDeepLink`.
+- The native client is blocked from cleartext `http://` by Android. `EXPO_PUBLIC_API_URL` must be `https://` for the shield. Cleartext is not enabled. The web build and `pnpm web` may use `http://localhost`.
+- The shield needs `EXPO_PUBLIC_API_URL`; it does not use the mock.
+- After editing `modules/shield-module`, run `rm -rf node_modules/shield-module && pnpm install` (the `file:` dependency is copied).
+
 ## Rules
 
 - All UI copy is English. Only the model response follows the selected report language.

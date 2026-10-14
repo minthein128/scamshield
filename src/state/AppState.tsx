@@ -1,5 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { CheckResponse, LanguageCode } from '../api/types';
+import { useShieldSync } from '../hooks/useShieldSync';
 import { HistoryEntry, addHistory, loadHistory, loadLanguage, saveLanguage } from '../lib/history';
 
 interface AppStateValue {
@@ -29,6 +30,8 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const next = await addHistory({ id: result.id, createdAt: result.createdAt, language: lang, source, result });
     setHistory(next);
   }, []);
+
+  useShieldSync(saveCheck, language);
 
   const value = useMemo(() => ({ language, setLanguage, history, saveCheck }), [language, setLanguage, history, saveCheck]);
   return <AppStateContext.Provider value={value}>{children}</AppStateContext.Provider>;

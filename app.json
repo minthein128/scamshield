@@ -20,7 +20,8 @@
       "permissions": [
         "SYSTEM_ALERT_WINDOW",
         "FOREGROUND_SERVICE",
-        "FOREGROUND_SERVICE_MEDIA_PROJECTION"
+        "FOREGROUND_SERVICE_MEDIA_PROJECTION",
+        "POST_NOTIFICATIONS"
       ]
     },
     "web": {

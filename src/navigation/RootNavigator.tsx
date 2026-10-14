@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { NavigationContainer, DefaultTheme, createNavigationContainerRef } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import type { CheckResponse, LanguageCode } from '../api/types';
 import { TabIcon } from './TabIcons';
 import type { RootStackParamList, TabParamList } from './types';
 import HomeScreen from '../screens/HomeScreen';
@@ -13,6 +14,7 @@ import LearnScreen from '../screens/LearnScreen';
 import ShieldScreen from '../screens/ShieldScreen';
 import DemoBoardScreen from '../screens/DemoBoardScreen';
 import { useSharedDraft } from '../hooks/useSharedDraft';
+import { useShieldDeepLink } from '../hooks/useShieldDeepLink';
 import theme from '../theme/theme';
 
 const Tab = createBottomTabNavigator<TabParamList>();
@@ -50,6 +52,13 @@ const ShareIntentBridge: React.FC<{ ready: boolean }> = ({ ready }) => {
   return null;
 };
 
+const openReport = (result: CheckResponse, language: LanguageCode) => navigationRef.navigate('Report', { result, language });
+
+const DeepLinkBridge: React.FC<{ ready: boolean }> = ({ ready }) => {
+  useShieldDeepLink(ready, openReport);
+  return null;
+};
+
 export const RootNavigator: React.FC = () => {
   const [ready, setReady] = useState(false);
   return (
@@ -62,6 +71,7 @@ export const RootNavigator: React.FC = () => {
         <Stack.Screen name="DemoBoard" component={DemoBoardScreen} />
       </Stack.Navigator>
       <ShareIntentBridge ready={ready} />
+      <DeepLinkBridge ready={ready} />
     </NavigationContainer>
   );
 };

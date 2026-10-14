@@ -4,6 +4,7 @@ import { draftFromShare } from '../lib/share';
 import { buildRequest } from '../lib/request';
 import { base64Bytes, prepareImage } from '../lib/image';
 import { findVoiceLocale, pickSpeechLocale } from '../lib/speech';
+import { isCleartext, reportIdFromUrl, toCheckResponse } from '../lib/shield';
 
 const flag = (family: Flag['family'], severity: Flag['severity'], label = family): Flag => ({ family, severity, label, evidence: '' });
 
@@ -85,5 +86,20 @@ describe('voice lookup', () => {
   it('returns undefined when no voice matches', () => {
     expect(findVoiceLocale(['en-US'], 'my')).toBeUndefined();
     expect(findVoiceLocale(['my_MM'], 'my')).toBe('my_MM');
+  });
+});
+
+describe('shield results', () => {
+  it('parses report deep links', () => {
+    expect(reportIdFromUrl('saferoute://report/chk_abc123')).toBe('chk_abc123');
+    expect(reportIdFromUrl('https://example.com/report/1')).toBeNull();
+    expect(reportIdFromUrl(null)).toBeNull();
+  });
+  it('maps an overlay result to a full response', () => {
+    const r = toCheckResponse({ id: 'chk_1', createdAt: '2026-10-14T00:00:00Z', kind: 'screen', verdict: 'danger', score: 88, title: 't', summary: 's', flags: [{ family: 'pressure', label: 'Rush', severity: 'medium' }] });
+    expect(r.flags[0].evidence).toBe('');
+    expect(r.spokenWarning).toBe('s');
+    expect(r.actions).toEqual([]);
+    expect(isCleartext('http://x.test')).toBe(true);
   });
 });
