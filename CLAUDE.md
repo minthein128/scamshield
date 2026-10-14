@@ -19,6 +19,7 @@ Expo SDK 52 / React Native, TypeScript strict. Android anti-scam app. The Expo w
 - `src/navigation/` React Navigation: bottom tabs (Home, Check, Contacts, Learn) inside a native stack (Onboarding, Checking, Report, Shield, Settings, Account, GetHelp, DemoBoard).
 - `src/screens/` real screens. `src/screens/demo/` illustrated walkthroughs, listed in `boards.ts` and shown under Learn as "See how scams look".
 - `src/hooks/useSharedDraft.android.ts` Android share intent. The default file is a no-op for web.
+- `bench/` screenshot benchmark (run from `server/`, see `bench/README.md`). Never commit real screenshots. `media/` holds the deck PDF and the demo video (Git LFS).
 - `modules/shield-module/` native overlay owned by another engineer. `server/` is the backend. Do not edit either from app work.
 
 ## Mock or real API
