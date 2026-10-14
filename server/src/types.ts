@@ -28,8 +28,10 @@ export interface CheckRequest {
   url?: string;
   imageBase64?: string;
   imageMimeType?: string;
-  context?: { destination?: string; route?: string };
+  context?: { destination?: string; route?: string; home?: string };
   language: Lang;
+  /** false opts this check out of the anonymous network signal. */
+  shareSignals?: boolean;
 }
 
 export interface Flag {
@@ -75,6 +77,12 @@ export interface Extraction {
   summary: string;
   spokenWarning: string;
   urls: string[];
+  /** Network intel: model-made redacted template and sender-side indicators. */
+  template?: string;
+  templateSafe?: boolean;
+  campaign?: string;
+  inputLanguage?: string;
+  sender?: { phones: string[]; handles: string[]; accounts: string[] };
 }
 
 export interface CheckResponse {
@@ -92,6 +100,7 @@ export interface CheckResponse {
   sources: Source[];
   actions: Action[];
   model: string;
+  network?: { seenCount: number; firstSeen: string; campaign?: { name: string; seenThisWeek: number } };
 }
 
 export class ApiError extends Error {

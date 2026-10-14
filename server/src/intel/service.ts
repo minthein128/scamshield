@@ -1,0 +1,181 @@
+import type { CheckRequest, Extraction, Flag, Lang, Severity } from '../types.js';
+import { COUNTRY_CODES } from './countries.js';
+import { createHasher, type Hasher } from './indicators.js';
+import { buildInsights } from './insights.js';
+import { campaignLabel, reportedEvidence, reportedLabel } from './messages.js';
+import { nearest } from './minhash.js';
+import { countIn, sumDays } from './rank.js';
+import { aggId, aggregateWrites, buildSignal, isRecordable, type Outcome, type Prepared, prepare, scopesOf } from './signal.js';
+import { type AggDoc, type ClusterMeta, GLOBAL, type Insights, type IntelStore, K_ANON, type NetworkInfo } from './types.js';
+
+export interface Lookup {
+  flags: Flag[];
+  network?: NetworkInfo;
+}
+
+export interface Intel {
+  prepare(req: Pick<CheckRequest, 'kind' | 'language' | 'url' | 'context'>, ex: Extraction): Prepared;
+  lookup(p: Prepared, lang: Lang): Promise<Lookup>;
+  record(p: Prepared, o: Outcome, opts?: { now?: Date; seed?: boolean }): Promise<'recorded' | 'duplicate' | 'skipped'>;
+  insights(country?: string, days?: number): Promise<Insights>;
+  readonly store: IntelStore;
+}
+
+export const NO_LOOKUP: Lookup = { flags: [] };
+
+/** Severity of a network match from its 30-day report count. */
+export function severityForCount(n: number): Severity {
+  return n >= 15 ? 'high' : n >= 6 ? 'medium' : 'low';
+}
+
+const iso = (day: string) => `${day.slice(0, 4)}-${day.slice(4, 6)}-${day.slice(6, 8)}`;
+const firstDay = (days: Record<string, number>) => Object.keys(days).sort()[0];
+
+export function createIntel(opts: { store: IntelStore; pepper: string; cacheMs?: number; now?: () => Date }): Intel {
+  const { store } = opts;
+  const hasher: Hasher = createHasher(opts.pepper);
+  const cacheMs = opts.cacheMs ?? 60_000;
+  const clock = opts.now ?? (() => new Date());
+
+  const insightCache = new Map<string, { at: number; value: Insights }>();
+  let clusterCache: { at: number; docs: AggDoc[] } | undefined;
+
+  async function clusters(): Promise<AggDoc[]> {
+    if (clusterCache && Date.now() - clusterCache.at < cacheMs) return clusterCache.docs;
+    const docs = await store.listAggs('cluster', GLOBAL, 400);
+    clusterCache = { at: Date.now(), docs };
+    return docs;
+  }
+
+  return {
+    store,
+
+    prepare: (req, ex) =>
+      prepare(
+        { kind: req.kind, language: req.language, url: req.url, home: req.context?.home, destination: req.context?.destination },
+        ex,
+        hasher,
+      ),
+
+    async lookup(p, lang) {
+      const now = clock();
+      const ids = [
+        ...p.ind.map((i) => aggId('ind', GLOBAL, i.h)),
+        ...p.domains.map((d) => aggId('dom', GLOBAL, hasher.hash('dom', d).slice(0, 24))),
+      ];
+      const docs = await store.getAggs(ids);
+      const flags: Flag[] = [];
+      const seen: Array<{ n: number; first?: string }> = [];
+      const bySubject = new Map<string, { n: number; first?: string }>();
+      for (const a of docs) {
+        const days = sumDays(a.real.days, a.seed.days);
+        const n = countIn(days, now, 30);
+        if (n < K_ANON) continue;
+        const subject = a.kind === 'dom' ? 'domain' : (a.itype as 'phone' | 'handle' | 'account');
+        const cur = bySubject.get(subject);
+        if (!cur || n > cur.n) bySubject.set(subject, { n, first: firstDay(days) });
+      }
+      for (const [subject, m] of bySubject) {
+        seen.push(m);
+        flags.push({
+          family: 'known_bad',
+          label: reportedLabel(lang, subject as 'phone' | 'handle' | 'account' | 'domain', m.n),
+          evidence: reportedEvidence(lang, m.n),
+          severity: severityForCount(m.n),
+        });
+      }
+
+      let campaign: NetworkInfo['campaign'];
+      if (p.sig) {
+        const m = nearest(p.sig, await clusters());
+        if (m) {
+          const days = sumDays(m.real.days, m.seed.days);
+          const week = countIn(days, now, 7);
+          if (week >= K_ANON && m.label) {
+            campaign = { name: m.label, seenThisWeek: week };
+            seen.push({ n: countIn(days, now, 30), first: firstDay(days) });
+            flags.push({
+              family: 'known_bad',
+              label: campaignLabel(lang, m.label, week),
+              evidence: reportedEvidence(lang, week),
+              severity: 'low',
+            });
+          }
+        }
+      }
+      if (seen.length === 0) return NO_LOOKUP;
+      const firsts = seen.map((s) => s.first).filter((d): d is string => Boolean(d));
+      const network: NetworkInfo = {
+        seenCount: Math.max(...seen.map((s) => s.n)),
+        firstSeen: iso(firsts.sort()[0] ?? '19700101'),
+      };
+      if (campaign) network.campaign = campaign;
+      return { flags, network };
+    },
+
+    async record(p, o, ropts = {}) {
+      if (!isRecordable(o)) return 'skipped';
+      const now = ropts.now ?? clock();
+      let clusterId: string | undefined;
+      let metas: ClusterMeta[] | undefined;
+      if (p.sig && p.template) {
+        const match = nearest(
+          p.sig,
+          (await clusters()).filter((c) => c.scamType === o.scamType),
+        );
+        const meta = match
+          ? { key: match.key, label: match.label, example: match.example, sig: match.sig as number[] }
+          : {
+              key: `c${p.sig
+                .slice(0, 3)
+                .map((n) => n.toString(16).padStart(8, '0'))
+                .join('')}`,
+              label: p.campaign,
+              example: p.template,
+              sig: p.sig,
+            };
+        clusterId = meta.key;
+        metas = scopesOf(p).map((scope) => ({ ...meta, id: aggId('cluster', scope, meta.key), scope, scamType: o.scamType }));
+      }
+      const { id, doc } = buildSignal(p, o, hasher, {
+        now,
+        clusterId,
+        seed: ropts.seed,
+        expireBase: ropts.seed ? new Date() : undefined,
+      });
+      const result = await store.record(id, doc, aggregateWrites(doc, hasher), metas);
+      if (result === 'recorded') {
+        insightCache.clear();
+        const g = metas?.find((m) => m.scope === GLOBAL);
+        if (g && clusterCache) {
+          let c = clusterCache.docs.find((d) => d.key === g.key);
+          if (!c) {
+            c = { ...g, kind: 'cluster', real: { days: {}, fam: {} }, seed: { days: {}, fam: {} } };
+            clusterCache.docs.push(c);
+          }
+          const bucket = ropts.seed ? c.seed : c.real;
+          bucket.days[doc.day] = (bucket.days[doc.day] ?? 0) + 1;
+        }
+      }
+      return result;
+    },
+
+    async insights(country, days = 30) {
+      const code = !country || country.toUpperCase() === GLOBAL ? GLOBAL : country.toUpperCase();
+      const span = Math.min(90, Math.max(1, Math.floor(days)));
+      const key = `${code}|${span}`;
+      const hit = insightCache.get(key);
+      if (hit && Date.now() - hit.at < cacheMs) return hit.value;
+      const [types, cl, domains] = await Promise.all([
+        store.listAggs('type', code, 20),
+        store.listAggs('cluster', code, 300),
+        store.listAggs('dom', code, 300),
+      ]);
+      const value = buildInsights({ types, clusters: cl, domains }, code, span, clock());
+      insightCache.set(key, { at: Date.now(), value });
+      return value;
+    },
+  };
+}
+
+export const isCountry = (c: string) => c.toUpperCase() === GLOBAL || COUNTRY_CODES.includes(c.toUpperCase());
