@@ -47,7 +47,7 @@ export const GetHelpScreen: React.FC<RootScreenProps<'GetHelp'>> = ({ navigation
       <ScreenHeader title={t('title')} onBack={() => navigation.goBack()} />
       <Text style={styles.body}>{t('intro')}</Text>
 
-      <Button testID="help-report-scam" label="Report a scam" variant="secondary" icon="flag" onPress={() => navigation.navigate('ReportScam')} />
+      <Button testID="help-report-scam" label={t('reportScam')} variant="secondary" icon="flag" onPress={() => navigation.navigate('ReportScam')} />
 
       {!chosen ? (
         <EmptyState

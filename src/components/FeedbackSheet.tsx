@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { Modal, Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { Modal, Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import type { Verdict } from '../api/types';
 import { SCAM_CHOICES, type ChoosableScam, type FeedbackAnswer } from '../lib/feedback';
 import theme from '../theme/theme';
+import { Text } from './Text';
 import { Button, Chip } from './ui';
 
 const { colors, fonts } = theme;
@@ -17,6 +19,7 @@ interface Props {
 }
 
 export const FeedbackSheet: React.FC<Props> = ({ visible, verdict, scamType, busy, onClose, onSend }) => {
+  const { t } = useTranslation(['feedback', 'common']);
   const { height } = useWindowDimensions();
   const risky = verdict !== 'safe';
   const [picking, setPicking] = useState(false);
@@ -41,31 +44,31 @@ export const FeedbackSheet: React.FC<Props> = ({ visible, verdict, scamType, bus
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={close}>
       <View style={[styles.overlay, { height }]}>
-        <Pressable accessibilityLabel="Close" style={styles.backdrop} onPress={close} />
+        <Pressable accessibilityLabel={t('common:actions.close')} style={styles.backdrop} onPress={close} />
         <View style={styles.sheet} testID="feedback-sheet">
-          <Text accessibilityRole="header" style={styles.title}>{risky ? 'What was it?' : 'What kind of scam was it?'}</Text>
+          <Text accessibilityRole="header" style={styles.title}>{risky ? t('sheet.titleRisky') : t('sheet.titleSafe')}</Text>
           {risky ? (
             picking ? (
               <>
-                <Text style={styles.body}>Pick the closest match.</Text>
+                <Text style={styles.body}>{t('sheet.pick')}</Text>
                 {chips}
-                <Button testID="feedback-send" label="Send" disabled={!type || busy} onPress={() => type && onSend({ kind: 'different', scamType: type })} />
+                <Button testID="feedback-send" label={t('sheet.send')} disabled={!type || busy} onPress={() => type && onSend({ kind: 'different', scamType: type })} />
               </>
             ) : (
               <>
-                <Text style={styles.body}>Your answer helps us warn others more accurately. Nothing you wrote is sent.</Text>
-                <Button testID="feedback-safe" label="It was safe" variant="secondary" disabled={busy} onPress={() => onSend({ kind: 'safe' })} />
-                <Button testID="feedback-different" label="It was a different scam" variant="secondary" disabled={busy} onPress={() => setPicking(true)} />
+                <Text style={styles.body}>{t('sheet.sendBody')}</Text>
+                <Button testID="feedback-safe" label={t('sheet.itWasSafe')} variant="secondary" disabled={busy} onPress={() => onSend({ kind: 'safe' })} />
+                <Button testID="feedback-different" label={t('sheet.different')} variant="secondary" disabled={busy} onPress={() => setPicking(true)} />
               </>
             )
           ) : (
             <>
-              <Text style={styles.body}>Optional. Your answer helps us catch it next time.</Text>
+              <Text style={styles.body}>{t('sheet.optional')}</Text>
               {chips}
-              <Button testID="feedback-scam" label="It was a scam" disabled={busy} onPress={() => onSend({ kind: 'scam', ...(type ? { scamType: type } : {}) })} />
+              <Button testID="feedback-scam" label={t('sheet.scam')} disabled={busy} onPress={() => onSend({ kind: 'scam', ...(type ? { scamType: type } : {}) })} />
             </>
           )}
-          <Button label="Cancel" variant="secondary" onPress={close} />
+          <Button label={t('common:actions.cancel')} variant="secondary" onPress={close} />
         </View>
       </View>
     </Modal>

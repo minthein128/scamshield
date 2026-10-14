@@ -42,6 +42,10 @@
     "unknown": {
       "title": "May nagkaproblema",
       "message": "Pakiusap, subukan muli."
+    },
+    "not_found": {
+      "title": "Lumipas na ang pagsusuring iyon",
+      "message": "Tinatanggap ang feedback sa loob ng ilang araw pagkatapos ng pagsusuri."
     }
   },
   "rateLimitedWait": "Subukan muli sa loob ng mga {{wait}}. Mas mataas ang limitasyon sa libreng account.",

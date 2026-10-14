@@ -26,6 +26,8 @@
     "trafficking": "Anti-trafficking",
     "police": "Pulisya",
     "cybercrime": "Pag-uulat ng scam at cybercrime",
-    "consular": "Tulong para sa mga mamamayan sa ibang bansa"
-  }
+    "consular": "Tulong para sa mga mamamayan sa ibang bansa",
+    "ngo": "Mga organisasyong tumutulong"
+  },
+  "reportScam": "Mag-ulat ng scam"
 }

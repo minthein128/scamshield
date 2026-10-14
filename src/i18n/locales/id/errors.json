@@ -42,6 +42,10 @@
     "unknown": {
       "title": "Terjadi kendala",
       "message": "Silakan coba lagi."
+    },
+    "not_found": {
+      "title": "Pemeriksaan itu sudah kedaluwarsa",
+      "message": "Masukan diterima selama beberapa hari setelah pemeriksaan."
     }
   },
   "rateLimitedWait": "Coba lagi dalam sekitar {{wait}}. Akun gratis mendapat batas lebih banyak.",

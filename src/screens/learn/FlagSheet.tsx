@@ -1,9 +1,11 @@
 import React from 'react';
-import { Modal, Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { Modal, Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { Text } from '../../components/Text';
 import { Button } from '../../components/ui';
 import { Icon } from '../../components/Icon';
 import theme from '../../theme/theme';
-import { SHEET_CLOSE, SHEET_EXAMPLE, type RedFlag } from './content';
+import type { RedFlag } from './content';
 
 const { colors, fonts } = theme;
 
@@ -13,11 +15,12 @@ interface Props {
 }
 
 export const FlagSheet: React.FC<Props> = ({ flag, onClose }) => {
+  const { t } = useTranslation('learn');
   const { height } = useWindowDimensions();
   return (
     <Modal visible={flag !== null} transparent animationType="slide" onRequestClose={onClose}>
       <View style={[styles.overlay, { height }]}>
-        <Pressable accessibilityLabel={SHEET_CLOSE} accessibilityRole="button" style={styles.backdrop} onPress={onClose} />
+        <Pressable accessibilityLabel={t('sheet.close')} accessibilityRole="button" style={styles.backdrop} onPress={onClose} />
         {flag ? (
           <View style={styles.sheet} testID="flag-sheet" accessibilityViewIsModal>
             <View style={styles.grab} />
@@ -29,10 +32,10 @@ export const FlagSheet: React.FC<Props> = ({ flag, onClose }) => {
             </View>
             <Text style={styles.body}>{flag.explain}</Text>
             <View style={styles.quote}>
-              <Text style={styles.quoteLabel}>{SHEET_EXAMPLE}</Text>
+              <Text style={styles.quoteLabel}>{t('sheet.example')}</Text>
               <Text style={styles.quoteText}>{flag.phrase}</Text>
             </View>
-            <Button label={SHEET_CLOSE} variant="secondary" onPress={onClose} />
+            <Button label={t('sheet.close')} variant="secondary" onPress={onClose} />
           </View>
         ) : null}
       </View>

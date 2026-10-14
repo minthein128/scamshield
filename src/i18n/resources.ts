@@ -4,8 +4,10 @@ import enChecking from './locales/en/checking.json';
 import enCommon from './locales/en/common.json';
 import enContacts from './locales/en/contacts.json';
 import enErrors from './locales/en/errors.json';
+import enFeedback from './locales/en/feedback.json';
 import enHelp from './locales/en/help.json';
 import enHome from './locales/en/home.json';
+import enLearn from './locales/en/learn.json';
 import enOnboarding from './locales/en/onboarding.json';
 import enRadar from './locales/en/radar.json';
 import enReport from './locales/en/report.json';
@@ -23,8 +25,10 @@ export const en = {
   common: enCommon,
   contacts: enContacts,
   errors: enErrors,
+  feedback: enFeedback,
   help: enHelp,
   home: enHome,
+  learn: enLearn,
   onboarding: enOnboarding,
   radar: enRadar,
   report: enReport,

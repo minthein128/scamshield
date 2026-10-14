@@ -1,7 +1,9 @@
 import React, { useCallback, useState } from 'react';
-import { Image, Platform, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Image, Platform, StyleSheet, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import * as Clipboard from 'expo-clipboard';
 import { Screen } from '../components/Screen';
+import { Text, TextInput } from '../components/Text';
 import { Button, Card, Chip, LinkButton, Notice, ScreenHeader } from '../components/ui';
 import { countryName } from '../lib/countries';
 import { SCAM_CHOICES, buildReportRequest, reportReady, type ChoosableScam } from '../lib/feedback';
@@ -13,6 +15,7 @@ import theme from '../theme/theme';
 const { colors, fonts } = theme;
 
 export const ReportScamScreen: React.FC<RootScreenProps<'ReportScam'>> = ({ navigation }) => {
+  const { t } = useTranslation(['feedback', 'check', 'common']);
   const { language, profile } = useAppState();
   const [text, setText] = useState('');
   const [image, setImage] = useState<PreparedImage | null>(null);
@@ -23,12 +26,12 @@ export const ReportScamScreen: React.FC<RootScreenProps<'ReportScam'>> = ({ navi
 
   const paste = useCallback(async () => {
     const value = (await Clipboard.getStringAsync()).trim();
-    if (!value) setNotice('Your clipboard is empty.');
+    if (!value) setNotice(t('check:errors.clipboardEmpty'));
     else {
       setNotice(null);
       setText(value);
     }
-  }, []);
+  }, [t]);
 
   const pick = useCallback(async () => {
     setBusy(true);
@@ -37,11 +40,11 @@ export const ReportScamScreen: React.FC<RootScreenProps<'ReportScam'>> = ({ navi
       const prepared = await pickScreenshot();
       if (prepared) setImage(prepared);
     } catch {
-      setNotice('We could not use that picture. Try another screenshot.');
+      setNotice(t('check:errors.image'));
     } finally {
       setBusy(false);
     }
-  }, []);
+  }, [t]);
 
   const form = {
     text,
@@ -57,45 +60,45 @@ export const ReportScamScreen: React.FC<RootScreenProps<'ReportScam'>> = ({ navi
 
   const submit = () => {
     const request = buildReportRequest(form);
-    if (request) navigation.navigate('Checking', { request, source: 'Reported scam', reported: true });
+    if (request) navigation.navigate('Checking', { request, source: t('reportScam.source'), reported: true });
   };
 
   return (
-    <Screen footer={<Button testID="report-scam-submit" label="Send report" onPress={submit} disabled={!ready || busy} />}>
-      <ScreenHeader title="Report a scam" onBack={() => (navigation.canGoBack() ? navigation.goBack() : navigation.navigate('Tabs'))} />
-      <Text style={styles.body}>Tell us about a scam you saw. We remove names, numbers and links before anything is kept, and it helps warn others.</Text>
+    <Screen footer={<Button testID="report-scam-submit" label={t('reportScam.submit')} onPress={submit} disabled={!ready || busy} />}>
+      <ScreenHeader title={t('reportScam.title')} onBack={() => (navigation.canGoBack() ? navigation.goBack() : navigation.navigate('Tabs'))} />
+      <Text style={styles.body}>{t('reportScam.intro')}</Text>
 
       <View style={{ gap: 6 }}>
         <View style={styles.labelRow}>
-          <Text style={styles.label}>Paste the text or chat</Text>
-          <LinkButton label="Paste" onPress={paste} />
+          <Text style={styles.label}>{t('reportScam.textLabel')}</Text>
+          <LinkButton label={t('common:actions.paste')} onPress={paste} />
         </View>
         <TextInput
           testID="report-scam-text"
-          accessibilityLabel="Scam text or chat"
+          accessibilityLabel={t('reportScam.textA11y')}
           multiline
           value={text}
           onChangeText={setText}
-          placeholder="The message, job post or chat"
+          placeholder={t('reportScam.placeholder')}
           placeholderTextColor={colors.textMuted}
           style={[styles.input, styles.textArea]}
         />
       </View>
 
       <Card style={{ gap: 10 }}>
-        <Text style={styles.label}>Or a screenshot</Text>
+        <Text style={styles.label}>{t('reportScam.screenshotLabel')}</Text>
         {image ? (
           <View style={styles.imageRow}>
             <Image source={{ uri: image.uri }} style={styles.thumb} resizeMode="cover" />
             <View style={{ flex: 1, gap: 8 }}>
-              <Text style={styles.meta}>{Math.round(image.bytes / 1024)} KB, ready to send</Text>
-              <Button label="Remove" variant="secondary" onPress={() => setImage(null)} />
+              <Text style={styles.meta}>{t('check:screenshot.ready', { kb: Math.round(image.bytes / 1024) })}</Text>
+              <Button label={t('common:actions.remove')} variant="secondary" onPress={() => setImage(null)} />
             </View>
           </View>
         ) : (
           <Button
             testID="report-scam-pick-image"
-            label={busy ? 'Preparing picture...' : Platform.OS === 'web' ? 'Upload a screenshot' : 'Pick a screenshot'}
+            label={busy ? t('check:screenshot.preparing') : Platform.OS === 'web' ? t('check:screenshot.upload') : t('check:screenshot.pick')}
             variant="secondary"
             disabled={busy}
             onPress={pick}
@@ -104,7 +107,7 @@ export const ReportScamScreen: React.FC<RootScreenProps<'ReportScam'>> = ({ navi
       </Card>
 
       <View style={{ gap: 8 }}>
-        <Text style={styles.label}>What kind of scam was it?</Text>
+        <Text style={styles.label}>{t('reportScam.kindLabel')}</Text>
         <View style={styles.wrap}>
           {SCAM_CHOICES.map(c => (
             <Chip key={c.type} label={c.label} selected={scamType === c.type} onPress={() => setScamType(c.type)} />
@@ -113,12 +116,12 @@ export const ReportScamScreen: React.FC<RootScreenProps<'ReportScam'>> = ({ navi
       </View>
 
       <View style={{ gap: 8 }}>
-        <Text style={styles.label}>Did you lose money? (optional)</Text>
+        <Text style={styles.label}>{t('reportScam.lostLabel')}</Text>
         <View style={styles.wrap}>
-          <Chip label="Yes" selected={lostMoney === true} onPress={() => setLostMoney(lostMoney === true ? null : true)} />
-          <Chip label="No" selected={lostMoney === false} onPress={() => setLostMoney(lostMoney === false ? null : false)} />
+          <Chip label={t('reportScam.yes')} selected={lostMoney === true} onPress={() => setLostMoney(lostMoney === true ? null : true)} />
+          <Chip label={t('reportScam.no')} selected={lostMoney === false} onPress={() => setLostMoney(lostMoney === false ? null : false)} />
         </View>
-        <Text style={styles.meta}>Yes or no only. We never ask how much.</Text>
+        <Text style={styles.meta}>{t('reportScam.lostNote')}</Text>
       </View>
 
       {notice ? <Notice message={notice} /> : null}

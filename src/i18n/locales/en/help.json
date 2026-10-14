@@ -23,6 +23,8 @@
     "trafficking": "Anti-trafficking",
     "police": "Police",
     "cybercrime": "Scam and cybercrime reporting",
-    "consular": "Help for citizens abroad"
-  }
+    "consular": "Help for citizens abroad",
+    "ngo": "Support organisations"
+  },
+  "reportScam": "Report a scam"
 }

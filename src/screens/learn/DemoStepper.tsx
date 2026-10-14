@@ -1,9 +1,11 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View, type LayoutChangeEvent, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native';
+import { ScrollView, StyleSheet, TouchableOpacity, View, type LayoutChangeEvent, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { Text } from '../../components/Text';
 import { useReduceMotion } from '../../components/ShieldLoader';
 import theme from '../../theme/theme';
 import { DEMOS, DEMO_SIZE } from '../demo/registry';
-import { STEPPER_BACK, STEPPER_DONE, STEPPER_NEXT, type DemoKey } from './content';
+import type { DemoKey } from './content';
 
 const { colors, fonts } = theme;
 const MAX_FRAME = 280;
@@ -43,6 +45,7 @@ const Frame: React.FC<{ demo: DemoKey; width: number; label: string }> = ({ demo
 };
 
 export const DemoStepper: React.FC<Props> = ({ steps, accent = colors.accent, onDone, testID }) => {
+  const { t } = useTranslation('learn');
   const reduceMotion = useReduceMotion();
   const scroller = useRef<ScrollView>(null);
   const [width, setWidth] = useState(0);
@@ -64,7 +67,7 @@ export const DemoStepper: React.FC<Props> = ({ steps, accent = colors.accent, on
 
   const atEnd = index === last;
   const step = steps[index];
-  const nextLabel = atEnd && onDone ? STEPPER_DONE : STEPPER_NEXT;
+  const nextLabel = atEnd && onDone ? t('stepper.done') : t('stepper.next');
   const nextDisabled = atEnd && !onDone;
 
   return (
@@ -77,19 +80,19 @@ export const DemoStepper: React.FC<Props> = ({ steps, accent = colors.accent, on
           showsHorizontalScrollIndicator={false}
           scrollEventThrottle={16}
           onScroll={onScroll}
-          accessibilityLabel={`Example, ${steps.length} steps. Swipe or use Next and Back.`}
+          accessibilityLabel={t('stepper.scroller', { total: steps.length })}
         >
           {steps.map((s, i) => (
             <View key={s.demo + i} style={[styles.page, { width }]}>
               <Text style={styles.title}>{`${i + 1}. ${s.title}`}</Text>
               <Text style={styles.caption}>{s.caption}</Text>
-              <Frame demo={s.demo} width={frameWidth} label={`Example screen for step ${i + 1}: ${s.title}`} />
+              <Frame demo={s.demo} width={frameWidth} label={t('stepper.frame', { current: i + 1, title: s.title })} />
             </View>
           ))}
         </ScrollView>
       ) : null}
 
-      <View accessibilityRole="progressbar" accessibilityLabel={`Step ${index + 1} of ${steps.length}: ${step?.title ?? ''}`} accessibilityLiveRegion="polite" style={styles.dots}>
+      <View accessibilityRole="progressbar" accessibilityLabel={t('stepper.progress', { current: index + 1, total: steps.length, title: step?.title ?? '' })} accessibilityLiveRegion="polite" style={styles.dots}>
         {steps.map((s, i) => (
           <View key={s.demo + i} style={[styles.dot, i === index && { backgroundColor: accent, width: 22 }]} />
         ))}
@@ -99,19 +102,19 @@ export const DemoStepper: React.FC<Props> = ({ steps, accent = colors.accent, on
         <TouchableOpacity
           testID="stepper-back"
           accessibilityRole="button"
-          accessibilityLabel={`${STEPPER_BACK}, to step ${index} of ${steps.length}`}
+          accessibilityLabel={t('stepper.backA11y', { step: index, total: steps.length })}
           accessibilityState={{ disabled: index === 0 }}
           disabled={index === 0}
           activeOpacity={0.7}
           onPress={() => goTo(index - 1)}
           style={[styles.btn, styles.btnBack, index === 0 && styles.off]}
         >
-          <Text style={[styles.btnText, { color: colors.textPrimary }]}>{STEPPER_BACK}</Text>
+          <Text style={[styles.btnText, { color: colors.textPrimary }]}>{t('stepper.back')}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           testID="stepper-next"
           accessibilityRole="button"
-          accessibilityLabel={atEnd ? nextLabel : `${STEPPER_NEXT}, to step ${index + 2} of ${steps.length}`}
+          accessibilityLabel={atEnd ? nextLabel : t('stepper.nextA11y', { step: index + 2, total: steps.length })}
           accessibilityState={{ disabled: nextDisabled }}
           disabled={nextDisabled}
           activeOpacity={0.7}

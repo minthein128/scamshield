@@ -26,6 +26,8 @@
     "trafficking": "Anti-perdagangan orang",
     "police": "Polisi",
     "cybercrime": "Pelaporan penipuan dan kejahatan siber",
-    "consular": "Bantuan untuk warga di luar negeri"
-  }
+    "consular": "Bantuan untuk warga di luar negeri",
+    "ngo": "Organisasi bantuan"
+  },
+  "reportScam": "Laporkan penipuan"
 }

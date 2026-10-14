@@ -58,6 +58,19 @@ describe('interpolation and plurals', () => {
   });
 });
 
+describe('learn content', () => {
+  it('follows the active language', async () => {
+    const { SCAM_TYPES, RED_FLAGS, findScamType } = require('../screens/learn/content') as typeof import('../screens/learn/content');
+    const jobs = findScamType('jobs');
+    expect(jobs?.title).toBe('Risky job offers and trafficking');
+    expect(SCAM_TYPES[0]).toBe(jobs);
+    await i18n.changeLanguage('my');
+    expect(jobs?.title).not.toBe('Risky job offers and trafficking');
+    expect(jobs?.signs[0].text).toBeTruthy();
+    expect(RED_FLAGS[0].explain).not.toBe('Pay or perks far above normal, with no experience needed.');
+  });
+});
+
 describe('language switch', () => {
   it('changes strings at once and persists the choice', async () => {
     expect(t('common:tabs.home')).toBe('Home');
