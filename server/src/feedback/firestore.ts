@@ -1,10 +1,10 @@
 import { FieldValue, type Firestore, Timestamp } from 'firebase-admin/firestore';
-import { getDb } from '../intel/firestore.js';
+import { COLLECTION_PREFIX, getDb } from '../intel/firestore.js';
 import type { CheckRecord, FeedbackDoc, FeedbackStore } from './types.js';
 
-export const CHECKS = 'intel_checks';
-export const FEEDBACK = 'intel_feedback';
-export const TALLY = 'intel_tally';
+export const CHECKS = `${COLLECTION_PREFIX}intel_checks`;
+export const FEEDBACK = `${COLLECTION_PREFIX}intel_feedback`;
+export const TALLY = `${COLLECTION_PREFIX}intel_tally`;
 
 const ALREADY_EXISTS = 6;
 const clean = <T extends object>(o: T) => Object.fromEntries(Object.entries(o).filter(([, v]) => v !== undefined));

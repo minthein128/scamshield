@@ -2,9 +2,11 @@ import { applicationDefault, getApps, initializeApp } from 'firebase-admin/app';
 import { FieldValue, type Firestore, getFirestore, type QueryDocumentSnapshot, Timestamp } from 'firebase-admin/firestore';
 import type { AggDelta, AggDoc, AggKind, AggWrite, Bucket, ClusterMeta, IntelStore, SignalDoc } from './types.js';
 
-export const SIGNALS = 'intel_signals';
-export const AGGREGATES = 'intel_aggregates';
-export const SEEN = 'intel_seen';
+/** A sandbox prefix keeps manual test runs out of the live network collections. */
+export const COLLECTION_PREFIX = process.env.INTEL_COLLECTION_PREFIX ?? '';
+export const SIGNALS = `${COLLECTION_PREFIX}intel_signals`;
+export const AGGREGATES = `${COLLECTION_PREFIX}intel_aggregates`;
+export const SEEN = `${COLLECTION_PREFIX}intel_seen`;
 
 const ALREADY_EXISTS = 6;
 const codeOf = (e: unknown) => (e as { code?: number }).code;
