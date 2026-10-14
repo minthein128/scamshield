@@ -40,6 +40,7 @@ export function createPipeline(deps: {
         linkChecks,
         unsolicited: extraction.unsolicited,
         llmVerdict: extraction.verdictDraft,
+        scamType: extraction.scamType,
       });
       const scamType = scored.flags.length === 0 ? 'none' : extraction.scamType;
       return {
