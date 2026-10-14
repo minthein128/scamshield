@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ApiError, type CheckRequest, KINDS, LANGS, type Lang } from './types.js';
+import { ApiError, type CheckRequest, KINDS, LANGS, type Lang, SCAM_TYPES } from './types.js';
 
 const MAX_IMAGE_B64 = 5_600_000;
 const MAX_TEXT = 20_000;
@@ -15,11 +15,15 @@ const schema = z
       .object({ destination: z.string().max(100).optional(), route: z.string().max(300).optional(), home: z.string().max(100).optional() })
       .optional(),
     shareSignals: z.boolean().optional(),
+    reported: z.boolean().optional(),
+    reportedType: z.enum(SCAM_TYPES.filter((t) => t !== 'none') as [string, ...string[]]).optional(),
+    lostMoney: z.boolean().optional(),
     language: z.enum(LANGS).default('en'),
   })
   .refine((v) => Boolean(v.text?.trim() || v.url?.trim() || v.imageBase64), {
     message: 'at least one of text, url, imageBase64 is required',
-  });
+  })
+  .refine((v) => !v.reported || Boolean(v.reportedType), { message: 'reportedType is required when reported is true' });
 
 export function parseRequest(body: unknown): CheckRequest {
   const r = schema.safeParse(body);
@@ -41,6 +45,11 @@ export function parseRequest(body: unknown): CheckRequest {
   }
   if (v.context) out.context = v.context;
   if (v.shareSignals !== undefined) out.shareSignals = v.shareSignals;
+  if (v.reported) {
+    out.reported = true;
+    out.reportedType = v.reportedType as CheckRequest['reportedType'];
+    if (v.lostMoney !== undefined) out.lostMoney = v.lostMoney;
+  }
   return out;
 }
 

@@ -42,7 +42,7 @@ export const JobVerdictScreen: React.FC<JobVerdictScreenProps> = ({ onNavigate }
           </View>
           <Text style={{ backgroundColor: '#EEF2F6', paddingVertical: 6, paddingHorizontal: 10, borderRadius: 999, color: '#334155', fontSize: 13, fontFamily: theme.fonts.bold, lineHeight: 18, includeFontPadding: false }}>Bahasa</Text>
         </View>
-        <Text style={{ color: '#0F1B2D', fontSize: 20, lineHeight: 29, fontFamily: theme.fonts.bold, includeFontPadding: false }}>This job is likely a trap. Do not go. Keep your passport.</Text>
+        <Text style={{ color: '#0F1B2D', fontSize: 20, lineHeight: 29, fontFamily: theme.fonts.bold, includeFontPadding: false }}>This job shows signs of a trap. Be careful. Keep your passport.</Text>
         {!playing ? (
           <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('noop')} style={{ height: 60, borderRadius: 16, borderWidth: 2, borderColor: '#0F1B2D', backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center', gap: 10, flexDirection: 'row' }}>
             <Svg width={26} height={26} viewBox="0 0 24 24" fill="none" stroke="#0F1B2D" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">

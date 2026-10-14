@@ -1,10 +1,17 @@
+import { existsSync, readFileSync } from 'node:fs';
 import { loadConfig } from '../src/config.js';
 import { createCorrelator } from '../src/correlate.js';
 import { createClient, createGeminiExtractor } from '../src/extract.js';
 import { createGrounder } from '../src/ground.js';
 import { createPipeline, type LanguageStats } from '../src/pipeline.js';
 import type { CheckResponse } from '../src/types.js';
-import { CASES } from './cases.js';
+import { CASES as BASE_CASES, type EvalCase } from './cases.js';
+
+const candidatesPath = new URL('./candidates.json', import.meta.url);
+const CASES: EvalCase[] =
+  process.env.EVAL_CANDIDATES && existsSync(candidatesPath)
+    ? [...BASE_CASES, ...(JSON.parse(readFileSync(candidatesPath, 'utf8')) as EvalCase[])]
+    : BASE_CASES;
 
 const cfg = loadConfig({ ...process.env, MOCK: '0', LOG_SILENT: process.env.EVAL_VERBOSE ? '' : '1' });
 if (!cfg.geminiApiKey && !(cfg.useVertex && cfg.project)) {

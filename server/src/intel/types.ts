@@ -26,6 +26,13 @@ export interface SignalDoc {
   dayTs: Date;
   expireAt: Date;
   seed?: true;
+  /** Signal weight in the aggregates. Absent means 1. See weights.ts. */
+  w?: number;
+  /** Set for reported scams and missed-scam feedback. */
+  confirmed?: true;
+  src?: 'reported' | 'feedback';
+  /** The scam type a user gave when the model's type was wrong. */
+  actualScamType?: ScamType;
 }
 
 export type AggKind = 'type' | 'ind' | 'dom' | 'cluster';
@@ -66,6 +73,9 @@ export interface AggWrite {
   marker?: string;
 }
 
+/** A signed counter change applied to one aggregate doc. Negative amounts floor at zero. */
+export type AggDelta = AggWrite & { amount: number };
+
 export interface ClusterMeta {
   id: string;
   scope: string;
@@ -79,6 +89,9 @@ export interface ClusterMeta {
 export interface IntelStore {
   /** Creates the signal and applies the counters in one atomic batch. */
   record(id: string, sig: SignalDoc, writes: AggWrite[], cluster?: ClusterMeta[]): Promise<'recorded' | 'duplicate'>;
+  getSignal(id: string): Promise<SignalDoc | undefined>;
+  /** Patches a signal and applies counter deltas in one transaction. False when the signal is gone. */
+  adjust(id: string, patch: Partial<SignalDoc>, deltas: AggDelta[]): Promise<boolean>;
   getAggs(ids: string[]): Promise<AggDoc[]>;
   listAggs(kind: AggKind, scope: string, limit: number): Promise<AggDoc[]>;
   purgeSeed(): Promise<{ signals: number; aggregates: number }>;

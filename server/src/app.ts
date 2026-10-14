@@ -3,6 +3,8 @@ import { bodyLimit } from 'hono/body-limit';
 import { cors } from 'hono/cors';
 import { bearerToken, type TokenVerifier } from './auth.js';
 import type { Config } from './config.js';
+import type { Feedback } from './feedback/service.js';
+import { parseFeedback } from './feedback/validate.js';
 import { type Intel, isCountry } from './intel/service.js';
 import { log } from './log.js';
 import type { Pipeline } from './pipeline.js';
@@ -15,10 +17,12 @@ const clientIp = (forwarded?: string, real?: string) => forwarded?.split(',')[0]
 
 const errorBody = (code: string, message: string) => ({ error: { code, message } });
 
-export function createApp(cfg: Config, pipeline: Pipeline, speaker: Speaker, intel?: Intel, verifier?: TokenVerifier) {
+export function createApp(cfg: Config, pipeline: Pipeline, speaker: Speaker, intel?: Intel, verifier?: TokenVerifier, feedback?: Feedback) {
   const app = new Hono();
   const limiter = createRateLimiter(cfg.rateLimitPerMin);
   const hourly = createRateLimiter(0, 3_600_000);
+  const feedbackIp = createRateLimiter(cfg.rateLimitPerMin);
+  const feedbackHourly = createRateLimiter(0, 3_600_000);
 
   app.use('*', cors({ origin: cfg.allowedOrigins.includes('*') ? '*' : cfg.allowedOrigins }));
 
@@ -71,6 +75,42 @@ export function createApp(cfg: Config, pipeline: Pipeline, speaker: Speaker, int
         latencyMs: Date.now() - started,
       });
       return c.json(res);
+    },
+  );
+
+  app.post(
+    '/v1/feedback',
+    async (c, next) => {
+      if (!feedbackIp.allow(clientIp(c.req.header('x-forwarded-for'), c.req.header('x-real-ip')))) {
+        return c.json(errorBody('rate_limited', 'Too many requests, retry in a minute'), 429, { 'retry-after': '60' });
+      }
+      const token = bearerToken(c.req.header('authorization'));
+      const identity = token && verifier ? await verifier(token) : null;
+      if (identity) {
+        c.set('uid' as never, identity.uid as never);
+        const decision = feedbackHourly.check(identity.uid, cfg.feedbackPerHour);
+        if (!decision.allowed) {
+          log('WARNING', 'uid_rate_limited', { route: 'feedback', anonymous: identity.anonymous });
+          return c.json(errorBody('rate_limited', 'Hourly feedback limit reached'), 429, { 'retry-after': String(decision.retryAfterSec) });
+        }
+      }
+      await next();
+    },
+    bodyLimit({ maxSize: 2 * 1024, onError: (c) => c.json(errorBody('too_large', 'Body exceeds 2048 bytes'), 413) }),
+    async (c) => {
+      let body: unknown;
+      try {
+        body = await c.req.json();
+      } catch {
+        throw new ApiError(400, 'bad_request', 'Body must be valid JSON');
+      }
+      const input = parseFeedback(body);
+      if (!feedback) return c.json({ ok: true });
+      const uid = c.get('uid' as never) as string | undefined;
+      const outcome = await feedback.submit(input, { uid });
+      if (outcome === 'unknown') throw new ApiError(404, 'not_found', 'This check is no longer available for feedback');
+      log('INFO', 'feedback_done', { outcome, correct: input.correct });
+      return c.json({ ok: true });
     },
   );
 

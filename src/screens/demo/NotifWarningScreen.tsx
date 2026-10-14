@@ -53,7 +53,7 @@ export const NotifWarningScreen: React.FC<NotifWarningScreenProps> = ({ onNaviga
             <Path d="M12 16h.01" />
           </Svg>
           <View style={{ flex: 1, flexDirection: 'column' }}>
-            <Text style={{ color: '#FFFFFF', lineHeight: 22, fontFamily: theme.fonts.extraBold, includeFontPadding: false, fontSize: 16 }}>Danger: likely fake message</Text>
+            <Text style={{ color: '#FFFFFF', lineHeight: 22, fontFamily: theme.fonts.extraBold, includeFontPadding: false, fontSize: 16 }}>Danger: this looks like a scam message</Text>
             <Text style={{ color: '#FFEDD5', lineHeight: 18, fontFamily: theme.fonts.regular, includeFontPadding: false, fontSize: 13 }}>Do not open the link. Tap to see why.</Text>
           </View>
           <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round">

@@ -1,10 +1,12 @@
 import { applicationDefault, getApps, initializeApp } from 'firebase-admin/app';
 import { FieldValue, type Firestore, getFirestore, type QueryDocumentSnapshot, Timestamp } from 'firebase-admin/firestore';
-import type { AggDoc, AggKind, AggWrite, Bucket, ClusterMeta, IntelStore, SignalDoc } from './types.js';
+import type { AggDelta, AggDoc, AggKind, AggWrite, Bucket, ClusterMeta, IntelStore, SignalDoc } from './types.js';
 
-export const SIGNALS = 'intel_signals';
-export const AGGREGATES = 'intel_aggregates';
-export const SEEN = 'intel_seen';
+/** A sandbox prefix keeps manual test runs out of the live network collections. */
+export const COLLECTION_PREFIX = process.env.INTEL_COLLECTION_PREFIX ?? '';
+export const SIGNALS = `${COLLECTION_PREFIX}intel_signals`;
+export const AGGREGATES = `${COLLECTION_PREFIX}intel_aggregates`;
+export const SEEN = `${COLLECTION_PREFIX}intel_seen`;
 
 const ALREADY_EXISTS = 6;
 const codeOf = (e: unknown) => (e as { code?: number }).code;
@@ -29,15 +31,21 @@ function toAgg(s: { id: string; data(): Record<string, unknown> | undefined }): 
   };
 }
 
+/** One shared Firestore handle: settings() may only run once per process. */
+export function getDb(projectId?: string): Firestore {
+  const app = getApps()[0] ?? initializeApp({ credential: applicationDefault(), projectId });
+  const fs = getFirestore(app);
+  if (!dbConfigured.has(fs)) {
+    fs.settings({ ignoreUndefinedProperties: true });
+    dbConfigured.add(fs);
+  }
+  return fs;
+}
+
+const dbConfigured = new WeakSet<Firestore>();
+
 export function createFirestoreStore(opts: { projectId?: string; db?: Firestore } = {}): IntelStore {
-  const db =
-    opts.db ??
-    (() => {
-      const app = getApps()[0] ?? initializeApp({ credential: applicationDefault(), projectId: opts.projectId });
-      const fs = getFirestore(app);
-      fs.settings({ ignoreUndefinedProperties: true });
-      return fs;
-    })();
+  const db = opts.db ?? getDb(opts.projectId);
 
   const clean = <T extends object>(o: T) => Object.fromEntries(Object.entries(o).filter(([, v]) => v !== undefined));
 
@@ -108,6 +116,53 @@ export function createFirestoreStore(opts: { projectId?: string; db?: Firestore 
         throw e;
       }
       return 'recorded';
+    },
+
+    async getSignal(id) {
+      const snap = await db.collection(SIGNALS).doc(id).get();
+      if (!snap.exists) return undefined;
+      const d = snap.data() as Record<string, unknown>;
+      return {
+        ...d,
+        dayTs: (d.dayTs as Timestamp).toDate(),
+        expireAt: (d.expireAt as Timestamp).toDate(),
+      } as SignalDoc;
+    },
+
+    async adjust(id, patch, deltas: AggDelta[]) {
+      const sigRef = db.collection(SIGNALS).doc(id);
+      return db.runTransaction(async (tx) => {
+        const sigSnap = await tx.get(sigRef);
+        if (!sigSnap.exists) return false;
+        const which = sigSnap.get('seed') === true ? 'seed' : 'real';
+        const refs = deltas.map((d) => db.collection(AGGREGATES).doc(d.id));
+        const snaps = refs.length ? await tx.getAll(...refs) : [];
+        const floored = (cur: unknown, amount: number) => (amount < 0 ? -Math.min(Number(cur ?? 0), -amount) : amount);
+        const expireAt = sigSnap.get('expireAt') as Timestamp;
+        deltas.forEach((d, i) => {
+          const snap = snaps[i];
+          const curDay = snap?.get(`${which}.days.${d.day}`);
+          const fam: Record<string, FieldValue> = {};
+          for (const f of d.fams) fam[f] = FieldValue.increment(floored(snap?.get(`${which}.fam.${f}`), d.amount));
+          tx.set(
+            refs[i] as (typeof refs)[number],
+            clean({
+              kind: d.kind,
+              scope: d.scope,
+              key: d.key,
+              value: d.value,
+              itype: d.itype,
+              scamType: d.scamType,
+              [which]: { days: { [d.day]: FieldValue.increment(floored(curDay, d.amount)) }, fam },
+              expireAt,
+            }),
+            { merge: true },
+          );
+        });
+        const { dayTs: _d, expireAt: _e, ...rest } = patch;
+        tx.update(sigRef, clean(rest));
+        return true;
+      });
     },
 
     async getAggs(ids) {
