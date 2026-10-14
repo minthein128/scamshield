@@ -21,7 +21,8 @@ import { useAppState } from '../state/AppState';
 import { useShieldTokenSync } from '../hooks/useShieldTokenSync';
 import LearnScreen from '../screens/LearnScreen';
 import ShieldScreen from '../screens/ShieldScreen';
-import DemoBoardScreen from '../screens/DemoBoardScreen';
+import ScamGuideScreen from '../screens/ScamGuideScreen';
+import ShieldHowToScreen from '../screens/ShieldHowToScreen';
 import { useSharedDraft } from '../hooks/useSharedDraft';
 import { useShieldDeepLink } from '../hooks/useShieldDeepLink';
 import theme from '../theme/theme';
@@ -88,7 +89,8 @@ export const RootNavigator: React.FC = () => {
             <Stack.Screen name="Account" component={AccountScreen} />
             <Stack.Screen name="GetHelp" component={GetHelpScreen} />
             <Stack.Screen name="Radar" component={RadarScreen} />
-            <Stack.Screen name="DemoBoard" component={DemoBoardScreen} />
+            <Stack.Screen name="ScamGuide" component={ScamGuideScreen} />
+            <Stack.Screen name="ShieldHowTo" component={ShieldHowToScreen} />
           </>
         ) : (
           <Stack.Screen name="Onboarding">{() => <OnboardingScreen onDone={onOnboardingDone} />}</Stack.Screen>
