@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useApiUrl } from '../config/runtime';
+import { BrandLockup } from '../components/BrandMark';
 import { Screen } from '../components/Screen';
 import { Text } from '../components/Text';
 import { ShieldCard } from '../components/ShieldCard';
@@ -67,6 +68,7 @@ export const OnboardingScreen: React.FC<{ onDone: (next?: AfterOnboarding) => vo
 
       {step === 'language' ? (
         <>
+          <BrandLockup size={40} />
           <Heading title={t('language.title')} body={t('language.body')} />
           <View style={styles.wrap}>
             {UI_LANGUAGES.map(l => (
