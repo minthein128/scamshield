@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { AppState, PermissionsAndroid, Platform } from 'react-native';
 import * as ShieldModule from 'shield-module';
 import { useApiUrl } from '../config/runtime';
@@ -50,6 +51,12 @@ export function useShieldControl(): ShieldControl {
     if (support !== 'ready') return;
     setRunning(await ShieldModule.isShieldRunning());
   }, [support]);
+
+  useFocusEffect(
+    useCallback(() => {
+      refresh().catch(() => undefined);
+    }, [refresh]),
+  );
 
   const turnOn = useCallback(async () => {
     if (busy.current) return;

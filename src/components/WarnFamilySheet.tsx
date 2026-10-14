@@ -19,6 +19,7 @@ export const WarnFamilySheet: React.FC<Props> = ({ visible, message, onClose, on
   const { contacts } = useAppState();
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+      <View style={styles.overlay}>
       <Pressable accessibilityLabel="Close" style={styles.backdrop} onPress={onClose} />
       <View style={styles.sheet} testID="warn-sheet">
         <Text accessibilityRole="header" style={styles.title}>Warn someone you trust</Text>
@@ -41,12 +42,14 @@ export const WarnFamilySheet: React.FC<Props> = ({ visible, message, onClose, on
         <Button testID="warn-share" label="Share another way" variant="secondary" onPress={() => { shareText(message).catch(() => undefined); onClose(); }} />
         <Button label="Cancel" variant="secondary" onPress={onClose} />
       </View>
+      </View>
     </Modal>
   );
 };
 
 const styles = StyleSheet.create({
-  backdrop: { flex: 1, backgroundColor: 'rgba(15,27,45,0.5)' },
+  overlay: { flex: 1, justifyContent: 'flex-end', alignItems: 'center' },
+  backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(15,27,45,0.5)' },
   sheet: { backgroundColor: colors.background, padding: 20, gap: 10, borderTopLeftRadius: 20, borderTopRightRadius: 20, width: '100%', maxWidth: 430, alignSelf: 'center' },
   title: { color: colors.textPrimary, fontSize: 18, lineHeight: 24, fontFamily: fonts.bold },
   body: { color: colors.textSecondary, fontSize: 13, lineHeight: 19, fontFamily: fonts.regular },

@@ -33,6 +33,7 @@ export function createApp(cfg: Config, pipeline: Pipeline, speaker: Speaker, int
       const token = bearerToken(c.req.header('authorization'));
       const identity = token && verifier ? await verifier(token) : null;
       if (identity) {
+        c.set('uid' as never, identity.uid as never);
         const max = identity.anonymous ? cfg.anonPerHour : cfg.userPerHour;
         const decision = hourly.check(identity.uid, max);
         if (!decision.allowed) {
