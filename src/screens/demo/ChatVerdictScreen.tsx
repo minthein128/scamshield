@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, TextInput, ScrollView } from 'react-native';
-import Svg, { Path, Rect, Circle, Polygon, Ellipse, Line } from 'react-native-svg';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import Svg, { Path, Circle } from 'react-native-svg';
 import theme from '../../theme/theme';
 
 interface ChatVerdictScreenProps {
@@ -8,7 +8,7 @@ interface ChatVerdictScreenProps {
 }
 
 export const ChatVerdictScreen: React.FC<ChatVerdictScreenProps> = ({ onNavigate }) => {
-  const [playing, setPlaying] = React.useState(false);
+  const [playing] = React.useState(false);
   return (
     <View style={styles.container}>
       <View style={{ height: 100, paddingVertical: 20, paddingHorizontal: 16, flexDirection: 'column', gap: 10 }}>

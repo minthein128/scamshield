@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import theme from '../../theme/theme';
 import ScanProgress from '../../components/ScanProgress';
 
 interface JobAutoCheckScreenProps {
