@@ -2,24 +2,24 @@ node_modules/
 .expo/
 dist/
 web-build/
+dist-apk/
+build/
+.gradle/
+.idea/
+.firebase/
+/android/
+*.log
 *.local
 local.properties
-.idea/
-.gradle/
-build/
-android/app/build/
-android/.gradle/
-android/local.properties
-*.log
 
 .env
 .env.*
+!.env.example
 *.jks
 *.keystore
-!android/app/debug.keystore
-dist-apk/
+*.p12
+*.pem
+serviceAccount*.json
+gcp-*.json
 
-/node_modules/
-/android/
-/dist/
-.idea/
+bench/private/

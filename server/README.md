@@ -81,18 +81,7 @@ npm run check                      # typecheck + lint + tests
 
 ## Deploy to Cloud Run
 
-```
-export GOOGLE_CLOUD_PROJECT=<project>
-./server/deploy.sh
-```
-
-The script enables the APIs, creates a runtime service account, grants it `roles/aiplatform.user`, and runs:
-
-```
-gcloud run deploy saferoute-api --source server --region us-central1 \
-  --service-account saferoute-api@$GOOGLE_CLOUD_PROJECT.iam.gserviceaccount.com --allow-unauthenticated \
-  --set-env-vars GOOGLE_GENAI_USE_VERTEXAI=true,GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT,GOOGLE_CLOUD_LOCATION=us-central1
-```
+Run `scripts/deploy-cloudrun.sh` from the repo root. Steps and prerequisites are in `docs/setup-gcp.md`.
 
 APIs to enable: `aiplatform.googleapis.com`, `webrisk.googleapis.com`, `run.googleapis.com`, `cloudbuild.googleapis.com` (plus `artifactregistry.googleapis.com`).
 
