@@ -13,7 +13,7 @@ title: SafeRoute - Google Cloud AI Builder Cup 2026
 
 ## A shield for migrant job seekers, built on Gemini and Cloud Run
 
-Check any job offer, chat, link or screenshot in 15 seconds. Get a colour verdict and a spoken warning in English, Bahasa, Tagalog or Burmese.
+Check any job offer, chat, link or screenshot in seconds. Get a colour verdict and a spoken warning in English, Bahasa, Tagalog or Burmese.
 
 <br>
 
@@ -199,7 +199,7 @@ Scam ads and chats arrive as images, with Burmese or Thai text and mixed layouts
 <div class="card">
 
 ### Grounding on the open web
-A fake agency has no fixed blocklist entry. Gemini searches Google to check that the recruiter or company exists and is licensed, and returns the source pages to the user.
+A fake agency has no fixed blocklist entry. Gemini searches Google to check that the recruiter or company exists and is licensed, and shows the source pages it found.
 
 </div>
 </div>
@@ -257,32 +257,32 @@ The warning is spoken by Gemini text-to-speech, so Burmese works on phones with 
 <div class="cols">
 <div>
 
-- **Built and running:** Cloud Run API, pipeline, rules engine, 49 server tests, Android app, mock mode for offline work.
+- **Built and measured:** Cloud Run API, pipeline, rules engine, 49 server tests, Android app. A 19-case eval (12 scams, 7 legitimate; English, Burmese, Bahasa, Tagalog) scored 19 of 19, p50 4.4 s and p95 7.5 s per check.
 - **Scales with traffic:** stateless Cloud Run autoscaling. No database to size.
 - **Fails soft:** each stage has a timeout, and the verdict is built from the evidence that arrived.
 - **Abuse control:** per-IP rate limits, size limits, CORS at the service edge.
-- **Add a language:** one code and one prompt entry.
+- **Model choice:** gemini-3.5-flash-lite was about 2x faster than gemini-3.8-flash on the same eval.
 
 </div>
 <div>
 
 | Estimated cost per check | USD |
 | --- | --- |
-| Extract (Gemini 2.5 Flash) | 0.003 |
+| Extract (Gemini 3.5 Flash-Lite) | 0.003 |
 | Spoken warning (TTS) | 0.003 |
 | Grounding, when an entity is named | 0.035 |
 | **Without grounding** | **about 0.006** |
 | **With grounding** | **about 0.04** |
 
-<p class="note">Estimate, not a measurement. Assumes 3,000 input and 800 output tokens, 250 audio tokens, list prices for Gemini 2.5 Flash and Search grounding at $35 per 1,000 grounded prompts. Cloud Run compute is not included.</p>
+<p class="note">Estimate, not a measurement. Assumes 3,000 input and 800 output tokens, 250 audio tokens, list prices ($0.30 in, $2.50 out per 1M tokens), and grounding at $35 per 1,000 grounded prompts (assumed to apply to this model). Cloud Run compute is not included.</p>
 
 </div>
 </div>
 
-<!-- _footer: "Pricing: ai.google.dev/gemini-api/docs/pricing (input $0.30 and output $2.50 per 1M tokens; TTS output $10 per 1M; grounding $35 per 1,000 prompts)" -->
+<!-- _footer: "Pricing: ai.google.dev/gemini-api/docs/pricing. Eval: server/eval, results in server/README.md." -->
 
 <!--
-Speaker notes. Arithmetic: extract 3,000 x 0.30/1M = 0.0009 plus 800 x 2.50/1M = 0.0020, about 0.003. TTS 250 audio tokens x 10/1M = 0.0025 (assumes about 10 s of audio at 25 tokens per second, priced at the Gemini 2.5 Flash preview TTS rate; the production TTS model may differ). Grounding 35/1000 = 0.035 per grounded prompt. Total about 0.006 without and 0.04 with grounding. Grounding runs only when the input names a company, agency, phone or domain. At 100,000 checks a month with 30% grounded the estimate is about 1,650 USD, compared with a Web Risk and Cloud Run bill we have not costed.
+Speaker notes. Arithmetic: extract 3,000 x 0.30/1M = 0.0009 plus 800 x 2.50/1M = 0.0020, about 0.003. TTS 250 audio tokens x 10/1M = 0.0025 (assumes about 10 s of audio at 25 tokens per second, priced at the upper TTS rate listed, $10 per 1M; the page lists a 3.8 Flash-Lite TTS at $6 per 1M, and the deployed id is gemini-3.8-flash-tts, so the exact rate is unconfirmed). Grounding 35/1000 = 0.035 per grounded prompt. Total about 0.006 without and 0.04 with grounding. Grounding runs only when the input names a company, agency, phone or domain. At 100,000 checks a month with 30% grounded the estimate is about 1,650 USD, compared with a Web Risk and Cloud Run bill we have not costed.
 -->
 
 <div class="tags"><span class="pill">Technical merit 40%</span><span class="pill">Impact 25%</span></div>
@@ -293,7 +293,7 @@ Speaker notes. Arithmetic: extract 3,000 x 0.30/1M = 0.0009 plus 800 x 2.50/1M =
 
 | When | Milestone |
 | --- | --- |
-| Now | Android app and Cloud Run API. Web demo on Firebase Hosting for judges. 4 languages. |
+| Now | Android app and Cloud Run API. Web demo on Firebase Hosting for judges. 4 languages. Web Risk runs on the service account; live verification is pending. |
 | Next 3 months | Pilot with migrant-worker NGOs and one source-country agency. Measure verdict accuracy on labelled real reports. |
 | 6 months | Real Family Guardian: check-in reminders, consented sharing, embassy and NGO case handoff. |
 | 12 months | More languages (Khmer, Lao, Thai, Vietnamese). Shared threat feed across partners. Grounded checks against national agency licence registries. |
