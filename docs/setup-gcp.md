@@ -160,5 +160,5 @@ gh variable set EXPO_PUBLIC_API_URL --repo "$GH_REPO" \
 ## 9. Verify
 
 ```bash
-curl -s "$(gcloud run services describe "$SERVICE" --region="$REGION" --format='value(status.url)')/health"
+curl -s "$(gcloud run services describe "$SERVICE" --region="$REGION" --format='value(status.url)')/healthz"
 ```
