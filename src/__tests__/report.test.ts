@@ -1,5 +1,6 @@
 import type { Flag } from '../api/types';
 import { VERDICT_STYLES, filledSegments, groupFlags, telUrl, verdictFromScore } from '../lib/report';
+import { verdictLabel } from '../lib/labels';
 import { draftFromShare } from '../lib/share';
 import { buildRequest } from '../lib/request';
 import { base64Bytes, prepareImage } from '../lib/image';
@@ -20,7 +21,7 @@ describe('report mapping', () => {
 
   it('has a colour per verdict', () => {
     expect(VERDICT_STYLES.danger.background).not.toBe(VERDICT_STYLES.careful.background);
-    expect(VERDICT_STYLES.safe.label).toBe('Low risk');
+    expect(verdictLabel('safe')).toBe('Low risk');
   });
 
   it('groups flags by family in priority order, high severity first', () => {
