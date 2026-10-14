@@ -7,7 +7,7 @@ interface JobAutoCheckScreenProps {
   onNavigate?: (route: string) => void;
 }
 
-const STEPS = ['Joining your 2 screens', 'Checking the company', 'Comparing with known scams'];
+const STEPS = ['Joining your 2 screens', 'Checking the company', 'Comparing with reported scams'];
 
 export const JobAutoCheckScreen: React.FC<JobAutoCheckScreenProps> = ({ onNavigate }) => {
   const [step, setStep] = useState(0);
