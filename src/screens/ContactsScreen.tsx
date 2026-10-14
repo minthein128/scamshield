@@ -56,7 +56,7 @@ export const ContactsScreen: React.FC = () => {
       </Text>
 
       {contacts.length === 0 ? (
-        <EmptyState testID="contacts-empty" title="No trusted contacts yet" body="Add a family member or friend below. Their number is saved only on your device unless you sign in." />
+        <EmptyState testID="contacts-empty" icon="people" title="No trusted contacts yet" body="Add a family member or friend below. Their number is saved only on your device unless you sign in." />
       ) : (
         contacts.map(c => (
           <Card key={c.id} style={styles.contact}>
@@ -90,9 +90,9 @@ const styles = StyleSheet.create({
   body: { color: colors.textSecondary, fontSize: 14, lineHeight: 20, fontFamily: fonts.regular },
   contact: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   name: { color: colors.textPrimary, fontSize: 15, lineHeight: 21, fontFamily: fonts.bold },
-  phone: { color: colors.textSecondary, fontSize: 13, lineHeight: 18, fontFamily: fonts.mono },
-  small: { height: 44, paddingHorizontal: 14 },
-  footnote: { color: colors.textSecondary, fontSize: 12, lineHeight: 17, textAlign: 'center', fontFamily: fonts.regular },
+  phone: { color: colors.textSecondary, fontSize: 14, lineHeight: 20, fontFamily: fonts.mono },
+  small: { minHeight: 48, paddingHorizontal: 16 },
+  footnote: { color: colors.textSecondary, fontSize: 14, lineHeight: 20, textAlign: 'center', fontFamily: fonts.regular },
 });
 
 export default ContactsScreen;

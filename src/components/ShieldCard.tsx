@@ -1,17 +1,10 @@
 import React from 'react';
 import { Linking, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
+import { Icon } from './Icon';
 import { STEP_TEXT, useShieldControl, type ShieldControl } from '../hooks/useShieldControl';
 import theme from '../theme/theme';
 
 const { colors, fonts } = theme;
-
-const ShieldIcon: React.FC = () => (
-  <Svg width={28} height={28} viewBox="0 0 24 24" fill="none" stroke={colors.white} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-    <Path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z" />
-    <Path d="M9 12l2 2 4-4" />
-  </Svg>
-);
 
 export const ShieldCard: React.FC<{ onDetails?: () => void }> = ({ onDetails }) => <ShieldCardView control={useShieldControl()} onDetails={onDetails} />;
 
@@ -39,13 +32,13 @@ export const ShieldCardView: React.FC<{ control: ShieldControl; onDetails?: () =
     <View testID="shield-card" style={[styles.card, unavailable && styles.cardOff]}>
       <View style={styles.row}>
         <View style={[styles.icon, running && styles.iconOn]}>
-          <ShieldIcon />
+          <Icon name="shieldCheck" size={28} color={colors.white} />
         </View>
         <View style={styles.text}>
           <Text style={styles.title}>Screen shield</Text>
           <Text testID="shield-status" style={styles.status}>{status}</Text>
         </View>
-        <Switch
+        {unavailable ? null : <Switch
           testID="shield-switch"
           accessibilityLabel="Screen shield"
           value={running || working}
@@ -53,7 +46,7 @@ export const ShieldCardView: React.FC<{ control: ShieldControl; onDetails?: () =
           onValueChange={setEnabled}
           trackColor={{ false: colors.borderDark, true: colors.accent }}
           thumbColor={colors.white}
-        />
+        />}
       </View>
       <Text style={styles.body}>A small button floats over other apps. Tap it on a job post, chat or listing and SafeRoute checks what is on your screen.</Text>
       {error ? <Text style={styles.error}>{error}</Text> : null}
@@ -72,18 +65,18 @@ export const ShieldCardView: React.FC<{ control: ShieldControl; onDetails?: () =
 };
 
 const styles = StyleSheet.create({
-  card: { backgroundColor: colors.darkBackground, borderRadius: 20, padding: 18, gap: 10 },
-  cardOff: { opacity: 0.92 },
+  card: { backgroundColor: colors.darkBackground, borderRadius: 24, padding: 20, gap: 12 },
+  cardOff: {},
   row: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  icon: { width: 48, height: 48, borderRadius: 24, backgroundColor: colors.slateDark, alignItems: 'center', justifyContent: 'center' },
+  icon: { width: 56, height: 56, borderRadius: 28, backgroundColor: colors.slateDark, alignItems: 'center', justifyContent: 'center' },
   iconOn: { backgroundColor: colors.accent },
   text: { flex: 1, gap: 2 },
-  title: { color: colors.white, fontSize: 18, lineHeight: 24, fontFamily: fonts.bold, includeFontPadding: false },
-  status: { color: colors.textLighter, fontSize: 13, lineHeight: 18, fontFamily: fonts.medium, includeFontPadding: false },
-  body: { color: colors.textLight, fontSize: 13, lineHeight: 19, fontFamily: fonts.regular },
-  error: { color: colors.warningBadge, fontSize: 13, lineHeight: 18, fontFamily: fonts.semiBold },
-  link: { minHeight: 44, justifyContent: 'center' },
-  linkText: { color: colors.brandBlueLight, fontSize: 14, lineHeight: 19, fontFamily: fonts.bold, textDecorationLine: 'underline' },
+  title: { color: colors.white, fontSize: 20, lineHeight: 28, fontFamily: fonts.bold, includeFontPadding: false },
+  status: { color: colors.textLighter, fontSize: 14, lineHeight: 20, fontFamily: fonts.medium, includeFontPadding: false },
+  body: { color: colors.textLight, fontSize: 14, lineHeight: 20, fontFamily: fonts.regular },
+  error: { color: colors.warningBadge, fontSize: 14, lineHeight: 20, fontFamily: fonts.semiBold },
+  link: { minHeight: 48, justifyContent: 'center' },
+  linkText: { color: colors.brandBlueLight, fontSize: 15, lineHeight: 20, fontFamily: fonts.bold, textDecorationLine: 'underline' },
 });
 
 export default ShieldCard;

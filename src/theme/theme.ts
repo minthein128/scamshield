@@ -19,7 +19,7 @@ export const colors = {
   // Typography Neutrals
   textPrimary: '#0F1B2D',
   textSecondary: '#475569',
-  textMuted: '#64748B',
+  textMuted: '#5B6B80',
   textLight: '#CBD5E1',
   textLighter: '#E2E8F0',
   textWhite: '#FFFFFF',
@@ -99,7 +99,32 @@ export const baseTextStyle: TextStyle = {
   }),
 };
 
+export const space = { 1: 4, 2: 8, 3: 12, 4: 16, 5: 20, 6: 24, 8: 32 } as const;
+
+export const radius = { sm: 8, md: 12, lg: 16, xl: 24, pill: 999 } as const;
+
+export const type = {
+  display: { fontSize: 28, lineHeight: 36 },
+  title: { fontSize: 22, lineHeight: 28 },
+  heading: { fontSize: 18, lineHeight: 24 },
+  lead: { fontSize: 16, lineHeight: 24 },
+  body: { fontSize: 15, lineHeight: 22 },
+  small: { fontSize: 14, lineHeight: 20 },
+  caption: { fontSize: 13, lineHeight: 18 },
+} as const;
+
+// Verdict roles, matching the overlay in ShieldPalette.kt (ring, chip background, chip text).
+export const verdictRoles = {
+  safe: { ring: colors.accent, chipBg: colors.safeBg, chipText: colors.safeText },
+  careful: { ring: colors.warningText, chipBg: colors.amberLight, chipText: colors.amberDark },
+  danger: { ring: colors.danger, chipBg: colors.danger, chipText: colors.white },
+} as const;
+
 export const theme = {
+  space,
+  radius,
+  type,
+  verdictRoles,
   colors,
   fonts,
   fontWeights,

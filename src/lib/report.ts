@@ -7,14 +7,16 @@ export interface VerdictStyle {
   foreground: string;
   subtle: string;
   track: string;
+  chipBackground: string;
+  chipForeground: string;
 }
 
 const { colors } = theme;
 
 export const VERDICT_STYLES: Record<Verdict, VerdictStyle> = {
-  danger: { label: 'High risk', background: colors.danger, foreground: colors.white, subtle: '#FFEDD5', track: colors.dangerBarTrack },
-  careful: { label: 'Be careful', background: colors.warningText, foreground: colors.white, subtle: colors.amberLight, track: colors.warningBadge },
-  safe: { label: 'Low risk', background: colors.brandBlue, foreground: colors.white, subtle: colors.brandBlueLight, track: '#93B4FF' },
+  danger: { label: 'High risk', background: colors.danger, foreground: colors.white, subtle: '#FFEDD5', track: colors.dangerBarTrack, chipBackground: theme.verdictRoles.danger.chipBg, chipForeground: theme.verdictRoles.danger.chipText },
+  careful: { label: 'Be careful', background: colors.warningText, foreground: colors.white, subtle: colors.amberLight, track: colors.warningBadge, chipBackground: theme.verdictRoles.careful.chipBg, chipForeground: theme.verdictRoles.careful.chipText },
+  safe: { label: 'Low risk', background: colors.brandBlue, foreground: colors.white, subtle: colors.brandBlueLight, track: '#93B4FF', chipBackground: theme.verdictRoles.safe.chipBg, chipForeground: theme.verdictRoles.safe.chipText },
 };
 
 export const FAMILY_ORDER: FlagFamily[] = ['trafficking', 'known_bad', 'payment_route', 'link_risk', 'identity', 'pressure', 'too_good'];

@@ -60,7 +60,7 @@ export const OnboardingScreen: React.FC<{ onDone: (next?: AfterOnboarding) => vo
           <Heading title="Choose your language" body="SafeRoute writes its reports and spoken warnings in this language. You can change it later." />
           <View style={styles.wrap}>
             {LANGUAGES.map(l => (
-              <Chip key={l.code} label={l.label} selected={language === l.code} onPress={() => setLanguage(l.code)} />
+              <Chip key={l.code} label={l.label} nativeLabel={l.nativeLabel} selected={language === l.code} onPress={() => setLanguage(l.code)} />
             ))}
           </View>
         </>
@@ -139,12 +139,12 @@ const styles = StyleSheet.create({
   h2: { color: colors.textPrimary, fontSize: 18, lineHeight: 24, fontFamily: fonts.bold, marginTop: 8 },
   body: { color: colors.textSecondary, fontSize: 14, lineHeight: 20, fontFamily: fonts.regular },
   wrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  point: { flexDirection: 'row', gap: 12, alignItems: 'flex-start', backgroundColor: colors.white, borderRadius: 16, borderWidth: 1, borderColor: colors.border, padding: 14 },
+  point: { flexDirection: 'row', gap: 12, alignItems: 'flex-start', backgroundColor: colors.white, borderRadius: 16, borderWidth: 1, borderColor: colors.border, padding: 16 },
   pointNumber: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.brandBlueLight, alignItems: 'center', justifyContent: 'center' },
   pointNumberText: { color: colors.safeText, fontSize: 15, fontFamily: fonts.bold },
   pointTitle: { color: colors.textPrimary, fontSize: 15, lineHeight: 21, fontFamily: fonts.bold },
-  pointBody: { color: colors.textSecondary, fontSize: 13, lineHeight: 19, fontFamily: fonts.regular },
-  accountNote: { backgroundColor: colors.white, borderRadius: 16, borderWidth: 1, borderColor: colors.border, padding: 14 },
+  pointBody: { color: colors.textSecondary, fontSize: 14, lineHeight: 20, fontFamily: fonts.regular },
+  accountNote: { backgroundColor: colors.white, borderRadius: 16, borderWidth: 1, borderColor: colors.border, padding: 16 },
 });
 
 export default OnboardingScreen;

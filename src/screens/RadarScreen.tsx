@@ -56,7 +56,7 @@ export const RadarScreen: React.FC<RootScreenProps<'Radar'>> = ({ navigation }) 
       {error ? <Notice testID="radar-error" title={error.title} message={error.message} actionLabel="Try again" onAction={() => load(scope)} /> : null}
 
       {!loading && !error && risks.length === 0 && domains.length === 0 ? (
-        <EmptyState testID="radar-empty" title="Not enough reports yet" body="When enough people report the same kind of scam here, it shows up on the radar. Your checks help, and nothing personal is shared." />
+        <EmptyState icon="radar" testID="radar-empty" title="Not enough reports yet" body="When enough people report the same kind of scam here, it shows up on the radar. Your checks help, and nothing personal is shared." />
       ) : null}
 
       {risks.map(r => (
@@ -94,8 +94,8 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   label: { flex: 1, color: colors.textPrimary, fontSize: 15, lineHeight: 21, fontFamily: fonts.bold },
   trend: { color: colors.textMuted, fontSize: 14, minWidth: 18, textAlign: 'center' },
-  count: { color: colors.textSecondary, fontSize: 12, lineHeight: 17, fontFamily: fonts.medium },
-  quote: { color: colors.textMuted, fontSize: 12, lineHeight: 18, fontFamily: fonts.regular, fontStyle: 'italic' },
+  count: { color: colors.textSecondary, fontSize: 14, lineHeight: 20, fontFamily: fonts.medium },
+  quote: { color: colors.textMuted, fontSize: 14, lineHeight: 20, fontFamily: fonts.regular, fontStyle: 'italic' },
   domain: { flex: 1, color: colors.codeText, fontSize: 13, fontFamily: fonts.mono },
 });
 

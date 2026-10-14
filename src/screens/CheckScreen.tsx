@@ -167,7 +167,7 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
         <Text style={styles.label}>Report language</Text>
         <View style={styles.wrap}>
           {LANGUAGES.map(l => (
-            <Chip key={l.code} label={l.label} selected={language === l.code} onPress={() => setLanguage(l.code)} />
+            <Chip key={l.code} label={l.label} nativeLabel={l.nativeLabel} selected={language === l.code} onPress={() => setLanguage(l.code)} />
           ))}
         </View>
       </View>
@@ -178,15 +178,15 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
 };
 
 const styles = StyleSheet.create({
-  label: { color: colors.textPrimary, fontSize: 13, lineHeight: 18, fontFamily: fonts.semiBold, includeFontPadding: false },
+  label: { color: colors.textPrimary, fontSize: 14, lineHeight: 20, fontFamily: fonts.semiBold, includeFontPadding: false },
   labelRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   wrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   input: { minHeight: 46, borderRadius: 12, borderWidth: 1, borderColor: colors.borderLight, backgroundColor: colors.white, paddingHorizontal: 14, paddingVertical: 10, color: colors.textPrimary, fontSize: 14, lineHeight: 19, fontFamily: fonts.regular },
   textArea: { minHeight: 110, textAlignVertical: 'top' },
   imageRow: { flexDirection: 'row', gap: 12 },
   thumb: { width: 80, height: 110, borderRadius: 10, backgroundColor: colors.codeBg },
-  meta: { color: colors.textSecondary, fontSize: 12, lineHeight: 16, fontFamily: fonts.regular },
-  small: { height: 38 },
+  meta: { color: colors.textSecondary, fontSize: 14, lineHeight: 20, fontFamily: fonts.regular },
+  small: { minHeight: 48 },
 });
 
 export default CheckScreen;
