@@ -1,164 +1,85 @@
-# GCP setup (run once by a human)
+# GCP setup
 
-TLDR: one project, five APIs, two service accounts, one Workload Identity pool, then set GitHub variables. Run in Cloud Shell or any shell with `gcloud` logged in as a project owner.
+TLDR: project `saferoute-aibc` (number 151183717652). The web demo and APK run now without billing. Link billing, then run `scripts/deploy-cloudrun.sh` to move the API to Cloud Run.
 
-## 1. Variables
+## State
+
+| Piece | State |
+|---|---|
+| Firebase Hosting `saferoute-aibc.web.app` | live, Spark plan |
+| API | temporary Cloudflare quick tunnel to a server on a dev machine |
+| Runtime service account `saferoute-api` | created; `aiplatform.user`, `serviceusage.serviceUsageConsumer` |
+| Deployer service account `saferoute-deployer` | created; `run.admin`, `cloudbuild.builds.editor`, `artifactregistry.writer`, `storage.admin`, `serviceusage.serviceUsageConsumer`, `serviceAccountUser` on the runtime account |
+| Workload Identity pool `github`, provider `github-provider` | created, bound to `minthein128/scamshield` |
+| Cloud Run, Cloud Build, Artifact Registry, Secret Manager | blocked until billing is linked |
+
+## Link billing
 
 ```bash
-export PROJECT_ID=saferoute-hackathon
-export REGION=asia-southeast1
-export GH_REPO=OWNER/REPO
-export SERVICE=saferoute-api
-export RUNTIME_SA=saferoute-runtime
-export DEPLOYER_SA=saferoute-deployer
+gcloud billing projects link saferoute-aibc --billing-account=BILLING_ACCOUNT_ID
 ```
 
-## 2. Project and APIs
+## Deploy
 
 ```bash
-gcloud projects create "$PROJECT_ID" --name="SafeRoute"
-gcloud config set project "$PROJECT_ID"
-gcloud billing projects link "$PROJECT_ID" --billing-account=BILLING_ACCOUNT_ID
-
-gcloud services enable \
-  run.googleapis.com \
-  cloudbuild.googleapis.com \
-  artifactregistry.googleapis.com \
-  aiplatform.googleapis.com \
-  webrisk.googleapis.com \
-  iamcredentials.googleapis.com \
-  sts.googleapis.com
+export CLOUDSDK_CONFIG=~/work/scamshield-secrets/gcloud-config PATH=~/work/google-cloud-sdk/bin:$PATH
+scripts/deploy-cloudrun.sh
 ```
 
-To reuse an existing project, skip `projects create` and run only `gcloud config set project`.
+The script is idempotent. It:
 
-## 3. Runtime service account
+1. enables run, cloudbuild, artifactregistry, secretmanager, webrisk, aiplatform;
+2. creates or updates the secret `gemini-api-key` from `~/work/scamshield-secrets/.env` and grants the runtime account `secretAccessor`;
+3. runs `gcloud run deploy saferoute-api --source server --region asia-southeast1` with the secret and `CORS_ORIGINS` set to the hosting origins;
+4. sets the GitHub variable `EXPO_PUBLIC_API_URL` to the service URL;
+5. rebuilds and redeploys the web demo, runs the Android workflow, and redeploys the web demo with the new APK.
 
-The Cloud Run service runs as this account. Gemini on Vertex AI needs `roles/aiplatform.user`.
+Override with `PROJECT`, `REGION`, `GH_REPO`, `BRANCH`, `ENV_FILE`, `GEMINI_MODEL`.
 
-```bash
-gcloud iam service-accounts create "$RUNTIME_SA" --display-name="SafeRoute API runtime"
+## Hosting notes
 
-gcloud projects add-iam-policy-binding "$PROJECT_ID" \
-  --member="serviceAccount:$RUNTIME_SA@$PROJECT_ID.iam.gserviceaccount.com" \
-  --role="roles/aiplatform.user"
+- Spark rejects `.apk` uploads ("Executable files are forbidden"). The APK is uploaded as `dist/dl/saferoute.pkg` and `firebase.json` rewrites `/saferoute.apk` to it, with the Android package content type.
+- Deploy by hand: `pnpm build:web`, copy the APK to `dist/dl/saferoute.pkg`, then `firebase deploy --only hosting --project saferoute-aibc`.
+- The release APK is signed with the debug key because no keystore secrets exist. Sideloading works.
 
-gcloud projects add-iam-policy-binding "$PROJECT_ID" \
-  --member="serviceAccount:$RUNTIME_SA@$PROJECT_ID.iam.gserviceaccount.com" \
-  --role="roles/serviceusage.serviceUsageConsumer"
-```
+## GitHub variables
 
-Web Risk has no dedicated IAM role. The API must be enabled (step 2), billing must be linked, and the caller must be able to use the project's quota. `serviceUsageConsumer` covers that when the server calls Web Risk with the runtime account through Application Default Credentials.
+| Name | Value |
+|---|---|
+| EXPO_PUBLIC_API_URL | API base URL (tunnel now, Cloud Run later) |
+| EXPO_PUBLIC_APK_URL | https://saferoute-aibc.web.app/saferoute.apk |
+| GCP_PROJECT_ID | saferoute-aibc |
+| GCP_REGION | asia-southeast1 |
+| GOOGLE_CLOUD_LOCATION | global |
+| GEMINI_MODEL | gemini-3.5-flash-lite |
+| GCP_RUNTIME_SERVICE_ACCOUNT | saferoute-api@saferoute-aibc.iam.gserviceaccount.com |
+| GCP_SERVICE_ACCOUNT | saferoute-deployer@saferoute-aibc.iam.gserviceaccount.com |
+| GCP_WORKLOAD_IDENTITY_PROVIDER | projects/151183717652/locations/global/workloadIdentityPools/github/providers/github-provider |
 
-## 4. Deployer service account
+Secrets are optional: `GCP_SA_KEY` (fallback when WIF is blocked) and `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD` for a release keystore.
 
-GitHub Actions deploys as this account.
+`server.yml` deploys on push to `main` with Vertex AI (`GOOGLE_GENAI_USE_VERTEXAI=true`) through the runtime account. The script deploys with the Gemini key secret instead. A later `main` deploy replaces the env vars and secret mount set by the script, so keep one path.
 
-```bash
-gcloud iam service-accounts create "$DEPLOYER_SA" --display-name="SafeRoute GitHub deployer"
-
-for ROLE in roles/run.admin roles/cloudbuild.builds.editor roles/artifactregistry.writer \
-            roles/storage.admin roles/serviceusage.serviceUsageConsumer; do
-  gcloud projects add-iam-policy-binding "$PROJECT_ID" \
-    --member="serviceAccount:$DEPLOYER_SA@$PROJECT_ID.iam.gserviceaccount.com" \
-    --role="$ROLE"
-done
-
-gcloud iam service-accounts add-iam-policy-binding \
-  "$RUNTIME_SA@$PROJECT_ID.iam.gserviceaccount.com" \
-  --member="serviceAccount:$DEPLOYER_SA@$PROJECT_ID.iam.gserviceaccount.com" \
-  --role="roles/iam.serviceAccountUser"
-```
-
-Source deploys also use the default Compute and Cloud Build accounts. If the first deploy fails with a permission error on a `...-compute@developer.gserviceaccount.com` or `...@cloudbuild.gserviceaccount.com` account, grant that account `roles/cloudbuild.builds.builder` and retry.
-
-## 5. Workload Identity Federation (preferred)
+## Recreate the IAM objects
 
 ```bash
-gcloud iam workload-identity-pools create github --location=global --display-name="GitHub"
-
-gcloud iam workload-identity-pools providers create-oidc github-provider \
-  --location=global \
-  --workload-identity-pool=github \
-  --display-name="GitHub OIDC" \
-  --issuer-uri="https://token.actions.githubusercontent.com" \
+P=saferoute-aibc; G=minthein128/scamshield; N=$(gcloud projects describe $P --format='value(projectNumber)')
+gcloud iam service-accounts create saferoute-api --project $P
+gcloud iam service-accounts create saferoute-deployer --project $P
+gcloud iam workload-identity-pools create github --location=global --project $P
+gcloud iam workload-identity-pools providers create-oidc github-provider --location=global \
+  --workload-identity-pool=github --issuer-uri=https://token.actions.githubusercontent.com \
   --attribute-mapping="google.subject=assertion.sub,attribute.repository=assertion.repository" \
-  --attribute-condition="assertion.repository=='$GH_REPO'"
-
-export PROJECT_NUMBER=$(gcloud projects describe "$PROJECT_ID" --format='value(projectNumber)')
-
-gcloud iam service-accounts add-iam-policy-binding \
-  "$DEPLOYER_SA@$PROJECT_ID.iam.gserviceaccount.com" \
-  --role="roles/iam.workloadIdentityUser" \
-  --member="principalSet://iam.googleapis.com/projects/$PROJECT_NUMBER/locations/global/workloadIdentityPools/github/attribute.repository/$GH_REPO"
-
-gcloud iam workload-identity-pools providers describe github-provider \
-  --location=global --workload-identity-pool=github --format='value(name)'
+  --attribute-condition="assertion.repository=='$G'" --project $P
+gcloud iam service-accounts add-iam-policy-binding saferoute-deployer@$P.iam.gserviceaccount.com \
+  --role=roles/iam.workloadIdentityUser --project $P \
+  --member="principalSet://iam.googleapis.com/projects/$N/locations/global/workloadIdentityPools/github/attribute.repository/$G"
 ```
 
-The last command prints the value for `GCP_WORKLOAD_IDENTITY_PROVIDER`.
+Web Risk has no IAM role. It needs the API enabled and billing linked; the runtime account calls it through ADC. If it returns 403, set `WEB_RISK_API_KEY` instead.
 
-## 6. Service account key (fallback)
-
-Use this only if WIF is blocked by org policy.
+## Verify
 
 ```bash
-gcloud iam service-accounts keys create key.json \
-  --iam-account="$DEPLOYER_SA@$PROJECT_ID.iam.gserviceaccount.com"
-gh secret set GCP_SA_KEY --repo "$GH_REPO" < key.json
-shred -u key.json
-```
-
-## 7. Allow unauthenticated invoke
-
-The workflow passes `--allow-unauthenticated` on every deploy. To set it up before the first deploy, or if your org blocks that flag, run after the service exists:
-
-```bash
-gcloud run services add-iam-policy-binding "$SERVICE" \
-  --region="$REGION" \
-  --member="allUsers" \
-  --role="roles/run.invoker"
-```
-
-If an org policy (`iam.allowedPolicyMemberDomains`) blocks `allUsers`, an org admin must relax it for this project.
-
-## 8. GitHub variables and secrets
-
-```bash
-gh variable set GCP_PROJECT_ID --repo "$GH_REPO" --body "$PROJECT_ID"
-gh variable set GCP_REGION --repo "$GH_REPO" --body "$REGION"
-gh variable set GOOGLE_CLOUD_LOCATION --repo "$GH_REPO" --body "global"
-gh variable set GEMINI_MODEL --repo "$GH_REPO" --body "gemini-2.5-flash"
-gh variable set GCP_RUNTIME_SERVICE_ACCOUNT --repo "$GH_REPO" --body "$RUNTIME_SA@$PROJECT_ID.iam.gserviceaccount.com"
-gh variable set GCP_SERVICE_ACCOUNT --repo "$GH_REPO" --body "$DEPLOYER_SA@$PROJECT_ID.iam.gserviceaccount.com"
-gh variable set GCP_WORKLOAD_IDENTITY_PROVIDER --repo "$GH_REPO" --body "projects/$PROJECT_NUMBER/locations/global/workloadIdentityPools/github/providers/github-provider"
-```
-
-After the first deploy, point the app at the service:
-
-```bash
-gh variable set EXPO_PUBLIC_API_URL --repo "$GH_REPO" \
-  --body "$(gcloud run services describe "$SERVICE" --region="$REGION" --format='value(status.url)')"
-```
-
-| Name | Kind | Used by | Notes |
-|---|---|---|---|
-| GCP_PROJECT_ID | variable | server | required |
-| GCP_REGION | variable | server | default asia-southeast1 |
-| GOOGLE_CLOUD_LOCATION | variable | server | Vertex location, default global |
-| GEMINI_MODEL | variable | server | default gemini-2.5-flash |
-| GCP_RUNTIME_SERVICE_ACCOUNT | variable | server | required |
-| GCP_SERVICE_ACCOUNT | variable | server | WIF path |
-| GCP_WORKLOAD_IDENTITY_PROVIDER | variable | server | WIF path |
-| GCP_SA_KEY | secret | server | fallback when WIF vars are unset |
-| EXPO_PUBLIC_API_URL | variable | android | Cloud Run URL |
-| ANDROID_KEYSTORE_BASE64 | secret | android | see release-keystore.md |
-| ANDROID_KEYSTORE_PASSWORD | secret | android | |
-| ANDROID_KEY_ALIAS | secret | android | |
-| ANDROID_KEY_PASSWORD | secret | android | |
-
-## 9. Verify
-
-```bash
-curl -s "$(gcloud run services describe "$SERVICE" --region="$REGION" --format='value(status.url)')/healthz"
+curl -s "$(gcloud run services describe saferoute-api --region asia-southeast1 --format='value(status.url)')/healthz"
 ```
