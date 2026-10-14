@@ -7,9 +7,10 @@ Default model: `gemini-2.5-flash` (set `GEMINI_MODEL` to change it, for example 
 ## Pipeline
 
 1. Extract: one Gemini call (text plus optional image) with a JSON response schema. It returns flags in 7 families, scam type, a draft verdict, summary, spoken warning and URLs, in `en`, `id`, `tl` or `my`.
-2. Correlate: each URL goes to Google Web Risk (`uris.search`: MALWARE, SOCIAL_ENGINEERING, UNWANTED_SOFTWARE) and to RDAP (`rdap.org`) for domain age. Both have short timeouts and return `unknown` on failure.
-3. Score: a deterministic rules engine (`src/score.ts`).
-4. Explain: title, summary, spoken warning, actions in the requested language.
+2. Detect: when the input names a company, agency, phone number or domain, a second Gemini call with the Google Search grounding tool checks that the entity exists and is licensed, whether scam reports exist, and whether the salary is plausible. Findings join the flags (capped at medium severity) and the source pages are returned as `sources`. Skipped when nothing is named.
+3. Correlate (runs in parallel with Detect): each URL goes to Google Web Risk (`uris.search`: MALWARE, SOCIAL_ENGINEERING, UNWANTED_SOFTWARE) and to RDAP (`rdap.org`) for domain age. Both have short timeouts and return `unknown` on failure.
+4. Score: a deterministic rules engine (`src/score.ts`).
+5. Explain: title, summary, spoken warning, actions in the requested language.
 
 ## Verdict rules
 
@@ -30,6 +31,7 @@ Link results add flags: a Web Risk hit adds `known_bad` (high); a domain under 1
 ## Endpoints
 
 - `POST /v1/check`: see the contract. 400 `bad_request`, 413 `too_large` (body over 6 MB, image over ~4 MB), 429 `rate_limited`, 502 `upstream`.
+- `POST /v1/speak`: `{text, language}` returns a base64 WAV from Gemini TTS (`TTS_MODEL`, default `gemini-3.8-flash-tts`; unverified, see CLAUDE.md).
 - `GET /healthz`: `{ ok, model, mock }`.
 
 ## Environment
@@ -46,7 +48,10 @@ Link results add flags: a Web Risk hit adds `known_bad` (high); a domain under 1
 | `CORS_ORIGINS` | comma list or `*` | `*` |
 | `RATE_LIMIT_PER_MIN` | per-IP limit (in memory, per instance) | 30 |
 | `MAX_BODY_BYTES` | request size cap | 6291456 |
-| `UPSTREAM_TIMEOUT_MS`, `LINK_TIMEOUT_MS` | Gemini and link-check timeouts | 25000, 4000 |
+| `UPSTREAM_TIMEOUT_MS`, `LINK_TIMEOUT_MS` | Gemini and link-check timeouts | 12000, 4000 |
+| `REQUEST_BUDGET_MS` | total budget per check; Detect and Correlate stop early when it runs out | 15000 |
+| `GROUNDING` | `0` disables the Google Search verification call | on |
+| `TTS_MODEL`, `TTS_VOICE` | speech model and voice | gemini-3.8-flash-tts, Kore |
 | `HOTLINES_JSON`, `DEFAULT_HOTLINE` | hotline numbers by destination (confirm before launch) | Thailand 1300, Philippines 1343 |
 
 ## Local run

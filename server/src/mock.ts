@@ -1,9 +1,10 @@
 import type { Correlator } from './correlate.js';
 import type { Extractor } from './extract.js';
+import type { Grounder } from './ground.js';
 import type { CheckRequest, Extraction, Kind, LinkCheck } from './types.js';
 import { findUrls } from './urls.js';
 
-type Canned = Omit<Extraction, 'urls'>;
+type Canned = Omit<Extraction, 'urls' | 'entities'> & { entities?: Extraction['entities'] };
 
 const ENGLISH: Record<Kind, Canned> = {
   job: {
@@ -20,6 +21,14 @@ const ENGLISH: Record<Kind, Canned> = {
     scamType: 'job_trafficking',
     verdictDraft: 'danger',
     unsolicited: true,
+    entities: {
+      companies: ['Golden Star Recruitment Co.'],
+      phones: [],
+      domains: [],
+      role: 'customer service',
+      country: 'Thailand',
+      salaryClaim: 'USD 1800 per month',
+    },
     summary:
       'This offer shows strong signs of a trafficking recruitment scam. Do not travel or send your passport until it has been verified.',
     spokenWarning: 'Danger. This job offer looks like trafficking. Do not travel.',
@@ -63,6 +72,7 @@ const ENGLISH: Record<Kind, Canned> = {
     scamType: 'fake_agency',
     verdictDraft: 'careful',
     unsolicited: false,
+    entities: { companies: ['Sunrise Overseas Agency'], phones: [], domains: [] },
     summary: 'This agency asks for money first and shows no licence. Check the agency with your national labour authority.',
     spokenWarning: 'Be careful. Check this agency is licensed.',
   },
@@ -89,12 +99,13 @@ export function createMockExtractor(): Extractor {
           scamType: 'none',
           verdictDraft: 'safe',
           unsolicited: false,
+          entities: { companies: [], phones: [], domains: [] },
           summary: 'No warning signs found in this text. Stay alert if anyone asks for money or documents.',
           spokenWarning: 'No warning signs found.',
           urls,
         };
       }
-      return { ...base, urls };
+      return { ...base, entities: base.entities ?? { companies: [], phones: [], domains: [] }, urls };
     },
   };
 }
@@ -112,6 +123,29 @@ export function createMockCorrelator(): Correlator {
           registrar: 'Mock Registrar',
         };
       });
+    },
+  };
+}
+
+export function createMockGrounder(): Grounder {
+  return {
+    async ground(_req, extraction) {
+      const name = extraction.entities.companies[0];
+      if (!name) return { flags: [], sources: [] };
+      return {
+        flags: [
+          {
+            family: 'identity',
+            label: `No licence found for ${name}`,
+            evidence: 'No match in the labour authority licence list',
+            severity: 'medium',
+          },
+        ],
+        sources: [
+          { title: 'Mock source: licensed agency registry', url: 'https://example.org/agency-registry' },
+          { title: 'Mock source: scam advisory', url: 'https://example.org/advisory' },
+        ],
+      };
     },
   };
 }

@@ -1,12 +1,19 @@
 import { describe, expect, it } from 'vitest';
 import { createApp } from '../src/app.js';
 import { loadConfig } from '../src/config.js';
-import { createMockCorrelator, createMockExtractor } from '../src/mock.js';
+import { createMockCorrelator, createMockExtractor, createMockGrounder } from '../src/mock.js';
 import { createPipeline } from '../src/pipeline.js';
+import { createMockSpeaker } from '../src/speak.js';
 
 function make(env: Record<string, string> = {}) {
   const cfg = loadConfig({ MOCK: '1', ...env });
-  return createApp(cfg, createPipeline({ extractor: createMockExtractor(), correlator: createMockCorrelator(), model: cfg.model }));
+  const pipeline = createPipeline({
+    extractor: createMockExtractor(),
+    correlator: createMockCorrelator(),
+    grounder: createMockGrounder(),
+    model: cfg.model,
+  });
+  return createApp(cfg, pipeline, createMockSpeaker(cfg));
 }
 const post = (app: ReturnType<typeof make>, body: unknown, headers: Record<string, string> = {}) =>
   app.request('/v1/check', {
@@ -73,6 +80,21 @@ describe('app', () => {
     expect(res.status).toBe(429);
     expect((await res.json()).error.code).toBe('rate_limited');
     expect((await post(app, { kind: 'job', text: 'a' }, { 'x-forwarded-for': '9.9.9.9' })).status).toBe(200);
+  });
+
+  it('returns sources for a grounded check', async () => {
+    const b = await (await post(make(), { kind: 'job', text: 'Golden Star Recruitment' })).json();
+    expect(b.sources.length).toBeGreaterThan(0);
+    expect(b.sources[0]).toHaveProperty('url');
+  });
+
+  it('speak returns base64 wav and validates input', async () => {
+    const app = make();
+    const ok = await app.request('/v1/speak', { method: 'POST', body: JSON.stringify({ text: 'Danger', language: 'my' }) });
+    expect(ok.status).toBe(200);
+    expect((await ok.json()).mimeType).toBe('audio/wav');
+    const bad = await app.request('/v1/speak', { method: 'POST', body: JSON.stringify({ text: '' }) });
+    expect(bad.status).toBe(400);
   });
 
   it('sets CORS headers', async () => {

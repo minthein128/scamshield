@@ -5,12 +5,15 @@ import type { Config } from './config.js';
 import { log } from './log.js';
 import type { Pipeline } from './pipeline.js';
 import { createRateLimiter } from './ratelimit.js';
+import type { Speaker } from './speak.js';
 import { ApiError } from './types.js';
-import { parseRequest } from './validate.js';
+import { parseRequest, parseSpeakRequest } from './validate.js';
+
+const clientIp = (forwarded?: string, real?: string) => forwarded?.split(',')[0]?.trim() || real || 'local';
 
 const errorBody = (code: string, message: string) => ({ error: { code, message } });
 
-export function createApp(cfg: Config, pipeline: Pipeline) {
+export function createApp(cfg: Config, pipeline: Pipeline, speaker: Speaker) {
   const app = new Hono();
   const limiter = createRateLimiter(cfg.rateLimitPerMin);
 
@@ -21,9 +24,7 @@ export function createApp(cfg: Config, pipeline: Pipeline) {
   app.post(
     '/v1/check',
     async (c, next) => {
-      const fwd = c.req.header('x-forwarded-for')?.split(',')[0]?.trim();
-      const ip = fwd || c.req.header('x-real-ip') || 'local';
-      if (!limiter.allow(ip)) {
+      if (!limiter.allow(clientIp(c.req.header('x-forwarded-for'), c.req.header('x-real-ip')))) {
         return c.json(errorBody('rate_limited', 'Too many requests, retry in a minute'), 429, { 'retry-after': '60' });
       }
       await next();
@@ -50,10 +51,35 @@ export function createApp(cfg: Config, pipeline: Pipeline) {
         language: req.language,
         flagCount: res.flags.length,
         linkCount: res.linkChecks.length,
+        sourceCount: res.sources.length,
         hasImage: Boolean(req.imageBase64),
         latencyMs: Date.now() - started,
       });
       return c.json(res);
+    },
+  );
+
+  app.post(
+    '/v1/speak',
+    async (c, next) => {
+      if (!limiter.allow(clientIp(c.req.header('x-forwarded-for'), c.req.header('x-real-ip')))) {
+        return c.json(errorBody('rate_limited', 'Too many requests, retry in a minute'), 429, { 'retry-after': '60' });
+      }
+      await next();
+    },
+    bodyLimit({ maxSize: 8 * 1024, onError: (c) => c.json(errorBody('too_large', 'Body exceeds 8192 bytes'), 413) }),
+    async (c) => {
+      const started = Date.now();
+      let body: unknown;
+      try {
+        body = await c.req.json();
+      } catch {
+        throw new ApiError(400, 'bad_request', 'Body must be valid JSON');
+      }
+      const req = parseSpeakRequest(body);
+      const out = await speaker.speak(req.text);
+      log('INFO', 'speak_done', { language: req.language, chars: req.text.length, model: out.model, latencyMs: Date.now() - started });
+      return c.json(out);
     },
   );
 

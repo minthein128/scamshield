@@ -15,6 +15,7 @@ Hono + TypeScript service implementing `docs/api-contract.md`. Pipeline: Extract
 - `src/score.ts`: pure rules engine. Weights are constants at the top. Change them with a test in `test/score.test.ts`.
 - `src/extract.ts`, `src/prompt.ts`: Gemini call, JSON schema, system prompt. The SDK client is injected so tests mock it.
 - `src/correlate.ts`: Web Risk (API key or ADC) and RDAP. Failures return "unknown", never throw.
+- `src/ground.ts`: Search-grounded verification. `src/speak.ts`: Gemini TTS to WAV. Both degrade without throwing (speak returns 502 `upstream`).
 - `src/pipeline.ts`: wires the stages. `src/app.ts`: HTTP, limits, errors. `src/mock.ts`: offline stubs.
 
 ## Rules
@@ -24,3 +25,5 @@ Hono + TypeScript service implementing `docs/api-contract.md`. Pipeline: Extract
 - Errors use `ApiError(status, code, message)` and the contract error body.
 - Logs are one JSON object per line via `log()`. Do not log request text or images.
 - Change the API shape only together with `docs/api-contract.md`.
+- The TTS model id and the AUDIO-modality `generateContent` call shape are unverified against a live key. Run `npm run smoke`, then curl `/v1/speak`, when a key exists.
+- Grounding cannot share a call with `responseSchema`, so `ground.ts` asks for JSON in plain text and parses leniently.
