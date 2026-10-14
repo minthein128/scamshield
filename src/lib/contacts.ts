@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { t } from '../i18n';
 
 export const CONTACTS_KEY = 'saferoute.contacts.v1';
 export const MAX_CONTACTS = 20;
@@ -17,10 +18,10 @@ export function normalizePhone(raw: string): string {
 }
 
 export function validateContact(input: { name: string; phone: string }): string | null {
-  if (!input.name.trim()) return 'Enter a name.';
-  if (input.name.trim().length > 80) return 'That name is too long.';
+  if (!input.name.trim()) return t('contacts:errors.nameRequired');
+  if (input.name.trim().length > 80) return t('contacts:errors.nameTooLong');
   const digits = normalizePhone(input.phone).replace(/\D/g, '');
-  if (digits.length < 6 || digits.length > 15) return 'Enter a phone number with 6 to 15 digits.';
+  if (digits.length < 6 || digits.length > 15) return t('contacts:errors.phoneInvalid');
   return null;
 }
 

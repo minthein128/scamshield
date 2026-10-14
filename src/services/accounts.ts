@@ -15,6 +15,7 @@ import {
   type AuthProvider,
   type User,
 } from 'firebase/auth';
+import { t } from '../i18n';
 
 export type AuthStatus =
   | { kind: 'loading' }
@@ -28,28 +29,29 @@ export function statusFromUser(user: User | null): AuthStatus {
   return { kind: 'account', uid: user.uid, email: user.email ?? '' };
 }
 
-const MESSAGES: Record<string, string> = {
-  'auth/email-already-in-use': 'That email already has an account. Sign in instead.',
-  'auth/credential-already-in-use': 'That account already exists. Sign in instead.',
-  'auth/invalid-email': 'Enter a valid email address.',
-  'auth/weak-password': 'Use a password with at least 6 characters.',
-  'auth/missing-password': 'Enter your password.',
-  'auth/invalid-credential': 'The email or password is not right.',
-  'auth/wrong-password': 'The email or password is not right.',
-  'auth/user-not-found': 'The email or password is not right.',
-  'auth/too-many-requests': 'Too many attempts. Wait a few minutes and try again.',
-  'auth/network-request-failed': 'No connection. Check your internet and try again.',
-  'auth/popup-closed-by-user': 'The Google window was closed before sign-in finished.',
-  'auth/account-exists-with-different-credential': 'That email already has an account with another sign-in method. Use that method.',
-  'auth/unauthorized-domain': 'Sign-in is not allowed from this web address.',
-  'auth/popup-blocked': 'Your browser blocked the Google window. Allow pop-ups and try again.',
-  'auth/requires-recent-login': 'For your safety, sign in again and then repeat this step.',
-  'auth/operation-not-allowed': 'This sign-in method is not available yet.',
-};
+const MESSAGE_KEYS = {
+  'auth/email-already-in-use': 'errors:auth.emailInUse',
+  'auth/credential-already-in-use': 'errors:auth.credentialInUse',
+  'auth/invalid-email': 'errors:auth.invalidEmail',
+  'auth/weak-password': 'errors:auth.weakPassword',
+  'auth/missing-password': 'errors:auth.missingPassword',
+  'auth/invalid-credential': 'errors:auth.badCredential',
+  'auth/wrong-password': 'errors:auth.badCredential',
+  'auth/user-not-found': 'errors:auth.badCredential',
+  'auth/too-many-requests': 'errors:auth.tooManyRequests',
+  'auth/network-request-failed': 'errors:auth.network',
+  'auth/popup-closed-by-user': 'errors:auth.popupClosed',
+  'auth/account-exists-with-different-credential': 'errors:auth.differentMethod',
+  'auth/unauthorized-domain': 'errors:auth.unauthorizedDomain',
+  'auth/popup-blocked': 'errors:auth.popupBlocked',
+  'auth/requires-recent-login': 'errors:auth.recentLogin',
+  'auth/operation-not-allowed': 'errors:auth.notAllowed',
+} as const;
 
 export function authErrorMessage(error: unknown): string {
   const code = (error as { code?: string } | null)?.code;
-  return (code && MESSAGES[code]) || 'Something went wrong. Please try again.';
+  const key = code && code in MESSAGE_KEYS ? MESSAGE_KEYS[code as keyof typeof MESSAGE_KEYS] : 'errors:auth.fallback';
+  return t(key);
 }
 
 export async function ensureAnonymous(auth: Auth): Promise<void> {

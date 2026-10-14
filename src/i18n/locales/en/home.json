@@ -1,0 +1,29 @@
+{
+  "settingsA11y": "Settings",
+  "check": {
+    "title": "Check a job offer, message or link",
+    "body": "Paste it or share a screenshot. We look for trafficking and money-mule warning signs.",
+    "start": "Start a check"
+  },
+  "quick": {
+    "link": "Paste link",
+    "image": "Screenshot",
+    "chat": "Chat"
+  },
+  "recent": {
+    "title": "Recent checks",
+    "emptyTitle": "No checks yet",
+    "emptyBody": "Your checks are saved on this device and show up here."
+  },
+  "radar": {
+    "title": "Scam radar",
+    "a11y": "Scam radar: what people are reporting",
+    "body": "See which scams people are reporting right now."
+  },
+  "help": {
+    "title": "Get help",
+    "a11y": "Get help: hotlines and reporting",
+    "bodyCountries": "Hotlines for your countries.",
+    "bodyRegion": "Hotlines and reporting lines in Southeast Asia."
+  }
+}

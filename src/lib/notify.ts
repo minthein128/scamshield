@@ -1,5 +1,6 @@
 import { Alert, Platform, Share } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
+import { t } from '../i18n';
 
 export function notify(title: string, message?: string): void {
   if (Platform.OS === 'web') {
@@ -14,7 +15,7 @@ export async function shareText(message: string): Promise<void> {
     await Share.share({ message });
   } catch {
     await Clipboard.setStringAsync(message);
-    notify('Copied', 'The warning is copied. Paste it into any chat to share it.');
+    notify(t('common:copied.title'), t('common:copied.message'));
   }
 }
 
@@ -27,7 +28,7 @@ export function confirmAction(title: string, message: string, confirmLabel: stri
       title,
       message,
       [
-        { text: 'Cancel', style: 'cancel', onPress: () => resolve(false) },
+        { text: t('common:actions.cancel'), style: 'cancel', onPress: () => resolve(false) },
         { text: confirmLabel, style: 'destructive', onPress: () => resolve(true) },
       ],
       { cancelable: true, onDismiss: () => resolve(false) },

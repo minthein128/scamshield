@@ -1,18 +1,22 @@
 import React from 'react';
-import { View, Text, TextInput, TextInputProps, TouchableOpacity, StyleSheet, ViewStyle, StyleProp } from 'react-native';
+import { View, TextInputProps, TouchableOpacity, StyleSheet, ViewStyle, StyleProp } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import theme from '../theme/theme';
-import { scriptStyle } from '../theme/script';
+import { Text, TextInput } from './Text';
 import { Icon, type IconName } from './Icon';
 
 const { colors, fonts } = theme;
 
-export const BackButton: React.FC<{ onPress: () => void }> = ({ onPress }) => (
-  <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" activeOpacity={0.7} onPress={onPress} style={styles.back}>
-    <View style={{ transform: [{ scaleX: -1 }] }}>
-      <Icon name="chevron" size={22} />
-    </View>
-  </TouchableOpacity>
-);
+export const BackButton: React.FC<{ onPress: () => void }> = ({ onPress }) => {
+  const { t } = useTranslation();
+  return (
+    <TouchableOpacity accessibilityRole="button" accessibilityLabel={t('actions.back')} activeOpacity={0.7} onPress={onPress} style={styles.back}>
+      <View style={{ transform: [{ scaleX: -1 }] }}>
+        <Icon name="chevron" size={22} />
+      </View>
+    </TouchableOpacity>
+  );
+};
 
 export const ScreenHeader: React.FC<{ title: string; onBack?: () => void }> = ({ title, onBack }) => (
   <View style={styles.header}>
@@ -45,7 +49,7 @@ export const Button: React.FC<ButtonProps> = ({ label, onPress, variant = 'prima
       style={[styles.button, v.container, disabled && { opacity: 0.45 }, style]}
     >
       {icon ? <Icon name={icon} size={22} color={v.color} /> : null}
-      <Text style={[styles.buttonText, { color: v.color }, scriptStyle(label, 'bold', 20)]}>{label}</Text>
+      <Text style={[styles.buttonText, { color: v.color }]}>{label}</Text>
     </TouchableOpacity>
   );
 };
@@ -62,10 +66,12 @@ interface ChipProps {
   nativeLabel?: string;
   selected: boolean;
   onPress: () => void;
+  testID?: string;
 }
 
-export const Chip: React.FC<ChipProps> = ({ label, nativeLabel, selected, onPress }) => (
+export const Chip: React.FC<ChipProps> = ({ label, nativeLabel, selected, onPress, testID }) => (
   <TouchableOpacity
+    testID={testID}
     accessibilityRole="button"
     accessibilityLabel={label}
     accessibilityState={{ selected }}
@@ -73,8 +79,8 @@ export const Chip: React.FC<ChipProps> = ({ label, nativeLabel, selected, onPres
     onPress={onPress}
     style={[styles.chip, selected ? styles.chipOn : styles.chipOff]}
   >
-    <Text style={[styles.chipText, { color: selected ? colors.white : colors.textPrimary }, scriptStyle(label, 'semiBold', 18)]}>{label}</Text>
-    {nativeLabel ? <Text style={[styles.chipText, { color: selected ? colors.white : colors.textSecondary }, scriptStyle(nativeLabel, 'semiBold', 18)]}>{nativeLabel}</Text> : null}
+    <Text style={[styles.chipText, { color: selected ? colors.white : colors.textPrimary }]}>{label}</Text>
+    {nativeLabel ? <Text style={[styles.chipText, { color: selected ? colors.white : colors.textSecondary }]}>{nativeLabel}</Text> : null}
   </TouchableOpacity>
 );
 
@@ -83,12 +89,12 @@ export const Card: React.FC<{ children: React.ReactNode; style?: StyleProp<ViewS
 );
 
 export const Pill: React.FC<{ label: string; background: string; color: string }> = ({ label, background, color }) => (
-  <Text style={[styles.pill, { backgroundColor: background, color }, scriptStyle(label, 'bold', 18)]}>{label}</Text>
+  <Text style={[styles.pill, { backgroundColor: background, color }]}>{label}</Text>
 );
 
 export const LinkButton: React.FC<{ label: string; onPress: () => void; testID?: string; color?: string }> = ({ label, onPress, testID, color = colors.accent }) => (
   <TouchableOpacity testID={testID} accessibilityRole="button" accessibilityLabel={label} activeOpacity={0.7} onPress={onPress} style={styles.linkButton}>
-    <Text style={[styles.linkText, { color }, scriptStyle(label, 'bold', 20)]}>{label}</Text>
+    <Text style={[styles.linkText, { color }]}>{label}</Text>
   </TouchableOpacity>
 );
 
@@ -99,7 +105,7 @@ export const Field: React.FC<TextInputProps & { label: string; hint?: string }> 
       accessibilityLabel={label}
       placeholderTextColor={colors.textMuted}
       {...rest}
-      style={[styles.input, scriptStyle(typeof rest.value === 'string' ? rest.value : '', 'regular'), style]}
+      style={[styles.input, style]}
     />
     {hint ? <Text style={styles.hint}>{hint}</Text> : null}
   </View>

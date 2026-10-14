@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { Text, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { Screen } from '../components/Screen';
+import { Text } from '../components/Text';
 import { Button, Card, Field, LinkButton, Notice, ScreenHeader } from '../components/ui';
 import { facebookAvailable, googleAvailable } from '../services/social';
 import type { RootScreenProps } from '../navigation/types';
@@ -11,6 +13,7 @@ import theme from '../theme/theme';
 const { colors, fonts } = theme;
 
 export const AccountScreen: React.FC<RootScreenProps<'Account'>> = ({ navigation, route }) => {
+  const { t } = useTranslation(['account', 'common']);
   const { status, signUp, signIn, google, facebook, sendReset } = useAuth();
   const [mode, setMode] = useState<'signUp' | 'signIn'>(route.params?.mode ?? 'signUp');
   const [email, setEmail] = useState('');
@@ -38,7 +41,7 @@ export const AccountScreen: React.FC<RootScreenProps<'Account'>> = ({ navigation
 
   const submit = () => {
     if (!email.trim() || !password) {
-      setError('Enter your email and password.');
+      setError(t('errors.missing'));
       return;
     }
     run(() => (signUpMode ? signUp(email, password) : signIn(email, password))).catch(() => undefined);
@@ -46,13 +49,13 @@ export const AccountScreen: React.FC<RootScreenProps<'Account'>> = ({ navigation
 
   const reset = async () => {
     if (!email.trim()) {
-      setError('Enter your email first, then tap Forgot password.');
+      setError(t('errors.resetNeedsEmail'));
       return;
     }
     setError(null);
     try {
       await sendReset(email);
-      setInfo('If that email has an account, a reset link is on its way.');
+      setInfo(t('resetSent'));
     } catch (e) {
       setError(authErrorMessage(e));
     }
@@ -61,8 +64,8 @@ export const AccountScreen: React.FC<RootScreenProps<'Account'>> = ({ navigation
   if (status.kind === 'unavailable') {
     return (
       <Screen>
-        <ScreenHeader title="Account" onBack={leave} />
-        <Notice tone="info" title="Accounts are not available" message="This build is not connected to the account service. SafeRoute still works fully without an account." />
+        <ScreenHeader title={t('title')} onBack={leave} />
+        <Notice tone="info" title={t('unavailable.title')} message={t('unavailable.body')} />
       </Screen>
     );
   }
@@ -70,28 +73,26 @@ export const AccountScreen: React.FC<RootScreenProps<'Account'>> = ({ navigation
   if (status.kind === 'account') {
     return (
       <Screen>
-        <ScreenHeader title="Account" onBack={leave} />
+        <ScreenHeader title={t('title')} onBack={leave} />
         <Card style={{ gap: 4 }}>
-          <Text style={styles.label}>Signed in as</Text>
+          <Text style={styles.label}>{t('signedInAs')}</Text>
           <Text style={styles.value}>{status.email}</Text>
         </Card>
-        <Button label="Done" onPress={leave} />
+        <Button label={t('common:actions.done')} onPress={leave} />
       </Screen>
     );
   }
 
   return (
-    <Screen footer={<Button testID="account-submit" label={signUpMode ? 'Create account' : 'Sign in'} onPress={submit} disabled={busy} />}>
-      <ScreenHeader title={signUpMode ? 'Create account' : 'Sign in'} onBack={leave} />
+    <Screen footer={<Button testID="account-submit" label={signUpMode ? t('createTitle') : t('signInTitle')} onPress={submit} disabled={busy} />}>
+      <ScreenHeader title={signUpMode ? t('createTitle') : t('signInTitle')} onBack={leave} />
       <Text style={styles.body}>
-        {signUpMode
-          ? 'Your checks and trusted contacts so far stay with you and are saved to the new account.'
-          : 'Sign in to get your saved checks and trusted contacts back.'}
+        {signUpMode ? t('introSignUp') : t('introSignIn')}
       </Text>
 
       <Field
         testID="account-email"
-        label="Email"
+        label={t('email')}
         value={email}
         onChangeText={setEmail}
         autoCapitalize="none"
@@ -102,14 +103,14 @@ export const AccountScreen: React.FC<RootScreenProps<'Account'>> = ({ navigation
       />
       <Field
         testID="account-password"
-        label="Password"
+        label={t('password')}
         value={password}
         onChangeText={setPassword}
         secureTextEntry
         autoCapitalize="none"
         autoComplete={signUpMode ? 'new-password' : 'current-password'}
         textContentType={signUpMode ? 'newPassword' : 'password'}
-        hint={signUpMode ? 'At least 6 characters.' : undefined}
+        hint={signUpMode ? t('passwordHint') : undefined}
         onSubmitEditing={submit}
       />
 
@@ -119,20 +120,20 @@ export const AccountScreen: React.FC<RootScreenProps<'Account'>> = ({ navigation
       <View style={styles.links}>
         <LinkButton
           testID="account-toggle"
-          label={signUpMode ? 'I already have an account' : 'Create a new account'}
+          label={signUpMode ? t('haveAccount') : t('createNew')}
           onPress={() => {
             setMode(signUpMode ? 'signIn' : 'signUp');
             setError(null);
           }}
         />
-        {!signUpMode ? <LinkButton testID="account-forgot" label="Forgot password?" onPress={reset} /> : null}
+        {!signUpMode ? <LinkButton testID="account-forgot" label={t('forgot')} onPress={reset} /> : null}
       </View>
 
       {googleAvailable ? (
-        <Button testID="account-google" label="Continue with Google" variant="secondary" disabled={busy} onPress={() => run(google).catch(() => undefined)} />
+        <Button testID="account-google" label={t('google')} variant="secondary" disabled={busy} onPress={() => run(google).catch(() => undefined)} />
       ) : null}
       {facebookAvailable ? (
-        <Button testID="account-facebook" label="Continue with Facebook" variant="secondary" disabled={busy} onPress={() => run(facebook).catch(() => undefined)} />
+        <Button testID="account-facebook" label={t('facebook')} variant="secondary" disabled={busy} onPress={() => run(facebook).catch(() => undefined)} />
       ) : null}
     </Screen>
   );

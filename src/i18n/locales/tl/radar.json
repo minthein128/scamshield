@@ -1,0 +1,21 @@
+{
+  "_meta": {
+    "reviewed": false
+  },
+  "title": "Scam radar",
+  "intro_one": "Ang mga iniulat ng ibang gumagamit ng SafeRoute sa nakalipas na 30 araw. Ang mga pattern lang na nakita nang hindi bababa sa {{count}} beses ang ipinapakita.",
+  "intro_other": "Ang mga iniulat ng ibang gumagamit ng SafeRoute sa nakalipas na 30 araw. Ang mga pattern lang na nakita nang hindi bababa sa {{count}} beses ang ipinapakita.",
+  "global": "Pandaigdig",
+  "empty": {
+    "title": "Wala pang sapat na ulat",
+    "body": "Kapag sapat na ang nag-ulat ng ganitong uri ng panloloko rito, lalabas ito sa radar. Nakatutulong ang mga pagsusuri mo, at walang personal na impormasyon ang ibinabahagi."
+  },
+  "domains": "Mga domain na pinakamadalas iulat",
+  "trend": {
+    "up": "Tumataas",
+    "flat": "Hindi nagbabago",
+    "down": "Bumababa"
+  },
+  "reports_one": "{{count}} ulat sa loob ng {{days}} araw",
+  "reports_other": "{{count}} na ulat sa loob ng {{days}} araw"
+}

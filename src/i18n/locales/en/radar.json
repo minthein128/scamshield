@@ -1,0 +1,18 @@
+{
+  "title": "Scam radar",
+  "intro_one": "What other SafeRoute users reported in the last 30 days. Only patterns seen at least {{count}} time are shown.",
+  "intro_other": "What other SafeRoute users reported in the last 30 days. Only patterns seen at least {{count}} times are shown.",
+  "global": "Global",
+  "empty": {
+    "title": "Not enough reports yet",
+    "body": "When enough people report the same kind of scam here, it shows up on the radar. Your checks help, and nothing personal is shared."
+  },
+  "domains": "Domains reported most",
+  "trend": {
+    "up": "Rising",
+    "flat": "Steady",
+    "down": "Falling"
+  },
+  "reports_one": "{{count}} report in {{days}} days",
+  "reports_other": "{{count}} reports in {{days}} days"
+}

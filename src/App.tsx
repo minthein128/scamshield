@@ -1,8 +1,11 @@
-import React from 'react';
-import { Platform, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Platform, StyleSheet, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { restoreUiLanguage } from './i18n';
+import { Text } from './components/Text';
 import RootNavigator from './navigation/RootNavigator';
 import { AppStateProvider } from './state/AppState';
 import { AuthProvider } from './state/AuthState';
@@ -10,7 +13,12 @@ import { useApiUrl } from './config/runtime';
 import theme from './theme/theme';
 
 export default function App() {
+  const { t } = useTranslation();
   const apiUrl = useApiUrl();
+  const [languageReady, setLanguageReady] = useState(false);
+  useEffect(() => {
+    restoreUiLanguage().finally(() => setLanguageReady(true));
+  }, []);
   const mockMode = __DEV__ && apiUrl === '';
   const [fontsLoaded] = useFonts({
     'PlusJakartaSans-Regular': require('../assets/fonts/PlusJakartaSans-Regular.ttf'),
@@ -25,10 +33,10 @@ export default function App() {
     'NotoSansThai-Bold': require('../assets/fonts/NotoSansThai-Bold.ttf'),
   });
 
-  if (!fontsLoaded) {
+  if (!fontsLoaded || !languageReady) {
     return (
       <View style={styles.loading}>
-        <Text style={styles.loadingText}>Loading SafeRoute...</Text>
+        <Text style={styles.loadingText}>{t('loading')}</Text>
       </View>
     );
   }
@@ -40,7 +48,7 @@ export default function App() {
         <View style={styles.column}>
           {mockMode ? (
             <View testID="mock-banner" accessibilityRole="alert" style={styles.mock}>
-              <Text style={styles.mockText}>Offline demo mode</Text>
+              <Text style={styles.mockText}>{t('offlineDemo')}</Text>
             </View>
           ) : null}
           <AuthProvider>

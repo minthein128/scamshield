@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { getApiClient } from '../api';
 import { ApiError } from '../api/errors';
 import type { CheckResponse } from '../api/types';
@@ -7,10 +8,12 @@ import { type FeedbackAnswer, buildFeedback, markAnswered, wasAnswered } from '.
 import theme from '../theme/theme';
 import { FeedbackSheet } from './FeedbackSheet';
 import { Icon } from './Icon';
+import { Text } from './Text';
 
 const { colors, fonts } = theme;
 
 export const FeedbackRow: React.FC<{ result: CheckResponse }> = ({ result }) => {
+  const { t } = useTranslation('feedback');
   const [done, setDone] = useState(wasAnswered(result.id));
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -39,7 +42,7 @@ export const FeedbackRow: React.FC<{ result: CheckResponse }> = ({ result }) => 
     return (
       <View testID="feedback-done" style={styles.row}>
         <Icon name="check" size={18} color={colors.textSecondary} />
-        <Text style={styles.label}>Thanks for the feedback</Text>
+        <Text style={styles.label}>{t('row.thanks')}</Text>
       </View>
     );
   }
@@ -47,17 +50,17 @@ export const FeedbackRow: React.FC<{ result: CheckResponse }> = ({ result }) => 
   return (
     <>
       <View testID="feedback-row" style={styles.row}>
-        <Text style={styles.label}>Was this right?</Text>
+        <Text style={styles.label}>{t('row.label')}</Text>
         <View style={styles.thumbs}>
-          <TouchableOpacity testID="feedback-up" accessibilityRole="button" accessibilityLabel="Yes, this was right" activeOpacity={0.7} disabled={busy} onPress={() => send({ kind: 'right' })} style={styles.thumb}>
+          <TouchableOpacity testID="feedback-up" accessibilityRole="button" accessibilityLabel={t('row.up')} activeOpacity={0.7} disabled={busy} onPress={() => send({ kind: 'right' })} style={styles.thumb}>
             <Icon name="thumbUp" size={20} color={colors.textSecondary} />
           </TouchableOpacity>
-          <TouchableOpacity testID="feedback-down" accessibilityRole="button" accessibilityLabel="No, this was wrong" activeOpacity={0.7} disabled={busy} onPress={() => setOpen(true)} style={styles.thumb}>
+          <TouchableOpacity testID="feedback-down" accessibilityRole="button" accessibilityLabel={t('row.down')} activeOpacity={0.7} disabled={busy} onPress={() => setOpen(true)} style={styles.thumb}>
             <Icon name="thumbDown" size={20} color={colors.textSecondary} />
           </TouchableOpacity>
         </View>
       </View>
-      {failed ? <Text style={styles.error}>We could not send that. Try again later.</Text> : null}
+      {failed ? <Text style={styles.error}>{t('row.failed')}</Text> : null}
       <FeedbackSheet visible={open} verdict={result.verdict} scamType={result.scamType} busy={busy} onClose={() => setOpen(false)} onSend={send} />
     </>
   );

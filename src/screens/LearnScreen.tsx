@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { Screen } from '../components/Screen';
+import { Text } from '../components/Text';
 import { ScreenHeader, SectionTitle } from '../components/ui';
 import { Icon } from '../components/Icon';
 import type { TabScreenProps } from '../navigation/types';
@@ -8,10 +10,7 @@ import theme from '../theme/theme';
 import { FlagSheet } from './learn/FlagSheet';
 import { LinkRow } from './learn/LinkRow';
 import { ScamCard } from './learn/ScamCard';
-import {
-  FLAGS_HEADING, FLAGS_HINT, HELP_ROW, LEARN_TAGLINE, LEARN_TITLE, RED_FLAGS, REPORT_ROW,
-  SCAMS_HEADING, SCAM_TYPES, SHIELD_ROW_HINT, SHIELD_ROW_TITLE, type RedFlag,
-} from './learn/content';
+import { RED_FLAGS, SCAM_TYPES, type RedFlag } from './learn/content';
 import { openReportScam } from './learn/nav';
 
 const { colors, fonts } = theme;
@@ -23,24 +22,25 @@ const pairs = <T,>(items: T[]): (T | null)[][] => {
 };
 
 export const LearnScreen: React.FC<TabScreenProps<'Learn'>> = ({ navigation }) => {
+  const { t } = useTranslation('learn');
   const [flag, setFlag] = useState<RedFlag | null>(null);
   return (
     <Screen contentStyle={styles.content}>
       <View style={{ gap: 6 }}>
-        <ScreenHeader title={LEARN_TITLE} />
-        <Text style={styles.tagline}>{LEARN_TAGLINE}</Text>
+        <ScreenHeader title={t('title')} />
+        <Text style={styles.tagline}>{t('tagline')}</Text>
       </View>
 
       <View style={styles.section}>
-        <SectionTitle>{SCAMS_HEADING}</SectionTitle>
+        <SectionTitle>{t('scamsHeading')}</SectionTitle>
         {SCAM_TYPES.map(scam => (
           <ScamCard key={scam.id} scam={scam} onPress={() => navigation.navigate('ScamGuide', { type: scam.id })} />
         ))}
       </View>
 
       <View style={styles.section}>
-        <SectionTitle>{FLAGS_HEADING}</SectionTitle>
-        <Text style={styles.hint}>{FLAGS_HINT}</Text>
+        <SectionTitle>{t('flagsHeading')}</SectionTitle>
+        <Text style={styles.hint}>{t('flagsHint')}</Text>
         {pairs(RED_FLAGS).map(([a, b], i) => (
           <View key={i} style={styles.chipRow}>
             {[a, b].map((f, j) =>
@@ -50,7 +50,7 @@ export const LearnScreen: React.FC<TabScreenProps<'Learn'>> = ({ navigation }) =
                   testID={`flag-${f.family}`}
                   accessibilityRole="button"
                   accessibilityLabel={`${f.title}. ${f.explain}`}
-                  accessibilityHint="Opens an explanation"
+                  accessibilityHint={t('flagsHintA11y')}
                   activeOpacity={0.7}
                   onPress={() => setFlag(f)}
                   style={styles.chip}
@@ -69,14 +69,14 @@ export const LearnScreen: React.FC<TabScreenProps<'Learn'>> = ({ navigation }) =
       <LinkRow
         testID="learn-shield-howto"
         icon="shield"
-        label={SHIELD_ROW_TITLE}
-        hint={SHIELD_ROW_HINT}
+        label={t('shieldRow.title')}
+        hint={t('shieldRow.hint')}
         onPress={() => navigation.navigate('ShieldHowTo')}
       />
 
       <View style={styles.footer}>
-        <LinkRow quiet testID="learn-report" icon="flag" label={REPORT_ROW} onPress={() => { openReportScam(); }} />
-        <LinkRow quiet testID="learn-help" icon="phone" label={HELP_ROW} onPress={() => navigation.navigate('GetHelp')} />
+        <LinkRow quiet testID="learn-report" icon="flag" label={t('reportRow')} onPress={() => { openReportScam(); }} />
+        <LinkRow quiet testID="learn-help" icon="phone" label={t('helpRow')} onPress={() => navigation.navigate('GetHelp')} />
       </View>
 
       <FlagSheet flag={flag} onClose={() => setFlag(null)} />

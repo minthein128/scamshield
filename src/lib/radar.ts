@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import type { Trend } from '../api/types';
 import type { CountryCode } from '../data/countries';
 
@@ -8,13 +9,15 @@ export function defaultScope(destination?: CountryCode, home?: CountryCode): Rad
 }
 
 export const TREND_SYMBOL: Record<Trend, string> = { up: '▲', flat: '▬', down: '▼' };
-export const TREND_LABEL: Record<Trend, string> = { up: 'Rising', flat: 'Steady', down: 'Falling' };
+export function trendLabel(trend: Trend): string {
+  return t(`radar:trend.${trend}`);
+}
 
 export function reportCountText(n: number, days = 30): string {
-  return `${n} ${n === 1 ? 'report' : 'reports'} in ${days} days`;
+  return t('radar:reports', { count: n, days });
 }
 
 export function seenLine(seenCount: number | undefined): string | null {
   if (!seenCount || seenCount < 1) return null;
-  return `Reported ${seenCount} ${seenCount === 1 ? 'time' : 'times'} by other SafeRoute users in the last 30 days`;
+  return t('report:seen', { count: seenCount });
 }
