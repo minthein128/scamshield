@@ -73,7 +73,8 @@ export const scopesOf = (p: { home?: string; dest?: string }) => [
   ...new Set([p.home, p.dest].filter((c): c is string => Boolean(c))),
 ];
 
-export function isRecordable(o: Outcome): boolean {
+export function isRecordable(o: Outcome, confirmed = false): boolean {
+  if (confirmed) return o.scamType !== 'none';
   return o.verdict !== 'safe' && o.scamType !== 'none';
 }
 
@@ -92,7 +93,16 @@ export function buildSignal(
   p: Prepared,
   o: Outcome,
   hasher: Hasher,
-  opts: { now?: Date; clusterId?: string; seed?: boolean; nonce?: string; expireBase?: Date; uid?: string } = {},
+  opts: {
+    now?: Date;
+    clusterId?: string;
+    seed?: boolean;
+    nonce?: string;
+    expireBase?: Date;
+    uid?: string;
+    confirmed?: boolean;
+    src?: 'reported' | 'feedback';
+  } = {},
 ): { id: string; doc: SignalDoc } {
   const now = opts.now ?? new Date();
   const day = dayKey(now);
@@ -124,6 +134,8 @@ export function buildSignal(
   if (opts.clusterId) doc.clusterId = opts.clusterId;
   if (rk) doc.rk = rk;
   if (opts.seed) doc.seed = true;
+  if (opts.confirmed) doc.confirmed = true;
+  if (opts.src) doc.src = opts.src;
   return { id: hasher.hash('sig', idSource), doc };
 }
 

@@ -23,6 +23,7 @@ export interface ErrorCopy {
 
 const COPY: Record<ClientErrorCode, ErrorCopy> = {
   bad_request: { title: 'We could not read that', message: 'Add some text, a link or a screenshot and try again.' },
+  not_found: { title: 'That check has expired', message: 'Feedback is accepted for a few days after a check.' },
   too_large: { title: 'That file is too large', message: 'Pick a smaller screenshot and try again.' },
   upstream: { title: 'The check service is down', message: 'This is a problem on our side. Try again in a few minutes.' },
   rate_limited: { title: 'You reached the check limit', message: 'Wait a little and try again. A free account gets a higher limit.' },
@@ -54,6 +55,7 @@ export function userMessage(error: unknown): string {
 }
 
 export function codeFromStatus(status: number): ClientErrorCode {
+  if (status === 404) return 'not_found';
   if (status === 413) return 'too_large';
   if (status === 429) return 'rate_limited';
   if (status >= 500) return 'upstream';

@@ -10,6 +10,7 @@ import HomeScreen from '../screens/HomeScreen';
 import CheckScreen from '../screens/CheckScreen';
 import CheckingScreen from '../screens/CheckingScreen';
 import ReportScreen from '../screens/ReportScreen';
+import ReportScamScreen from '../screens/ReportScamScreen';
 import ContactsScreen from '../screens/ContactsScreen';
 import OnboardingScreen from '../screens/OnboardingScreen';
 import AccountScreen from '../screens/AccountScreen';
@@ -83,6 +84,7 @@ export const RootNavigator: React.FC = () => {
             <Stack.Screen name="Tabs" component={Tabs} />
             <Stack.Screen name="Checking" component={CheckingScreen} options={{ gestureEnabled: false }} />
             <Stack.Screen name="Report" component={ReportScreen} />
+            <Stack.Screen name="ReportScam" component={ReportScamScreen} />
             <Stack.Screen name="Shield" component={ShieldScreen} />
             <Stack.Screen name="Settings" component={SettingsScreen} />
             <Stack.Screen name="Account" component={AccountScreen} />

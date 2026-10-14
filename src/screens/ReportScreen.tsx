@@ -20,6 +20,8 @@ import { resolveCallTarget } from '../lib/hotlines';
 import { seenLine } from '../lib/radar';
 import { callNumber } from '../lib/warn';
 import { WarnFamilySheet } from '../components/WarnFamilySheet';
+import { FeedbackRow } from '../components/FeedbackRow';
+import { canGiveFeedback } from '../lib/feedback';
 import { useAppState } from '../state/AppState';
 import { notify, shareText } from '../lib/notify';
 import { speak, stopSpeaking } from '../lib/speech';
@@ -46,7 +48,7 @@ const FAMILY_ICONS: Record<string, IconName> = {
 };
 
 export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, route }) => {
-  const { result, language, fresh } = route.params;
+  const { result, language, fresh, reported } = route.params;
   const style = VERDICT_STYLES[result.verdict];
   const flags = groupFlags(result.flags).flatMap(g => g.flags);
   const sources = result.sources ?? [];
@@ -140,6 +142,13 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
         ))}
       </View>
 
+      {reported ? (
+        <View testID="report-thanks" style={styles.thanks}>
+          <Icon name="check" size={20} color={colors.safeText} />
+          <Text style={styles.thanksText}>Thanks, this helps protect others</Text>
+        </View>
+      ) : null}
+
       <Button
         testID="report-listen"
         icon={speaking ? 'stop' : 'speaker'}
@@ -226,6 +235,8 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
           ))}
         </View>
       ) : null}
+
+      {!reported && canGiveFeedback(result) ? <FeedbackRow result={result} /> : null}
     </Screen>
   );
 };
@@ -239,6 +250,8 @@ const styles = StyleSheet.create({
   scoreMax: { fontSize: 14, fontFamily: fonts.medium },
   segments: { flexDirection: 'row', gap: 4, marginTop: -8 },
   seg: { flex: 1, height: 8, borderRadius: 4 },
+  thanks: { flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 16, paddingVertical: 14, paddingHorizontal: 16, backgroundColor: colors.safeBg },
+  thanksText: { flex: 1, color: colors.safeText, fontSize: 15, lineHeight: 22, fontFamily: fonts.semiBold },
   network: { color: colors.textSecondary, fontSize: 14, lineHeight: 20, fontFamily: fonts.medium, textAlign: 'center' },
   reportTitle: { fontSize: 20, lineHeight: 28, fontFamily: fonts.bold, color: colors.textPrimary },
   summary: { fontSize: 16, lineHeight: 24, fontFamily: fonts.medium, color: colors.textPrimary },

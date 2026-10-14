@@ -27,8 +27,9 @@ export type RootStackParamList = {
   Settings: undefined;
   GetHelp: undefined;
   Radar: undefined;
-  Checking: { request: CheckRequest; source?: string };
-  Report: { result: CheckResponse; language: LanguageCode; fresh?: boolean };
+  ReportScam: undefined;
+  Checking: { request: CheckRequest; source?: string; reported?: boolean };
+  Report: { result: CheckResponse; language: LanguageCode; fresh?: boolean; reported?: boolean };
   Shield: undefined;
   DemoBoard: { key: string };
 };

@@ -32,6 +32,11 @@ export interface CheckRequest {
   language: Lang;
   /** false opts this check out of the anonymous network signal. */
   shareSignals?: boolean;
+  /** A user report of a scam they met: recorded as a confirmed signal. */
+  reported?: boolean;
+  reportedType?: ScamType;
+  /** Yes or no only. Counted in the feedback tally, never stored with the signal. */
+  lostMoney?: boolean;
   /** Verified Firebase uid set by the auth layer, never read from the body. */
   uid?: string;
 }
@@ -107,8 +112,8 @@ export interface CheckResponse {
 
 export class ApiError extends Error {
   constructor(
-    public status: 400 | 413 | 429 | 502,
-    public code: 'bad_request' | 'too_large' | 'upstream' | 'rate_limited',
+    public status: 400 | 404 | 413 | 429 | 502,
+    public code: 'bad_request' | 'not_found' | 'too_large' | 'upstream' | 'rate_limited',
     message: string,
   ) {
     super(message);
