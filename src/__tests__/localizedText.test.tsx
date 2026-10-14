@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text as RNText, View, type StyleProp, type TextStyle } from 'react-native';
+import { Platform, StyleSheet, Text as RNText, View, type StyleProp, type TextStyle } from 'react-native';
 import { render } from '@testing-library/react-native';
 import { Text } from '../components/Text';
 import { Button } from '../components/ui';
@@ -25,6 +25,18 @@ describe('localized text style', () => {
 
   it('gives Burmese a line height when the style has none', () => {
     expect(flat(localizedStyle('မြန်မာ', { fontFamily: 'PlusJakartaSans-Regular', fontSize: 16 })).lineHeight).toBe(27);
+  });
+
+  it('adds a Latin fallback font on web only', () => {
+    const style = { fontFamily: 'PlusJakartaSans-Regular', fontSize: 14, lineHeight: 20 };
+    expect(flat(localizedStyle('SafeRoute မြန်မာ', style)).fontFamily).toBe('NotoSansMyanmar-Regular');
+    const os = Platform.OS;
+    Platform.OS = 'web';
+    try {
+      expect(flat(localizedStyle('SafeRoute မြန်မာ', style)).fontFamily).toBe('NotoSansMyanmar-Regular, PlusJakartaSans-Regular');
+    } finally {
+      Platform.OS = os;
+    }
   });
 
   it('reads text from nested children', () => {

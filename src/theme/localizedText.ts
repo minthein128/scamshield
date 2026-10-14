@@ -1,4 +1,4 @@
-import { StyleSheet, type StyleProp, type TextStyle } from 'react-native';
+import { Platform, StyleSheet, type StyleProp, type TextStyle } from 'react-native';
 import type { ReactNode } from 'react';
 import { fonts } from './theme';
 import { scriptOf, scriptStyle, type FontWeight } from './script';
@@ -29,5 +29,9 @@ export function localizedStyle(text: string, style: StyleProp<TextStyle>): Style
   const weight = flat.fontFamily ? WEIGHT_BY_FAMILY[flat.fontFamily] : 'regular';
   if (!weight) return style;
   const base = flat.lineHeight ?? (flat.fontSize ? Math.round(flat.fontSize * 1.25) : undefined);
-  return [style, scriptStyle(text, weight, base), { includeFontPadding: true }];
+  const script = scriptStyle(text, weight, base);
+  // Noto Myanmar and Thai have no Latin glyphs. The browser needs a Latin font to fall back to,
+  // or it uses a serif. Android picks a system font per glyph, and rejects a font list.
+  const family = Platform.OS === 'web' && flat.fontFamily ? { fontFamily: `${script.fontFamily}, ${flat.fontFamily}` } : null;
+  return [style, script, family, { includeFontPadding: true }];
 }
