@@ -203,7 +203,7 @@ export const RED_FLAGS: RedFlag[] = [
   { family: 'payment_route', icon: 'card', name: 'Odd payment', title: 'Payment route', explain: 'Fees, deposits or transfers before you start, or outside the app.', phrase: '"Send the fee to this account to book your seat."' },
   { family: 'identity', icon: 'user', name: 'Hidden identity', title: 'Hidden identity', explain: 'No clear name or company. They only use private chat apps.', phrase: '"Just message me on Telegram."' },
   { family: 'link_risk', icon: 'link', name: 'Risky link', title: 'Risky link', explain: 'New web addresses, shortened links or fake tracking pages.', phrase: '"Track your parcel: bit.ly/x7Kd2"' },
-  { family: 'known_bad', icon: 'flag', name: 'Known scam', title: 'Known scam', explain: 'The number, page or script was already reported by others.', phrase: '"Dear customer, your account is locked."' },
+  { family: 'known_bad', icon: 'flag', name: 'Reported before', title: 'Reported before', explain: 'The number, page or script was already reported by others.', phrase: '"Dear customer, your account is locked."' },
   { family: 'trafficking', icon: 'octagon', name: 'Trafficking', title: 'Trafficking signs', explain: 'No visa, your passport is kept, or a pickup at the border.', phrase: '"A driver will meet you at the border. Bring your passport."' },
 ];
 
