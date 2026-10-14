@@ -8,7 +8,7 @@ export interface LanguageOption {
 
 export const LANGUAGES: LanguageOption[] = [
   { code: 'en', label: 'English', speechLocale: 'en-US' },
-  { code: 'id', label: 'Bahasa', speechLocale: 'id-ID' },
+  { code: 'id', label: 'Bahasa Indonesia', speechLocale: 'id-ID' },
   { code: 'tl', label: 'Tagalog', speechLocale: 'fil-PH' },
   { code: 'my', label: 'Myanmar', speechLocale: 'my-MM' },
 ];

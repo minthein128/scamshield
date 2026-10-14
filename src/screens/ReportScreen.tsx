@@ -12,10 +12,14 @@ import {
   WEB_RISK_LABELS,
   filledSegments,
   groupFlags,
-  hotlineNumber,
   shareMessage,
-  telUrl,
+  warnMessage,
 } from '../lib/report';
+import { countryName } from '../lib/countries';
+import { resolveCallTarget } from '../lib/hotlines';
+import { callNumber } from '../lib/warn';
+import { WarnFamilySheet } from '../components/WarnFamilySheet';
+import { useAppState } from '../state/AppState';
 import { notify, shareText } from '../lib/notify';
 import { speak, stopSpeaking } from '../lib/speech';
 import type { RootScreenProps } from '../navigation/types';
@@ -35,6 +39,8 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
   const groups = groupFlags(result.flags);
   const sources = result.sources ?? [];
   const [speaking, setSpeaking] = useState(false);
+  const [warnOpen, setWarnOpen] = useState(false);
+  const { profile } = useAppState();
 
   useEffect(() => {
     if (fresh && result.verdict !== 'safe') {
@@ -55,7 +61,7 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
   };
 
   const callAction = result.actions.find(a => a.type === 'call');
-  const number = hotlineNumber(callAction);
+  const hotline = resolveCallTarget(callAction?.value, profile.destinationCountry, profile.homeCountry);
 
   const shareResult = async () => {
     await shareText(shareMessage(result));
@@ -63,12 +69,10 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
 
   const run = (action: CheckAction) => {
     switch (action.type) {
-      case 'call': {
-        const target = hotlineNumber(action);
-        if (target) Linking.openURL(telUrl(target)).catch(() => undefined);
-        else notify('No hotline number is set for this region yet.');
+      case 'call':
+        if (hotline?.dial) callNumber(hotline.dial).catch(() => undefined);
+        else navigation.navigate('GetHelp');
         break;
-      }
       case 'share':
         shareResult();
         break;
@@ -88,13 +92,24 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
       edges={['top']}
       footer={
         <>
-          <Button testID="report-share" label="Share this warning" onPress={shareResult} />
-          {number && result.verdict !== 'safe' ? (
-            <Button testID="report-call" label={`Call hotline ${number}`} variant="secondary" onPress={() => callAction && run({ ...callAction, value: number })} />
+          <Button testID="report-warn" label="Warn my family" onPress={() => setWarnOpen(true)} />
+          {result.verdict !== 'safe' ? (
+            hotline?.dial ? (
+              <Button testID="report-call" label={`Call ${hotline.number ?? hotline.dial} (${countryName(hotline.country)} help line)`} variant="secondary" onPress={() => callNumber(hotline.dial ?? '')} />
+            ) : (
+              <Button testID="report-help" label="Get help" variant="secondary" onPress={() => navigation.navigate('GetHelp')} />
+            )
           ) : null}
+          <Button testID="report-share" label="Share this warning" variant="secondary" onPress={shareResult} />
         </>
       }
     >
+ <WarnFamilySheet
+        visible={warnOpen}
+        message={warnMessage(result)}
+        onClose={() => setWarnOpen(false)}
+        onAddContact={() => navigation.navigate('Tabs', { screen: 'Contacts' })}
+      />
       <ScreenHeader title="Risk report" onBack={() => (navigation.canGoBack() ? navigation.goBack() : navigation.navigate('Tabs'))} />
 
       <View style={[styles.banner, { backgroundColor: style.background }]} testID={`verdict-${result.verdict}`}>

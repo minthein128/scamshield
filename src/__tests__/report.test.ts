@@ -1,5 +1,5 @@
 import type { Flag } from '../api/types';
-import { VERDICT_STYLES, filledSegments, groupFlags, hotlineNumber, telUrl, verdictFromScore } from '../lib/report';
+import { VERDICT_STYLES, filledSegments, groupFlags, telUrl, verdictFromScore } from '../lib/report';
 import { draftFromShare } from '../lib/share';
 import { buildRequest } from '../lib/request';
 import { base64Bytes, prepareImage } from '../lib/image';
@@ -31,7 +31,6 @@ describe('report mapping', () => {
 
   it('builds tel urls and picks a hotline', () => {
     expect(telUrl('+66 (0) 2-123')).toBe('tel:+6602123');
-    expect(hotlineNumber({ label: 'x', type: 'call', value: ' 1300 ' })).toBe('1300');
   });
 });
 

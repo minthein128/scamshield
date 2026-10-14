@@ -16,7 +16,7 @@ export const DemoBoardScreen: React.FC<RootScreenProps<'DemoBoard'>> = ({ naviga
   return (
     <SafeAreaView edges={['top']} style={styles.root}>
       <View style={styles.header}>
-        <ScreenHeader title={board?.title ?? 'Demo'} onBack={() => navigation.goBack()} />
+        <ScreenHeader title={board?.title ?? 'Example'} onBack={() => navigation.goBack()} />
       </View>
       <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scroll} horizontal={(board?.width ?? 0) > 430}>
         <ScrollView nestedScrollEnabled contentContainerStyle={styles.scroll}>

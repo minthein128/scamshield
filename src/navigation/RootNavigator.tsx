@@ -1,15 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { NavigationContainer, DefaultTheme, createNavigationContainerRef } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import type { CheckResponse, LanguageCode } from '../api/types';
 import { TabIcon } from './TabIcons';
 import type { RootStackParamList, TabParamList } from './types';
+import type { AfterOnboarding } from '../lib/onboarding';
 import HomeScreen from '../screens/HomeScreen';
 import CheckScreen from '../screens/CheckScreen';
 import CheckingScreen from '../screens/CheckingScreen';
 import ReportScreen from '../screens/ReportScreen';
-import FamilyScreen from '../screens/FamilyScreen';
+import ContactsScreen from '../screens/ContactsScreen';
+import OnboardingScreen from '../screens/OnboardingScreen';
+import AccountScreen from '../screens/AccountScreen';
+import SettingsScreen from '../screens/SettingsScreen';
+import GetHelpScreen from '../screens/GetHelpScreen';
+import { navigationRef } from './ref';
+import { useAppState } from '../state/AppState';
+import { useShieldTokenSync } from '../hooks/useShieldTokenSync';
 import LearnScreen from '../screens/LearnScreen';
 import ShieldScreen from '../screens/ShieldScreen';
 import DemoBoardScreen from '../screens/DemoBoardScreen';
@@ -19,7 +27,6 @@ import theme from '../theme/theme';
 
 const Tab = createBottomTabNavigator<TabParamList>();
 const Stack = createNativeStackNavigator<RootStackParamList>();
-const navigationRef = createNavigationContainerRef<RootStackParamList>();
 
 const navTheme = { ...DefaultTheme, colors: { ...DefaultTheme.colors, background: theme.colors.background, card: theme.colors.white, border: theme.colors.border, primary: theme.colors.accent } };
 
@@ -37,7 +44,7 @@ const Tabs: React.FC = () => (
   >
     <Tab.Screen name="Home" component={HomeScreen} />
     <Tab.Screen name="Check" component={CheckScreen} />
-    <Tab.Screen name="Family" component={FamilyScreen} />
+    <Tab.Screen name="Contacts" component={ContactsScreen} options={{ title: 'Contacts', tabBarAccessibilityLabel: 'Trusted contacts' }} />
     <Tab.Screen name="Learn" component={LearnScreen} />
   </Tab.Navigator>
 );
@@ -61,17 +68,32 @@ const DeepLinkBridge: React.FC<{ ready: boolean }> = ({ ready }) => {
 
 export const RootNavigator: React.FC = () => {
   const [ready, setReady] = useState(false);
+  const { ready: loaded, profile } = useAppState();
+  useShieldTokenSync();
+  const onOnboardingDone = (next?: AfterOnboarding) => {
+    if (next) setTimeout(() => navigationRef.navigate('Account', { mode: next }), 150);
+  };
+  if (!loaded) return null;
   return (
     <NavigationContainer ref={navigationRef} theme={navTheme} onReady={() => setReady(true)}>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Tabs" component={Tabs} />
-        <Stack.Screen name="Checking" component={CheckingScreen} options={{ gestureEnabled: false }} />
-        <Stack.Screen name="Report" component={ReportScreen} />
-        <Stack.Screen name="Shield" component={ShieldScreen} />
-        <Stack.Screen name="DemoBoard" component={DemoBoardScreen} />
+        {profile.onboarded ? (
+          <>
+            <Stack.Screen name="Tabs" component={Tabs} />
+            <Stack.Screen name="Checking" component={CheckingScreen} options={{ gestureEnabled: false }} />
+            <Stack.Screen name="Report" component={ReportScreen} />
+            <Stack.Screen name="Shield" component={ShieldScreen} />
+            <Stack.Screen name="Settings" component={SettingsScreen} />
+            <Stack.Screen name="Account" component={AccountScreen} />
+            <Stack.Screen name="GetHelp" component={GetHelpScreen} />
+            <Stack.Screen name="DemoBoard" component={DemoBoardScreen} />
+          </>
+        ) : (
+          <Stack.Screen name="Onboarding">{() => <OnboardingScreen onDone={onOnboardingDone} />}</Stack.Screen>
+        )}
       </Stack.Navigator>
-      <ShareIntentBridge ready={ready} />
-      <DeepLinkBridge ready={ready} />
+      <ShareIntentBridge ready={ready && profile.onboarded} />
+      <DeepLinkBridge ready={ready && profile.onboarded} />
     </NavigationContainer>
   );
 };

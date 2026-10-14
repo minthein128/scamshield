@@ -50,16 +50,19 @@ describe('hotline filter', () => {
 });
 
 describe('call target', () => {
-  it('prefers the destination anti-trafficking line, then home, then police', () => {
+  it('prefers the destination anti-trafficking line, then home trafficking, then police', () => {
     expect(primaryHotline('TH', 'MM')?.id).toBe('th-rtp-ahtd-1599');
-    expect(primaryHotline('PH', 'VN')?.id).toBe('vn-111');
-    expect(primaryHotline('MY', 'PH')?.id).toBe('my-pdrm-999');
+    expect(primaryHotline('LA', 'VN')?.id).toBe('vn-111');
+    expect(primaryHotline('PH', 'VN')?.id).toBe('ph-1343-actionline');
+    expect(primaryHotline('MY', undefined)?.id).toBe('my-pdrm-999');
+    expect(primaryHotline('MY', 'PH')?.id).toBe('ph-1343-actionline');
     expect(primaryHotline(undefined, undefined)).toBeUndefined();
   });
 
   it('uses the number the server sent when the shared data knows it', () => {
     expect(hotlineByDial('1599')?.country).toBe('TH');
     expect(resolveCallTarget('111', 'TH', 'MM')?.id).toBe('vn-111');
+    expect(resolveCallTarget('1343', 'TH', 'MM')?.country).toBe('PH');
     expect(resolveCallTarget('00000', 'TH', 'MM')?.id).toBe('th-rtp-ahtd-1599');
     expect(resolveCallTarget(undefined, undefined, undefined)).toBeUndefined();
   });

@@ -2,8 +2,10 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ScanProgress from '../components/ScanProgress';
-import { Button } from '../components/ui';
-import { getApiClient, userMessage } from '../api';
+import { Button, LinkButton } from '../components/ui';
+import { useAuth } from '../state/AuthState';
+import { errorCopy, getApiClient } from '../api';
+import type { ErrorCopy } from '../api/errors';
 import { ApiError } from '../api/errors';
 import type { RootScreenProps } from '../navigation/types';
 import { useAppState } from '../state/AppState';
@@ -25,7 +27,8 @@ export const CheckingScreen: React.FC<RootScreenProps<'Checking'>> = ({ navigati
   const { request, source } = route.params;
   const { saveCheck } = useAppState();
   const [step, setStep] = useState(0);
-  const [error, setError] = useState<string | null>(null);
+  const { status } = useAuth();
+  const [error, setError] = useState<(ErrorCopy & { code?: string }) | null>(null);
   const abortRef = useRef<AbortController | null>(null);
 
   const run = useCallback(async () => {
@@ -39,7 +42,7 @@ export const CheckingScreen: React.FC<RootScreenProps<'Checking'>> = ({ navigati
       navigation.replace('Report', { result, language: request.language, fresh: true });
     } catch (e) {
       if (e instanceof ApiError && e.code === 'cancelled') return;
-      setError(userMessage(e));
+      setError({ ...errorCopy(e), code: e instanceof ApiError ? e.code : undefined });
     }
   }, [navigation, request, saveCheck, source]);
 
@@ -59,8 +62,11 @@ export const CheckingScreen: React.FC<RootScreenProps<'Checking'>> = ({ navigati
       <View style={styles.body}>
         {error ? (
           <View style={styles.errorBox}>
-            <Text style={styles.errorTitle}>The check did not finish</Text>
-            <Text style={styles.errorText}>{error}</Text>
+            <Text accessibilityRole="header" style={styles.errorTitle}>{error.title}</Text>
+            <Text testID="checking-error" style={styles.errorText}>{error.message}</Text>
+            {error.code === 'rate_limited' && status.kind === 'anonymous' ? (
+              <LinkButton label="Create a free account" color={colors.brandBlueLight} onPress={() => navigation.replace('Account', { mode: 'signUp' })} />
+            ) : null}
           </View>
         ) : (
           <ScanProgress steps={STEPS} step={step} title="Checking..." />

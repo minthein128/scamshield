@@ -318,5 +318,108 @@ export const HOTLINES: Hotline[] = [
     "dial": "+63284260833",
     "sourceUrl": "https://dmw.gov.ph/archives/v1/resources/dsms/DMW/DMW-Directory-as-of-15-April-2026.pdf",
     "verifiedOn": "2026-10-14"
+  },
+  {
+    "id": "ph-1343-actionline",
+    "country": "PH",
+    "category": "trafficking",
+    "name": "1343 Actionline, Inter-Agency Council Against Trafficking",
+    "number": "1343",
+    "dial": "1343",
+    "domesticOnly": true,
+    "hours": "Open 24 hours",
+    "sourceUrl": "https://web.archive.org/web/20251206083207/https://1343actionline.ph/background",
+    "verifiedOn": "2026-10-14"
+  },
+  {
+    "id": "ph-owwa-1348",
+    "country": "PH",
+    "category": "consular",
+    "name": "OWWA hotline, Overseas Workers Welfare Administration",
+    "number": "1348",
+    "dial": "1348",
+    "domesticOnly": true,
+    "hours": "Open 24 hours",
+    "sourceUrl": "https://web.archive.org/web/2025/https://owwa.gov.ph/contact-us/",
+    "verifiedOn": "2026-10-14"
+  },
+  {
+    "id": "ph-embassy-yangon-atn",
+    "country": "PH",
+    "category": "consular",
+    "name": "Philippine Embassy Yangon, Assistance-to-Nationals hotline",
+    "number": "+95 998 521 0991",
+    "dial": "+959985210991",
+    "notes": "For Filipinos who may be trapped in scam hubs near the Myanmar-Thai border.",
+    "sourceUrl": "https://web.archive.org/web/20260103083613/https://bangkokpe.dfa.gov.ph/",
+    "verifiedOn": "2026-10-14"
+  },
+  {
+    "id": "ph-mwo-bangkok",
+    "country": "PH",
+    "category": "consular",
+    "name": "Migrant Workers Office Bangkok, hotline",
+    "number": "+66 83 137 6167",
+    "dial": "+66831376167",
+    "notes": "Also on LINE, Viber and WhatsApp.",
+    "sourceUrl": "https://web.archive.org/web/20260103083613/https://bangkokpe.dfa.gov.ph/",
+    "verifiedOn": "2026-10-14"
+  },
+  {
+    "id": "ph-police-911",
+    "country": "PH",
+    "category": "police",
+    "name": "Emergency services (police, fire, ambulance)",
+    "number": "911",
+    "dial": "911",
+    "domesticOnly": true,
+    "sourceUrl": "https://www.gov.uk/foreign-travel-advice/philippines/getting-help",
+    "verifiedOn": "2026-10-14"
+  },
+  {
+    "id": "kh-ncct-1288",
+    "country": "KH",
+    "category": "trafficking",
+    "name": "National Committee for Counter Trafficking (NCCT)",
+    "number": "1288",
+    "dial": "1288",
+    "domesticOnly": true,
+    "notes": "Report suspected labour or sex trafficking. Second number: 023 997 919.",
+    "sourceUrl": "https://web.archive.org/web/20260108170204/https://ncct.gov.kh/pages/7/39",
+    "verifiedOn": "2026-10-14"
+  },
+  {
+    "id": "kh-police-117",
+    "country": "KH",
+    "category": "police",
+    "name": "Police emergency",
+    "number": "117",
+    "dial": "117",
+    "domesticOnly": true,
+    "sourceUrl": "https://www.gov.uk/foreign-travel-advice/cambodia/getting-help",
+    "verifiedOn": "2026-10-14"
+  },
+  {
+    "id": "la-police-1191",
+    "country": "LA",
+    "category": "police",
+    "name": "Police emergency",
+    "number": "1191",
+    "dial": "1191",
+    "domesticOnly": true,
+    "notes": "Tourist police in Vientiane: 021 251 128.",
+    "sourceUrl": "https://www.gov.uk/foreign-travel-advice/laos/getting-help",
+    "verifiedOn": "2026-10-14"
+  },
+  {
+    "id": "mm-police-199",
+    "country": "MM",
+    "category": "police",
+    "name": "Police emergency",
+    "number": "199",
+    "dial": "199",
+    "domesticOnly": true,
+    "sourceUrl": "https://www.gov.uk/foreign-travel-advice/myanmar/getting-help",
+    "verifiedOn": "2026-10-14"
   }
 ];

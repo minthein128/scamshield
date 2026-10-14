@@ -16,12 +16,16 @@ export interface CheckParams {
 export type TabParamList = {
   Home: undefined;
   Check: CheckParams | undefined;
-  Family: undefined;
+  Contacts: undefined;
   Learn: undefined;
 };
 
 export type RootStackParamList = {
+  Onboarding: undefined;
   Tabs: NavigatorScreenParams<TabParamList> | undefined;
+  Account: { mode?: 'signUp' | 'signIn' } | undefined;
+  Settings: undefined;
+  GetHelp: undefined;
   Checking: { request: CheckRequest; source?: string };
   Report: { result: CheckResponse; language: LanguageCode; fresh?: boolean };
   Shield: undefined;
