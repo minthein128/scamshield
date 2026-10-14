@@ -72,6 +72,10 @@ export function writeReport() {
                 : ''
             }`,
           ],
+          [
+            'Responses with certainty wording (before / after guard)',
+            s.certainty ? `${s.certainty.before ?? 'n/a'} / ${s.certainty.after} of ${s.certainty.measured}` : 'not measured',
+          ],
           ['Request errors', s.errors],
         ],
       ),

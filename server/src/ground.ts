@@ -51,9 +51,11 @@ export function buildGroundingPrompt(x: Extraction, lang: Lang): string {
     '',
     `Reply with ONLY a JSON object: {"findings":[{"family":"known_bad|identity|too_good","label":"...","evidence":"..."}]}`,
     '- known_bad: you found scam or blacklist reports that name this exact company, phone number or domain as the scammer. Reports that scammers impersonate a well-known brand (a courier, bank or marketplace) are NOT evidence against a message from that brand: do not report them.',
+    '- General advisories that scammers use a brand name (Tokopedia, Shopee, DHL, a bank) say nothing about the message you are checking. Never report them in any family. A well-known brand with a normal, specific listing or notice needs no finding.',
     '- identity: the entity cannot be found, has no licence, or the claimed identity does not match.',
     '- too_good: the salary is far above the market for that role and country.',
     '- Add a finding only when search results support it. If everything checks out, return {"findings":[]}.',
+    '- Use likelihood language. Say "We could not find a licence record for X", never "X is unlicensed" or "X is a scammer". Say "Reports online describe similar messages as scams", never "X is a scam". Never call a named company, person or number a criminal. Never use "definitely", "confirmed" or "100%".',
     `- Write label in ${LANG_NAMES[lang]}. Keep evidence to one short sentence naming the source.`,
   );
   return lines.join('\n');

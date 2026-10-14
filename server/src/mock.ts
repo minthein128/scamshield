@@ -10,7 +10,7 @@ type Canned = Omit<Extraction, 'urls' | 'entities'> & { entities?: Extraction['e
 const ENGLISH: Record<Kind, Canned> = {
   job: {
     flags: [
-      { family: 'too_good', label: 'Pay far above normal', evidence: 'Salary USD 1800, no experience needed', severity: 'high' },
+      { family: 'too_good', label: 'Pay looks far above normal', evidence: 'Salary USD 1800, no experience needed', severity: 'high' },
       {
         family: 'trafficking',
         label: 'Border route and passport',
@@ -31,8 +31,9 @@ const ENGLISH: Record<Kind, Canned> = {
       salaryClaim: 'USD 1800 per month',
     },
     summary:
-      'This offer shows strong signs of a trafficking recruitment scam. Do not travel or send your passport until it has been verified.',
-    spokenWarning: 'Danger. This job offer looks like trafficking. Do not travel.',
+      'This offer shows several warning signs of trafficking recruitment. Please do not travel or send your passport until it has been verified.',
+    spokenWarning:
+      'This offer shows several warning signs of trafficking. Please do not pay or send your passport, and check with someone you trust.',
   },
   message: {
     flags: [
@@ -43,16 +44,17 @@ const ENGLISH: Record<Kind, Canned> = {
     scamType: 'parcel_phishing',
     verdictDraft: 'careful',
     unsolicited: true,
-    summary: 'This message looks like a fake parcel fee. Do not tap the link. Check the parcel in the official courier app.',
-    spokenWarning: 'Be careful. This looks like a fake parcel message.',
+    summary:
+      'This message looks like it could be a fake parcel fee. Please do not tap the link, and check the parcel in the official courier app.',
+    spokenWarning: 'This message shows signs of a parcel scam. Please check the parcel in the official courier app.',
   },
   link: {
     flags: [{ family: 'link_risk', label: 'Unfamiliar domain', evidence: 'Odd domain name', severity: 'medium' }],
     scamType: 'other',
     verdictDraft: 'careful',
     unsolicited: false,
-    summary: 'This link is unfamiliar. Open the official site by typing its address yourself.',
-    spokenWarning: 'Be careful with this link.',
+    summary: 'We could not verify this link. Please open the official site by typing its address yourself.',
+    spokenWarning: 'We could not verify this link. Please be careful.',
   },
   shop: {
     flags: [
@@ -62,8 +64,9 @@ const ENGLISH: Record<Kind, Canned> = {
     scamType: 'marketplace_fraud',
     verdictDraft: 'danger',
     unsolicited: false,
-    summary: 'A very cheap price and a request to pay outside the app is a common fake seller trick. Pay only through the platform.',
-    spokenWarning: 'Danger. Do not pay outside the app.',
+    summary:
+      'A very low price and a request to pay outside the app match a common pattern of fake sellers. Please pay only through the platform.',
+    spokenWarning: 'This listing shows several warning signs. Please do not pay outside the app.',
   },
   agency: {
     flags: [
@@ -74,16 +77,16 @@ const ENGLISH: Record<Kind, Canned> = {
     verdictDraft: 'careful',
     unsolicited: false,
     entities: { companies: ['Sunrise Overseas Agency'], phones: [], domains: [] },
-    summary: 'This agency asks for money first and shows no licence. Check the agency with your national labour authority.',
-    spokenWarning: 'Be careful. Check this agency is licensed.',
+    summary: 'This agency asks for money first and shows no licence in the text. Please check it with your national labour authority.',
+    spokenWarning: 'We could not verify this agency. Please check its licence first.',
   },
   screen: {
     flags: [{ family: 'pressure', label: 'Pushy message', evidence: 'Reply now to claim your bonus', severity: 'low' }],
     scamType: 'other',
     verdictDraft: 'careful',
     unsolicited: true,
-    summary: 'The screenshot has a pushy message. Do not reply until you have checked who sent it.',
-    spokenWarning: 'Be careful. Check who sent this.',
+    summary: 'The screenshot has a pushy message that shows some warning signs. Please check who sent it before you reply.',
+    spokenWarning: 'This message shows some warning signs. Please check who sent it.',
   },
 };
 
@@ -101,8 +104,8 @@ export function createMockExtractor(): Extractor {
           verdictDraft: 'safe',
           unsolicited: false,
           entities: { companies: [], phones: [], domains: [] },
-          summary: 'No warning signs found in this text. Stay alert if anyone asks for money or documents.',
-          spokenWarning: 'No warning signs found.',
+          summary: 'We found no major warning signs in this text. Stay alert if anyone asks for money or documents.',
+          spokenWarning: 'We found no major warning signs.',
           urls,
         };
       }
@@ -146,14 +149,14 @@ export function createMockGrounder(): Grounder {
         flags: [
           {
             family: 'identity',
-            label: `No licence found for ${name}`,
-            evidence: 'No match in the labour authority licence list',
+            label: `We could not find a licence record for ${name}`,
+            evidence: 'No match in our search of labour authority licence lists',
             severity: 'medium',
           },
         ],
         sources: [
           { title: 'Mock source: licensed agency registry', url: 'https://example.org/agency-registry' },
-          { title: 'Mock source: scam advisory', url: 'https://example.org/advisory' },
+          { title: 'Mock source: advisory', url: 'https://example.org/advisory' },
         ],
       };
     },

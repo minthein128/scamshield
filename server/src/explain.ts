@@ -3,30 +3,30 @@ import type { Action, Lang, LinkCheck, ScamType, Verdict } from './types.js';
 
 const TITLES: Record<Verdict, Record<Lang, string>> = {
   danger: {
-    en: 'High risk: do not continue',
-    id: 'Risiko tinggi: jangan lanjutkan',
-    tl: 'Mataas na panganib: huwag ituloy',
-    my: 'အန္တရာယ်မြင့်မားသည်: ဆက်မလုပ်ပါနှင့်',
+    en: 'Many warning signs: please pause and check first',
+    id: 'Banyak tanda bahaya: berhenti dulu dan periksa',
+    tl: 'Maraming babala: huminto muna at mag-verify',
+    my: 'သတိပေးလက္ခဏာ များစွာ တွေ့ရသည်: ခဏရပ်ပြီး စစ်ဆေးပါ',
   },
   careful: {
-    en: 'Be careful: verify first',
-    id: 'Hati-hati: periksa dulu',
-    tl: 'Mag-ingat: i-verify muna',
-    my: 'သတိထားပါ: အရင်စစ်ဆေးပါ',
+    en: 'Some warning signs: please verify first',
+    id: 'Ada beberapa tanda bahaya: periksa dulu',
+    tl: 'May ilang babala: i-verify muna',
+    my: 'သတိပေးလက္ခဏာ အချို့ တွေ့ရသည်: အရင်စစ်ဆေးပါ',
   },
   safe: {
-    en: 'No major warning signs found',
-    id: 'Tidak ada tanda bahaya besar',
-    tl: 'Walang malaking babala',
-    my: 'အရေးကြီးသော သတိပေးချက် မတွေ့ပါ',
+    en: 'We found no major warning signs',
+    id: 'Kami tidak menemukan tanda bahaya besar',
+    tl: 'Wala kaming nakitang malaking babala',
+    my: 'အရေးကြီးသော သတိပေးချက် မတွေ့ရပါ',
   },
 };
 
 const WEB_RISK_NOTE: Record<Lang, string> = {
-  en: 'Google Web Risk lists a link in this message as dangerous.',
-  id: 'Google Web Risk menandai tautan dalam pesan ini sebagai berbahaya.',
-  tl: 'Itinuturing ng Google Web Risk na mapanganib ang isang link sa mensaheng ito.',
-  my: 'ဤစာထဲရှိ လင့်ခ်တစ်ခုကို Google Web Risk က အန္တရာယ်ရှိသည်ဟု သတ်မှတ်ထားသည်။',
+  en: 'Google Web Risk flags a link in this message as unsafe.',
+  id: 'Google Web Risk menandai tautan dalam pesan ini sebagai tidak aman.',
+  tl: 'Namarkahan ng Google Web Risk na hindi ligtas ang isang link sa mensaheng ito.',
+  my: 'ဤစာထဲရှိ လင့်ခ်တစ်ခုကို Google Web Risk က မလုံခြုံဟု အမှတ်အသားပြုထားသည်။',
 };
 
 const LABELS: Record<'call' | 'share' | 'block' | 'learn', Record<Lang, string>> = {
@@ -38,16 +38,16 @@ const LABELS: Record<'call' | 'share' | 'block' | 'learn', Record<Lang, string>>
     my: 'မိသားစု သို့မဟုတ် သူငယ်ချင်းကို သတိပေးရန်',
   },
   block: {
-    en: 'Block and report the sender',
+    en: 'Block and report this sender',
     id: 'Blokir dan laporkan pengirim',
     tl: 'I-block at i-report ang nagpadala',
     my: 'ပို့သူကို ပိတ်ပင်ပြီး တိုင်ကြားရန်',
   },
   learn: {
-    en: 'Learn how this scam works',
-    id: 'Pelajari cara penipuan ini',
-    tl: 'Alamin kung paano gumagana ang scam',
-    my: 'ဤလိမ်လည်မှု လုပ်ပုံကို လေ့လာရန်',
+    en: 'Learn how scams like this work',
+    id: 'Pelajari cara kerja penipuan seperti ini',
+    tl: 'Alamin kung paano gumagana ang mga scam na tulad nito',
+    my: 'ဤကဲ့သို့သော လိမ်လည်မှုများ လုပ်ပုံကို လေ့လာရန်',
   },
 };
 
