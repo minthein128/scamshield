@@ -3,7 +3,7 @@ import { VERDICT_STYLES, filledSegments, groupFlags, hotlineNumber, telUrl, verd
 import { draftFromShare } from '../lib/share';
 import { buildRequest } from '../lib/request';
 import { base64Bytes, prepareImage } from '../lib/image';
-import { pickSpeechLocale } from '../lib/speech';
+import { findVoiceLocale, pickSpeechLocale } from '../lib/speech';
 
 const flag = (family: Flag['family'], severity: Flag['severity'], label = family): Flag => ({ family, severity, label, evidence: '' });
 
@@ -78,5 +78,12 @@ describe('speech locale', () => {
     expect(pickSpeechLocale(['en-US', 'id-ID'], 'id')).toBe('id-ID');
     expect(pickSpeechLocale(['en-GB', 'fil-PH'], 'tl')).toBe('fil-PH');
     expect(pickSpeechLocale(['en-US'], 'my')).toBe('en-US');
+  });
+});
+
+describe('voice lookup', () => {
+  it('returns undefined when no voice matches', () => {
+    expect(findVoiceLocale(['en-US'], 'my')).toBeUndefined();
+    expect(findVoiceLocale(['my_MM'], 'my')).toBe('my_MM');
   });
 });

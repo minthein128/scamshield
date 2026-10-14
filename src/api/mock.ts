@@ -141,6 +141,9 @@ export function createMockClient(options: MockOptions = {}): CheckClient {
       await wait(opts?.signal);
       return buildMockResponse(request);
     },
+    async speak() {
+      throw new ApiError('upstream', 'No speech service in mock mode');
+    },
     async health() {
       return { ok: true, model: 'mock-heuristic-v1', mock: true };
     },

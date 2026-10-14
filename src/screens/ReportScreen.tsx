@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Linking } from 'react-native';
+import { View, Text, StyleSheet, Linking, TouchableOpacity } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { Screen } from '../components/Screen';
 import { Button, Card, Pill, ScreenHeader, SectionTitle } from '../components/ui';
+import { getApiClient } from '../api';
 import type { CheckAction } from '../api/types';
 import { languageOption } from '../lib/languages';
 import {
@@ -32,12 +33,13 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
   const { result, language, fresh } = route.params;
   const style = VERDICT_STYLES[result.verdict];
   const groups = groupFlags(result.flags);
+  const sources = result.sources ?? [];
   const [speaking, setSpeaking] = useState(false);
 
   useEffect(() => {
     if (fresh && result.verdict !== 'safe') {
       setSpeaking(true);
-      speak(result.spokenWarning, language, () => setSpeaking(false)).catch(() => setSpeaking(false));
+      speak(result.spokenWarning, language, () => setSpeaking(false), getApiClient()).catch(() => setSpeaking(false));
     }
     return () => stopSpeaking();
   }, [fresh, result, language]);
@@ -49,7 +51,7 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
       return;
     }
     setSpeaking(true);
-    await speak(result.spokenWarning, language, () => setSpeaking(false)).catch(() => setSpeaking(false));
+    await speak(result.spokenWarning, language, () => setSpeaking(false), getApiClient()).catch(() => setSpeaking(false));
   };
 
   const callAction = result.actions.find(a => a.type === 'call');
@@ -148,6 +150,20 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
                 );
               })}
             </View>
+          ))}
+        </View>
+      ) : null}
+
+      {sources.length > 0 ? (
+        <View style={{ gap: 8 }}>
+          <SectionTitle>Sources we checked</SectionTitle>
+          {sources.map(src => (
+            <TouchableOpacity key={src.url} accessibilityRole="link" activeOpacity={0.7} onPress={() => Linking.openURL(src.url).catch(() => undefined)} style={styles.flagCard}>
+              <View style={{ flex: 1, gap: 3 }}>
+                <Text numberOfLines={2} style={styles.flagLabel}>{src.title}</Text>
+                <Text numberOfLines={1} style={styles.link}>{src.url}</Text>
+              </View>
+            </TouchableOpacity>
           ))}
         </View>
       ) : null}

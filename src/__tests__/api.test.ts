@@ -1,6 +1,7 @@
 import { createHttpClient } from '../api/http';
 import { ApiError, userMessage } from '../api/errors';
 import { createClientFromEnv } from '../api';
+import { createMockClient } from '../api/mock';
 import type { CheckRequest } from '../api/types';
 
 const request: CheckRequest = { kind: 'job', text: 'Urgent data entry in Thailand', language: 'en' };
@@ -74,5 +75,26 @@ describe('client selection', () => {
     expect(createClientFromEnv(undefined).isMock).toBe(true);
     expect(createClientFromEnv('  ').isMock).toBe(true);
     expect(createClientFromEnv('https://api.test').isMock).toBe(false);
+  });
+});
+
+describe('speak and sources', () => {
+  it('posts to /v1/speak', async () => {
+    const fetchImpl = reply(200, { audioBase64: 'AAAA', mimeType: 'audio/wav', sampleRate: 24000, model: 'tts' });
+    const client = createHttpClient({ baseUrl: 'https://api.test', fetchImpl });
+    const out = await client.speak({ text: 'hi', language: 'my' });
+    expect(out.audioBase64).toBe('AAAA');
+    expect(fetchImpl).toHaveBeenCalledWith('https://api.test/v1/speak', expect.objectContaining({ method: 'POST' }));
+  });
+
+  it('defaults sources to an empty list and keeps given ones', async () => {
+    const plain = createHttpClient({ baseUrl: 'https://api.test', fetchImpl: reply(200, okBody) });
+    expect((await plain.check(request)).sources).toEqual([]);
+    const withSrc = createHttpClient({ baseUrl: 'https://api.test', fetchImpl: reply(200, { ...okBody, sources: [{ title: 'T', url: 'https://x.test' }] }) });
+    expect((await withSrc.check(request)).sources).toHaveLength(1);
+  });
+
+  it('mock speak fails so the app falls back to a local voice', async () => {
+    await expect(createMockClient({ delayMs: 0 }).speak({ text: 'x', language: 'my' })).rejects.toMatchObject({ code: 'upstream' });
   });
 });
