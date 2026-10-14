@@ -93,17 +93,17 @@ GASA: 46,000 adults surveyed, 42 countries, about $442 bn lost, 57% scammed in t
 - Cannot judge a recruiter, a visa claim or a company registry by herself.
 
 ### Ibu, her mother
-- Sees Rina's check result in the Family Guardian view.
-- Gets a missed check-in alert and one-tap calls to Rina, an embassy or an NGO partner.
+- Gets the warning Rina sends from her trusted contacts, with the check result in plain words.
+- Calls Rina, an embassy or an NGO partner in one tap.
 
 </div>
 <div class="side shots">
 <figure><img class="phone sm" src="img/home.png"><figcaption>Home</figcaption></figure>
-<figure><img class="phone sm" src="img/family.png"><figcaption>Family circle</figcaption></figure>
+<figure><img class="phone sm" src="img/family.png"><figcaption>Trusted contacts</figcaption></figure>
 </div>
 </div>
 
-<!-- _footer: "Rina and Ibu are design personas, not real users. Screens are captures of the running web app; Family data is sample data." -->
+<!-- _footer: "Rina and Ibu are design personas, not real users. Screens are captures of the running web app; the contact shown is a made-up example." -->
 
 ---
 
@@ -175,13 +175,13 @@ Speaker notes. Show the web demo or the Android app. Run these flows: a pasted B
 | Stage | What it does | Google service |
 | --- | --- | --- |
 | 1. Capture | App or web demo sends text, link or screenshot with language | Cloud Run, `POST /v1/check`; web on Firebase Hosting |
-| 2. Extract | One multimodal call reads text and image, returns flags in 7 families as JSON | Gemini on Vertex AI, JSON response schema |
+| 2. Extract | One multimodal call reads text and image, returns flags in 7 families as JSON | Gemini API, JSON response schema |
 | 3. Detect | Verifies named recruiters, companies, phones and pay against the open web | Gemini with Grounding with Google Search |
 | 4. Correlate | Checks every URL for known threats and domain age (parallel with 3) | Web Risk API, RDAP |
 | 5. Score | Deterministic weighted rules set the score and verdict | Cloud Run, no model call |
 | 6. Explain | Plain-language verdict and spoken warning in the user's language | Gemini text-to-speech, `POST /v1/speak` |
 
-<p class="note">One Cloud Run service. One service account with <code>roles/aiplatform.user</code>, no stored keys. A 15 second budget per check: a late stage returns "unknown" and the verdict still ships.</p>
+<p class="note">One Cloud Run service. The Gemini API key lives in Secret Manager; Web Risk uses the service account. A 15 second budget per check: a late stage returns "unknown" and the verdict still ships.</p>
 
 <div class="tags"><span class="pill">Technical merit and Gen AI 40%</span></div>
 

@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Screen } from '../components/Screen';
 import { Card, ScreenHeader, SectionTitle } from '../components/ui';
+import { Icon } from '../components/Icon';
 import { BOARDS } from './demo/boards';
 import type { TabScreenProps } from '../navigation/types';
 import theme from '../theme/theme';
@@ -36,9 +37,9 @@ export const LearnScreen: React.FC<TabScreenProps<'Learn'>> = ({ navigation }) =
 
       <View style={{ gap: 8 }}>
         <SectionTitle>Seven red flags</SectionTitle>
-        <Card style={{ gap: 10 }}>
+        <Card style={{ gap: 16 }}>
           {RED_FLAGS.map(([title, body]) => (
-            <View key={title} style={{ gap: 2 }}>
+            <View key={title} style={{ gap: 4 }}>
               <Text style={styles.famTitle}>{title}</Text>
               <Text style={styles.famBody}>{body}</Text>
             </View>
@@ -50,7 +51,7 @@ export const LearnScreen: React.FC<TabScreenProps<'Learn'>> = ({ navigation }) =
         <SectionTitle>See how scams look</SectionTitle>
         <Text style={styles.famBody}>Step-by-step examples of common scams and how SafeRoute flags them. The posts and chats shown are made-up examples.</Text>
         {groups.map(group => (
-          <View key={group} style={{ gap: 6 }}>
+          <View key={group} style={{ gap: 8 }}>
             <Text style={styles.group}>{GROUP_TITLES[group]}</Text>
             {boards.filter(b => b.group === group).map(b => (
               <TouchableOpacity
@@ -63,7 +64,7 @@ export const LearnScreen: React.FC<TabScreenProps<'Learn'>> = ({ navigation }) =
                 style={styles.item}
               >
                 <Text style={styles.itemText}>{b.title}</Text>
-                <Text style={styles.chevron}>{'›'}</Text>
+                <Icon name="chevron" size={20} color={colors.textMuted} />
               </TouchableOpacity>
             ))}
           </View>
@@ -74,12 +75,11 @@ export const LearnScreen: React.FC<TabScreenProps<'Learn'>> = ({ navigation }) =
 };
 
 const styles = StyleSheet.create({
-  famTitle: { color: colors.textPrimary, fontSize: 13, lineHeight: 18, fontFamily: fonts.bold },
-  famBody: { color: colors.textSecondary, fontSize: 12, lineHeight: 18, fontFamily: fonts.regular },
-  group: { color: colors.textSecondary, fontSize: 12, lineHeight: 16, fontFamily: fonts.bold, textTransform: 'uppercase', letterSpacing: 0.6, marginTop: 6 },
-  item: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: 48, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.border, borderRadius: 12, paddingVertical: 12, paddingHorizontal: 14 },
+  famTitle: { color: colors.textPrimary, fontSize: 16, lineHeight: 22, fontFamily: fonts.bold },
+  famBody: { color: colors.textSecondary, fontSize: 14, lineHeight: 20, fontFamily: fonts.regular },
+  group: { color: colors.textPrimary, fontSize: 16, lineHeight: 22, fontFamily: fonts.bold, marginTop: 8 },
+  item: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: 56, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.border, borderRadius: 12, paddingVertical: 12, paddingHorizontal: 16 },
   itemText: { color: colors.textPrimary, fontSize: 14, lineHeight: 19, fontFamily: fonts.semiBold },
-  chevron: { color: colors.textMuted, fontSize: 20 },
 });
 
 export default LearnScreen;

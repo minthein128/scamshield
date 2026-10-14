@@ -3,6 +3,7 @@ import type { LanguageCode } from '../api/types';
 export interface LanguageOption {
   code: LanguageCode;
   label: string;
+  nativeLabel?: string;
   speechLocale: string;
 }
 
@@ -10,7 +11,7 @@ export const LANGUAGES: LanguageOption[] = [
   { code: 'en', label: 'English', speechLocale: 'en-US' },
   { code: 'id', label: 'Bahasa Indonesia', speechLocale: 'id-ID' },
   { code: 'tl', label: 'Tagalog', speechLocale: 'fil-PH' },
-  { code: 'my', label: 'Myanmar', speechLocale: 'my-MM' },
+  { code: 'my', label: 'Myanmar', nativeLabel: 'မြန်မာ', speechLocale: 'my-MM' },
 ];
 
 export function languageOption(code: LanguageCode): LanguageOption {

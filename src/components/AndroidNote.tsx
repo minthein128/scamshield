@@ -22,6 +22,6 @@ export const AndroidNote: React.FC<{ text: string }> = ({ text }) => {
 
 const styles = StyleSheet.create({
   card: { gap: 6, backgroundColor: colors.brandBlueLight, borderColor: colors.brandBlueLight },
-  text: { color: colors.safeText, fontSize: 13, lineHeight: 19, fontFamily: fonts.semiBold },
-  link: { color: colors.accent, fontSize: 13, lineHeight: 19, fontFamily: fonts.bold, textDecorationLine: 'underline' },
+  text: { color: colors.safeText, fontSize: 14, lineHeight: 20, fontFamily: fonts.semiBold },
+  link: { color: colors.accent, fontSize: 14, lineHeight: 20, fontFamily: fonts.bold, textDecorationLine: 'underline' },
 });

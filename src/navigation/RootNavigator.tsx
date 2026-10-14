@@ -37,7 +37,7 @@ const Tabs: React.FC = () => (
       headerShown: false,
       tabBarActiveTintColor: theme.colors.accent,
       tabBarInactiveTintColor: theme.colors.textSecondary,
-      tabBarLabelStyle: { fontFamily: theme.fonts.semiBold, fontSize: 11, lineHeight: 18 },
+      tabBarLabelStyle: { fontFamily: theme.fonts.semiBold, fontSize: 12, lineHeight: 18 },
       tabBarStyle: { height: 72, paddingTop: 8, paddingBottom: 12 },
       tabBarItemStyle: { height: 52 },
       tabBarIcon: ({ color }) => <TabIcon name={route.name} color={color} />,

@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
   rowBetween: { flexDirection: 'row', justifyContent: 'space-between', gap: 8 },
   name: { flex: 1, color: colors.textPrimary, fontSize: 15, lineHeight: 21, fontFamily: fonts.bold },
   number: { color: colors.textPrimary, fontSize: 22, lineHeight: 28, fontFamily: fonts.mono },
-  meta: { color: colors.textSecondary, fontSize: 12, lineHeight: 17, fontFamily: fonts.regular },
+  meta: { color: colors.textSecondary, fontSize: 14, lineHeight: 20, fontFamily: fonts.regular },
 });
 
 export default GetHelpScreen;

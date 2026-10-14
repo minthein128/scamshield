@@ -107,7 +107,7 @@ export const SettingsScreen: React.FC<RootScreenProps<'Settings'>> = ({ navigati
         <SectionTitle>Language</SectionTitle>
         <View style={styles.wrap}>
           {LANGUAGES.map(l => (
-            <Chip key={l.code} label={l.label} selected={language === l.code} onPress={() => setLanguage(l.code)} />
+            <Chip key={l.code} label={l.label} nativeLabel={l.nativeLabel} selected={language === l.code} onPress={() => setLanguage(l.code)} />
           ))}
         </View>
       </View>
@@ -172,7 +172,7 @@ export const SettingsScreen: React.FC<RootScreenProps<'Settings'>> = ({ navigati
 
 const styles = StyleSheet.create({
   strong: { color: colors.textPrimary, fontSize: 15, lineHeight: 21, fontFamily: fonts.bold },
-  body: { color: colors.textSecondary, fontSize: 13, lineHeight: 19, fontFamily: fonts.regular },
+  body: { color: colors.textSecondary, fontSize: 14, lineHeight: 20, fontFamily: fonts.regular },
   switchRow: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 44 },
   wrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   version: { color: colors.textMuted, fontSize: 12, textAlign: 'center', fontFamily: fonts.regular },
