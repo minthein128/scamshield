@@ -85,6 +85,18 @@ describe('score', () => {
     expect(score({ flags: [], linkChecks: [], unsolicited: true, llmVerdict: 'danger' }).verdict).toBe('safe');
   });
 
+  it('floors a named scam pattern with evidence at careful', () => {
+    const r = score({ flags: [f('identity')], linkChecks: [], unsolicited: true, scamType: 'romance_pig_butchering' });
+    expect(r.score).toBe(35);
+    expect(r.overrides).toContain('scam_pattern_floor');
+  });
+
+  it('does not floor without flags or for none/other', () => {
+    expect(score({ flags: [], linkChecks: [], unsolicited: true, scamType: 'fake_agency' }).score).toBe(0);
+    expect(score({ flags: [f('identity')], linkChecks: [], unsolicited: true, scamType: 'none' }).score).toBe(0);
+    expect(score({ flags: [f('identity')], linkChecks: [], unsolicited: true, scamType: 'other' }).score).toBe(0);
+  });
+
   it('keeps score within 0..100', () => {
     const all = (['too_good', 'pressure', 'payment_route', 'identity', 'link_risk', 'known_bad', 'trafficking'] as const).map((x) =>
       f(x, 'high'),
