@@ -1,0 +1,62 @@
+{
+  "_meta": {
+    "reviewed": false
+  },
+  "title": "Mga Setting",
+  "account": {
+    "title": "Account",
+    "signOut": "Mag-sign out",
+    "deleteAccount": "Burahin ang account",
+    "unavailable": "Ginagamit mo ang SafeRoute nang walang account. Hindi pa available ang mga account sa bersyong ito.",
+    "none": "Walang account",
+    "noneBody": "Gumagana ang lahat kahit walang account. Gumawa ng account para maitabi ang iyong mga pagsusuri at contact kung magpapalit ka ng telepono, at para makakuha ng mas mataas na limit sa pagsusuri bawat oras.",
+    "create": "Gumawa ng account",
+    "signIn": "Mag-sign in"
+  },
+  "sync": {
+    "syncing": "Sini-sync ang iyong mga pagsusuri at contact...",
+    "done": "Naka-sync na ang iyong mga pagsusuri at contact.",
+    "error": "Nakahinto muna ang pag-sync. Susubukan naming muli sa susunod na buksan mo ang app."
+  },
+  "appLanguage": {
+    "title": "Wika ng app",
+    "body": "Ang wika ng app. Itinatakda rin nito ang wika ng ulat kapag suportado ito."
+  },
+  "reportLanguage": "Wika ng ulat",
+  "myCountry": "Aking bansa",
+  "destination": "Kung saan ako magtatrabaho o pupunta",
+  "privacy": {
+    "title": "Privacy",
+    "share": "Tumulong sa iba: magbahagi ng mga pattern ng scam nang hindi nagpapakilala",
+    "shareBody": "Walang ibinabahaging screenshot o orihinal na text. Inaalis muna ang personal na impormasyon, at ang mga numero ng telepono, account, at link ay itinatago lamang bilang one-way code. Lalabas ang mga pattern sa Scam radar kapag naiulat na ito ng ilang tao.",
+    "p1": "Naka-save ang iyong mga pagsusuri sa teleponong ito. Para sa mga naka-sign in, sini-sync din ang text ng ulat, mga pinagkakatiwalaang contact, at mga setting. Hinding-hindi sine-save o sini-sync ang mga screenshot.",
+    "p2": "Para suriin ang isang bagay, ipinapadala ng SafeRoute ang text, link, o screenshot sa aming serbisyo ng pagsusuri, na gumagamit ng Google AI models at Google Safe Browsing para suriin ito. Hindi namin itinatala ang nilalaman nito.",
+    "p3": "Bawat pag-install ay binibigyan ng anonymous ID. Ginagamit lang namin ito para limitahan kung ilang pagsusuri ang puwedeng gawin ng isang tao bawat oras.",
+    "p4": "Maaari mong burahin ang data sa teleponong ito anumang oras. Puwede ring burahin ng mga may account ang kanilang account at ang lahat ng naka-sync.",
+    "policy": "Patakaran sa Privacy",
+    "deleteInfo": "Paano burahin ang iyong data",
+    "deleteLocal": "Burahin ang data sa teleponong ito"
+  },
+  "confirm": {
+    "signOut": {
+      "title": "Mag-sign out?",
+      "message": "Mananatili ang iyong mga pagsusuri at contact sa iyong account. Mabubura naman ang mga ito sa teleponong ito.",
+      "action": "Mag-sign out"
+    },
+    "deleteLocal": {
+      "title": "Burahin ang data sa teleponong ito?",
+      "messageSynced": "Buburahin nito ang mga pagsusuri, contact, at setting sa teleponong ito at magsa-sign out ka. Mananatili ang iyong account at ang mga naka-sync na kopya nito hanggang sa burahin mo ang account.",
+      "messageLocal": "Buburahin nito ang iyong mga pagsusuri, mga pinagkakatiwalaang contact, at mga setting sa teleponong ito.",
+      "action": "Burahin"
+    },
+    "deleteAccount": {
+      "title": "Burahin ang iyong account?",
+      "message": "Permanenteng buburahin nito ang iyong account at ang lahat ng naka-sync dito. Mabubura rin ang data sa teleponong ito.",
+      "action": "Burahin ang account"
+    }
+  },
+  "deleted": {
+    "title": "Nabura na ang account",
+    "message": "Wala na ang iyong account at mga naka-sync na data."
+  }
+}

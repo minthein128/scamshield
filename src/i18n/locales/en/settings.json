@@ -1,0 +1,59 @@
+{
+  "title": "Settings",
+  "account": {
+    "title": "Account",
+    "signOut": "Sign out",
+    "deleteAccount": "Delete account",
+    "unavailable": "You are using SafeRoute without an account. Accounts are not available in this build.",
+    "none": "No account",
+    "noneBody": "Everything works without one. Create an account to keep your checks and contacts if you change phone, and to get a higher hourly check limit.",
+    "create": "Create account",
+    "signIn": "Sign in"
+  },
+  "sync": {
+    "syncing": "Syncing your checks and contacts...",
+    "done": "Your checks and contacts are synced.",
+    "error": "Sync is paused. We will try again next time you open the app."
+  },
+  "appLanguage": {
+    "title": "App language",
+    "body": "The language of the app. It also sets the report language when we support it."
+  },
+  "reportLanguage": "Report language",
+  "myCountry": "My country",
+  "destination": "Where I will work or travel",
+  "privacy": {
+    "title": "Privacy",
+    "share": "Help others: share anonymous scam patterns",
+    "shareBody": "No screenshots and no raw text are shared. Personal details are removed first, and phone numbers, accounts and links are stored only as one-way hashes. Patterns appear on the Scam radar once several people report them.",
+    "p1": "Your checks are saved on this device. Signed-in accounts also sync the report text, trusted contacts and settings. Screenshots are never saved or synced.",
+    "p2": "To check something, SafeRoute sends the text, link or screenshot to our check service, which uses Google AI models and Google Safe Browsing to assess it. We do not log the content.",
+    "p3": "Each install gets an anonymous ID. We use it only to limit how many checks one person can run per hour.",
+    "p4": "You can delete the data on this device at any time. Account holders can also delete their account and everything synced.",
+    "policy": "Privacy policy",
+    "deleteInfo": "How to delete your data",
+    "deleteLocal": "Delete data on this device"
+  },
+  "confirm": {
+    "signOut": {
+      "title": "Sign out?",
+      "message": "Your checks and contacts stay in your account. This device will be cleared.",
+      "action": "Sign out"
+    },
+    "deleteLocal": {
+      "title": "Delete data on this device?",
+      "messageSynced": "This clears checks, contacts and settings on this device and signs you out. Your account and its synced copies stay until you delete the account.",
+      "messageLocal": "This clears your checks, trusted contacts and settings on this device.",
+      "action": "Delete"
+    },
+    "deleteAccount": {
+      "title": "Delete your account?",
+      "message": "This permanently deletes your account and everything synced to it. Data on this device is cleared too.",
+      "action": "Delete account"
+    }
+  },
+  "deleted": {
+    "title": "Account deleted",
+    "message": "Your account and synced data are gone."
+  }
+}

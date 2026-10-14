@@ -1,0 +1,31 @@
+{
+  "_meta": {
+    "reviewed": false
+  },
+  "title": "Dapatkan bantuan",
+  "intro": "Nomor darurat resmi dan saluran pelaporan. Jika ada yang menahan paspor Anda, melarang Anda pergi, atau Anda merasa dalam bahaya, hubungi sekarang.",
+  "pick": {
+    "title": "Pilih negara Anda",
+    "body": "Pilih negara asal Anda dan tempat Anda akan bekerja, lalu kami akan menampilkan nomor darurat tersebut lebih dulu.",
+    "action": "Pilih negara"
+  },
+  "none": {
+    "title": "Tidak ada nomor darurat",
+    "body": "Kami tidak dapat memuat rincian nomor darurat. Coba lagi nanti."
+  },
+  "whereWork": "{{country}} (tempat Anda akan bekerja)",
+  "yourCountry": "{{country}} (negara asal Anda)",
+  "unverified": "Kami belum memverifikasi nomor darurat resmi untuk {{country}}. Hubungi kedutaan terdekat atau polisi, atau gunakan nomor bantuan untuk negara tempat Anda berada.",
+  "dialInside": "Telepon dari dalam {{country}}.",
+  "callNumber": "Hubungi {{number}}",
+  "openSite": "Buka situs pelaporan",
+  "source": "Sumber resmi",
+  "showMine": "Tampilkan negara saya saja",
+  "showAll": "Tampilkan semua negara",
+  "categories": {
+    "trafficking": "Anti-perdagangan orang",
+    "police": "Polisi",
+    "cybercrime": "Pelaporan penipuan dan kejahatan siber",
+    "consular": "Bantuan untuk warga di luar negeri"
+  }
+}

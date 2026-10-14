@@ -1,0 +1,20 @@
+{
+  "title": "Checking...",
+  "steps": {
+    "read": "Reading what you sent",
+    "pick": "Picking out names, numbers and links",
+    "spot": "Spotting red flags",
+    "links": "Checking the links and the company",
+    "score": "Scoring the risk",
+    "write": "Writing your warning"
+  },
+  "verdict": {
+    "safe": "Looks low risk",
+    "careful": "Hmm, be careful",
+    "danger": "Looks risky"
+  },
+  "createAccount": "Create a free account",
+  "retry": "Try again",
+  "goBack": "Go back",
+  "cancel": "Cancel"
+}

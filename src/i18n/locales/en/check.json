@@ -1,0 +1,43 @@
+{
+  "title": "Check something",
+  "whatIsIt": "What is it?",
+  "kinds": {
+    "job": "Job offer",
+    "message": "Message",
+    "link": "Link",
+    "shop": "Shop",
+    "agency": "Agency"
+  },
+  "text": {
+    "label": "Paste the text or chat",
+    "a11y": "Text or chat to check",
+    "placeholder": "Job post, chat messages or SMS"
+  },
+  "link": {
+    "label": "Link",
+    "a11y": "Link to check"
+  },
+  "screenshot": {
+    "label": "Screenshot",
+    "ready": "{{kb}} KB, ready to send",
+    "preparing": "Preparing picture...",
+    "upload": "Upload a screenshot",
+    "pick": "Pick a screenshot"
+  },
+  "destination": {
+    "label": "Where will you work or travel? (optional)",
+    "a11y": "Destination",
+    "placeholder": "For example Bangkok, Thailand"
+  },
+  "reportLanguage": "Report language",
+  "submit": "Check now",
+  "errors": {
+    "image": "We could not use that picture. Try another screenshot.",
+    "clipboardEmpty": "Your clipboard is empty."
+  },
+  "source": {
+    "screenshot": "Screenshot",
+    "screenshotAt": "Screenshot, {{place}}",
+    "fallback": "Check"
+  }
+}

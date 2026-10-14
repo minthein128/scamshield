@@ -1,0 +1,31 @@
+{
+  "_meta": {
+    "reviewed": false
+  },
+  "title": "Humingi ng tulong",
+  "intro": "Mga opisyal na hotline at linya para sa pag-uulat. Kung hawak ng iba ang iyong pasaporte, pinipigilan kang umalis, o pakiramdam mo ay nasa panganib ka, tumawag na ngayon.",
+  "pick": {
+    "title": "Piliin ang iyong mga bansa",
+    "body": "Piliin kung saan ka nanggaling at kung saan ka magtatrabaho, at ipapakita muna namin ang mga hotline na iyon.",
+    "action": "Pumili ng mga bansa"
+  },
+  "none": {
+    "title": "Walang maipakitang hotline",
+    "body": "Hindi ma-load ang mga detalye ng hotline. Subukang muli mamaya."
+  },
+  "whereWork": "{{country}} (kung saan ka magtatrabaho)",
+  "yourCountry": "{{country}} (iyong bansa)",
+  "unverified": "Hindi pa namin nakukumpirma ang opisyal na hotline para sa {{country}}. Makipag-ugnayan sa pinakamalapit na embahada o sa pulisya, o gamitin ang mga linya para sa bansang kinaroroonan mo.",
+  "dialInside": "Tawagan mula sa loob ng {{country}}.",
+  "callNumber": "Tawagan ang {{number}}",
+  "openSite": "Buksan ang website para sa pag-uulat",
+  "source": "Opisyal na pinagmulan",
+  "showMine": "Ipakita lang ang aking mga bansa",
+  "showAll": "Ipakita ang lahat ng bansa",
+  "categories": {
+    "trafficking": "Anti-trafficking",
+    "police": "Pulisya",
+    "cybercrime": "Pag-uulat ng scam at cybercrime",
+    "consular": "Tulong para sa mga mamamayan sa ibang bansa"
+  }
+}

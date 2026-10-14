@@ -1,0 +1,19 @@
+{
+  "_meta": {
+    "reviewed": false
+  },
+  "title": "Radar penipuan",
+  "intro_other": "Laporan dari pengguna SafeRoute lain dalam 30 hari terakhir. Hanya pola yang terlihat setidaknya {{count}} kali yang ditampilkan.",
+  "global": "Global",
+  "empty": {
+    "title": "Belum cukup laporan",
+    "body": "Ketika cukup banyak orang melaporkan dugaan penipuan serupa di sini, hal itu akan muncul di radar. Pemeriksaan Anda sangat membantu, dan data pribadi tidak dibagikan."
+  },
+  "domains": "Domain paling sering dilaporkan",
+  "trend": {
+    "up": "Meningkat",
+    "flat": "Stabil",
+    "down": "Menurun"
+  },
+  "reports_other": "{{count}} laporan dalam {{days}} hari"
+}
