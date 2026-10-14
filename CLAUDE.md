@@ -12,7 +12,7 @@ Expo SDK 52 / React Native, TypeScript strict. Android anti-scam app. The Expo w
 
 - `src/api/` contract types (`types.ts`, from `docs/api-contract.md`), HTTP client, mock backend, error mapping. Import from `src/api`.
 - `src/lib/` pure helpers: image compression, speech, history storage, report mapping, request building, share-intent mapping.
-- `src/state/AppState.tsx` profile (language, home and destination country, onboarded), history, trusted contacts; syncs to Firestore when signed in. `AuthState.tsx` wraps Firebase Auth (anonymous by default, email/password, Google on web behind `EXPO_PUBLIC_GOOGLE_SIGNIN=1`).
+- `src/state/AppState.tsx` profile (language, home and destination country, onboarded), history, trusted contacts; syncs to Firestore when signed in. `AuthState.tsx` wraps Firebase Auth (anonymous by default, email/password, Google and Facebook through `src/services/social.ts` (popup on web) and `social.native.ts` (google-signin and expo-auth-session on Android); Google needs `EXPO_PUBLIC_GOOGLE_SIGNIN=1` and `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID`, Facebook needs `EXPO_PUBLIC_FACEBOOK_APP_ID`; `public/privacy` and `public/delete-account` ship in the web build.
 - `src/config/runtime.ts` resolves the API URL at startup: `EXPO_PUBLIC_CONFIG_URL` (default `https://saferoute-aibc.web.app/config.json`, 3 s), then the cached value, then `EXPO_PUBLIC_API_URL`.
 - `src/data/hotlines.ts` verified hotlines with source URLs; the server reads a generated copy (`pnpm sync:hotlines`).
 - `firestore.rules`, `firestore-tests/`: per-user rules and the emulator test (`pnpm test:rules`).

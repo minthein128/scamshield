@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Platform, Text, StyleSheet, View } from 'react-native';
+import { Text, StyleSheet, View } from 'react-native';
 import { Screen } from '../components/Screen';
 import { Button, Card, Field, LinkButton, Notice, ScreenHeader } from '../components/ui';
-import { GOOGLE_SIGNIN_WEB } from '../config/env';
+import { facebookAvailable, googleAvailable } from '../services/social';
 import type { RootScreenProps } from '../navigation/types';
 import { authErrorMessage } from '../services/accounts';
 import { useAuth } from '../state/AuthState';
@@ -11,7 +11,7 @@ import theme from '../theme/theme';
 const { colors, fonts } = theme;
 
 export const AccountScreen: React.FC<RootScreenProps<'Account'>> = ({ navigation, route }) => {
-  const { status, signUp, signIn, google, sendReset } = useAuth();
+  const { status, signUp, signIn, google, facebook, sendReset } = useAuth();
   const [mode, setMode] = useState<'signUp' | 'signIn'>(route.params?.mode ?? 'signUp');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -128,8 +128,11 @@ export const AccountScreen: React.FC<RootScreenProps<'Account'>> = ({ navigation
         {!signUpMode ? <LinkButton testID="account-forgot" label="Forgot password?" onPress={reset} /> : null}
       </View>
 
-      {Platform.OS === 'web' && GOOGLE_SIGNIN_WEB ? (
+      {googleAvailable ? (
         <Button testID="account-google" label="Continue with Google" variant="secondary" disabled={busy} onPress={() => run(google).catch(() => undefined)} />
+      ) : null}
+      {facebookAvailable ? (
+        <Button testID="account-facebook" label="Continue with Facebook" variant="secondary" disabled={busy} onPress={() => run(facebook).catch(() => undefined)} />
       ) : null}
     </Screen>
   );

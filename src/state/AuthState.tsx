@@ -5,13 +5,13 @@ import {
   removeAccount,
   resetPassword,
   signInWithEmail,
-  signInWithGoogle,
   signOutToAnonymous,
   signUpWithEmail,
   statusFromUser,
   type AuthStatus,
 } from '../services/accounts';
 import { getAuthInstance } from '../services/authInstance';
+import { signInWithFacebook, signInWithGoogle } from '../services/social';
 import { setTokenProvider } from '../services/token';
 
 interface AuthValue {
@@ -19,6 +19,7 @@ interface AuthValue {
   signUp: (email: string, password: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   google: () => Promise<void>;
+  facebook: () => Promise<void>;
   sendReset: (email: string) => Promise<void>;
   signOut: () => Promise<void>;
   deleteAccount: () => Promise<void>;
@@ -66,6 +67,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       signIn: (email, password) => signInWithEmail(need(), email, password),
       google: async () => {
         await signInWithGoogle(need());
+        setStatus(statusFromUser(need().currentUser));
+      },
+      facebook: async () => {
+        await signInWithFacebook(need());
         setStatus(statusFromUser(need().currentUser));
       },
       sendReset: email => resetPassword(need(), email),
