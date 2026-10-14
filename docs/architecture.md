@@ -7,7 +7,7 @@ SafeRoute checks a job offer, message, link, listing or screenshot and returns a
 | Stage | What it does | Google service |
 | --- | --- | --- |
 | 1. Capture | The app sends text, a link or a screenshot (JPEG or PNG) with the language | Cloud Run (HTTPS endpoint `POST /v1/check`) |
-| 2. Extract | One multimodal call reads the text and image (OCR included) and returns red flags in 7 families, scam type, URLs, named entities and a draft verdict as structured JSON, in en, id, tl or my | Gemini on Vertex AI (`@google/genai`, JSON response schema) |
+| 2. Extract | One multimodal call reads the text and image (OCR included) and returns red flags in 7 families, scam type, URLs, named entities and a draft verdict as structured JSON, in en, id, tl or my | Gemini API (`@google/genai`, JSON response schema); Vertex AI with the same SDK when `GOOGLE_GENAI_USE_VERTEXAI=true` |
 | 3. Detect | The named companies, agencies, phone numbers and salary claims are checked against the live web: does the agency exist and hold a licence, are there scam reports, is the pay plausible. Source pages are returned to the user | Gemini with Grounding with Google Search |
 | 4. Correlate | Every URL is checked for known threats and for domain age | Google Web Risk API (`uris.search`), RDAP via rdap.org |
 | 5. Score | A deterministic rules engine adds weighted flag families, link results and domain age. It sets the final score and verdict. The model's opinion cannot raise a result with no evidence | Cloud Run (no model call) |
@@ -26,7 +26,7 @@ Gemini finds and explains evidence. The rules engine decides.
 
 ## Runtime
 
-- One Cloud Run service, one runtime service account with `roles/aiplatform.user`. No keys are stored: Vertex AI and Web Risk use the service account.
+- One Cloud Run service with one runtime service account. The Gemini API key lives in Secret Manager; Web Risk uses the service account. Setting `GOOGLE_GENAI_USE_VERTEXAI=true` switches Gemini to Vertex AI with no key.
 - Per-IP rate limits, request size limits and CORS at the edge of the service.
 - Structured JSON logs go to Cloud Logging. Request text and images are never logged.
 - Mock mode (`MOCK=1`) returns canned responses for every endpoint so the app team can work offline.
@@ -38,7 +38,7 @@ Android app
    |  POST /v1/check {kind, text, imageBase64, language}
    v
 Cloud Run (Hono)
-   |-- Extract ---------> Gemini (Vertex AI), JSON schema
+   |-- Extract ---------> Gemini API, JSON schema
    |-- Detect  --+------> Gemini + Google Search grounding   (parallel)
    |-- Correlate-+------> Web Risk + RDAP
    |-- Score -----------> rules engine
