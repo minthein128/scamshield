@@ -2,6 +2,13 @@
 
 An anti-scam and anti-trafficking app built with **Expo SDK 52 (React Native)**. Paste text, a link or a screenshot, get a risk report from the Gemini-backed Check API, and hear the warning in your language. The same code runs on Android and in the browser.
 
+## Try it
+
+- Web demo: https://saferoute-aibc.web.app (open it, tap Check, paste a job post or SMS)
+- Android APK: https://saferoute-aibc.web.app/saferoute.apk
+
+The demo calls the live SafeRoute API (Gemini with Google Search grounding, plus RDAP and Web Risk link checks). Install the APK by opening the link on an Android phone and allowing "install unknown apps" for your browser. The APK is signed with a debug key, so Play Protect may ask for confirmation. The floating Shield overlay needs the notification and screen capture permissions.
+
 ## Development
 
 ```bash
@@ -40,37 +47,12 @@ This application reproduces all **24 design screens and flows**:
 
 ---
 
-## 🚀 Running on Android Studio
+## Install and run
 
-The native Android project is generated and synced in the `android/` directory.
-
-### Quick Launch in Android Studio:
-1. Open **Android Studio** (`D:\Android Studio\bin\studio64.exe`).
-2. Select **File → Open...**
-3. Navigate to and select the folder:
-   ```
-   D:\scamshield\android
-   ```
-4. Wait for Gradle to finish indexing (the SDK path is already configured to `D:\Android\Sdk` in [local.properties](file:///D:/scamshield/android/local.properties)).
-5. Select your target device or emulator in the toolbar and click **▶ Run (Shift + F10)**.
-
-### Updating Android after React edits:
-Whenever you make changes to React components, re-sync with a single command:
-```bash
-pnpm run build:android
-```
-This builds the React app into `dist/` and copies all assets directly into Android Studio's asset bundle (`android/app/src/main/assets/public`).
-
----
-
-## 🌐 Running Locally in Web Browser
-
-To test or develop in your browser:
-```bash
-pnpm dev
-```
-Open [http://localhost:5173](http://localhost:5173). You can switch between:
-- **Mobile Simulator** (iPhone chassis frame preview)
-- **Scam Taxonomy Matrix**
-- **6-Stage Pipeline Architecture**
-- **All 24 Boards Catalog**
+| Goal | Steps |
+|---|---|
+| Use the app | Open the APK link above on an Android phone |
+| Run the web app locally | `pnpm install --frozen-lockfile && pnpm web` (offline mock API unless `EXPO_PUBLIC_API_URL` is set) |
+| Run the backend locally | `cd server && npm ci && MOCK=1 npm run dev`, or set `GEMINI_API_KEY` for the real model |
+| Build the APK | Push a `feat/**` branch; the Android workflow uploads the `saferoute-apk` artifact |
+| Deploy to Google Cloud | `scripts/deploy-cloudrun.sh` (see `docs/setup-gcp.md`) |
