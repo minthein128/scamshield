@@ -38,6 +38,10 @@ The compile check does not exercise runtime behavior. Verify these on a real dev
 3. "Open full report" opens `saferoute://report/<id>`. The app must declare the `saferoute` scheme and read the result with `getShieldResult(id)`.
 4. Android 14 and up: the consent dialog must appear again after the user stops sharing from the status bar chip.
 
+## Auth token
+
+`startShield({ apiUrl, language, authToken })` takes an optional Firebase ID token that `CheckClient` sends as `Authorization: Bearer`. `setShieldAuthToken(token)` replaces it while the shield runs. Without a token the server limits by IP. The token is held in memory only (`ShieldBridge.authToken`).
+
 ## Rules to keep
 
 - Android 14 allows one `createVirtualDisplay` per MediaProjection and one `getMediaProjection` per consent result. The capturer keeps one display for the session. Do not create one per tap.

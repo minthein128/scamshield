@@ -62,7 +62,9 @@ Link results add flags: a Web Risk hit adds `known_bad` (high); a domain under 1
 | `GROUNDING` | `0` disables the Google Search verification call | on |
 | `THINKING_LEVEL` | MINIMAL, LOW, MEDIUM or HIGH; empty uses the model default | LOW |
 | `TTS_MODEL`, `TTS_VOICE` | speech model and voice | gemini-3.8-flash-tts, Kore |
-| `HOTLINES_JSON`, `DEFAULT_HOTLINE` | hotline numbers by destination (confirm before launch) | Thailand 1300, Philippines 1343 |
+| `DEFAULT_HOTLINE` | call number when the destination is unknown (hotlines come from the shared data) | none |
+| `FIREBASE_PROJECT_ID` | project for ID token verification | `saferoute-aibc` |
+| `ANON_LIMIT_PER_HOUR`, `USER_LIMIT_PER_HOUR` | per-uid limits | 20, 60 |
 
 ## Local run
 
