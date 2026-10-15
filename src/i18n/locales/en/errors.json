@@ -22,7 +22,7 @@
     },
     "server_unreachable": {
       "title": "SafeRoute cannot be reached",
-      "message": "Your internet works, but our check service does not answer right now. Tap Retry in a moment."
+      "message": "Your internet works, but our check service does not answer right now. Try again in a moment."
     },
     "timeout": {
       "title": "The check took too long",
