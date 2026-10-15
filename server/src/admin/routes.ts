@@ -3,6 +3,8 @@ import { bodyLimit } from 'hono/body-limit';
 import type { TokenVerifier } from '../auth.js';
 import { log } from '../log.js';
 import { ApiError } from '../types.js';
+import type { AiAssist } from './ai.js';
+import { createAiRoutes } from './ai-routes.js';
 import { adminOf, requireAdmin, requireRole } from './auth.js';
 import { ConflictError } from './changes.js';
 import { COLLECTIONS, type Collection, type Draft, draftInputSchema, ValidationError, validateItem } from './schema.js';
@@ -10,6 +12,8 @@ import { type ConfigStore, loadPublished, NotFoundError } from './store.js';
 
 export interface AdminDeps {
   store: ConfigStore;
+  ai?: AiAssist;
+  aiPerHour?: number;
   verifier?: TokenVerifier;
   /** Called after a draft is approved so readers drop their cached copy. */
   onPublished?: (collection: Collection) => void;
@@ -147,6 +151,8 @@ export function createAdminRoutes(deps: AdminDeps) {
       return mapError(err);
     }
   });
+
+  if (deps.ai) app.route('/ai', createAiRoutes(deps.ai, deps.aiPerHour ?? 30));
 
   return app;
 }
