@@ -1,5 +1,5 @@
 import React from 'react';
-import { Linking, StyleSheet, Switch, TouchableOpacity, View } from 'react-native';
+import { Linking, StyleProp, StyleSheet, Switch, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Text } from './Text';
 import { Icon } from './Icon';
@@ -8,9 +8,9 @@ import theme from '../theme/theme';
 
 const { colors, fonts } = theme;
 
-export const ShieldCard: React.FC<{ onDetails?: () => void }> = ({ onDetails }) => <ShieldCardView control={useShieldControl()} onDetails={onDetails} />;
+export const ShieldCard: React.FC<{ onDetails?: () => void; style?: StyleProp<ViewStyle> }> = ({ onDetails, style }) => <ShieldCardView control={useShieldControl()} onDetails={onDetails} style={style} />;
 
-export const ShieldCardView: React.FC<{ control: ShieldControl; onDetails?: () => void }> = ({ control, onDetails }) => {
+export const ShieldCardView: React.FC<{ control: ShieldControl; onDetails?: () => void; style?: StyleProp<ViewStyle> }> = ({ control, onDetails, style }) => {
   const { t } = useTranslation('shield');
   const { support, running, step, error, setEnabled } = control;
   const apkUrl = process.env.EXPO_PUBLIC_APK_URL?.trim();
@@ -32,7 +32,7 @@ export const ShieldCardView: React.FC<{ control: ShieldControl; onDetails?: () =
         : t('status.off');
 
   return (
-    <View testID="shield-card" style={[styles.card, unavailable && styles.cardOff]}>
+    <View testID="shield-card" style={[styles.card, unavailable && styles.cardOff, style]}>
       <View style={styles.row}>
         <View style={[styles.icon, running && styles.iconOn]}>
           <Icon name="shieldCheck" size={28} color={colors.white} />

@@ -3,6 +3,7 @@ import { Modal, Pressable, StyleSheet, Switch, TouchableOpacity, View, useWindow
 import { useTranslation } from 'react-i18next';
 import type { CheckResponse, LanguageCode } from '../api/types';
 import { useLiveVoice, type LiveAction } from '../hooks/useLiveVoice';
+import { useSheetLayout } from './useSheetLayout';
 import theme from '../theme/theme';
 import { Icon } from './Icon';
 import { ShieldVoice } from './ShieldVoice';
@@ -25,6 +26,7 @@ interface Props {
 export const LiveVoiceSheet: React.FC<Props> = ({ visible, result, language, home, destination, onClose, onAction, onGetHelp }) => {
   const { t } = useTranslation('live');
   const { height } = useWindowDimensions();
+  const sheet = useSheetLayout();
   const [family, setFamily] = useState(false);
   const live = useLiveVoice({ result, language, mode: family ? 'family' : 'self', home, destination, onAction });
   const { start, reset } = live;
@@ -59,9 +61,9 @@ export const LiveVoiceSheet: React.FC<Props> = ({ visible, result, language, hom
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={close}>
-      <View style={[styles.overlay, { height }]}>
+      <View style={[styles.overlay, { height }, sheet.overlay]}>
         <Pressable accessibilityLabel={t('close')} style={styles.backdrop} onPress={close} />
-        <View style={styles.sheet} testID="live-sheet" {...({ dataSet: { state: live.state } } as object)}>
+        <View style={[styles.sheet, sheet.sheet]} testID="live-sheet" {...({ dataSet: { state: live.state } } as object)}>
           <View style={styles.head}>
             <Text accessibilityRole="header" style={styles.title}>{t('title')}</Text>
             {active ? (

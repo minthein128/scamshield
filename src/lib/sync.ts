@@ -1,4 +1,4 @@
-import type { CheckResponse } from '../api/types';
+import type { CheckResponse, LanguageCode } from '../api/types';
 import { isCountryCode } from './countries';
 import type { TrustedContact } from './contacts';
 import { MAX_HISTORY, type HistoryEntry } from './history';
@@ -88,22 +88,24 @@ export function docToContact(id: string, data: Record<string, unknown>): Trusted
   return { id, name: data.name, phone: data.phone, updatedAt: typeof data.updatedAt === 'string' ? data.updatedAt : new Date(0).toISOString() };
 }
 
-export function profileToDoc(p: Profile, now: Date = new Date()): ProfileDoc {
+export function profileToDoc(p: Profile, language: LanguageCode, now: Date = new Date()): ProfileDoc {
   return {
-    language: p.language,
+    language,
     ...(p.homeCountry ? { homeCountry: p.homeCountry } : {}),
     ...(p.destinationCountry ? { destinationCountry: p.destinationCountry } : {}),
     updatedAt: now.toISOString(),
   };
 }
 
-export function docToProfile(data: Record<string, unknown>): Profile | null {
+export function docToProfile(data: Record<string, unknown>): { profile: Profile; language: LanguageCode } | null {
   if (!isLanguage(data.language)) return null;
   return {
-    onboarded: true,
     language: data.language,
-    shareSignals: true,
-    ...(isCountryCode(data.homeCountry) ? { homeCountry: data.homeCountry } : {}),
-    ...(isCountryCode(data.destinationCountry) ? { destinationCountry: data.destinationCountry } : {}),
+    profile: {
+      onboarded: true,
+      shareSignals: true,
+      ...(isCountryCode(data.homeCountry) ? { homeCountry: data.homeCountry } : {}),
+      ...(isCountryCode(data.destinationCountry) ? { destinationCountry: data.destinationCountry } : {}),
+    },
   };
 }

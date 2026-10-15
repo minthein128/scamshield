@@ -6,6 +6,7 @@ import { Button } from './ui';
 import { useAppState } from '../state/AppState';
 import { shareText } from '../lib/notify';
 import { textContact } from '../lib/warn';
+import { useSheetLayout } from './useSheetLayout';
 import theme from '../theme/theme';
 
 const { colors, fonts } = theme;
@@ -21,11 +22,12 @@ export const WarnFamilySheet: React.FC<Props> = ({ visible, message, onClose, on
   const { t } = useTranslation(['contacts', 'common']);
   const { contacts } = useAppState();
   const { height } = useWindowDimensions();
+  const sheet = useSheetLayout();
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <View style={[styles.overlay, { height }]}>
+      <View style={[styles.overlay, { height }, sheet.overlay]}>
       <Pressable accessibilityLabel={t('common:actions.close')} style={styles.backdrop} onPress={onClose} />
-      <View style={styles.sheet} testID="warn-sheet">
+      <View style={[styles.sheet, sheet.sheet]} testID="warn-sheet">
         <Text accessibilityRole="header" style={styles.title}>{t('warn.title')}</Text>
         <Text style={styles.body}>{t('warn.body')}</Text>
         {contacts.length === 0 ? (

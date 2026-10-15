@@ -18,11 +18,10 @@
     "done": "Naka-sync na ang iyong mga pagsusuri at contact.",
     "error": "Nakahinto muna ang pag-sync. Susubukan naming muli sa susunod na buksan mo ang app."
   },
-  "appLanguage": {
-    "title": "Wika ng app",
-    "body": "Ang wika ng app. Itinatakda rin nito ang wika ng ulat kapag suportado ito."
+  "language": {
+    "title": "Wika",
+    "body": "Ang app, mga ulat, mga babala sa boses, at Kausapin ang SafeRoute ay gumagamit ng wikang ito."
   },
-  "reportLanguage": "Wika ng ulat",
   "myCountry": "Aking bansa",
   "destination": "Kung saan ako magtatrabaho o pupunta",
   "connection": {

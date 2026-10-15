@@ -12,7 +12,7 @@
     "agency": "Agensi"
   },
   "text": {
-    "label": "Tempel teks atau obrolan",
+    "title": "Pesan teks",
     "a11y": "Teks atau obrolan untuk diperiksa",
     "placeholder": "Lowongan kerja, pesan obrolan, atau SMS"
   },
@@ -28,11 +28,14 @@
     "pick": "Pilih tangkapan layar"
   },
   "destination": {
-    "label": "Ke mana Anda akan bekerja atau bepergian? (opsional)",
+    "label": "Di mana Anda bekerja atau bepergian?",
     "a11y": "Tujuan",
     "placeholder": "Misalnya Bangkok, Thailand"
   },
-  "reportLanguage": "Bahasa laporan",
+  "optional": {
+    "title": "Opsional",
+    "language": "Bahasa laporan"
+  },
   "submit": "Periksa sekarang",
   "errors": {
     "image": "Gambar tersebut tidak dapat digunakan. Coba tangkapan layar yang lain.",

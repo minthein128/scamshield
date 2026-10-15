@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import i18n, { restoreUiLanguage, setUiLanguage, t } from '../i18n';
-import { checkLanguageFor, pickDefaultLanguage } from '../i18n/languages';
+import { UI_LANGUAGES, pickDefaultLanguage } from '../i18n/languages';
 import { UI_LANGUAGE_KEY } from '../i18n/storage';
 import { seenLine } from '../lib/radar';
 import { formatRelative } from '../lib/time';
@@ -89,9 +89,9 @@ describe('language switch', () => {
     expect(await restoreUiLanguage()).toBe('en');
   });
 
-  it('checks in Thai for the Thai UI', () => {
-    expect(checkLanguageFor('th')).toBe('th');
-    expect(checkLanguageFor('my')).toBe('my');
+  it('offers the five languages once, without native-script duplicates', () => {
+    expect(UI_LANGUAGES.map(l => l.label)).toEqual(['English', 'Myanmar', 'Bahasa Indonesia', 'Tagalog', 'Thai']);
+    expect(UI_LANGUAGES.every(l => Object.keys(l).sort().join() === 'code,label')).toBe(true);
   });
 });
 
@@ -167,5 +167,16 @@ describe('locale files', () => {
     const copy = JSON.stringify([read('en', 'common.json').scamTypes, read('en', 'checking.json').verdict]);
     expect(copy).not.toMatch(/\b(fake|scammer|confirmed)\b/i);
     expect(copy).not.toMatch(/This is a scam/i);
+  });
+});
+
+describe('single language setting', () => {
+  it.each(['en', 'my', 'id', 'tl', 'th'])('%s has one Language row and no second language strings', lng => {
+    const settings = require(`../i18n/locales/${lng}/settings.json`) as Record<string, unknown>;
+    const check = require(`../i18n/locales/${lng}/check.json`) as Record<string, unknown>;
+    expect(settings.language).toEqual({ title: expect.any(String), body: expect.any(String) });
+    expect(settings).not.toHaveProperty('appLanguage');
+    expect(settings).not.toHaveProperty('reportLanguage');
+    expect(check).not.toHaveProperty('reportLanguage');
   });
 });

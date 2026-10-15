@@ -4,11 +4,12 @@ import { useTranslation } from 'react-i18next';
 import * as Clipboard from 'expo-clipboard';
 import { Screen } from '../components/Screen';
 import { Text, TextInput } from '../components/Text';
-import { Button, Card, Chip, LinkButton, Notice, ScreenHeader } from '../components/ui';
+import { Button, Card, Divider, LinkButton, Notice, ScreenHeader, SectionTitle } from '../components/ui';
+import { Select } from '../components/Select';
+import { UI_LANGUAGES } from '../i18n/languages';
 import { countryName } from '../lib/countries';
 import { hasInput } from '../api';
 import type { CheckKind } from '../api/types';
-import { LANGUAGES } from '../lib/languages';
 import { PreparedImage, pickScreenshot, prepareImage } from '../lib/image';
 import { KIND_OPTIONS, buildRequest, looksLikeUrl, sourceLabel } from '../lib/request';
 import type { TabScreenProps } from '../navigation/types';
@@ -83,22 +84,23 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
 
   return (
     <Screen
+      header={
+        <>
+          <ScreenHeader title={t('title')} />
+          <Select
+            testID="check-kind"
+            label={t('whatIsIt')}
+            value={kind}
+            options={KIND_OPTIONS.map(k => ({ value: k, label: t(`kinds.${k}`) }))}
+            onChange={setKind}
+          />
+        </>
+      }
       footer={<Button testID="check-submit" label={t('submit')} onPress={submit} disabled={!ready || busy} />}
     >
-      <ScreenHeader title={t('title')} />
-
-      <View style={{ gap: 8 }}>
-        <Text style={styles.label}>{t('whatIsIt')}</Text>
-        <View style={styles.wrap}>
-          {KIND_OPTIONS.map(k => (
-            <Chip key={k} label={t(`kinds.${k}`)} selected={kind === k} onPress={() => setKind(k)} />
-          ))}
-        </View>
-      </View>
-
-      <View style={{ gap: 6 }}>
+      <View style={styles.section}>
         <View style={styles.labelRow}>
-          <Text style={styles.label}>{t('text.label')}</Text>
+          <SectionTitle>{t('text.title')}</SectionTitle>
           <LinkButton label={t('common:actions.paste')} onPress={() => pasteInto('text')} />
         </View>
         <TextInput
@@ -113,9 +115,11 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
         />
       </View>
 
-      <View style={{ gap: 6 }}>
+      <Divider />
+
+      <View style={styles.section}>
         <View style={styles.labelRow}>
-          <Text style={styles.label}>{t('link.label')}</Text>
+          <SectionTitle>{t('link.label')}</SectionTitle>
           <LinkButton label={t('common:actions.paste')} onPress={() => pasteInto('url')} />
         </View>
         <TextInput
@@ -132,47 +136,54 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
         />
       </View>
 
-      <Card style={{ gap: 10 }}>
-        <Text style={styles.label}>{t('screenshot.label')}</Text>
-        {image ? (
-          <View style={styles.imageRow}>
-            <Image source={{ uri: image.uri }} style={styles.thumb} resizeMode="cover" />
-            <View style={{ flex: 1, gap: 8 }}>
-              <Text style={styles.meta}>{t('screenshot.ready', { kb: Math.round(image.bytes / 1024) })}</Text>
-              <Button label={t('common:actions.remove')} variant="secondary" onPress={() => setImage(null)} style={styles.small} />
-            </View>
-          </View>
-        ) : (
-          <Button
-            testID="check-pick-image"
-            label={busy ? t('screenshot.preparing') : Platform.OS === 'web' ? t('screenshot.upload') : t('screenshot.pick')}
-            variant="secondary"
-            disabled={busy}
-            onPress={() => attachImage(pickScreenshot)}
-          />
-        )}
-      </Card>
+      <Divider />
 
-      <View style={{ gap: 6 }}>
-        <Text style={styles.label}>{t('destination.label')}</Text>
-        <TextInput
-          testID="check-destination"
-          accessibilityLabel={t('destination.a11y')}
-          value={destination}
-          onChangeText={setDestination}
-          placeholder={t('destination.placeholder')}
-          placeholderTextColor={colors.textMuted}
-          style={styles.input}
-        />
+      <View style={styles.section}>
+        <SectionTitle>{t('screenshot.label')}</SectionTitle>
+        <Card style={{ gap: 10 }}>
+          {image ? (
+            <View style={styles.imageRow}>
+              <Image source={{ uri: image.uri }} style={styles.thumb} resizeMode="cover" />
+              <View style={{ flex: 1, gap: 8 }}>
+                <Text style={styles.meta}>{t('screenshot.ready', { kb: Math.round(image.bytes / 1024) })}</Text>
+                <Button label={t('common:actions.remove')} variant="secondary" onPress={() => setImage(null)} style={styles.small} />
+              </View>
+            </View>
+          ) : (
+            <Button
+              testID="check-pick-image"
+              label={busy ? t('screenshot.preparing') : Platform.OS === 'web' ? t('screenshot.upload') : t('screenshot.pick')}
+              variant="secondary"
+              disabled={busy}
+              onPress={() => attachImage(pickScreenshot)}
+            />
+          )}
+        </Card>
       </View>
 
-      <View style={{ gap: 8 }}>
-        <Text style={styles.label}>{t('reportLanguage')}</Text>
-        <View style={styles.wrap}>
-          {LANGUAGES.map(l => (
-            <Chip key={l.code} label={l.label} nativeLabel={l.nativeLabel} selected={language === l.code} onPress={() => setLanguage(l.code)} />
-          ))}
+      <Divider />
+
+      <View style={[styles.section, { gap: 14 }]}>
+        <SectionTitle>{t('optional.title')}</SectionTitle>
+        <View style={{ gap: 6 }}>
+          <Text style={styles.label}>{t('destination.label')}</Text>
+          <TextInput
+            testID="check-destination"
+            accessibilityLabel={t('destination.a11y')}
+            value={destination}
+            onChangeText={setDestination}
+            placeholder={t('destination.placeholder')}
+            placeholderTextColor={colors.textMuted}
+            style={styles.input}
+          />
         </View>
+        <Select
+          testID="check-language"
+          label={t('optional.language')}
+          value={language}
+          options={UI_LANGUAGES.map(l => ({ value: l.code, label: l.label }))}
+          onChange={setLanguage}
+        />
       </View>
 
       {notice ? <Notice message={notice} /> : null}
@@ -182,8 +193,8 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
 
 const styles = StyleSheet.create({
   label: { color: colors.textPrimary, fontSize: 14, lineHeight: 20, fontFamily: fonts.semiBold, includeFontPadding: false },
+  section: { gap: 8 },
   labelRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  wrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   input: { minHeight: 46, borderRadius: 12, borderWidth: 1, borderColor: colors.borderLight, backgroundColor: colors.white, paddingHorizontal: 14, paddingVertical: 10, color: colors.textPrimary, fontSize: 14, lineHeight: 19, fontFamily: fonts.regular },
   textArea: { minHeight: 110, textAlignVertical: 'top' },
   imageRow: { flexDirection: 'row', gap: 12 },

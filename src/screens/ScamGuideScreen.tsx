@@ -6,7 +6,8 @@ import { Text } from '../components/Text';
 import { BackButton, Card, SectionTitle } from '../components/ui';
 import { Icon } from '../components/Icon';
 import type { RootScreenProps } from '../navigation/types';
-import theme from '../theme/theme';
+import { useLayout } from '../hooks/useLayout';
+import theme, { readable } from '../theme/theme';
 import { ACCENTS } from './learn/accents';
 import { DemoStepper } from './learn/DemoStepper';
 import { LinkRow } from './learn/LinkRow';
@@ -16,6 +17,7 @@ const { colors, fonts } = theme;
 
 export const ScamGuideScreen: React.FC<RootScreenProps<'ScamGuide'>> = ({ navigation, route }) => {
   const { t, i18n } = useTranslation('learn');
+  const tablet = useLayout().isTablet;
   const scam = findScamType(route.params.type);
   if (!scam) return null;
   const { accent, soft } = ACCENTS[scam.id];
@@ -37,12 +39,12 @@ export const ScamGuideScreen: React.FC<RootScreenProps<'ScamGuide'>> = ({ naviga
           <Icon name={scam.icon} size={28} color={accent} />
         </View>
         <Text accessibilityRole="header" style={styles.heroTitle}>{scam.title}</Text>
-        <Text style={styles.heroHook}>{scam.hook}</Text>
+        <Text style={[styles.heroHook, readable(tablet, 16, 24)]}>{scam.hook}</Text>
       </View>
 
       <View style={styles.section}>
         <SectionTitle>{t('guide.howItStarts')}</SectionTitle>
-        <Text style={styles.para}>{scam.howItStarts}</Text>
+        <Text style={[styles.para, readable(tablet, 16, 25)]}>{scam.howItStarts}</Text>
       </View>
 
       <View style={styles.section}>
@@ -55,7 +57,7 @@ export const ScamGuideScreen: React.FC<RootScreenProps<'ScamGuide'>> = ({ naviga
                 <View style={styles.signIcon}>
                   <Icon name={flag?.icon ?? 'flag'} size={18} color={colors.danger} />
                 </View>
-                <Text style={styles.signText}>{s.text}</Text>
+                <Text style={[styles.signText, readable(tablet, 15, 22)]}>{s.text}</Text>
               </View>
             );
           })}

@@ -18,6 +18,7 @@ import { callLabel } from '../lib/callLabel';
 import { voiceRowStacks } from '../lib/voiceRow';
 import { scamTypeLabel, verdictLabel } from '../lib/labels';
 import { resolveCallTarget } from '../lib/hotlines';
+import { useLayout } from '../hooks/useLayout';
 import { useRuntimeConfig } from '../lib/runtimeConfig';
 import { seenLine } from '../lib/radar';
 import { callNumber } from '../lib/warn';
@@ -29,9 +30,11 @@ import { useAppState } from '../state/AppState';
 import { notify, shareText } from '../lib/notify';
 import { speak, stopSpeaking } from '../lib/speech';
 import type { RootScreenProps } from '../navigation/types';
-import theme from '../theme/theme';
+import theme, { readable } from '../theme/theme';
 
 const { colors, fonts } = theme;
+
+const PANE_GAP = 24;
 
 const SEVERITY = {
   high: { bg: colors.dangerSoftBg, fg: colors.dangerSoftText, bar: colors.danger },
@@ -58,8 +61,10 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
   const [speaking, setSpeaking] = useState(false);
   const [warnOpen, setWarnOpen] = useState(false);
   const [liveOpen, setLiveOpen] = useState(false);
-  const { profile } = useAppState();
+  const { profile, language: settingLanguage } = useAppState();
   const { width } = useWindowDimensions();
+  const layout = useLayout();
+  const tablet = layout.isTablet;
   const narrow = width < 360;
   const score = <Text style={[styles.score, narrow && styles.scoreNarrow]}>{result.score}<Text style={styles.scoreMax}>/100</Text></Text>;
 
@@ -88,7 +93,11 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
   const call = hotline ? callLabel(hotline, { call: number => t('call', { number }), ext: ext => t('callExt', { ext }) }) : { label: '' };
   const listenLabel = speaking ? t('stop') : t('listen', { language: t(`common:languageNames.${language}`) });
   const talkLabel = t('live:button');
-  const stackVoice = voiceRowStacks(width, [listenLabel, talkLabel], PixelRatio.getFontScale());
+  const paneWidth = layout.isExpanded
+    ? (layout.wideMaxWidth - layout.gutter * 2 - PANE_GAP) / 2
+    : Math.min(layout.contentMaxWidth, layout.width - layout.gutter * 2);
+  const stackVoice = voiceRowStacks(tablet ? paneWidth + 40 : width, [listenLabel, talkLabel], PixelRatio.getFontScale());
+  const footerButton = tablet ? styles.footerButton : undefined;
 
   const shareResult = async () => {
     await shareText(shareMessage(result));
@@ -114,46 +123,8 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
 
   const otherActions = result.actions.filter(a => a.type !== 'call' && a.type !== 'share' && !(result.verdict === 'safe' && a.type === 'learn'));
 
-  return (
-    <Screen
-      edges={['top']}
-      footer={
-        <>
-          <Button testID="report-warn" label={t('warn')} icon="people" onPress={() => setWarnOpen(true)} />
-          {result.verdict !== 'safe' ? (
-            hotline?.dial ? (
-              <Button testID="report-call" icon="phone" label={call.label} subLabel={call.sub} variant="secondary" onPress={() => callNumber(hotline.dial ?? '')} />
-            ) : (
-              <Button testID="report-help" label={t('help')} variant="secondary" onPress={() => navigation.navigate('GetHelp')} />
-            )
-          ) : null}
-          <LinkButton testID="report-share" label={t('share')} onPress={shareResult} />
-        </>
-      }
-    >
-      <WarnFamilySheet
-        visible={warnOpen}
-        message={warnMessage(result)}
-        onClose={() => setWarnOpen(false)}
-        onAddContact={() => navigation.navigate('Tabs', { screen: 'Contacts' })}
-      />
-      <LiveVoiceSheet
-        visible={liveOpen}
-        result={result}
-        language={language}
-        home={profile.homeCountry}
-        destination={profile.destinationCountry}
-        onClose={() => setLiveOpen(false)}
-        onGetHelp={() => {
-          setLiveOpen(false);
-          navigation.navigate('GetHelp');
-        }}
-        onAction={screen => {
-          setLiveOpen(false);
-          if (screen === 'HOTLINES') navigation.navigate('GetHelp');
-          else setWarnOpen(true);
-        }}
-      />
+  const leftTop = (
+    <>
       <ScreenHeader title={t('title')} onBack={() => (navigation.canGoBack() ? navigation.goBack() : navigation.navigate('Tabs'))} />
 
       <View style={[styles.banner, narrow && styles.bannerNarrow, { backgroundColor: style.background }]} testID={`verdict-${result.verdict}`} accessible accessibilityLabel={t('a11yVerdict', { verdict: verdictLabel(result.verdict), score: result.score })}>
@@ -207,10 +178,14 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
       ) : null}
 
       <Card style={{ gap: 8 }}>
-        <Text style={styles.reportTitle}>{result.title}</Text>
-        <Text style={styles.summary}>{result.summary}</Text>
+        <Text style={[styles.reportTitle, readable(tablet, 20, 28)]}>{result.title}</Text>
+        <Text style={[styles.summary, readable(tablet, 16, 24)]}>{result.summary}</Text>
       </Card>
 
+    </>
+  );
+  const rightPane = (
+    <>
       {flags.length > 0 ? (
         <View style={{ gap: 12 }}>
           <SectionTitle>{result.verdict === 'safe' ? t('flagsSafe') : t('flagsRisky')}</SectionTitle>
@@ -223,8 +198,8 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
                   <Icon name={FAMILY_ICONS[flag.family] ?? 'flag'} size={22} color={sev.fg} />
                 </View>
                 <View style={{ flex: 1, gap: 4 }}>
-                  <Text style={styles.flagLabel}>{flag.label}</Text>
-                  {flag.evidence ? <Text numberOfLines={3} style={styles.flagEvidence}>{flag.evidence}</Text> : null}
+                  <Text style={[styles.flagLabel, readable(tablet, 15, 22)]}>{flag.label}</Text>
+                  {flag.evidence ? <Text numberOfLines={3} style={[styles.flagEvidence, readable(tablet, 14, 20)]}>{flag.evidence}</Text> : null}
                   <Pill label={t(`severity.${flag.severity}`)} background={sev.bg} color={sev.fg} />
                 </View>
               </View>
@@ -272,6 +247,10 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
         </View>
       ) : null}
 
+    </>
+  );
+  const leftBottom = (
+    <>
       {otherActions.length > 0 ? (
         <View style={{ gap: 8 }}>
           <SectionTitle>{t('actions')}</SectionTitle>
@@ -282,11 +261,75 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
       ) : null}
 
       {!reported && canGiveFeedback(result) ? <FeedbackRow result={result} /> : null}
+    </>
+  );
+  const hasRight = flags.length > 0 || sources.length > 0 || result.linkChecks.length > 0;
+
+  return (
+    <Screen
+      edges={['top']}
+      wide={layout.isExpanded}
+      footerRow={tablet}
+      footer={
+        <>
+          <Button testID="report-warn" label={t('warn')} icon="people" style={footerButton} onPress={() => setWarnOpen(true)} />
+          {result.verdict !== 'safe' ? (
+            hotline?.dial ? (
+              <Button testID="report-call" icon="phone" label={call.label} subLabel={call.sub} variant="secondary" style={footerButton} onPress={() => callNumber(hotline.dial ?? '')} />
+            ) : (
+              <Button testID="report-help" label={t('help')} variant="secondary" style={footerButton} onPress={() => navigation.navigate('GetHelp')} />
+            )
+          ) : null}
+          <LinkButton testID="report-share" label={t('share')} onPress={shareResult} />
+        </>
+      }
+    >
+      <WarnFamilySheet
+        visible={warnOpen}
+        message={warnMessage(result)}
+        onClose={() => setWarnOpen(false)}
+        onAddContact={() => navigation.navigate('Tabs', { screen: 'Contacts' })}
+      />
+      <LiveVoiceSheet
+        visible={liveOpen}
+        result={result}
+        language={settingLanguage}
+        home={profile.homeCountry}
+        destination={profile.destinationCountry}
+        onClose={() => setLiveOpen(false)}
+        onGetHelp={() => {
+          setLiveOpen(false);
+          navigation.navigate('GetHelp');
+        }}
+        onAction={screen => {
+          setLiveOpen(false);
+          if (screen === 'HOTLINES') navigation.navigate('GetHelp');
+          else setWarnOpen(true);
+        }}
+      />
+      {layout.isExpanded ? (
+        <View style={styles.panes}>
+          <View style={styles.pane}>
+{leftTop}
+{leftBottom}
+          </View>
+          {hasRight ? <View style={styles.pane}>{rightPane}</View> : null}
+        </View>
+      ) : (
+        <>
+          {leftTop}
+          {rightPane}
+          {leftBottom}
+        </>
+      )}
     </Screen>
   );
 };
 
 const styles = StyleSheet.create({
+  panes: { flexDirection: 'row', alignItems: 'flex-start', gap: PANE_GAP },
+  pane: { flex: 1, flexBasis: 0, minWidth: 0, gap: 16 },
+  footerButton: { flex: 1, flexBasis: 0, minWidth: 0 },
   voiceRow: { flexDirection: 'row', gap: 10 },
   voiceStack: { gap: 10 },
   voiceButton: { flex: 1, flexBasis: 0, minHeight: 64, paddingHorizontal: 10 },
