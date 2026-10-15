@@ -27,24 +27,24 @@
     "checkFailed": "စစ်ဆေးမှု မစတင်နိုင်သေးပါ။ Shield ကို ဖွင့်ပြီး ထပ်စမ်းကြည့်ပါ။"
   },
   "messageGuard": {
-    "title": "Message Guard: warns you about risky messages as they arrive",
-    "privacy": "Only messages that look risky are checked. Codes and personal numbers are removed first.",
+    "title": "Message Guard: အန္တရာယ်ရှိနိုင်သော မက်ဆေ့ဂျ်များ ဝင်လာချိန်တွင် သတိပေးပါသည်",
+    "privacy": "အန္တရာယ်ရှိပုံပေါ်သော မက်ဆေ့ဂျ်များကိုသာ စစ်ဆေးပါသည်။ ကုဒ်များနှင့် ကိုယ်ရေးကိုယ်တာ နံပါတ်များကို ဦးစွာ ဖယ်ရှားပါသည်။",
     "a11y": "Message Guard",
     "status": {
-      "web": "Works in the SafeRoute Android app.",
-      "unavailable": "Not available in this build.",
-      "on": "On. Risky messages from your chat and SMS apps get a warning.",
-      "off": "Off.",
-      "needsAccess": "Off. Turning it on opens Android notification access."
+      "web": "SafeRoute Android အက်ပ်တွင် အသုံးပြုနိုင်ပါသည်။",
+      "unavailable": "ဤဗားရှင်းတွင် မရနိုင်သေးပါ။",
+      "on": "ဖွင့်ထားသည်။ သင့် ချက်တင်နှင့် SMS အက်ပ်များမှ အန္တရာယ်ရှိနိုင်သော မက်ဆေ့ဂျ်များအတွက် သတိပေးပါမည်။",
+      "off": "ပိတ်ထားသည်။",
+      "needsAccess": "ပိတ်ထားသည်။ ဖွင့်လိုက်ပါက Android အသိပေးချက် ရယူခွင့်ကို ဖွင့်ပေးပါမည်။"
     },
     "apps": {
-      "show": "Choose apps ({{count}} on)",
-      "hide": "Hide apps ({{count}} on)",
-      "a11y": "Apps Message Guard watches, {{count}} on"
+      "show": "အက်ပ်များ ရွေးရန် ({{count}} ခု ဖွင့်ထားသည်)",
+      "hide": "အက်ပ်များ ဝှက်ရန် ({{count}} ခု ဖွင့်ထားသည်)",
+      "a11y": "Message Guard စောင့်ကြည့်နေသော အက်ပ်များ၊ {{count}} ခု ဖွင့်ထားသည်"
     },
     "errors": {
-      "accessOff": "Notification access is still off. If the switch is greyed out, open SafeRoute in App info, tap the three dots and choose \"Allow restricted settings\".",
-      "cannotOpen": "Could not open the notification access settings."
+      "accessOff": "အသိပေးချက် ရယူခွင့် ပိတ်ထားဆဲ ဖြစ်ပါသည်။ ခလုတ်ကို နှိပ်မရဘဲ မီးခိုးရောင် ဖြစ်နေပါက App info တွင် SafeRoute ကို ဖွင့်ပါ၊ အစက်သုံးစက်ကို နှိပ်ပြီး \"Allow restricted settings\" ကို ရွေးပါ။",
+      "cannotOpen": "အသိပေးချက် ရယူခွင့် ဆက်တင်ကို ဖွင့်၍မရပါ။"
     }
   }
 }

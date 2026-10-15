@@ -27,24 +27,24 @@
     "checkFailed": "Pemeriksaan tidak berjalan. Nyalakan shield dan coba lagi."
   },
   "messageGuard": {
-    "title": "Message Guard: warns you about risky messages as they arrive",
-    "privacy": "Only messages that look risky are checked. Codes and personal numbers are removed first.",
+    "title": "Message Guard: memberi Anda peringatan tentang pesan yang tampak berisiko saat pesan tiba",
+    "privacy": "Hanya pesan yang tampak berisiko yang diperiksa. Kode dan nomor pribadi dihapus terlebih dahulu.",
     "a11y": "Message Guard",
     "status": {
-      "web": "Works in the SafeRoute Android app.",
-      "unavailable": "Not available in this build.",
-      "on": "On. Risky messages from your chat and SMS apps get a warning.",
-      "off": "Off.",
-      "needsAccess": "Off. Turning it on opens Android notification access."
+      "web": "Berfungsi di aplikasi Android SafeRoute.",
+      "unavailable": "Tidak tersedia pada versi ini.",
+      "on": "Aktif. Pesan yang tampak berisiko dari aplikasi chat dan SMS Anda akan diberi peringatan.",
+      "off": "Mati",
+      "needsAccess": "Mati. Mengaktifkannya akan membuka akses notifikasi Android."
     },
     "apps": {
-      "show": "Choose apps ({{count}} on)",
-      "hide": "Hide apps ({{count}} on)",
-      "a11y": "Apps Message Guard watches, {{count}} on"
+      "show": "Pilih aplikasi ({{count}} aktif)",
+      "hide": "Sembunyikan aplikasi ({{count}} aktif)",
+      "a11y": "Aplikasi yang diawasi Message Guard, {{count}} aktif"
     },
     "errors": {
-      "accessOff": "Notification access is still off. If the switch is greyed out, open SafeRoute in App info, tap the three dots and choose \"Allow restricted settings\".",
-      "cannotOpen": "Could not open the notification access settings."
+      "accessOff": "Akses notifikasi masih nonaktif. Jika tombol berwarna abu-abu, buka SafeRoute di Info aplikasi, ketuk titik tiga dan pilih \"Izinkan setelan terbatas\".",
+      "cannotOpen": "Tidak dapat membuka pengaturan akses notifikasi."
     }
   }
 }
