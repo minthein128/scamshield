@@ -8,12 +8,14 @@ import { facebookAvailable, googleAvailable } from '../services/social';
 import type { RootScreenProps } from '../navigation/types';
 import { authErrorMessage } from '../services/accounts';
 import { useAuth } from '../state/AuthState';
-import theme from '../theme/theme';
+import { useLayout } from '../hooks/useLayout';
+import theme, { readable } from '../theme/theme';
 
 const { colors, fonts } = theme;
 
 export const AccountScreen: React.FC<RootScreenProps<'Account'>> = ({ navigation, route }) => {
   const { t } = useTranslation(['account', 'common']);
+  const tablet = useLayout().isTablet;
   const { status, signUp, signIn, google, facebook, sendReset } = useAuth();
   const [mode, setMode] = useState<'signUp' | 'signIn'>(route.params?.mode ?? 'signUp');
   const [email, setEmail] = useState('');
@@ -86,7 +88,7 @@ export const AccountScreen: React.FC<RootScreenProps<'Account'>> = ({ navigation
   return (
     <Screen footer={<Button testID="account-submit" label={signUpMode ? t('createTitle') : t('signInTitle')} onPress={submit} disabled={busy} />}>
       <ScreenHeader title={signUpMode ? t('createTitle') : t('signInTitle')} onBack={leave} />
-      <Text style={styles.body}>
+      <Text style={[styles.body, readable(tablet, 14, 20)]}>
         {signUpMode ? t('introSignUp') : t('introSignIn')}
       </Text>
 

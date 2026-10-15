@@ -113,6 +113,10 @@ export const type = {
   caption: { fontSize: 13, lineHeight: 18 },
 } as const;
 
+/** One step up for reading text on tablets. Returns null on phones so styles stay as they are. */
+export const readable = (tablet: boolean, fontSize: number, lineHeight: number): TextStyle | null =>
+  tablet ? { fontSize: fontSize + 2, lineHeight: lineHeight + 4 } : null;
+
 // Verdict roles, matching the overlay in ShieldPalette.kt (ring, chip background, chip text).
 export const verdictRoles = {
   safe: { ring: colors.accent, chipBg: colors.safeBg, chipText: colors.safeText },
@@ -124,6 +128,7 @@ export const theme = {
   space,
   radius,
   type,
+  readable,
   verdictRoles,
   colors,
   fonts,

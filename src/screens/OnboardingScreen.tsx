@@ -15,12 +15,14 @@ import { useUiLanguage } from '../i18n/useUiLanguage';
 import { HELP_POINTS, onboardingSteps, type AfterOnboarding } from '../lib/onboarding';
 import type { LanguageCode } from '../api/types';
 import { useAppState } from '../state/AppState';
-import theme from '../theme/theme';
+import { useLayout } from '../hooks/useLayout';
+import theme, { readable } from '../theme/theme';
 
 const { colors, fonts } = theme;
 
 export const OnboardingScreen: React.FC<{ onDone: (next?: AfterOnboarding) => void }> = ({ onDone }) => {
   const { t } = useTranslation(['onboarding', 'common']);
+  const tablet = useLayout().isTablet;
   const { uiLanguage, setUiLanguage } = useUiLanguage();
   const { profile, finishOnboarding } = useAppState();
   const steps = onboardingSteps(shieldSupport(Platform.OS, useApiUrl()) === 'ready');
@@ -105,8 +107,8 @@ export const OnboardingScreen: React.FC<{ onDone: (next?: AfterOnboarding) => vo
                 <Text style={styles.pointNumberText}>{i + 1}</Text>
               </View>
               <View style={{ flex: 1, gap: 2 }}>
-                <Text style={styles.pointTitle}>{t(`how.${p}.title`)}</Text>
-                <Text style={styles.pointBody}>{t(`how.${p}.body`)}</Text>
+                <Text style={[styles.pointTitle, readable(tablet, 15, 21)]}>{t(`how.${p}.title`)}</Text>
+                <Text style={[styles.pointBody, readable(tablet, 14, 20)]}>{t(`how.${p}.body`)}</Text>
               </View>
             </View>
           ))}
@@ -133,12 +135,15 @@ export const OnboardingScreen: React.FC<{ onDone: (next?: AfterOnboarding) => vo
   );
 };
 
-const Heading: React.FC<{ title: string; body: string; small?: boolean }> = ({ title, body, small }) => (
-  <View style={{ gap: 4 }}>
-    <Text accessibilityRole="header" style={small ? styles.h2 : styles.h1}>{title}</Text>
-    <Text style={styles.body}>{body}</Text>
-  </View>
-);
+const Heading: React.FC<{ title: string; body: string; small?: boolean }> = ({ title, body, small }) => {
+  const tablet = useLayout().isTablet;
+  return (
+    <View style={{ gap: 4 }}>
+      <Text accessibilityRole="header" style={[small ? styles.h2 : styles.h1, small ? null : readable(tablet, 24, 32)]}>{title}</Text>
+      <Text style={[styles.body, readable(tablet, 14, 20)]}>{body}</Text>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   top: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: 44 },
