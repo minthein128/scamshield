@@ -25,7 +25,8 @@
     "feedback:export": "tsx src/feedback/export.ts",
     "bench": "tsx ../bench/run.ts",
     "bench:labels": "tsx ../bench/labels.ts",
-    "bench:report": "tsx ../bench/report.ts"
+    "bench:report": "tsx ../bench/report.ts",
+    "live:smoke": "tsx eval/live-smoke.ts"
   },
   "dependencies": {
     "@google/genai": "^2.29.1",
