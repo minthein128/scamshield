@@ -45,7 +45,7 @@ export async function api<T>(path: string, init: { method?: string; body?: unkno
     let msg = res.statusText;
     try {
       const j = await res.json();
-      msg = j.error ?? j.message ?? msg;
+      const e = j.error as unknown; msg = (typeof e === "string" ? e : (e as { message?: string } | undefined)?.message) ?? j.message ?? msg;
     } catch {
       /* body is not JSON */
     }
