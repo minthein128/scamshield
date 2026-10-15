@@ -16,24 +16,24 @@ describe('localized text style', () => {
 
   it('switches Burmese and Thai to Noto by weight and widens the line', () => {
     const my = flat(localizedStyle('စစ်ဆေးပါ', { fontFamily: 'PlusJakartaSans-Bold', fontSize: 16, lineHeight: 20 }));
-    expect(my.fontFamily).toBe('NotoSansMyanmar-Bold');
-    expect(my.lineHeight).toBe(27);
+    expect(my.fontFamily).toBe('A10YoeShin-Bold');
+    expect(my.lineHeight).toBe(24);
     const th = flat(localizedStyle('ตรวจสอบ', { fontFamily: 'PlusJakartaSans-Regular', fontSize: 14, lineHeight: 20 }));
     expect(th.fontFamily).toBe('NotoSansThai-Regular');
     expect(th.lineHeight).toBe(23);
   });
 
   it('gives Burmese a line height when the style has none', () => {
-    expect(flat(localizedStyle('မြန်မာ', { fontFamily: 'PlusJakartaSans-Regular', fontSize: 16 })).lineHeight).toBe(27);
+    expect(flat(localizedStyle('မြန်မာ', { fontFamily: 'PlusJakartaSans-Regular', fontSize: 16 })).lineHeight).toBe(24);
   });
 
   it('adds a Latin fallback font on web only', () => {
     const style = { fontFamily: 'PlusJakartaSans-Regular', fontSize: 14, lineHeight: 20 };
-    expect(flat(localizedStyle('SafeRoute မြန်မာ', style)).fontFamily).toBe('NotoSansMyanmar-Regular');
+    expect(flat(localizedStyle('SafeRoute မြန်မာ', style)).fontFamily).toBe('A10YoeShin-Regular');
     const os = Platform.OS;
     Platform.OS = 'web';
     try {
-      expect(flat(localizedStyle('SafeRoute မြန်မာ', style)).fontFamily).toBe('NotoSansMyanmar-Regular, PlusJakartaSans-Regular');
+      expect(flat(localizedStyle('SafeRoute မြန်မာ', style)).fontFamily).toBe('A10YoeShin-Regular, PlusJakartaSans-Regular');
     } finally {
       Platform.OS = os;
     }
@@ -51,6 +51,6 @@ describe('localized text style', () => {
       </View>,
     );
     const fonts = tree.UNSAFE_getAllByType(RNText).map(n => flat(n.props.style).fontFamily);
-    expect(fonts).toEqual(['NotoSansMyanmar-Regular', 'NotoSansMyanmar-Bold']);
+    expect(fonts).toEqual(['A10YoeShin-Regular', 'A10YoeShin-Bold']);
   });
 });

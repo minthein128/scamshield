@@ -21,7 +21,7 @@ export function plainText(children: ReactNode): string {
 
 /**
  * Style layer for text in `text`. Latin and mono text stay as they are. Burmese and Thai get
- * the Noto family for the weight, a taller line height and Android font padding so marks fit.
+ * the script font for the weight, a taller line height and Android font padding so marks fit.
  */
 export function localizedStyle(text: string, style: StyleProp<TextStyle>): StyleProp<TextStyle> {
   if (scriptOf(text) === 'latin') return style;
@@ -30,8 +30,7 @@ export function localizedStyle(text: string, style: StyleProp<TextStyle>): Style
   if (!weight) return style;
   const base = flat.lineHeight ?? (flat.fontSize ? Math.round(flat.fontSize * 1.25) : undefined);
   const script = scriptStyle(text, weight, base);
-  // Noto Myanmar and Thai have no Latin glyphs. The browser needs a Latin font to fall back to,
-  // or it uses a serif. Android picks a system font per glyph, and rejects a font list.
+  // Web needs a Latin face after the script font, or it uses a serif. Android rejects font lists.
   const family = Platform.OS === 'web' && flat.fontFamily ? { fontFamily: `${script.fontFamily}, ${flat.fontFamily}` } : null;
   return [style, script, family, { includeFontPadding: true }];
 }
