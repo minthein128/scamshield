@@ -1,44 +1,43 @@
 {
   "_meta": {
-    "reviewed": false,
-    "placeholder": "English text, not translated yet"
+    "reviewed": false
   },
-  "button": "Talk to SafeRoute",
-  "a11yButton": "Talk to SafeRoute about this report",
-  "title": "Talk to SafeRoute",
-  "privacy": "Your voice is sent to Google to answer. Nothing is recorded or saved.",
-  "family": "Explain to my family",
-  "mute": "Mute",
-  "unmute": "Unmute",
-  "end": "End",
-  "close": "Close",
-  "getHelp": "Get help",
-  "listen": "Listen",
-  "retry": "Try again",
-  "countdown": "{{seconds}} s left",
-  "a11yCountdown": "{{seconds}} seconds left",
-  "placeholder": "The answer will show here",
-  "heard": "You said: {{text}}",
+  "button": "Kausapin ang SafeRoute",
+  "a11yButton": "Kausapin ang SafeRoute tungkol sa ulat na ito",
+  "title": "Kausapin ang SafeRoute",
+  "privacy": "Ipinapadala ang boses mo sa Google para masagot. Walang nire-record o sine-save.",
+  "family": "Ipaliwanag sa pamilya ko",
+  "mute": "I-mute",
+  "unmute": "I-unmute",
+  "end": "Tapusin",
+  "close": "Isara",
+  "getHelp": "Humingi ng tulong",
+  "listen": "Pakinggan",
+  "retry": "Subukan ulit",
+  "countdown": "{{seconds}} s na lang",
+  "a11yCountdown": "{{seconds}} segundo na lang",
+  "placeholder": "Dito lalabas ang sagot",
+  "heard": "Sinabi mo: {{text}}",
   "state": {
-    "connecting": "Connecting...",
-    "warning": "Playing the warning first...",
-    "listening": "Listening. Ask your question.",
-    "listeningMuted": "The microphone is muted.",
-    "speaking": "SafeRoute is speaking..."
+    "connecting": "Kumokonekta...",
+    "warning": "Pinapatugtog muna ang babala...",
+    "listening": "Nakikinig. Itanong mo na.",
+    "listeningMuted": "Naka-mute ang mikropono.",
+    "speaking": "Nagsasalita ang SafeRoute..."
   },
   "ended": {
-    "user": "Conversation ended.",
-    "cap": "Time is up. Start again to ask more.",
-    "server": "Conversation ended."
+    "user": "Tapos na ang usapan.",
+    "cap": "Ubos na ang oras. Magsimula ulit para magtanong pa.",
+    "server": "Tapos na ang usapan."
   },
   "errors": {
-    "mic_denied": "The microphone is off. Allow it to talk, or tap Listen to hear the warning.",
-    "unavailable": "Live voice is not available right now. Tap Listen to hear the warning again.",
-    "rate_limited": "You have used many checks this hour. Try again later.",
-    "busy": "Another voice conversation is open. Close it and try again.",
-    "not_found": "This report is no longer available. Run the check again.",
-    "upstream": "The voice service had a problem. Try again.",
-    "bad_request": "The voice service could not start. Try again.",
-    "audio": "Audio is not available on this device."
+    "mic_denied": "Naka-off ang mikropono. Payagan ito para makipag-usap, o pindutin ang Pakinggan para marinig ang babala.",
+    "unavailable": "Hindi available ngayon ang live na boses. Pindutin ang Pakinggan para marinig muli ang babala.",
+    "rate_limited": "Marami ka nang nagamit na pagsusuri ngayong oras. Subukan ulit mamaya.",
+    "busy": "May isa pang usapang boses na bukas. Isara ito at subukan ulit.",
+    "not_found": "Wala na ang ulat na ito. Ulitin ang pagsusuri.",
+    "upstream": "May problema sa serbisyo ng boses. Subukan ulit.",
+    "bad_request": "Hindi masimulan ang serbisyo ng boses. Subukan ulit.",
+    "audio": "Hindi available ang audio sa device na ito."
   }
 }

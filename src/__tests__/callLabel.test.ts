@@ -1,6 +1,6 @@
 import { callLabel, splitExtension } from '../lib/callLabel';
 import { voiceRowStacks } from '../lib/voiceRow';
-import { t } from '../i18n';
+import i18n, { t } from '../i18n';
 
 const tr = { call: (number: string) => t('report:call', { number }), ext: (ext: string) => t('report:callExt', { ext }) };
 
@@ -31,5 +31,15 @@ describe('voice row layout', () => {
 
   it('stacks when a label needs more than two lines', () => {
     expect(voiceRowStacks(390, ['Listen in Bahasa Indonesia and then some more words here', 'Talk'])).toBe(true);
+  });
+});
+
+describe('listen label language names', () => {
+  it('writes the language in the UI language', async () => {
+    await i18n.changeLanguage('th');
+    expect(t('report:listen', { language: t('common:languageNames.th') })).toBe('ฟังเป็นภาษาไทย');
+    await i18n.changeLanguage('my');
+    expect(t('report:listen', { language: t('common:languageNames.my') })).toBe('မြန်မာ ဘာသာဖြင့် နားထောင်ပါ');
+    await i18n.changeLanguage('en');
   });
 });
