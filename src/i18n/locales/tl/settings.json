@@ -31,7 +31,9 @@
     "unhealthy": "Hindi sumasagot ang server",
     "checking": "Sinusuri...",
     "none": "Walang address ng server",
-    "recheck": "Suriin muli ang koneksyon"
+    "recheck": "Suriin muli ang koneksyon",
+    "copyReport": "Kopyahin ang ulat ng koneksyon",
+    "copied": "Nakopya ang ulat ng koneksyon. I-paste ito sa mensahe para sa SafeRoute team."
   },
   "privacy": {
     "title": "Privacy",

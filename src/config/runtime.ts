@@ -16,8 +16,16 @@ export const CONFIG_URLS = parseConfigUrls(process.env.EXPO_PUBLIC_CONFIG_URLS);
 export const API_URL_CACHE_KEY = 'saferoute.apiUrl.v1';
 export const CONFIG_TIMEOUT_MS = 6000;
 export const CONFIG_STAGGER_MS = 1500;
-export const HEALTH_TIMEOUT_MS = 3000;
-export const INTERNET_PROBE_URLS = ['https://www.gstatic.com/generate_204', 'https://www.cloudflare.com/cdn-cgi/trace'];
+export const HEALTH_TIMEOUT_MS = 5000;
+export const CONFIG_GRACE_MS = 2000;
+export const INTERNET_PROBE_URLS = [
+  'https://www.gstatic.com/generate_204',
+  'https://www.cloudflare.com/cdn-cgi/trace',
+  'https://www.msftconnecttest.com/connecttest.txt',
+  'https://captive.apple.com/hotspot-detect.html',
+  'https://connectivitycheck.platform.hicloud.com/generate_204',
+];
+const RECENT_REACH_MS = 30_000;
 export const FOREGROUND_REFRESH_MS = 5 * 60 * 1000;
 
 export function validApiUrl(value: unknown): string | null {
@@ -30,20 +38,44 @@ export function apiHost(url: string): string {
   return url.replace(/^https?:\/\//i, '').split(/[/?#]/)[0] ?? '';
 }
 
-async function timedFetch(fetchImpl: typeof fetch, url: string, timeoutMs: number, init: RequestInit = {}): Promise<Response | null> {
+export interface TraceEntry {
+  kind: 'config' | 'health' | 'probe';
+  target: string;
+  ok: boolean;
+  ms: number;
+  status?: number;
+}
+
+let trace: TraceEntry[] = [];
+let reachedAt = 0;
+
+const traceTarget = (url: string) => url.replace(/^https?:\/\//i, '').split(/[?#]/)[0] ?? '';
+
+/** True when any request answered a moment ago, whatever the status. */
+export function recentlyReached(): boolean {
+  return Date.now() - reachedAt < RECENT_REACH_MS;
+}
+
+async function timedFetch(fetchImpl: typeof fetch, url: string, timeoutMs: number, kind: TraceEntry['kind'], init: RequestInit = {}): Promise<Response | null> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
+  const started = Date.now();
+  let res: Response | null = null;
   try {
-    return await fetchImpl(url, { ...init, signal: controller.signal, cache: 'no-store' });
+    res = await fetchImpl(url, { ...init, signal: controller.signal, cache: 'no-store' });
+    reachedAt = Date.now();
   } catch {
-    return null;
+    res = null;
   } finally {
     clearTimeout(timer);
   }
+  const ok = kind === 'probe' ? res !== null : Boolean(res?.ok);
+  trace.push({ kind, target: traceTarget(url), ok, ms: Date.now() - started, ...(res ? { status: res.status } : {}) });
+  return res;
 }
 
 export async function fetchRemoteApiUrl(fetchImpl: typeof fetch = fetch, url: string = CONFIG_URLS[0], timeoutMs = CONFIG_TIMEOUT_MS): Promise<string | null> {
-  const res = await timedFetch(fetchImpl, url, timeoutMs, { headers: { Accept: 'application/json' } });
+  const res = await timedFetch(fetchImpl, url, timeoutMs, 'config', { headers: { Accept: 'application/json' } });
   if (!res?.ok) return null;
   try {
     return validApiUrl(((await res.json()) as { apiUrl?: unknown } | null)?.apiUrl);
@@ -94,13 +126,13 @@ export function fetchFirstApiUrl(
 }
 
 export async function checkHealth(url: string, fetchImpl: typeof fetch = fetch, timeoutMs = HEALTH_TIMEOUT_MS): Promise<boolean> {
-  const res = await timedFetch(fetchImpl, `${url.replace(/\/+$/, '')}/healthz`, timeoutMs);
+  const res = await timedFetch(fetchImpl, `${url.replace(/\/+$/, '')}/healthz`, timeoutMs, 'health');
   return Boolean(res?.ok);
 }
 
 /** True when any reliable public endpoint answers, whatever the status. */
-export async function hasInternet(fetchImpl: typeof fetch = fetch, urls: string[] = INTERNET_PROBE_URLS, timeoutMs = 4000): Promise<boolean> {
-  const results = await Promise.all(urls.map(u => timedFetch(fetchImpl, u, timeoutMs, { method: 'GET', mode: 'no-cors' } as RequestInit)));
+export async function hasInternet(fetchImpl: typeof fetch = fetch, urls: string[] = INTERNET_PROBE_URLS, timeoutMs = 5000): Promise<boolean> {
+  const results = await Promise.all(urls.map(u => timedFetch(fetchImpl, u, timeoutMs, 'probe', { method: 'GET', mode: 'no-cors' } as RequestInit)));
   return results.some(r => r !== null);
 }
 
@@ -110,33 +142,44 @@ export interface ResolveDeps {
   configUrls?: string[];
   staggerMs?: number;
   stableUrl?: string;
+  graceMs?: number;
 }
 
 export async function resolveApiUrl(deps: ResolveDeps = {}): Promise<string> {
   const fetchImpl = deps.fetchImpl ?? fetch;
+  trace = [];
   const cached = validApiUrl(await AsyncStorage.getItem(API_URL_CACHE_KEY).catch(() => null));
   const baked = validApiUrl(deps.envUrl ?? API_URL);
-  const remote = await fetchFirstApiUrl(fetchImpl, deps.configUrls ?? CONFIG_URLS, { staggerMs: deps.staggerMs });
   const stable = validApiUrl(deps.stableUrl ?? STABLE_API_URL);
-  const known = [cached, baked, stable].filter((u, i, a): u is string => Boolean(u) && a.indexOf(u) === i);
+  const known = [stable, cached, baked].filter((u, i, a): u is string => Boolean(u) && a.indexOf(u) === i);
+
+  const memo = new Map<string, Promise<boolean>>();
+  const healthy = (u: string) => {
+    let p = memo.get(u);
+    if (!p) memo.set(u, (p = checkHealth(u, fetchImpl)));
+    return p;
+  };
+  const firstAlive = async (): Promise<string | null> => {
+    for (const u of known) if (await healthy(u)) return u;
+    return null;
+  };
+  known.forEach(healthy);
+
+  const remoteP = fetchFirstApiUrl(fetchImpl, deps.configUrls ?? CONFIG_URLS, { staggerMs: deps.staggerMs });
+  const grace = firstAlive().then(u => (u ? new Promise<null>(r => setTimeout(() => r(null), deps.graceMs ?? CONFIG_GRACE_MS)) : new Promise<null>(() => undefined)));
+  const remote = await Promise.race([remoteP, grace]);
 
   if (remote) {
-    if (known[0] === remote) return remote;
-    const [remoteOk, ...knownOk] = await Promise.all([remote, ...known].map(u => checkHealth(u, fetchImpl)));
-    if (!remoteOk) {
-      const alive = known.find((_, i) => knownOk[i]);
-      if (alive) return alive;
+    if (await healthy(remote)) {
+      await AsyncStorage.setItem(API_URL_CACHE_KEY, remote).catch(() => undefined);
+      return remote;
     }
+    const alive = await firstAlive();
+    if (alive) return alive;
     await AsyncStorage.setItem(API_URL_CACHE_KEY, remote).catch(() => undefined);
     return remote;
   }
-
-  if (known.length > 1) {
-    const ok = await Promise.all(known.map(u => checkHealth(u, fetchImpl)));
-    const alive = known.find((_, i) => ok[i]);
-    if (alive) return alive;
-  }
-  return known[0] ?? '';
+  return (await firstAlive()) ?? known[0] ?? '';
 }
 
 let pending: Promise<string> | null = null;
@@ -145,7 +188,7 @@ let refreshing: Promise<string> | null = null;
 const listeners = new Set<(url: string) => void>();
 
 function publish(url: string): string {
-  const changed = url !== current;
+    const changed = url !== current;
   current = url;
   if (changed) listeners.forEach(l => l(url));
   return url;
@@ -193,4 +236,23 @@ export function resetRuntimeUrl(): void {
   pending = null;
   current = null;
   refreshing = null;
+}
+
+export async function connectionReport(info: { version: string; os: string }, fetchImpl: typeof fetch = fetch): Promise<string> {
+  const url = await refreshApiUrl().catch(() => current ?? '');
+  const resolution = trace.slice();
+  await hasInternet(fetchImpl);
+  const probes = trace.filter(e => e.kind === 'probe');
+  const line = (e: TraceEntry) => `${e.kind} ${e.target} ${e.ok ? 'ok' : 'fail'} ${e.status ?? '-'} ${e.ms}ms`;
+  return [
+    `SafeRoute ${info.version} (${info.os})`,
+    `time ${new Date().toISOString()}`,
+    `chosen ${url ? apiHost(url) : 'none'}`,
+    `baked ${apiHost(API_URL) || 'none'}`,
+    'resolution',
+    ...resolution.map(line),
+    'internet probes',
+    ...probes.map(line),
+    `online ${probes.some(e => e.ok)}`,
+  ].join('\n');
 }

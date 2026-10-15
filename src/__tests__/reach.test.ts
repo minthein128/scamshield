@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { API_URL_CACHE_KEY, apiHost, checkHealth, fetchFirstApiUrl, hasInternet, parseConfigUrls, resolveApiUrl } from '../config/runtime';
+import { API_URL_CACHE_KEY, apiHost, checkHealth, connectionReport, fetchFirstApiUrl, hasInternet, parseConfigUrls, resolveApiUrl } from '../config/runtime';
 import { ApiError, createRuntimeClient, type CheckClient, type CheckRequest } from '../api';
 
 const A = 'https://a.config/config.json';
@@ -84,6 +84,29 @@ describe('config sources', () => {
     expect(await resolveApiUrl({ ...base, stableUrl: stable, fetchImpl })).toBe(stable);
   });
 
+  it('never ends empty when every health check fails on a slow network: stable first, not the dead cache', async () => {
+    const stable = 'https://api.stable.test';
+    await AsyncStorage.setItem(API_URL_CACHE_KEY, 'https://dead-tunnel.example');
+    const { fetchImpl } = fakeFetch({});
+    expect(await resolveApiUrl({ ...base, stableUrl: stable, fetchImpl })).toBe(stable);
+  });
+
+  it('ignores a dead cached tunnel left by an older build without waiting for it', async () => {
+    const stable = 'https://api.stable.test';
+    await AsyncStorage.setItem(API_URL_CACHE_KEY, 'https://dead-tunnel.example');
+    const { fetchImpl, calls } = fakeFetch({ [`${stable}/healthz`]: 'ok', [A]: 'hang', [B]: 'hang' });
+    expect(await resolveApiUrl({ ...base, stableUrl: stable, graceMs: 10, fetchImpl })).toBe(stable);
+    expect(calls).toContain(`${stable}/healthz`);
+  });
+
+  it('builds a report with hosts and no user content', async () => {
+    const { fetchImpl } = fakeFetch({ 'https://www.gstatic.com/generate_204': 'ok' });
+    const report = await connectionReport({ version: '1.2.3', os: 'android' }, fetchImpl);
+    expect(report).toContain('SafeRoute 1.2.3 (android)');
+    expect(report).toContain('probe www.gstatic.com/generate_204 ok');
+    expect(report).toContain('online true');
+  });
+
   it('checks health and host helpers', async () => {
     const { fetchImpl } = fakeFetch({ [`${NEW}/healthz`]: 'ok' });
     expect(await checkHealth(NEW, fetchImpl)).toBe(true);
@@ -148,5 +171,7 @@ describe('runtime client retry and classification', () => {
     expect(await hasInternet(up as unknown as typeof fetch)).toBe(true);
     const down = jest.fn().mockRejectedValue(new TypeError('x'));
     expect(await hasInternet(down as unknown as typeof fetch)).toBe(false);
+    const onlyOne = jest.fn((u: string) => (u.includes('hicloud') ? Promise.resolve({ ok: true }) : Promise.reject(new TypeError('blocked'))));
+    expect(await hasInternet(onlyOne as unknown as typeof fetch)).toBe(true);
   });
 });
