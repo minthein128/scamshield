@@ -116,8 +116,8 @@ export interface CheckResponse {
 
 export class ApiError extends Error {
   constructor(
-    public status: 400 | 404 | 413 | 429 | 502,
-    public code: 'bad_request' | 'not_found' | 'too_large' | 'upstream' | 'rate_limited',
+    public status: 400 | 401 | 403 | 404 | 409 | 413 | 429 | 502,
+    public code: 'bad_request' | 'unauthorized' | 'forbidden' | 'not_found' | 'conflict' | 'too_large' | 'upstream' | 'rate_limited',
     message: string,
   ) {
     super(message);
