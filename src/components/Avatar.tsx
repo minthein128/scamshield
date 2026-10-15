@@ -7,15 +7,15 @@ import { useReduceMotion } from './ShieldLoader';
 export type { AvatarConcept, AvatarState } from './avatarArt';
 
 interface Props {
-  concept: AvatarConcept;
+  concept?: AvatarConcept;
   state: AvatarState;
   /** 0..1 loudness of the active voice: SafeRoute's while speaking, the user's while listening. */
   level?: number;
   /** Disc diameter. The halo grows up to 30% past it, so leave room around the avatar. */
   size?: number;
+  /** Hide from screen readers when a parent already names it, as in a button. */
+  decorative?: boolean;
 }
-
-const BLINK_MS = [3200, 5600] as const;
 
 const Shapes: React.FC<{ shapes: Shape[] }> = ({ shapes }) => (
   <>
@@ -40,11 +40,11 @@ const Layer: React.FC<{ art: AvatarArt; shapes: Shape[]; size: number }> = ({ ar
     </Svg>
   ) : null;
 
-/** SafeRoute's voice avatar: a halo that follows the voice level plus one small motion per concept. */
-export const Avatar: React.FC<Props> = ({ concept, state, level = 0, size = 160 }) => {
+/** SafeRoute's voice avatar, the pyit taing htaung doll: a halo that follows the voice and a gentle rock. */
+export const Avatar: React.FC<Props> = ({ concept = 'C', state, level = 0, size = 160, decorative }) => {
   const reduce = useReduceMotion();
   const art = AVATAR_ART[concept];
-  const pose = avatarPose(concept, state, level, reduce);
+  const pose = avatarPose(state, level, reduce);
 
   const haloScale = useRef(new Animated.Value(pose.haloScale)).current;
   const haloOpacity = useRef(new Animated.Value(pose.haloOpacity)).current;
@@ -52,8 +52,6 @@ export const Avatar: React.FC<Props> = ({ concept, state, level = 0, size = 160 
   const tilt = useRef(new Animated.Value(pose.tilt)).current;
   const swing = useRef(new Animated.Value(pose.swing)).current;
   const phase = useRef(new Animated.Value(0)).current;
-  const overlay = useRef(new Animated.Value(pose.overlay)).current;
-  const blink = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     haloScale.setValue(pose.haloScale);
@@ -64,17 +62,12 @@ export const Avatar: React.FC<Props> = ({ concept, state, level = 0, size = 160 
   useEffect(() => {
     if (reduce) {
       tilt.setValue(pose.tilt);
-      overlay.setValue(pose.overlay);
       return;
     }
-    const ease = { duration: 220, easing: Easing.out(Easing.quad), useNativeDriver: true };
-    const run = Animated.parallel([
-      Animated.timing(tilt, { toValue: pose.tilt, ...ease }),
-      Animated.timing(overlay, { toValue: pose.overlay, ...ease, duration: 120 }),
-    ]);
+    const run = Animated.timing(tilt, { toValue: pose.tilt, duration: 220, easing: Easing.out(Easing.quad), useNativeDriver: true });
     run.start();
     return () => run.stop();
-  }, [reduce, pose.tilt, pose.overlay, tilt, overlay]);
+  }, [reduce, pose.tilt, tilt]);
 
   const rocking = !reduce && pose.swing > 0;
   useEffect(() => {
@@ -82,12 +75,11 @@ export const Avatar: React.FC<Props> = ({ concept, state, level = 0, size = 160 
       phase.setValue(0);
       return;
     }
-    const half = concept === 'C' ? 700 : 1100;
-    const step = (to: number) => Animated.timing(phase, { toValue: to, duration: half, easing: Easing.inOut(Easing.sin), useNativeDriver: true });
+    const step = (to: number) => Animated.timing(phase, { toValue: to, duration: 700, easing: Easing.inOut(Easing.sin), useNativeDriver: true });
     const loop = Animated.loop(Animated.sequence([step(1), step(-1)]));
     loop.start();
     return () => loop.stop();
-  }, [rocking, concept, phase]);
+  }, [rocking, phase]);
 
   useEffect(() => {
     if (!pose.breathe) {
@@ -100,39 +92,17 @@ export const Avatar: React.FC<Props> = ({ concept, state, level = 0, size = 160 
     return () => loop.stop();
   }, [pose.breathe, breath]);
 
-  useEffect(() => {
-    if (!pose.blink) {
-      blink.setValue(0);
-      return;
-    }
-    let live = true;
-    let timer: ReturnType<typeof setTimeout>;
-    const next = () => {
-      timer = setTimeout(() => {
-        Animated.sequence([
-          Animated.timing(blink, { toValue: 1, duration: 70, useNativeDriver: true }),
-          Animated.timing(blink, { toValue: 0, duration: 110, useNativeDriver: true }),
-        ]).start(() => live && next());
-      }, BLINK_MS[0] + Math.random() * (BLINK_MS[1] - BLINK_MS[0]));
-    };
-    next();
-    return () => {
-      live = false;
-      clearTimeout(timer);
-      blink.stopAnimation();
-      blink.setValue(0);
-    };
-  }, [pose.blink, blink]);
-
   const [vx, vy, vs] = art.view;
   const origin = `${((art.pivot[0] - vx) / vs) * 100}% ${((art.pivot[1] - vy) / vs) * 100}%`;
   const angle = Animated.add(tilt, Animated.multiply(phase, swing)).interpolate({ inputRange: [-45, 45], outputRange: ['-45deg', '45deg'] });
   const haloAlpha = Animated.multiply(haloOpacity, breath.interpolate({ inputRange: [0, 1], outputRange: [1, 1.8] }));
-  const overlayOpacity = concept === 'A' ? blink : overlay;
   const round = { width: size, height: size, borderRadius: size / 2 };
+  const a11y = decorative
+    ? { accessibilityElementsHidden: true, importantForAccessibility: 'no-hide-descendants' as const }
+    : { accessible: true, accessibilityRole: 'image' as const, accessibilityLabel: 'SafeRoute' };
 
   return (
-    <View style={{ width: size, height: size }} accessible accessibilityRole="image" accessibilityLabel="SafeRoute" testID="avatar">
+    <View style={{ width: size, height: size }} testID="avatar" pointerEvents="none" {...a11y}>
       <Animated.View
         testID="avatar-halo"
         style={[styles.abs, round, { backgroundColor: pose.haloColor, opacity: haloAlpha, transform: [{ scale: haloScale }] }]}
@@ -141,11 +111,6 @@ export const Avatar: React.FC<Props> = ({ concept, state, level = 0, size = 160 
         <Layer art={art} shapes={art.ground} size={size} />
         <Animated.View testID="avatar-figure" style={[styles.abs, { transformOrigin: origin, transform: [{ rotate: angle }] }]}>
           <Layer art={art} shapes={art.back} size={size} />
-          {art.overlay.length > 0 && (
-            <Animated.View testID="avatar-overlay" style={[styles.abs, { opacity: overlayOpacity }]}>
-              <Layer art={art} shapes={art.overlay} size={size} />
-            </Animated.View>
-          )}
           <Layer art={art} shapes={art.front} size={size} />
         </Animated.View>
       </View>

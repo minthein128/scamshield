@@ -2,9 +2,10 @@
   "_meta": {
     "reviewed": false
   },
-  "button": "Bicara dengan SafeRoute",
-  "a11yButton": "Bicara dengan SafeRoute tentang laporan ini",
-  "title": "Bicara dengan SafeRoute",
+  "button": "Pyit Taing Htaung",
+  "a11yButton": "Pyit Taing Htaung: bicara dengan SafeRoute tentang laporan ini",
+  "title": "Pyit Taing Htaung",
+  "subtitle": "Bicara dengan SafeRoute tentang laporan ini",
   "privacy": "Suara Anda dikirim ke Google untuk dijawab. Tidak ada yang direkam atau disimpan.",
   "family": "Jelaskan ke keluarga saya",
   "mute": "Bisukan",

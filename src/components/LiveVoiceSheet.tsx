@@ -1,12 +1,12 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Modal, Pressable, StyleSheet, Switch, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import type { CheckResponse, LanguageCode } from '../api/types';
-import { useLiveVoice, type LiveAction } from '../hooks/useLiveVoice';
+import { useLiveVoice, type LiveAction, type LiveState } from '../hooks/useLiveVoice';
 import { useSheetLayout } from './useSheetLayout';
 import theme from '../theme/theme';
 import { Icon } from './Icon';
-import { ShieldVoice } from './ShieldVoice';
+import { Avatar, type AvatarState } from './Avatar';
 import { Text } from './Text';
 import { Button, LinkButton } from './ui';
 
@@ -21,6 +21,38 @@ interface Props {
   onClose: () => void;
   onAction: (screen: LiveAction) => void;
   onGetHelp: () => void;
+}
+
+const LEVEL_MS = 60;
+
+/** The doll's state for a live view: connecting reads as thinking, a muted mic as idle. */
+export function sheetAvatarState(state: LiveState, muted: boolean): AvatarState {
+  if (state === 'connecting') return 'thinking';
+  if (state === 'speaking') return 'speaking';
+  if (state === 'listening') return muted ? 'idle' : 'listening';
+  return 'idle';
+}
+
+/** Samples a per-frame level reader every 60 ms, smoothed, and re-renders only on visible steps. */
+export function useSampledLevel(read: (() => number) | null): number {
+  const [level, setLevel] = useState(0);
+  const reader = useRef(read);
+  reader.current = read;
+  const on = read !== null;
+  useEffect(() => {
+    if (!on) {
+      setLevel(0);
+      return;
+    }
+    let smooth = 0;
+    const id = setInterval(() => {
+      smooth += ((reader.current?.() ?? 0) - smooth) * 0.4;
+      const step = Math.round(smooth * 20) / 20;
+      setLevel(prev => (prev === step ? prev : step));
+    }, LEVEL_MS);
+    return () => clearInterval(id);
+  }, [on]);
+  return level;
 }
 
 export const LiveVoiceSheet: React.FC<Props> = ({ visible, result, language, home, destination, onClose, onAction, onGetHelp }) => {
@@ -47,7 +79,10 @@ export const LiveVoiceSheet: React.FC<Props> = ({ visible, result, language, hom
   };
 
   const active = live.state === 'listening' || (live.state === 'speaking' && !live.warning);
-  const animated = live.state === 'listening' || live.state === 'speaking';
+  const avatarState = sheetAvatarState(live.state, live.muted);
+  const level = useSampledLevel(
+    visible && avatarState === 'speaking' && !live.warning ? live.outputLevel : visible && avatarState === 'listening' ? live.inputLevel : null,
+  );
   const over = live.state === 'ended' || live.state === 'error';
   const status = (() => {
     if (live.state === 'error') return t(`errors.${live.error ?? 'upstream'}`);
@@ -65,7 +100,10 @@ export const LiveVoiceSheet: React.FC<Props> = ({ visible, result, language, hom
         <Pressable accessibilityLabel={t('close')} style={styles.backdrop} onPress={close} />
         <View style={[styles.sheet, sheet.sheet]} testID="live-sheet" {...({ dataSet: { state: live.state } } as object)}>
           <View style={styles.head}>
-            <Text accessibilityRole="header" style={styles.title}>{t('title')}</Text>
+            <View style={styles.titleBox}>
+              <Text accessibilityRole="header" style={styles.title}>{t('title')}</Text>
+              <Text testID="live-subtitle" style={styles.subtitle}>{t('subtitle')}</Text>
+            </View>
             {active ? (
               <Text testID="live-countdown" accessibilityLabel={t('a11yCountdown', { seconds: live.remainingSec })} style={styles.countdown}>
                 {t('countdown', { seconds: live.remainingSec })}
@@ -74,7 +112,7 @@ export const LiveVoiceSheet: React.FC<Props> = ({ visible, result, language, hom
           </View>
 
           <View style={styles.mascot}>
-            <ShieldVoice verdict={result.verdict} active={animated} outputLevel={live.outputLevel} inputLevel={live.inputLevel} />
+            <Avatar concept="C" state={avatarState} level={level} size={112} />
           </View>
 
           <Text testID="live-status" accessibilityLiveRegion="polite" style={styles.status}>{status}</Text>
@@ -124,9 +162,11 @@ const styles = StyleSheet.create({
   backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(15,27,45,0.6)' },
   sheet: { backgroundColor: colors.background, padding: 20, gap: 12, borderTopLeftRadius: 24, borderTopRightRadius: 24, width: '100%', maxWidth: 430, alignSelf: 'center' },
   head: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
-  title: { flex: 1, color: colors.textPrimary, fontSize: 18, lineHeight: 24, fontFamily: fonts.bold },
+  titleBox: { flex: 1, gap: 2 },
+  title: { color: colors.textPrimary, fontSize: 18, lineHeight: 24, fontFamily: fonts.bold },
+  subtitle: { color: colors.textSecondary, fontSize: 13, lineHeight: 18, fontFamily: fonts.medium },
   countdown: { marginLeft: 8, color: colors.textSecondary, fontSize: 14, lineHeight: 20, fontFamily: fonts.semiBold },
-  mascot: { alignItems: 'center', backgroundColor: colors.deepDarkBackground, borderRadius: 20, paddingVertical: 8 },
+  mascot: { alignItems: 'center', backgroundColor: colors.deepDarkBackground, borderRadius: 20, paddingVertical: 22 },
   status: { color: colors.textSecondary, fontSize: 14, lineHeight: 20, fontFamily: fonts.medium, textAlign: 'center' },
   captionBox: { minHeight: 92, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.border, borderRadius: 16, padding: 14, gap: 6, justifyContent: 'center' },
   caption: { color: colors.textPrimary, fontSize: 17, lineHeight: 26, fontFamily: fonts.medium },

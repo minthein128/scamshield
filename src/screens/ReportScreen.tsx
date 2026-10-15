@@ -22,6 +22,7 @@ import { useRuntimeConfig } from '../lib/runtimeConfig';
 import { seenLine } from '../lib/radar';
 import { callNumber } from '../lib/warn';
 import { WarnFamilySheet } from '../components/WarnFamilySheet';
+import { Avatar } from '../components/Avatar';
 import { LiveVoiceSheet } from '../components/LiveVoiceSheet';
 import { FeedbackRow } from '../components/FeedbackRow';
 import { canGiveFeedback } from '../lib/feedback';
@@ -134,8 +135,9 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
       <View>
         <Button
           testID="report-talk"
-          icon="mic"
+          leading={<Avatar state="idle" size={30} decorative />}
           label={talkLabel}
+          accessibilityLabel={t('live:a11yButton')}
           onPress={() => {
             stopSpeaking();
             setLiveOpen(true);

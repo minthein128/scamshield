@@ -36,28 +36,34 @@ interface ButtonProps {
   style?: StyleProp<ViewStyle>;
   testID?: string;
   icon?: IconName;
+  /** Drawn before the label in place of an icon, such as the voice avatar. */
+  leading?: React.ReactNode;
+  /** Screen reader label when the visible label is too short to explain the action. */
+  accessibilityLabel?: string;
   /** Label lines before it is ellipsized. */
   maxLines?: number;
 }
 
 const LABEL_LINE = 20;
 
-export const Button: React.FC<ButtonProps> = ({ label, subLabel, onPress, variant = 'primary', disabled, style, testID, icon, maxLines = 2 }) => {
+export const Button: React.FC<ButtonProps> = ({ label, subLabel, onPress, variant = 'primary', disabled, style, testID, icon, leading, accessibilityLabel, maxLines = 2 }) => {
   const v = BUTTON_VARIANTS[variant];
   const firstLine = Math.round((scriptStyle(label, 'bold', LABEL_LINE).lineHeight ?? LABEL_LINE) * PixelRatio.getFontScale());
   return (
     <TouchableOpacity
       testID={testID}
       accessibilityRole="button"
-      accessibilityLabel={subLabel ? `${label}. ${subLabel}` : label}
+      accessibilityLabel={accessibilityLabel ?? (subLabel ? `${label}. ${subLabel}` : label)}
       accessibilityState={{ disabled: Boolean(disabled) }}
       activeOpacity={0.7}
       disabled={disabled}
       onPress={onPress}
       style={[styles.button, v.container, disabled && { opacity: 0.45 }, style]}
     >
-      <View style={styles.buttonRow}>
-        {icon ? (
+      <View style={[styles.buttonRow, leading ? styles.buttonRowCentered : null]}>
+        {leading ? (
+          <View style={styles.buttonIcon}>{leading}</View>
+        ) : icon ? (
           <View style={[styles.buttonIcon, { height: firstLine }]}>
             <Icon name={icon} size={22} color={v.color} />
           </View>
@@ -178,6 +184,7 @@ const styles = StyleSheet.create({
   headerTitle: { fontSize: 22, lineHeight: 28, fontFamily: fonts.bold, color: colors.textPrimary, includeFontPadding: false },
   button: { minHeight: 48, maxWidth: '100%', borderRadius: 16, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 16, paddingVertical: 14 },
   buttonRow: { flexDirection: 'row', gap: 8, alignItems: 'flex-start', maxWidth: '100%' },
+  buttonRowCentered: { alignItems: 'center', gap: 10 },
   buttonIcon: { justifyContent: 'center', flexShrink: 0 },
   buttonBody: { flexShrink: 1, minWidth: 0, alignItems: 'center', gap: 2 },
   buttonText: { fontSize: 16, lineHeight: 20, textAlign: 'center', fontFamily: fonts.bold, flexShrink: 1, includeFontPadding: false },
