@@ -26,7 +26,7 @@ Request:
   "imageBase64": "optional JPEG/PNG screenshot, base64, max ~4 MB",
   "imageMimeType": "image/jpeg",
   "context": { "destination": "optional, e.g. Thailand", "route": "optional" },
-  "language": "en" | "id" | "tl" | "my",
+  "language": "en" | "id" | "tl" | "my" | "th",
   "shareSignals": false
 }
 ```
@@ -153,9 +153,9 @@ The native fetch in React Native does not expose a response stream, so on Androi
 
 ## POST /v1/speak
 
-Spoken warning audio from a Gemini text-to-speech model, for phones with no voice for the language (for example Burmese).
+Spoken warning audio from a Gemini text-to-speech model, for phones with no voice for the language (for example Burmese or Thai).
 
-Request: `{ "text": "max 600 chars", "language": "en" | "id" | "tl" | "my" }`
+Request: `{ "text": "max 600 chars", "language": "en" | "id" | "tl" | "my" | "th" }`
 
 Response 200: `{ "audioBase64": "...", "mimeType": "audio/wav", "sampleRate": 24000, "model": "..." }`
 

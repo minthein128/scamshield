@@ -8,7 +8,7 @@ Hono + TypeScript service implementing `docs/api-contract.md`. Pipeline: Extract
 - `npm run format`: apply biome fixes.
 - `MOCK=1 npm run dev`: server on :8080 with canned responses. Mock is also on when no credentials are set.
 - `npm run smoke`: one real Gemini + Web Risk + RDAP call. Needs `GEMINI_API_KEY` (or Vertex env). Exits 2 if unconfigured.
-- `npm run eval`: 27 labelled cases (en/my/id/tl) through the real pipeline, sequential, prints a verdict table, accuracy and p50/p95. Needs a key; never part of `npm test`. Env: `GEMINI_MODEL`, `EVAL_ONLY=id,id`, `EVAL_DELAY_MS`, `EVAL_JSON=path`.
+- `npm run eval`: 31 labelled cases (en/my/id/tl/th) through the real pipeline, sequential, prints a verdict table, accuracy and p50/p95. Needs a key; never part of `npm test`. Env: `GEMINI_MODEL`, `EVAL_ONLY=id,id`, `EVAL_DELAY_MS`, `EVAL_JSON=path`.
 - `npm run bench`: screenshot benchmark against a running server (`--api`) or `--inprocess`. Usage, labels format and privacy rules are in `../bench/README.md`. Never commit real screenshots.
 - `../scripts/deploy-cloudrun.sh`: deploys to Cloud Run (see `../docs/setup-gcp.md`).
 
@@ -20,7 +20,7 @@ Hono + TypeScript service implementing `docs/api-contract.md`. Pipeline: Extract
 - `src/ground.ts`: Search-grounded verification. `src/speak.ts`: Gemini TTS to WAV. Both degrade without throwing (speak returns 502 `upstream`).
 - `src/auth.ts`: optional Firebase ID token check (`TokenVerifier`, injected in tests). A bad token counts as no token. `src/app.ts` applies 20/h anonymous and 60/h signed-in per uid on `/v1/check`, on top of the per-IP limit. Env: `FIREBASE_PROJECT_ID`, `ANON_LIMIT_PER_HOUR`, `USER_LIMIT_PER_HOUR`. Counters are in memory per instance.
 - `src/data/hotlines.generated.ts`: generated from `../src/data` by `pnpm sync:hotlines` in the repo root. Never edit it. A test fails when it is stale.
-- `src/language-guard.ts`: curated certainty-phrase patterns (en/id/tl/my) that rewrite or trigger one re-ask; the pipeline reports stats via `onLanguage` and logs `certainty_rewrite`. User-facing text must speak in likelihood: add a pattern and a test when you find a new certainty phrase.
+- `src/language-guard.ts`: curated certainty-phrase patterns (en/id/tl/my/th; Thai uses lookbehinds, not \b) that rewrite or trigger one re-ask; the pipeline reports stats via `onLanguage` and logs `certainty_rewrite`. User-facing text must speak in likelihood: add a pattern and a test when you find a new certainty phrase.
 - `src/feedback/`: `POST /v1/feedback`, check-id to signal link (7 days), tally, `npm run feedback:report` and `feedback:export` (writes the gitignored `eval/candidates.json`). Weights live in `src/intel/weights.ts`. `INTEL_COLLECTION_PREFIX=test_` sends a manual run to sandbox collections (delete them afterwards).
 - `src/pipeline.ts`: wires the stages. `src/app.ts`: HTTP, limits, errors. `src/mock.ts`: offline stubs.
 
