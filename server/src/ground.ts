@@ -13,7 +13,7 @@ export interface Grounder {
   ground(req: CheckRequest, extraction: Extraction, timeoutMs: number): Promise<GroundResult>;
 }
 
-const LANG_NAMES: Record<Lang, string> = { en: 'English', id: 'Bahasa Indonesia', tl: 'Tagalog', my: 'Burmese' };
+const LANG_NAMES: Record<Lang, string> = { en: 'English', id: 'Bahasa Indonesia', tl: 'Tagalog', my: 'Burmese', th: 'Thai' };
 const MAX_SOURCES = 6;
 
 const findingsSchema = z.object({
@@ -55,7 +55,7 @@ export function buildGroundingPrompt(x: Extraction, lang: Lang): string {
     '- identity: the entity cannot be found, has no licence, or the claimed identity does not match.',
     '- too_good: the salary is far above the market for that role and country.',
     '- Add a finding only when search results support it. If everything checks out, return {"findings":[]}.',
-    '- Use likelihood language. Say "We could not find a licence record for X", never "X is unlicensed" or "X is a scammer". Say "Reports online describe similar messages as scams", never "X is a scam". Never call a named company, person or number a criminal. Never use "definitely", "confirmed" or "100%".',
+    '- Use likelihood language. Say "We could not find a licence record for X", never "X is unlicensed" or "X is a scammer". Say "Reports online describe similar messages as scams", never "X is a scam". Never call a named company, person or number a criminal. Never use "definitely", "confirmed" or "100%". In Thai, write "เราไม่พบข้อมูลใบอนุญาตของ X" or "มีรายงานออนไลน์ว่าข้อความคล้ายกันถูกใช้หลอกลวง", never "เป็นการหลอกลวง", "เป็นมิจฉาชีพ", "แน่นอน", "ชัวร์" or "ยืนยันแล้ว".',
     `- Write label in ${LANG_NAMES[lang]}. Keep evidence to one short sentence naming the source.`,
   );
   return lines.join('\n');
