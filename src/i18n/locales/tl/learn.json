@@ -78,7 +78,7 @@
         "s2": "Nagpapakita sila ng malalaking kita mula sa isang trading o crypto app.",
         "s3": "Nagpapadala sila ng link sa isang app na hindi mo makikita sa opisyal na app store.",
         "s4": "Humihingi sila ng deposito, o crypto, para makapagsimula.",
-        "s5": "Sinasabi nilang matatapos na agad ang pagkakataon."
+        "s5": "Sinasabi nilang malapit nang matapos ang pagkakataon."
       }
     },
     "parcel": {
@@ -122,7 +122,7 @@
     "jobs": {
       "e1": {
         "title": "May nakita kang post tungkol sa trabaho",
-        "caption": "Malaking sahod, libreng lipad at walang kailangang karanasan."
+        "caption": "Malaking sahod, libreng flight at walang kailangang karanasan."
       },
       "e2": {
         "title": "I-tap ang shield",
@@ -190,7 +190,7 @@
       },
       "e4": {
         "title": "Ang resulta",
-        "caption": "Ipinapakita ng SafeRoute ang mga senyales na nagpapakitang mapanganib ang alok na ito."
+        "caption": "Ipinapakita ng SafeRoute ang mga senyales kung bakit mukhang mapanganib ang alok na ito."
       }
     }
   },

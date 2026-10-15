@@ -71,7 +71,7 @@
     },
     "romance": {
       "title": "Asmara dan investasi",
-      "hook": "Orang asing yang ramah lalu mengajak kripto atau trading.",
+      "hook": "Orang tak dikenal yang ramah, lalu membujuk Anda main kripto atau trading.",
       "howItStarts": "Orang tak dikenal mengaku salah kirim pesan dan bersikap ramah. Setelah mengobrol berhari-hari atau berminggu-minggu, mereka bilang dapat banyak uang dari aplikasi trading. Lalu mereka mengajak Anda mencoba dengan setoran kecil.",
       "signs": {
         "s1": "Orang asing bilang \"salah nomor\" lalu terus mengajak mengobrol.",
@@ -197,7 +197,7 @@
   "flags": {
     "too_good": {
       "name": "Terlalu bagus",
-      "title": "Terlalu muluk untuk jadi nyata",
+      "title": "Terlalu bagus untuk jadi kenyataan",
       "explain": "Gaji atau keuntungan jauh di atas normal, tanpa perlu pengalaman.",
       "phrase": "\"Hasilkan 5.000 sebulan. Tidak perlu pengalaman.\""
     },
@@ -240,7 +240,7 @@
   },
   "shieldSteps": {
     "s1": {
-      "title": "Nyalakan pelindung",
+      "title": "Nyalakan Screen shield",
       "caption": "Tombol kecil akan muncul di tepi layar Anda."
     },
     "s2": {

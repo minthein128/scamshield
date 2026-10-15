@@ -27,24 +27,24 @@
     "checkFailed": "การตรวจสอบไม่เริ่มทำงาน เปิด Screen shield แล้วลองใหม่อีกครั้ง"
   },
   "messageGuard": {
-    "title": "Message Guard: warns you about risky messages as they arrive",
-    "privacy": "Only messages that look risky are checked. Codes and personal numbers are removed first.",
+    "title": "Message Guard: เตือนคุณเกี่ยวกับข้อความที่ดูมีความเสี่ยงทันทีที่ได้รับ",
+    "privacy": "ระบบจะตรวจสอบเฉพาะข้อความที่ดูมีความเสี่ยงเท่านั้น รหัสและหมายเลขส่วนตัวจะถูกลบออกก่อน",
     "a11y": "Message Guard",
     "status": {
-      "web": "Works in the SafeRoute Android app.",
-      "unavailable": "Not available in this build.",
-      "on": "On. Risky messages from your chat and SMS apps get a warning.",
-      "off": "Off.",
-      "needsAccess": "Off. Turning it on opens Android notification access."
+      "web": "ใช้งานได้ในแอป SafeRoute บน Android",
+      "unavailable": "ไม่พร้อมใช้งานในเวอร์ชันนี้",
+      "on": "เปิดอยู่ ระบบจะเตือนเมื่อมีข้อความที่ดูมีความเสี่ยงเข้ามาจากแอปแชทและ SMS ของคุณ",
+      "off": "ปิด",
+      "needsAccess": "ปิดอยู่ การเปิดใช้งานจะเปิดการเข้าถึงการแจ้งเตือนของ Android"
     },
     "apps": {
-      "show": "Choose apps ({{count}} on)",
-      "hide": "Hide apps ({{count}} on)",
-      "a11y": "Apps Message Guard watches, {{count}} on"
+      "show": "เลือกแอป (เปิดอยู่ {{count}} แอป)",
+      "hide": "ซ่อนแอป (เปิดอยู่ {{count}} แอป)",
+      "a11y": "แอปที่ Message Guard ตรวจสอบ, เปิดอยู่ {{count}} แอป"
     },
     "errors": {
-      "accessOff": "Notification access is still off. If the switch is greyed out, open SafeRoute in App info, tap the three dots and choose \"Allow restricted settings\".",
-      "cannotOpen": "Could not open the notification access settings."
+      "accessOff": "การเข้าถึงการแจ้งเตือนยังคงปิดอยู่ หากสวิตช์เป็นสีเทา ให้เปิด SafeRoute ในข้อมูลแอป แตะจุดสามจุด แล้วเลือก \"อนุญาตการตั้งค่าที่ถูกจำกัด\"",
+      "cannotOpen": "ไม่สามารถเปิดการตั้งค่าการเข้าถึงการแจ้งเตือนได้"
     }
   }
 }
