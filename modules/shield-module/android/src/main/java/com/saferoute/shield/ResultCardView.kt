@@ -35,12 +35,21 @@ internal data class CardModel(
     val summary: String,
     val flags: List<FlagRow>,
     val canOpenReport: Boolean,
-    val description: String
+    val description: String,
+    /** Shows the "Ask" mic chip that starts a voice companion session about this result. */
+    val canAsk: Boolean = false,
+    val askLabel: String = "Ask",
+    val askDescription: String = "Talk to SafeRoute about this result",
+    /** A voice notice rather than a check result. Dismissing it keeps the result. */
+    val notice: Boolean = false,
+    /** Notice pill: a tap opens SafeRoute. */
+    val opensApp: Boolean = false,
 ) {
     val canExpand: Boolean get() = state != ShieldOverlay.State.ERROR
 }
 
 internal interface CardCallbacks {
+    fun onAsk() {}
     fun onRetry()
     fun onFullReport()
     fun onDismissClicked()
@@ -133,6 +142,7 @@ internal class ResultCardView(
             ellipsize = TextUtils.TruncateAt.END
         }
         header.addView(titleView, titleParams())
+        if (model.canAsk) header.addView(askChip(), LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(36)).apply { marginEnd = dp(2) })
         if (model.canExpand) {
             header.addView(chevron, LayoutParams(dp(36), dp(36)))
         }
@@ -173,6 +183,31 @@ internal class ResultCardView(
         details.addView(actions, LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
             topMargin = dp(6)
         })
+    }
+
+    private fun askChip(): View {
+        val chip = LinearLayout(context).apply {
+            orientation = HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            setPadding(dp(8), 0, dp(12), 0)
+            minimumWidth = dp(48)
+            isClickable = true
+            isFocusable = true
+            contentDescription = model.askDescription
+            val shapeBg = GradientDrawable().apply {
+                cornerRadius = dp(18).toFloat()
+                setColor((palette.accent and 0x00FFFFFF) or 0x1F000000)
+            }
+            val mask = GradientDrawable().apply { cornerRadius = dp(18).toFloat(); setColor(0xFFFFFFFF.toInt()) }
+            background = RippleDrawable(ColorStateList.valueOf((palette.accent and 0x00FFFFFF) or 0x33000000), shapeBg, mask)
+            setOnClickListener { callbacks.onAsk() }
+        }
+        chip.addView(MicIconView(context, palette.accent), LayoutParams(dp(18), dp(18)))
+        chip.addView(
+            text(model.askLabel, 13f, palette.accent, fonts.bold).apply { maxLines = 1 },
+            LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply { marginStart = dp(4) }
+        )
+        return chip
     }
 
     private fun titleParams() = LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f).apply {
@@ -365,6 +400,31 @@ internal class ResultCardView(
             val a = 5f * resources.displayMetrics.density
             canvas.drawLine(cx - a, cy - a / 2, cx, cy + a / 2, paint)
             canvas.drawLine(cx, cy + a / 2, cx + a, cy - a / 2, paint)
+        }
+    }
+
+    internal class MicIconView(context: Context, private val color: Int) : View(context) {
+        private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            this.color = color
+            strokeCap = Paint.Cap.ROUND
+        }
+        private val oval = android.graphics.RectF()
+
+        init {
+            importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
+        }
+
+        override fun onDraw(canvas: Canvas) {
+            val w = width.toFloat()
+            val h = height.toFloat()
+            paint.style = Paint.Style.FILL
+            oval.set(w * 0.36f, h * 0.06f, w * 0.64f, h * 0.58f)
+            canvas.drawRoundRect(oval, w * 0.14f, w * 0.14f, paint)
+            paint.style = Paint.Style.STROKE
+            paint.strokeWidth = w * 0.09f
+            oval.set(w * 0.22f, h * 0.20f, w * 0.78f, h * 0.74f)
+            canvas.drawArc(oval, 20f, 140f, false, paint)
+            canvas.drawLine(w * 0.5f, h * 0.74f, w * 0.5f, h * 0.9f, paint)
         }
     }
 

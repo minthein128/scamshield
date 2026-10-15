@@ -128,6 +128,7 @@ private val BLUETOOTH_TYPES = setOf(AudioDeviceInfo.TYPE_BLUETOOTH_SCO, AudioDev
 class AndroidAudioSession(
     context: Context,
     @Volatile var communicationMode: Boolean = true,
+    private val onFocusChange: (Int) -> Unit = {},
 ) : AudioSession {
     private val audio = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
     private var active = false
@@ -135,7 +136,7 @@ class AndroidAudioSession(
     private var savedSpeaker = false
     private var focusRequest: AudioFocusRequest? = null
     private var scoStarted = false
-    private val focusListener = AudioManager.OnAudioFocusChangeListener { }
+    private val focusListener = AudioManager.OnAudioFocusChangeListener { change -> onFocusChange(change) }
 
     @Synchronized
     override fun begin() {

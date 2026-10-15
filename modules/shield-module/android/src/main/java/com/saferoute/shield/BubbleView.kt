@@ -23,6 +23,24 @@ internal class BubbleView(context: Context, palette: ShieldPalette) : View(conte
             invalidate()
         }
 
+    /** Voice companion glyph. NONE draws the plain shield. */
+    var voice: Voice = Voice.NONE
+        set(value) {
+            if (field == value) return
+            field = value
+            if (value == Voice.THINKING) startThink() else stopThink()
+            invalidate()
+        }
+
+    /** 0..1 input level while listening, output level while speaking. */
+    var level: Float = 0f
+        set(value) {
+            val v = value.coerceIn(0f, 1f)
+            if (kotlin.math.abs(v - field) < 0.01f) return
+            field = v
+            if (voice == Voice.LISTENING || voice == Voice.SPEAKING) invalidate()
+        }
+
     var shieldState: ShieldOverlay.State = ShieldOverlay.State.IDLE
         set(value) {
             val before = field
@@ -55,6 +73,10 @@ internal class BubbleView(context: Context, palette: ShieldPalette) : View(conte
     private var popScale = 1f
     private var markAlpha = 1f
     private val scanPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val levelRing = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE }
+    private val micPath = Path()
+    private var thinker: ValueAnimator? = null
+    private var thinkPhase = 0f
     private val clip = Path()
 
     init {
@@ -80,6 +102,11 @@ internal class BubbleView(context: Context, palette: ShieldPalette) : View(conte
         arcBounds.set(cx - radius + inset, cy - radius + inset, cx + radius - inset, cy + radius - inset)
         ring.color = if (shieldState == ShieldOverlay.State.CHECKING) (palette.accent and 0x00FFFFFF) or 0x33000000 else accent
         canvas.drawArc(arcBounds, 0f, 360f, false, ring)
+
+        if (voice != Voice.NONE) {
+            drawVoice(canvas, cx, cy, radius, accent)
+            return
+        }
 
         val checking = shieldState == ShieldOverlay.State.CHECKING
         val pulse = if (checking && scanner != null) 1f + 0.05f * Math.sin(phase * 2 * Math.PI).toFloat() else 1f
@@ -132,6 +159,84 @@ internal class BubbleView(context: Context, palette: ShieldPalette) : View(conte
             canvas.drawPath(dotPath, glyph)
         }
         canvas.restore()
+    }
+
+    private fun drawVoice(canvas: Canvas, cx: Float, cy: Float, radius: Float, accent: Int) {
+        if ((voice == Voice.LISTENING || voice == Voice.SPEAKING) && level > 0.02f) {
+            levelRing.color = (accent and 0x00FFFFFF) or ((0x30 + (0x70 * level).toInt()) shl 24)
+            levelRing.strokeWidth = (2f + 3f * level) * d
+            canvas.drawCircle(cx, cy, radius + (1.5f + 7f * level) * d, levelRing)
+        }
+        val box = 26f * d
+        matrix.setScale(box, box)
+        matrix.postTranslate(cx - box / 2f, cy - box / 2f)
+        when (voice) {
+            Voice.LISTENING, Voice.MUTED -> {
+                val color = if (voice == Voice.MUTED) palette.textMuted else palette.accent
+                micPath.reset()
+                micPath.addRoundRect(RectF(0.36f, 0.06f, 0.64f, 0.58f), 0.14f, 0.14f, Path.Direction.CW)
+                micPath.transform(matrix)
+                glyph.color = color
+                canvas.drawPath(micPath, glyph)
+                mark.color = color
+                mark.strokeWidth = 0.08f * box
+                markPath.reset()
+                markPath.addArc(RectF(0.22f, 0.20f, 0.78f, 0.74f), 20f, 140f)
+                markPath.moveTo(0.5f, 0.74f)
+                markPath.lineTo(0.5f, 0.90f)
+                markPath.moveTo(0.36f, 0.92f)
+                markPath.lineTo(0.64f, 0.92f)
+                if (voice == Voice.MUTED) {
+                    markPath.moveTo(0.16f, 0.10f)
+                    markPath.lineTo(0.84f, 0.90f)
+                }
+                markPath.transform(matrix)
+                canvas.drawPath(markPath, mark)
+            }
+            Voice.THINKING, Voice.SPEAKING -> {
+                val scale = if (voice == Voice.SPEAKING) 1f + 0.14f * level else 1f
+                canvas.save()
+                canvas.scale(scale, scale, cx, cy)
+                buildShield(shieldPath)
+                shieldPath.transform(matrix)
+                glyph.color = palette.glyph(shieldState)
+                canvas.drawPath(shieldPath, glyph)
+                val dot = palette.surface and 0x00FFFFFF
+                for (i in 0 until 3) {
+                    val wave = if (voice == Voice.THINKING) {
+                        val t = ((thinkPhase * 3f - i) % 3f + 3f) % 3f
+                        if (t < 1f) 1f - kotlin.math.abs(t - 0.5f) * 2f else 0f
+                    } else {
+                        level
+                    }
+                    glyph.color = dot or ((0x80 + (0x7F * wave).toInt()) shl 24)
+                    val bx = cx + (i - 1) * 0.2f * box
+                    val by = cy - (if (voice == Voice.THINKING) 0.06f * box * wave else 0f)
+                    canvas.drawCircle(bx, by, 0.065f * box, glyph)
+                }
+                canvas.restore()
+            }
+            Voice.NONE -> Unit
+        }
+    }
+
+    private fun startThink() {
+        if (thinker != null || !animationsEnabled()) return
+        thinker = ValueAnimator.ofFloat(0f, 1f).apply {
+            duration = 1200
+            repeatCount = ValueAnimator.INFINITE
+            interpolator = LinearInterpolator()
+            addUpdateListener {
+                thinkPhase = it.animatedValue as Float
+                invalidate()
+            }
+            start()
+        }
+    }
+
+    private fun stopThink() {
+        thinker?.cancel()
+        thinker = null
     }
 
     private fun drawScanLine(canvas: Canvas, cx: Float, cy: Float, box: Float) {
@@ -210,13 +315,17 @@ internal class BubbleView(context: Context, palette: ShieldPalette) : View(conte
 
     override fun onDetachedFromWindow() {
         stopScan()
+        stopThink()
         super.onDetachedFromWindow()
     }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         if (shieldState == ShieldOverlay.State.CHECKING) startScan()
+        if (voice == Voice.THINKING) startThink()
     }
+
+    enum class Voice { NONE, LISTENING, MUTED, THINKING, SPEAKING }
 
     companion object {
         const val CIRCLE_DP = 56
