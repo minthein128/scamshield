@@ -11,7 +11,7 @@
   "call": "Hubungi {{number}} (layanan bantuan {{country}})",
   "help": "Minta bantuan",
   "share": "Bagikan peringatan ini",
-  "flagsRisky": "Tanda bahaya yang kami temukan",
+  "flagsRisky": "Tanda peringatan yang kami temukan",
   "flagsSafe": "Hal yang kami perhatikan",
   "sources": "Sumber yang kami periksa",
   "linkChecks": "Pemeriksaan tautan",
@@ -24,7 +24,7 @@
   "domainAge_other": "Usia domain: {{count}} hari",
   "domainAgeUnknown": "Usia domain tidak diketahui",
   "webRisk": {
-    "clean": "Tidak ada ancaman yang ditemukan",
+    "clean": "Tidak ada ancaman yang diketahui",
     "malware": "Peringatan malware",
     "social_engineering": "Peringatan phishing atau penipuan",
     "unwanted_software": "Peringatan aplikasi tak diinginkan",

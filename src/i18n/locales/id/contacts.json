@@ -17,7 +17,7 @@
     "pick": "Pilih dari kontak saya"
   },
   "footnote": {
-    "synced": "Kontak Anda diselaraskan dengan akun Anda.",
+    "synced": "Kontak Anda disinkronkan dengan akun Anda.",
     "local": "Kontak Anda disimpan di perangkat ini. Masuk agar tetap tersimpan jika Anda ganti ponsel."
   },
   "errors": {
@@ -30,7 +30,7 @@
     "duplicate": "Nomor itu sudah ada di daftar Anda."
   },
   "warn": {
-    "title": "Beri tahu orang tepercaya",
+    "title": "Beri peringatan ke orang tepercaya",
     "body": "Ini akan membuka pesan teks berisi peringatan. Anda yang menentukan untuk mengirimnya atau tidak.",
     "addContact": "Tambah kontak tepercaya",
     "text": "Kirim SMS ke {{name}}",

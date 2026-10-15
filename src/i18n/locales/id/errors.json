@@ -17,7 +17,7 @@
     },
     "rate_limited": {
       "title": "Batas pemeriksaan tercapai",
-      "message": "Tunggu sebentar lalu coba lagi. Akun gratis mendapat batas lebih banyak."
+      "message": "Tunggu sebentar lalu coba lagi. Akun gratis mendapat batas lebih tinggi."
     },
     "network": {
       "title": "Anda sedang offline",
@@ -48,7 +48,7 @@
       "message": "Masukan diterima selama beberapa hari setelah pemeriksaan."
     }
   },
-  "rateLimitedWait": "Coba lagi dalam sekitar {{wait}}. Akun gratis mendapat batas lebih banyak.",
+  "rateLimitedWait": "Coba lagi dalam {{wait}}. Akun gratis mendapat batas lebih tinggi.",
   "wait": {
     "unknown": "beberapa saat",
     "minute": "1 menit",
