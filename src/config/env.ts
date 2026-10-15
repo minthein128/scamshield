@@ -20,7 +20,9 @@ export function readFirebaseConfig(env: Record<string, string | undefined> = {})
   };
 }
 
-export const API_URL = process.env.EXPO_PUBLIC_API_URL?.trim() ?? '';
+export const STABLE_API_URL = 'https://api.akkhayar.com';
+// Dev builds without a URL keep using the offline mock.
+export const API_URL = process.env.EXPO_PUBLIC_API_URL?.trim() || (__DEV__ ? '' : STABLE_API_URL);
 
 // Metro only inlines literal process.env.EXPO_PUBLIC_* reads.
 export const FIREBASE_CONFIG = readFirebaseConfig({

@@ -1,4 +1,4 @@
-import { ensureApiUrl } from '../config/runtime';
+import { ensureApiUrl, hasInternet, refreshApiUrl } from '../config/runtime';
 import { getAuthToken } from '../services/token';
 import { ApiError } from './errors';
 import { createHttpClient } from './http';
@@ -40,17 +40,53 @@ function createUnavailableClient(): CheckClient {
   return { isMock: false, check: fail, speak: fail, health: fail, insights: fail, feedback: fail };
 }
 
-export function createRuntimeClient(resolve: () => Promise<string> = ensureApiUrl, allowMock: boolean = __DEV__): CheckClient {
-  let inner: Promise<CheckClient> | null = null;
-  const client = () => (inner ??= resolve().then(url => createClientFromEnv(url, allowMock)));
+export interface RuntimeClientDeps {
+  refresh?: () => Promise<string>;
+  internet?: () => Promise<boolean>;
+  makeClient?: (url: string, allowMock: boolean) => CheckClient;
+}
+
+export function createRuntimeClient(resolve: () => Promise<string> = ensureApiUrl, allowMock: boolean = __DEV__, deps: RuntimeClientDeps = {}): CheckClient {
+  const refresh = deps.refresh ?? refreshApiUrl;
+  const internet = deps.internet ?? (() => hasInternet());
+  const make = deps.makeClient ?? createClientFromEnv;
+  let built: { url: string; client: CheckClient } | null = null;
+  const clientFor = (url: string): CheckClient => {
+    if (built?.url !== url) built = { url, client: make(url, allowMock) };
+    return built.client;
+  };
+
+  async function explain(e: unknown): Promise<unknown> {
+    if (!(e instanceof ApiError) || e.code !== 'network') return e;
+    return (await internet().catch(() => false)) ? new ApiError('server_unreachable', e.message) : e;
+  }
+
+  async function run<T>(op: (client: CheckClient) => Promise<T>): Promise<T> {
+    const url = await resolve();
+    try {
+      return await op(clientFor(url));
+    } catch (e) {
+      if (!(e instanceof ApiError) || e.code !== 'network') throw e;
+      const next = await refresh().catch(() => url);
+      if (next && next !== url) {
+        try {
+          return await op(clientFor(next));
+        } catch (e2) {
+          throw await explain(e2);
+        }
+      }
+      throw await explain(e);
+    }
+  }
+
   return {
     get isMock() {
       return false;
     },
-    check: async (r, o) => (await client()).check(r, o),
-    speak: async (r, o) => (await client()).speak(r, o),
-    health: async o => (await client()).health(o),
-    insights: async (c, o) => (await client()).insights(c, o),
-    feedback: async (r, o) => (await client()).feedback(r, o),
+    check: (r, o) => run(c => c.check(r, o)),
+    speak: (r, o) => run(c => c.speak(r, o)),
+    health: o => run(c => c.health(o)),
+    insights: (c, o) => run(x => x.insights(c, o)),
+    feedback: (r, o) => run(c => c.feedback(r, o)),
   };
 }

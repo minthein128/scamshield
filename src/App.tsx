@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Platform, StyleSheet, View } from 'react-native';
+import { AppState, Platform, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
@@ -10,7 +10,7 @@ import { Text } from './components/Text';
 import RootNavigator from './navigation/RootNavigator';
 import { AppStateProvider } from './state/AppState';
 import { AuthProvider } from './state/AuthState';
-import { useApiUrl } from './config/runtime';
+import { FOREGROUND_REFRESH_MS, refreshApiUrl, useApiUrl } from './config/runtime';
 import { startRuntimeConfig } from './lib/runtimeConfig';
 import theme from './theme/theme';
 
@@ -22,6 +22,16 @@ export default function App() {
     restoreUiLanguage().finally(() => setLanguageReady(true));
   }, []);
   useEffect(() => (languageReady ? startRuntimeConfig() : undefined), [languageReady]);
+  useEffect(() => {
+    let hiddenAt: number | null = null;
+    const sub = AppState.addEventListener('change', next => {
+      if (next === 'active') {
+        if (hiddenAt !== null && Date.now() - hiddenAt > FOREGROUND_REFRESH_MS) void refreshApiUrl().catch(() => undefined);
+        hiddenAt = null;
+      } else hiddenAt ??= Date.now();
+    });
+    return () => sub.remove();
+  }, []);
   const mockMode = __DEV__ && apiUrl === '';
   const [fontsLoaded] = useFonts({
     'PlusJakartaSans-Regular': require('../assets/fonts/PlusJakartaSans-Regular.ttf'),

@@ -3,6 +3,7 @@ import { Linking, Switch, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { SITE_URL } from '../config/env';
 import Constants from 'expo-constants';
+import { ConnectionCard } from '../components/ConnectionCard';
 import { Screen } from '../components/Screen';
 import { Text } from '../components/Text';
 import { Button, Card, Chip, LinkButton, Notice, ScreenHeader, SectionTitle } from '../components/ui';
@@ -177,6 +178,11 @@ export const SettingsScreen: React.FC<RootScreenProps<'Settings'>> = ({ navigati
         <LinkButton testID="settings-privacy-policy" label={t('privacy.policy')} onPress={() => Linking.openURL(`${SITE_URL}/privacy`).catch(() => undefined)} />
         <LinkButton testID="settings-delete-info" label={t('privacy.deleteInfo')} onPress={() => Linking.openURL(`${SITE_URL}/delete-account`).catch(() => undefined)} />
         <Button testID="settings-delete-local" label={t('privacy.deleteLocal')} variant="secondary" onPress={onDeleteLocal} disabled={busy} />
+      </View>
+
+      <View style={{ gap: 8 }}>
+        <SectionTitle>{t('connection.title')}</SectionTitle>
+        <ConnectionCard />
       </View>
 
       <Text style={styles.version}>{`SafeRoute ${Constants.expoConfig?.version ?? ''}`.trim()}</Text>

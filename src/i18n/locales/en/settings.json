@@ -22,6 +22,15 @@
   "reportLanguage": "Report language",
   "myCountry": "My country",
   "destination": "Where I will work or travel",
+  "connection": {
+    "title": "Connection",
+    "host": "Server",
+    "healthy": "Server answers",
+    "unhealthy": "Server does not answer",
+    "checking": "Checking...",
+    "none": "No server address",
+    "recheck": "Re-check connection"
+  },
   "privacy": {
     "title": "Privacy",
     "share": "Help others: share anonymous scam patterns",

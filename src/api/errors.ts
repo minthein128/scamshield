@@ -1,7 +1,7 @@
 import { t } from '../i18n';
 import type { ApiErrorCode } from './types';
 
-export type ClientErrorCode = ApiErrorCode | 'network' | 'timeout' | 'cancelled' | 'invalid_response' | 'unavailable' | 'unknown';
+export type ClientErrorCode = ApiErrorCode | 'network' | 'server_unreachable' | 'timeout' | 'cancelled' | 'invalid_response' | 'unavailable' | 'unknown';
 
 export class ApiError extends Error {
   readonly code: ClientErrorCode;

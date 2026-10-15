@@ -25,6 +25,15 @@
   "reportLanguage": "Wika ng ulat",
   "myCountry": "Aking bansa",
   "destination": "Kung saan ako magtatrabaho o pupunta",
+  "connection": {
+    "title": "Koneksyon",
+    "host": "Server",
+    "healthy": "Sumasagot ang server",
+    "unhealthy": "Hindi sumasagot ang server",
+    "checking": "Sinusuri...",
+    "none": "Walang address ng server",
+    "recheck": "Suriin muli ang koneksyon"
+  },
   "privacy": {
     "title": "Privacy",
     "share": "Tumulong sa iba: magbahagi ng mga pattern ng scam nang hindi nagpapakilala",
