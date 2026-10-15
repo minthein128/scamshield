@@ -545,6 +545,43 @@ export const HOTLINES: Hotline[] = [
     "verifiedOn": "2026-10-14"
   },
   {
+    "id": "mm-cbtip-naypyitaw",
+    "country": "MM",
+    "category": "trafficking",
+    "name": "Central Body for Suppression of Trafficking in Persons (Nay Pyi Taw)",
+    "number": "067-412555",
+    "dial": "+9567412555",
+    "domesticOnly": true,
+    "notes": "Listed as a 24 hour help line. From abroad dial +95 67 412555. The source is a JICA pamphlet dated October 2019, from before the current administration, so the line may have changed.",
+    "sourceUrl": "https://www.jica.go.jp/Resource/project/myanmar/032/materials/ku57pq00003sz6yz-att/ICTP_pamphlet.pdf",
+    "asOf": "2019-10",
+    "verifiedOn": "2026-10-15"
+  },
+  {
+    "id": "mm-atf-yangon",
+    "country": "MM",
+    "category": "trafficking",
+    "name": "Anti-Trafficking Task Force (Yangon)",
+    "number": "09-49555888",
+    "dial": "+95949555888",
+    "domesticOnly": true,
+    "notes": "Listed as a 24 hour help line. From abroad dial +95 9 49555888. The source is a JICA pamphlet dated October 2019, from before the current administration, so the line may have changed.",
+    "sourceUrl": "https://www.jica.go.jp/Resource/project/myanmar/032/materials/ku57pq00003sz6yz-att/ICTP_pamphlet.pdf",
+    "asOf": "2019-10",
+    "verifiedOn": "2026-10-15"
+  },
+  {
+    "id": "mm-embassy-vientiane",
+    "country": "MM",
+    "category": "consular",
+    "name": "Myanmar Embassy Vientiane",
+    "number": "+856 21 314 910",
+    "dial": "+85621314910",
+    "notes": "Other lines: +856 21 314 911, +856 21 353 491. Myanmar foreign ministry mission directory, republished by the Myanmar Consulate General in Kolkata. The page has no date and names an older head of mission, so call to check.",
+    "sourceUrl": "https://mcgkolkata.org/?p=151",
+    "verifiedOn": "2026-10-15"
+  },
+  {
     "id": "mm-dol-migrant-section",
     "country": "MM",
     "category": "consular",
@@ -648,7 +685,7 @@ export const HOTLINES: Hotline[] = [
     "name": "PNP Anti-Cybercrime Group",
     "number": "(02) 8723 0401 local 7491",
     "dial": "+63287230401",
-    "notes": "Dial the local 7491 after the call connects. The group does not take payments or file cases on Telegram. Source is a GMA News report quoting the PNP-ACG.",
+    "notes": "Ask for local 7491 after the call connects. The group does not take payments or file cases on Telegram. Source is a GMA News report quoting the PNP-ACG.",
     "sourceUrl": "https://www.gmanetwork.com/news/topstories/nation/931990/pnp-acg-warns-vs-fraud-account-on-telegram/story/",
     "asOf": "2025-01-06",
     "verifiedOn": "2026-10-14"
@@ -674,7 +711,7 @@ export const HOTLINES: Hotline[] = [
     "name": "DFA Assistance to Nationals (Manila home office)",
     "number": "(02) 8834 4000 local 4031",
     "dial": "+63288344000",
-    "notes": "Dial local 4031 after the call connects. From abroad dial +63 2 8834 4000. The page does not state the hours. Internet Archive snapshot.",
+    "notes": "Ask for local 4031 after the call connects. From abroad dial +63 2 8834 4000. The page does not state the hours. Internet Archive snapshot.",
     "sourceUrl": "https://web.archive.org/web/20251124002318/https://dfa.gov.ph/",
     "asOf": "2025-11-24",
     "verifiedOn": "2026-10-14"
