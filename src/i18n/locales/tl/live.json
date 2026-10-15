@@ -2,9 +2,10 @@
   "_meta": {
     "reviewed": false
   },
-  "button": "Kausapin ang SafeRoute",
-  "a11yButton": "Kausapin ang SafeRoute tungkol sa ulat na ito",
-  "title": "Kausapin ang SafeRoute",
+  "button": "Pyit Taing Htaung",
+  "a11yButton": "Pyit Taing Htaung: kausapin ang SafeRoute tungkol sa ulat na ito",
+  "title": "Pyit Taing Htaung",
+  "subtitle": "Kausapin ang SafeRoute tungkol sa ulat na ito",
   "privacy": "Ipinapadala ang boses mo sa Google para masagot. Walang nire-record o sine-save.",
   "family": "Ipaliwanag sa pamilya ko",
   "mute": "I-mute",
@@ -12,7 +13,6 @@
   "end": "Tapusin",
   "close": "Isara",
   "getHelp": "Humingi ng tulong",
-  "listen": "Pakinggan",
   "retry": "Subukan ulit",
   "countdown": "{{seconds}} s na lang",
   "a11yCountdown": "{{seconds}} segundo na lang",
@@ -23,7 +23,7 @@
     "warning": "Pinapatugtog muna ang babala...",
     "listening": "Nakikinig. Itanong mo na.",
     "listeningMuted": "Naka-mute ang mikropono.",
-    "speaking": "Nagsasalita ang SafeRoute..."
+    "speaking": "Nagsasalita ang Pyit Taing Htaung..."
   },
   "ended": {
     "user": "Tapos na ang usapan.",
@@ -31,8 +31,8 @@
     "server": "Tapos na ang usapan."
   },
   "errors": {
-    "mic_denied": "Naka-off ang mikropono. Payagan ito para makipag-usap, o pindutin ang Pakinggan para marinig ang babala.",
-    "unavailable": "Hindi available ngayon ang live na boses. Pindutin ang Pakinggan para marinig muli ang babala.",
+    "mic_denied": "Naka-off ang mikropono. Payagan ito sa settings ng phone para makipag-usap, o isara ito at basahin ang ulat.",
+    "unavailable": "Hindi available ngayon ang live na boses. Subukan ulit mamaya, o isara ito at basahin ang ulat.",
     "rate_limited": "Marami ka nang nagamit na pagsusuri ngayong oras. Subukan ulit mamaya.",
     "busy": "May isa pang usapang boses na bukas. Isara ito at subukan ulit.",
     "not_found": "Wala na ang ulat na ito. Ulitin ang pagsusuri.",

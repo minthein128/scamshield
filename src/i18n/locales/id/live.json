@@ -2,9 +2,10 @@
   "_meta": {
     "reviewed": false
   },
-  "button": "Bicara dengan SafeRoute",
-  "a11yButton": "Bicara dengan SafeRoute tentang laporan ini",
-  "title": "Bicara dengan SafeRoute",
+  "button": "Pyit Taing Htaung",
+  "a11yButton": "Pyit Taing Htaung: bicara dengan SafeRoute tentang laporan ini",
+  "title": "Pyit Taing Htaung",
+  "subtitle": "Bicara dengan SafeRoute tentang laporan ini",
   "privacy": "Suara Anda dikirim ke Google untuk dijawab. Tidak ada yang direkam atau disimpan.",
   "family": "Jelaskan ke keluarga saya",
   "mute": "Bisukan",
@@ -12,7 +13,6 @@
   "end": "Akhiri",
   "close": "Tutup",
   "getHelp": "Minta bantuan",
-  "listen": "Dengarkan",
   "retry": "Coba lagi",
   "countdown": "Sisa {{seconds}} dtk",
   "a11yCountdown": "Sisa {{seconds}} detik",
@@ -23,7 +23,7 @@
     "warning": "Memutar peringatan dulu...",
     "listening": "Mendengarkan. Ajukan pertanyaan Anda.",
     "listeningMuted": "Mikrofon dibisukan.",
-    "speaking": "SafeRoute sedang berbicara..."
+    "speaking": "Pyit Taing Htaung sedang berbicara..."
   },
   "ended": {
     "user": "Percakapan selesai.",
@@ -31,8 +31,8 @@
     "server": "Percakapan selesai."
   },
   "errors": {
-    "mic_denied": "Mikrofon mati. Izinkan untuk berbicara, atau ketuk Dengarkan untuk mendengar peringatan.",
-    "unavailable": "Suara langsung belum tersedia sekarang. Ketuk Dengarkan untuk mendengar peringatan lagi.",
+    "mic_denied": "Mikrofon mati. Izinkan di pengaturan ponsel untuk berbicara, atau tutup ini dan baca laporannya.",
+    "unavailable": "Suara langsung belum tersedia sekarang. Coba lagi nanti, atau tutup ini dan baca laporannya.",
     "rate_limited": "Anda sudah memakai banyak pemeriksaan jam ini. Coba lagi nanti.",
     "busy": "Percakapan suara lain sedang terbuka. Tutup lalu coba lagi.",
     "not_found": "Laporan ini tidak tersedia lagi. Jalankan pemeriksaan lagi.",
