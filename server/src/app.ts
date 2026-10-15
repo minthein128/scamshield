@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { bodyLimit } from 'hono/body-limit';
 import { cors } from 'hono/cors';
 import { streamSSE } from 'hono/streaming';
+import { type AdminDeps, createAdminRoutes } from './admin/routes.js';
 import { bearerToken, type TokenVerifier } from './auth.js';
 import type { Config } from './config.js';
 import type { Feedback } from './feedback/service.js';
@@ -38,6 +39,7 @@ export function createApp(
   verifier?: TokenVerifier,
   feedback?: Feedback,
   limits: Limits = createLimits(cfg),
+  admin?: AdminDeps,
 ) {
   const app = new Hono();
   const limiter = limits.ip;
@@ -218,6 +220,8 @@ export function createApp(
       return c.json(out);
     },
   );
+
+  if (admin) app.route('/v1/admin', createAdminRoutes(admin));
 
   app.notFound((c) => c.json(errorBody('bad_request', `No route for ${c.req.method} ${c.req.path}`), 404 as never));
 
