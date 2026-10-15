@@ -276,8 +276,8 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
 };
 
 const styles = StyleSheet.create({
-  voiceRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
-  voiceButton: { flexGrow: 1, flexBasis: 150 },
+  voiceRow: { flexDirection: 'row', gap: 10 },
+  voiceButton: { flex: 1, flexBasis: 0, minHeight: 64, paddingHorizontal: 10 },
   banner: { flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: 24, paddingVertical: 24, paddingHorizontal: 20 },
   bannerIcon: { width: 56, height: 56, borderRadius: 28, backgroundColor: 'rgba(255,255,255,0.18)', alignItems: 'center', justifyContent: 'center' },
   bannerTitle: { fontSize: 28, lineHeight: 34, fontFamily: fonts.extraBold, letterSpacing: -0.3, color: colors.white, includeFontPadding: false },
