@@ -34,6 +34,7 @@ export interface Config {
   liveModel: string;
   liveVoice: string;
   liveMaxMs: number;
+  liveCompanionMaxMs: number;
   liveMaxConcurrent: number;
   adminAiModel: string;
   adminAiPerHour: number;
@@ -94,6 +95,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     liveModel: env.LIVE_MODEL || 'gemini-3.8-live',
     liveVoice: env.LIVE_VOICE || 'Sulafat',
     liveMaxMs: Number(env.LIVE_MAX_MS ?? 120_000),
+    liveCompanionMaxMs: Number(env.LIVE_COMPANION_MAX_MS ?? 300_000),
     liveMaxConcurrent: Number(env.LIVE_MAX_CONCURRENT ?? 20),
     adminAiModel: env.ADMIN_AI_MODEL || 'gemini-3.8-flash',
     adminAiPerHour: Number(env.ADMIN_AI_LIMIT_PER_HOUR ?? 30),

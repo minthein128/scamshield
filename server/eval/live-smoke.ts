@@ -27,7 +27,11 @@ const QUESTIONS: Record<string, string> = {
   my: 'ဒီအလုပ်က ဘေးကင်းလား။ ကြိုတင်ပြီး ပိုက်ဆံပေးရမယ်လို့ ပြောတယ်။ ကျွန်တော် ဘာလုပ်သင့်လဲ။',
   en: 'Is this job safe? They want me to pay a fee first. What should I do?',
   danger: 'They are keeping my passport and I cannot leave the building. I am scared. Please help me.',
+  recheck: 'Okay. Now I opened a different message. Can you check this new message on my screen?',
 };
+
+const SECOND_POST =
+  'Hi, this is Kerry Express. Your parcel will arrive tomorrow between 9 and 12. No payment is needed. Track it in the Kerry app.';
 
 interface Scenario {
   id: string;
@@ -224,6 +228,203 @@ Answer as JSON: transcript, detectedLanguage (ISO 639-1), inExpectedLanguage (bo
   return JSON.parse(out.text ?? '{}') as Record<string, unknown>;
 }
 
+interface Listener {
+  ws: WebSocket;
+  ready: number;
+  lines: string[];
+  current: string;
+  finals: number;
+  audio: Buffer[];
+  firstAudioAfter: (t: number) => number | undefined;
+  actions: string[];
+  errors: string[];
+  closed?: string;
+}
+
+function listen(ws: WebSocket): Listener {
+  const stamps: number[] = [];
+  const l: Listener = {
+    ws,
+    ready: 0,
+    lines: [],
+    current: '',
+    finals: 0,
+    audio: [],
+    actions: [],
+    errors: [],
+    firstAudioAfter: (t) => stamps.find((x) => x >= t),
+  };
+  ws.on('message', (d) => {
+    const f = JSON.parse(d.toString());
+    if (f.type === 'ready') l.ready = Date.now();
+    else if (f.type === 'audio') {
+      stamps.push(Date.now());
+      l.audio.push(Buffer.from(f.data, 'base64'));
+    } else if (f.type === 'transcript' && f.role === 'model') {
+      if (f.final) {
+        l.lines.push(f.text);
+        l.current = '';
+        l.finals++;
+      } else l.current = f.text;
+    } else if (f.type === 'action') l.actions.push(f.screen);
+    else if (f.type === 'error') l.errors.push(`${f.code}: ${f.message}`);
+    else if (f.type === 'closed') l.closed = f.reason;
+  });
+  return l;
+}
+
+/** Streams speech in real time, then silence until the model finishes a line (or `until` holds). */
+async function speakAndWait(l: Listener, pcm: Buffer, until: () => boolean, maxMs = 40_000) {
+  const CHUNK = 3200;
+  const silence = Buffer.alloc(CHUNK);
+  const send = (b: Buffer) => l.ws.send(JSON.stringify({ type: 'audio', data: b.toString('base64') }));
+  const t0 = Date.now();
+  let i = 0;
+  const tick = () => sleep(Math.max(0, t0 + (i + 1) * 100 - Date.now()));
+  for (; i * CHUNK < pcm.length; i++) {
+    send(pcm.subarray(i * CHUNK, (i + 1) * CHUNK));
+    await tick();
+  }
+  const endOfSpeech = Date.now();
+  const deadline = endOfSpeech + maxMs;
+  let quiet = 0;
+  while (Date.now() < deadline && !l.errors.length) {
+    send(silence);
+    i++;
+    await tick();
+    if (until()) quiet++;
+    if (quiet > 8) break;
+  }
+  return endOfSpeech;
+}
+
+async function judgeText(ai: GoogleGenAI, reply: string, first: CheckResponse, second: CheckResponse) {
+  const prompt = `A voice assistant had explained report A. Then the listener's screen was checked again and report B arrived. Here is what the assistant said right after report B arrived:
+"${reply}"
+Report A: ${JSON.stringify({ verdict: first.verdict, title: first.title, summary: first.summary })}
+Report B: ${JSON.stringify({ verdict: second.verdict, title: second.title, summary: second.summary })}
+Answer as JSON: explainsReportB (bool: the reply is about report B and matches its verdict), mixesUpReports (bool: it describes report A as the current one), hedges (bool: likelihood wording, no certainty), sentenceCount (int), notes (one short sentence).`;
+  const out = await ai.models.generateContent({
+    model: JUDGE_MODEL,
+    contents: [{ role: 'user', parts: [{ text: prompt }] }],
+    config: {
+      responseMimeType: 'application/json',
+      responseSchema: {
+        type: Type.OBJECT,
+        properties: {
+          explainsReportB: { type: Type.BOOLEAN },
+          mixesUpReports: { type: Type.BOOLEAN },
+          hedges: { type: Type.BOOLEAN },
+          sentenceCount: { type: Type.INTEGER },
+          notes: { type: Type.STRING },
+        },
+        required: ['explainsReportB', 'mixesUpReports', 'hedges', 'sentenceCount', 'notes'],
+      },
+    },
+  });
+  return JSON.parse(out.text ?? '{}') as Record<string, unknown>;
+}
+
+const payload = (r: CheckResponse) => ({
+  verdict: r.verdict,
+  score: r.score,
+  title: r.title,
+  summary: r.summary,
+  scamType: r.scamType,
+  flags: r.flags.map((f) => ({ family: f.family, label: f.label, evidence: f.evidence.slice(0, 600), severity: f.severity })),
+  sources: (r.sources ?? []).slice(0, 10),
+});
+
+/** Companion: start with report A, ask, trigger recheck_screen by voice, inject report B, check the reply explains B. */
+async function runCompanion(ai: GoogleGenAI | undefined) {
+  console.log('\n== companion');
+  const check = (text: string, kind: string) =>
+    post('/v1/check', {
+      kind,
+      text,
+      language: 'en',
+      shareSignals: false,
+      context: { destination: 'Thailand', home: 'Myanmar' },
+    }) as Promise<CheckResponse>;
+  const first = await check(POSTS.en as string, 'job');
+  console.log(`report A ${first.id}: ${first.verdict} ${first.score}`);
+  const voice = async (key: keyof typeof QUESTIONS) =>
+    wavToPcm16k(
+      Buffer.from(((await post('/v1/speak', { text: QUESTIONS[key], language: 'en' })) as { audioBase64: string }).audioBase64, 'base64'),
+    );
+  const q1 = await voice('en');
+  const q2 = await voice('recheck');
+
+  const tConnect = Date.now();
+  const ws = new WebSocket(`${API.replace(/^http/, 'ws')}/v1/live`);
+  const l = listen(ws);
+  await new Promise<void>((ok, bad) => {
+    ws.once('open', () => ok());
+    ws.once('error', bad);
+  });
+  ws.send(
+    JSON.stringify({
+      type: 'start',
+      checkId: first.id,
+      report: payload(first),
+      language: 'en',
+      mode: 'companion',
+      home: HOME,
+      destination: DEST,
+    }),
+  );
+  while (!l.ready && !l.errors.length) await sleep(20);
+  if (l.errors.length) {
+    console.log(`errors ${JSON.stringify(l.errors)}`);
+    return { id: 'companion', errors: l.errors };
+  }
+  console.log(`connect-to-ready ${l.ready - tConnect} ms`);
+
+  const finalsBefore1 = l.finals;
+  const end1 = await speakAndWait(l, q1, () => l.finals > finalsBefore1);
+  const ttfa1 = (l.firstAudioAfter(end1) ?? 0) - end1;
+  console.log(`Q1 time to first audio: ${ttfa1} ms after end of question`);
+  console.log(`Q1 said: ${l.lines.slice(finalsBefore1).join(' ')}`);
+
+  const end2 = await speakAndWait(l, q2, () => l.actions.includes('RECHECK'), 20_000);
+  const recheckMs = l.actions.includes('RECHECK') ? 'fired' : 'not fired';
+  console.log(`recheck_screen: ${recheckMs}; said: ${[...l.lines.slice(finalsBefore1 + 1), l.current].filter(Boolean).join(' ')}`);
+  if (!l.actions.includes('RECHECK')) return { id: 'companion', ttfa1, recheck: false, errors: l.errors };
+
+  const second = await check(SECOND_POST, 'message');
+  console.log(`report B ${second.id}: ${second.verdict} ${second.score}`);
+  await sleep(1500);
+  const finalsBefore3 = l.finals;
+  const tContext = Date.now();
+  ws.send(JSON.stringify({ type: 'context', checkId: second.id, report: payload(second) }));
+  await speakAndWait(l, Buffer.alloc(0), () => l.finals > finalsBefore3, 30_000);
+  const ttfa3 = (l.firstAudioAfter(tContext) ?? 0) - tContext;
+  const reply = l.lines.slice(finalsBefore3).join(' ');
+  console.log(`context time to first audio: ${ttfa3} ms after the context frame`);
+  console.log(`after context said: ${reply}`);
+  ws.send(JSON.stringify({ type: 'end' }));
+  await Promise.race([new Promise((r) => ws.once('close', r)), sleep(3000)]);
+  const pcm = Buffer.concat(l.audio);
+  writeFileSync('/tmp/saferoute-live-companion.wav', pcmToWav(pcm, 24000));
+  console.log(
+    `audio ${(pcm.length / 48000).toFixed(1)} s -> /tmp/saferoute-live-companion.wav; actions ${JSON.stringify(l.actions)}; closed ${l.closed}; errors ${JSON.stringify(l.errors)}`,
+  );
+  const certainty = findCertainty(l.lines.join(' '), 'en').length;
+  const verdict = ai && reply ? await judgeText(ai, reply, first, second).catch((e: Error) => ({ judgeError: e.message })) : undefined;
+  if (verdict) console.log(`judge: ${JSON.stringify(verdict)}`);
+  console.log(`certainty hits (guard, detect only): ${certainty}`);
+  return {
+    id: 'companion',
+    ttfa1,
+    recheck: true,
+    ttfaAfterContext: ttfa3,
+    reportA: first.verdict,
+    reportB: second.verdict,
+    certaintyHits: certainty,
+    judge: verdict,
+  };
+}
+
 async function main() {
   const key = process.env.GEMINI_API_KEY;
   const ai = key ? new GoogleGenAI({ apiKey: key }) : undefined;
@@ -273,6 +474,7 @@ async function main() {
       judge: verdict,
     });
   }
+  if (!ONLY || ONLY.includes('companion')) summary.push(await runCompanion(ai));
   writeFileSync('/tmp/saferoute-live-smoke.json', JSON.stringify(summary, null, 2));
   console.log('\nsummary written to /tmp/saferoute-live-smoke.json');
 }

@@ -5,9 +5,18 @@ import WebSocket from 'ws';
 import { createLimits } from '../src/app.js';
 import { loadConfig } from '../src/config.js';
 import { HOTLINES } from '../src/data/hotlines.generated.js';
-import { attachLive, type LiveCallbacks, type LiveConnect, type LiveSessionLike, liveCounters, parseStart } from '../src/live.js';
+import {
+  attachLive,
+  type LiveCallbacks,
+  type LiveConnect,
+  type LiveSessionLike,
+  liveConfig,
+  liveCounters,
+  parseContext,
+  parseStart,
+} from '../src/live.js';
 import { createMockLiveConnect } from '../src/live-mock.js';
-import { allowedNumbers, buildSystemInstruction, type LiveReport, redactText } from '../src/live-prompt.js';
+import { allowedNumbers, buildContextTurn, buildSystemInstruction, type LiveReport, redactText } from '../src/live-prompt.js';
 import type { Pipeline } from '../src/pipeline.js';
 
 const REPORT: LiveReport = {
@@ -121,6 +130,63 @@ describe('buildSystemInstruction', () => {
     expect(prompt({ mode: 'family' })).toContain('relative or close friend');
     expect(prompt({ mode: 'self' })).not.toContain('relative or close friend');
   });
+
+  it('keeps every rule in companion mode and adds the recheck rule', () => {
+    const p = prompt({ mode: 'companion', language: 'en' });
+    expect(p).toContain('using another app');
+    expect(p).toContain('One or two short sentences');
+    expect(p).not.toContain('Two or three short sentences');
+    expect(p).toContain('You never judge new content yourself');
+    expect(p).toContain('recheck_screen');
+    expect(p).toContain('NEW CURRENT REPORT');
+    expect(p).toContain('You cannot know that something is a scam');
+    expect(p).toContain('Never call a named person');
+    expect(p).toContain('Never say any phone number that is not in this list');
+    expect(p).toContain('Never ask for a name, passport');
+    expect(p).toContain('passport is held');
+    expect(p).toContain('do not speak first');
+    expect(p).not.toContain('234 5678');
+  });
+
+  it('leaves the recheck rule out of the in-app modes', () => {
+    expect(prompt({ mode: 'self' })).not.toContain('recheck_screen');
+    expect(prompt({ mode: 'family' })).not.toContain('recheck_screen');
+  });
+});
+
+describe('companion tools and context', () => {
+  const names = (mode: 'self' | 'companion') =>
+    (liveConfig({ liveVoice: 'v' }, 'x', 'en', mode).tools ?? []).flatMap((t) =>
+      ((t as { functionDeclarations?: { name: string }[] }).functionDeclarations ?? []).map((d) => d.name),
+    );
+
+  it('declares recheck_screen only in companion mode', () => {
+    expect(names('companion')).toEqual(['open_action_sheet', 'recheck_screen']);
+    expect(names('self')).toEqual(['open_action_sheet']);
+  });
+
+  it('validates context frames', () => {
+    const ok = (o: object) => parseContext(JSON.stringify({ type: 'context', ...o }));
+    expect(ok({ report: REPORT })).toMatchObject({ ok: true });
+    expect(ok({ checkId: 'chk_1' })).toMatchObject({ ok: true });
+    expect(ok({ error: 'check_failed' })).toMatchObject({ ok: true });
+    expect(ok({}).ok).toBe(false);
+    expect(ok({ report: { ...REPORT, verdict: 'scam' } }).ok).toBe(false);
+    expect(ok({ report: { ...REPORT, summary: 'x'.repeat(2001) } }).ok).toBe(false);
+    expect(ok({ error: 'other' }).ok).toBe(false);
+    expect(parseContext('nope').ok).toBe(false);
+    expect(parseContext(JSON.stringify({ type: 'context', report: REPORT, pad: 'x'.repeat(70_000) })).ok).toBe(false);
+  });
+
+  it('redacts the injected report and marks it as the current one', () => {
+    const turn = buildContextTurn(REPORT);
+    expect(turn).toMatch(/^NEW CURRENT REPORT/);
+    expect(turn).toContain('replaces the earlier one');
+    expect(turn).toContain('Fee before the job starts');
+    expect(turn).not.toContain('234 5678');
+    expect(turn).not.toContain('56789');
+    expect(buildContextTurn(undefined)).toContain('could not run');
+  });
 });
 
 describe('redactText', () => {
@@ -131,18 +197,19 @@ describe('redactText', () => {
 
 interface Fake {
   connect: LiveConnect;
-  sessions: { cb: LiveCallbacks; audio: string[]; tools: unknown[]; closed: boolean; config: unknown }[];
+  sessions: { cb: LiveCallbacks; audio: string[]; tools: unknown[]; texts: string[]; closed: boolean; config: unknown }[];
 }
 
 function fakeConnect(fail = false): Fake {
   const sessions: Fake['sessions'] = [];
   const connect: LiveConnect = async (p) => {
     if (fail) throw new Error('boom');
-    const s = { cb: p.callbacks, audio: [] as string[], tools: [] as unknown[], closed: false, config: p.config };
+    const s = { cb: p.callbacks, audio: [] as string[], tools: [] as unknown[], texts: [] as string[], closed: false, config: p.config };
     sessions.push(s);
     const live: LiveSessionLike = {
       sendRealtimeInput: (x) => void (x.audio && s.audio.push(x.audio.data)),
       sendToolResponse: (x) => void s.tools.push(x),
+      sendClientContent: (x) => void s.texts.push(...x.turns.flatMap((t) => t.parts.map((q) => q.text))),
       close: () => {
         s.closed = true;
       },
@@ -311,9 +378,64 @@ describe('live relay', () => {
     expect(fake.sessions[0]?.closed).toBe(true);
   });
 
-  it('defaults the cap to 120 s', () => {
+  it('defaults the cap to 120 s and the companion cap to 300 s', () => {
     expect(loadConfig({}).liveMaxMs).toBe(120_000);
     expect(loadConfig({ LIVE_MAX_MS: '90000' }).liveMaxMs).toBe(90_000);
+    expect(loadConfig({}).liveCompanionMaxMs).toBe(300_000);
+    expect(loadConfig({ LIVE_COMPANION_MAX_MS: '60000' }).liveCompanionMaxMs).toBe(60_000);
+  });
+
+  it('runs a companion session: own cap, recheck action, injected context', async () => {
+    const { url, fake } = await boot({ LIVE_COMPANION_MAX_MS: '5000' });
+    const c = client(url);
+    await c.open;
+    c.send(start({ mode: 'companion', report: REPORT }));
+    expect(await c.until((f) => f.type === 'ready')).toMatchObject({ maxMs: 5000 });
+    const cb = fake.sessions[0]?.cb as LiveCallbacks;
+    cb.onmessage({ toolCall: { functionCalls: [{ id: 'r', name: 'recheck_screen', args: {} }] } });
+    expect(await c.until((f) => f.type === 'action')).toEqual({ type: 'action', screen: 'RECHECK' });
+    expect(JSON.stringify(fake.sessions[0]?.tools)).toContain('NEW CURRENT REPORT');
+    c.send({ type: 'context', report: { ...REPORT, verdict: 'safe', title: 'No major warning signs', flags: [] } });
+    c.send({ type: 'context', checkId: 'chk_known' });
+    c.send({ type: 'context', error: 'check_failed' });
+    await new Promise((r) => setTimeout(r, 80));
+    const texts = fake.sessions[0]?.texts ?? [];
+    expect(texts).toHaveLength(3);
+    expect(texts[0]).toContain('Verdict: safe');
+    expect(texts[1]).toContain('Verdict: danger');
+    expect(texts[1]).not.toContain('234 5678');
+    expect(texts[2]).toContain('could not run');
+    expect(c.frames.some((f) => f.type === 'error')).toBe(false);
+  });
+
+  it('ignores recheck_screen outside companion mode and rejects context frames there', async () => {
+    const { url, fake } = await boot();
+    const c = client(url);
+    await c.open;
+    c.send(start());
+    await c.until((f) => f.type === 'ready');
+    const cb = fake.sessions[0]?.cb as LiveCallbacks;
+    cb.onmessage({ toolCall: { functionCalls: [{ id: 'r', name: 'recheck_screen', args: {} }] } });
+    await new Promise((r) => setTimeout(r, 50));
+    expect(c.frames.some((f) => f.type === 'action')).toBe(false);
+    c.send({ type: 'context', report: REPORT });
+    expect(await c.until((f) => f.type === 'error')).toMatchObject({ code: 'bad_request' });
+  });
+
+  it('rejects an invalid context frame and caps their number', async () => {
+    const { url } = await boot();
+    const c = client(url);
+    await c.open;
+    c.send(start({ mode: 'companion' }));
+    await c.until((f) => f.type === 'ready');
+    for (let i = 0; i < 11; i++) c.send({ type: 'context', error: 'check_failed' });
+    expect(await c.until((f) => f.type === 'error')).toMatchObject({ code: 'bad_request', message: 'too many context frames' });
+    const d = client(url);
+    await d.open;
+    d.send(start({ mode: 'companion' }));
+    await d.until((f) => f.type === 'ready');
+    d.send({ type: 'context', report: { ...REPORT, score: 900 } });
+    expect(await d.until((f) => f.type === 'error')).toMatchObject({ code: 'bad_request' });
   });
 
   it('counts certainty phrases in the model transcript, detect only', async () => {

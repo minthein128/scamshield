@@ -89,6 +89,10 @@ function mockSession(cb: LiveCallbacks, lang: Lang, risky: boolean): LiveSession
       if (heard >= TURN_AFTER_BYTES) answer();
     },
     sendToolResponse() {},
+    sendClientContent() {
+      if (busy) return;
+      answer();
+    },
     close() {
       for (const t of timers) clearTimeout(t);
       timers.clear();
