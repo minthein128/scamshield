@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { loadConfig } from '../src/config.js';
 import { createStreamingExtractor, parseEntities, scanObject } from '../src/extract-stream.js';
-import { createMockCorrelator, createMockGrounder } from '../src/mock.js';
+import { createMockCorrelator } from '../src/mock.js';
 import { createPipeline } from '../src/pipeline.js';
 
 const cfg = loadConfig({ MOCK: '0', GEMINI_API_KEY: 'k' });

@@ -1,6 +1,6 @@
 import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, extname, join, relative, resolve, sep } from 'node:path';
-import { loadConfig, pipelineOptions } from '../server/src/config.js';
+import { loadConfig } from '../server/src/config.js';
 import { createCorrelator } from '../server/src/correlate.js';
 import { createClient } from '../server/src/extract.js';
 import { createExtractor } from '../server/src/extract-stream.js';

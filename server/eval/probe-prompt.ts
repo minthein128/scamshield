@@ -14,7 +14,9 @@ const variants: Record<string, string> = {
 const ids = (process.env.ONLY ?? 'job-traf-en,parcel-id,legit-sms-en,hn-courier-en').split(',');
 const rounds = Number(process.env.ROUNDS ?? 6);
 const names = Object.keys(variants);
-const rows: Record<string, { total: number[]; first: number[]; inTok: number }> = Object.fromEntries(names.map((n) => [n, { total: [], first: [], inTok: 0 }]));
+const rows: Record<string, { total: number[]; first: number[]; inTok: number }> = Object.fromEntries(
+  names.map((n) => [n, { total: [], first: [], inTok: 0 }]),
+);
 for (let r = 0; r < rounds; r++) {
   for (const id of ids) {
     const c = CASES.find((x) => x.id === id);
@@ -27,7 +29,14 @@ for (let r = 0; r < rounds; r++) {
       const stream = await client.models.generateContentStream({
         model: cfg.model,
         contents: [{ role: 'user', parts: [{ text: buildUserParts({ kind: c.kind, language: c.lang, text: c.text }) }] }],
-        config: { systemInstruction: variants[name], responseMimeType: 'application/json', responseSchema, temperature: 0.2, ...thinkingOf(cfg), maxOutputTokens: 2048 },
+        config: {
+          systemInstruction: variants[name],
+          responseMimeType: 'application/json',
+          responseSchema,
+          temperature: 0.2,
+          ...thinkingOf(cfg),
+          maxOutputTokens: 2048,
+        },
       });
       for await (const chunk of stream) {
         if (!first) first = performance.now() - t0;
@@ -44,5 +53,7 @@ const med = (xs: number[]) => [...xs].sort((a, b) => a - b)[Math.floor(xs.length
 const mean = (xs: number[]) => xs.reduce((a, b) => a + b, 0) / xs.length;
 for (const n of names) {
   const r = rows[n] as (typeof rows)[string];
-  console.log(`${n.padEnd(12)} inTok=${r.inTok} n=${r.total.length} first p50=${med(r.first).toFixed(0)} mean=${mean(r.first).toFixed(0)}  total p50=${med(r.total).toFixed(0)} mean=${mean(r.total).toFixed(0)}`);
+  console.log(
+    `${n.padEnd(12)} inTok=${r.inTok} n=${r.total.length} first p50=${med(r.first).toFixed(0)} mean=${mean(r.first).toFixed(0)}  total p50=${med(r.total).toFixed(0)} mean=${mean(r.total).toFixed(0)}`,
+  );
 }
