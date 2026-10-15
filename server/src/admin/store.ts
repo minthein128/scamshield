@@ -250,7 +250,7 @@ export interface Published<C extends Collection> {
   source: 'firestore' | 'bundled';
 }
 
-const withTimeout = <T>(p: Promise<T>, ms: number): Promise<T> =>
+export const withTimeout = <T>(p: Promise<T>, ms: number): Promise<T> =>
   Promise.race([p, new Promise<never>((_, rej) => setTimeout(() => rej(new Error(`timeout after ${ms} ms`)), ms).unref())]);
 
 /** Reads a published doc. Firestore errors, timeouts and empty docs fall back to the bundled data. */

@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { bodyLimit } from 'hono/body-limit';
 import { cors } from 'hono/cors';
 import { streamSSE } from 'hono/streaming';
+import { createConfigRoutes, type PublishedCache } from './admin/published.js';
 import { type AdminDeps, createAdminRoutes } from './admin/routes.js';
 import { bearerToken, type TokenVerifier } from './auth.js';
 import type { Config } from './config.js';
@@ -40,6 +41,7 @@ export function createApp(
   feedback?: Feedback,
   limits: Limits = createLimits(cfg),
   admin?: AdminDeps,
+  published?: PublishedCache,
 ) {
   const app = new Hono();
   const limiter = limits.ip;
@@ -221,6 +223,15 @@ export function createApp(
     },
   );
 
+  if (published) {
+    app.use('/v1/config/*', async (c, next) => {
+      if (!limiter.allow(clientIp(c.req.header('x-forwarded-for'), c.req.header('x-real-ip')))) {
+        return c.json(errorBody('rate_limited', 'Too many requests, retry in a minute'), 429, { 'retry-after': '60' });
+      }
+      await next();
+    });
+    app.route('/v1/config', createConfigRoutes(published));
+  }
   if (admin) app.route('/v1/admin', createAdminRoutes(admin));
 
   app.notFound((c) => c.json(errorBody('bad_request', `No route for ${c.req.method} ${c.req.path}`), 404 as never));
