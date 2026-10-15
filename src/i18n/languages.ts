@@ -13,7 +13,7 @@ export const UI_LANGUAGES: UiLanguageOption[] = [
   { code: 'en', label: 'English', checkLanguage: 'en' },
   { code: 'id', label: 'Bahasa Indonesia', checkLanguage: 'id' },
   { code: 'tl', label: 'Tagalog', checkLanguage: 'tl' },
-  { code: 'my', label: 'Myanmar', nativeLabel: 'မြန်မာ', checkLanguage: 'my' },
+  { code: 'my', label: 'Myanmar', checkLanguage: 'my' },
   { code: 'th', label: 'Thai', nativeLabel: 'ไทย', checkLanguage: 'en' },
 ];
 
