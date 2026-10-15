@@ -5,6 +5,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import type { CheckResponse, LanguageCode } from '../api/types';
 import { TabIcon } from './TabIcons';
+import { TabRail } from './TabRail';
+import { useLayout } from '../hooks/useLayout';
 import type { RootStackParamList, TabParamList } from './types';
 import type { AfterOnboarding } from '../lib/onboarding';
 import HomeScreen from '../screens/HomeScreen';
@@ -39,10 +41,13 @@ const navTheme = { ...DefaultTheme, colors: { ...DefaultTheme.colors, background
 const Tabs: React.FC = () => {
   const { t, i18n } = useTranslation();
   const tall = i18n.language === 'my' || i18n.language === 'th';
+  const rail = useLayout().isExpanded;
   return (
   <Tab.Navigator
+    tabBar={rail ? props => <TabRail {...props} /> : undefined}
     screenOptions={({ route }) => ({
       headerShown: false,
+      tabBarPosition: rail ? 'left' : 'bottom',
       tabBarActiveTintColor: theme.colors.accent,
       tabBarInactiveTintColor: theme.colors.textSecondary,
       tabBarLabel: ({ color, children }) => <Text style={{ color, fontFamily: theme.fonts.semiBold, fontSize: 12, lineHeight: 18, textAlign: 'center' }}>{children}</Text>,

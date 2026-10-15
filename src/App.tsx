@@ -11,12 +11,16 @@ import RootNavigator from './navigation/RootNavigator';
 import { AppStateProvider } from './state/AppState';
 import { AuthProvider } from './state/AuthState';
 import { useApiUrl } from './config/runtime';
+import { useLayout, APP_MAX_WIDTH } from './hooks/useLayout';
+import { useOrientationPolicy } from './hooks/useOrientationPolicy';
 import { startRuntimeConfig } from './lib/runtimeConfig';
 import theme from './theme/theme';
 
 export default function App() {
   const { t } = useTranslation();
   const apiUrl = useApiUrl();
+  const layout = useLayout();
+  useOrientationPolicy();
   const [languageReady, setLanguageReady] = useState(false);
   useEffect(() => {
     restoreUiLanguage().finally(() => setLanguageReady(true));
@@ -49,7 +53,7 @@ export default function App() {
     <SafeAreaProvider>
       <StatusBar style="dark" />
       <View style={styles.page}>
-        <View style={styles.column}>
+        <View style={[styles.column, { maxWidth: layout.isTablet ? APP_MAX_WIDTH : PHONE_MAX_WIDTH }]}>
           {mockMode ? (
             <View testID="mock-banner" accessibilityRole="alert" style={styles.mock}>
               <Text style={styles.mockText}>{t('offlineDemo')}</Text>
@@ -66,12 +70,13 @@ export default function App() {
   );
 }
 
+const PHONE_MAX_WIDTH = 430;
+
 const styles = StyleSheet.create({
   page: { flex: 1, alignItems: 'center', backgroundColor: Platform.OS === 'web' ? theme.colors.deepDarkBackground : theme.colors.background },
   column: {
     flex: 1,
     width: '100%',
-    maxWidth: 430,
     backgroundColor: theme.colors.background,
     ...(Platform.OS === 'web' ? { overflow: 'hidden' as const } : {}),
   },
