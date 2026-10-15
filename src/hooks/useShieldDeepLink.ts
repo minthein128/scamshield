@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Linking, Platform } from 'react-native';
 import { getShieldResult } from 'shield-module';
 import type { CheckResponse, LanguageCode } from '../api/types';
-import { reportIdFromUrl, toCheckResponse } from '../lib/shield';
+import { reportIdFromUrl, sourceLabel, toCheckResponse } from '../lib/shield';
 import { useAppState } from '../state/AppState';
 
 const handled = new Set<string>();
@@ -19,7 +19,7 @@ export function useShieldDeepLink(ready: boolean, open: (result: CheckResponse, 
       const raw = await getShieldResult(id);
       if (!raw) return;
       const result = toCheckResponse(raw);
-      await saveCheck(result, language, 'Screen check').catch(() => undefined);
+      await saveCheck(result, language, sourceLabel(result.kind)).catch(() => undefined);
       open(result, language);
     };
     Linking.getInitialURL().then(handle).catch(() => undefined);

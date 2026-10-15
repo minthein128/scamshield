@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useApiUrl } from '../config/runtime';
 import { BrandLockup } from '../components/BrandMark';
 import { Screen } from '../components/Screen';
+import { MessageGuardCard } from '../components/MessageGuardCard';
 import { Text } from '../components/Text';
 import { ShieldCard } from '../components/ShieldCard';
 import { Button, Chip, LinkButton } from '../components/ui';
@@ -117,6 +118,7 @@ export const OnboardingScreen: React.FC<{ onDone: (next?: AfterOnboarding) => vo
         <>
           <Heading title={t('shield.title')} body={t('shield.body')} />
           <ShieldCard />
+          <MessageGuardCard />
         </>
       ) : null}
 

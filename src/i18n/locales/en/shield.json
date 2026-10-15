@@ -22,5 +22,26 @@
     "notStarted": "The shield did not start. Check that \"Display over other apps\" is allowed and try again.",
     "failed": "The shield did not start. Try again.",
     "checkFailed": "The check did not start. Turn the shield on and try again."
+  },
+  "messageGuard": {
+    "title": "Message Guard: warns you about risky messages as they arrive",
+    "privacy": "Only messages that look risky are checked. Codes and personal numbers are removed first.",
+    "a11y": "Message Guard",
+    "status": {
+      "web": "Works in the SafeRoute Android app.",
+      "unavailable": "Not available in this build.",
+      "on": "On. Risky messages from your chat and SMS apps get a warning.",
+      "off": "Off.",
+      "needsAccess": "Off. Turning it on opens Android notification access."
+    },
+    "apps": {
+      "show": "Choose apps ({{count}} on)",
+      "hide": "Hide apps ({{count}} on)",
+      "a11y": "Apps Message Guard watches, {{count}} on"
+    },
+    "errors": {
+      "accessOff": "Notification access is still off. If the switch is greyed out, open SafeRoute in App info, tap the three dots and choose \"Allow restricted settings\".",
+      "cannotOpen": "Could not open the notification access settings."
+    }
   }
 }

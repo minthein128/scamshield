@@ -25,5 +25,26 @@
     "notStarted": "Shield မပွင့်သေးပါ။ \"အခြားအက်ပ်များပေါ်တွင် ပြသရန်\" ခွင့်ပြုထားခြင်း ရှိမရှိ စစ်ဆေးပြီး ထပ်စမ်းကြည့်ပါ။",
     "failed": "Shield မပွင့်သေးပါ။ နောက်တစ်ကြိမ် ထပ်စမ်းကြည့်ပါ။",
     "checkFailed": "စစ်ဆေးမှု မစတင်နိုင်သေးပါ။ Shield ကို ဖွင့်ပြီး ထပ်စမ်းကြည့်ပါ။"
+  },
+  "messageGuard": {
+    "title": "Message Guard: warns you about risky messages as they arrive",
+    "privacy": "Only messages that look risky are checked. Codes and personal numbers are removed first.",
+    "a11y": "Message Guard",
+    "status": {
+      "web": "Works in the SafeRoute Android app.",
+      "unavailable": "Not available in this build.",
+      "on": "On. Risky messages from your chat and SMS apps get a warning.",
+      "off": "Off.",
+      "needsAccess": "Off. Turning it on opens Android notification access."
+    },
+    "apps": {
+      "show": "Choose apps ({{count}} on)",
+      "hide": "Hide apps ({{count}} on)",
+      "a11y": "Apps Message Guard watches, {{count}} on"
+    },
+    "errors": {
+      "accessOff": "Notification access is still off. If the switch is greyed out, open SafeRoute in App info, tap the three dots and choose \"Allow restricted settings\".",
+      "cannotOpen": "Could not open the notification access settings."
+    }
   }
 }
