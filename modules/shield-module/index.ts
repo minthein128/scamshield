@@ -27,12 +27,48 @@ export interface ShieldCheckResult {
   model?: string;
 }
 
+/** Labels the voice companion shows on the bubble pill. Missing keys fall back to English. */
+export const COMPANION_STRING_KEYS = [
+  'ask',
+  'askA11y',
+  'talkA11y',
+  'listening',
+  'muted',
+  'paused',
+  'thinking',
+  'speaking',
+  'checking',
+  'warning',
+  'rechecking',
+  'connecting',
+  'end',
+  'endA11y',
+  'captionHint',
+  'voiceChip',
+  'micDenied',
+  'needsForeground',
+  'unavailable',
+  'rateLimited',
+  'busy',
+  'notFound',
+  'endedCap',
+  'muteA11y',
+  'unmuteA11y',
+] as const;
+
+export type CompanionStringKey = (typeof COMPANION_STRING_KEYS)[number];
+
 export interface ShieldStartOptions {
   /** Defaults to EXPO_PUBLIC_API_URL. */
   apiUrl?: string;
   language?: 'en' | 'id' | 'tl' | 'my' | 'th';
   /** Firebase ID token sent as a Bearer header. Optional; without it the server limits by IP. */
   authToken?: string;
+  /** ISO country codes from the profile; the voice companion uses them to pick verified hotlines. */
+  home?: string;
+  destination?: string;
+  /** Voice companion labels in the user's language. */
+  strings?: Partial<Record<CompanionStringKey, string>>;
 }
 
 /** One messaging app Message Guard can watch. */

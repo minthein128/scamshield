@@ -9,6 +9,13 @@ export function reportIdFromUrl(url: string | null | undefined): string | null {
   return match ? decodeURIComponent(match[1]) : null;
 }
 
+/** In-app screens the shield bubble may open: Get help (voice HOTLINES action) and the Shield screen (allow voice). */
+export function screenFromUrl(url: string | null | undefined): 'GetHelp' | 'Shield' | null {
+  const m = url ? /^saferoute:\/\/(help|shield)\/?(?:[?#].*)?$/i.exec(url) : null;
+  if (!m) return null;
+  return m[1].toLowerCase() === 'help' ? 'GetHelp' : 'Shield';
+}
+
 export function toCheckResponse(result: ShieldCheckResult): CheckResponse {
   return normalizeResponse({
     ...result,
