@@ -1,0 +1,17 @@
+-keep class com.saferoute.shield.** { *; }
+-keep class com.saferoute.liveaudio.** { *; }
+-keep class expo.modules.** { *; }
+-keep class com.facebook.react.turbomodule.** { *; }
+-keep class com.reactnativegooglesignin.** { *; }
+-keep class com.google.android.gms.auth.api.signin.** { *; }
+-keep class com.google.android.libraries.identity.googleid.** { *; }
+-keep class androidx.credentials.** { *; }
+-keep class com.horcrux.svg.** { *; }
+-keep class androidx.dynamicanimation.** { *; }
+-keep class okhttp3.internal.platform.** { *; }
+-dontwarn okhttp3.internal.platform.**
+-dontwarn org.conscrypt.**
+-dontwarn org.bouncycastle.**
+-dontwarn org.openjsse.**
+-keepclassmembers class * { @com.facebook.proguard.annotations.DoNotStrip *; }
+-keepclassmembers class * { @com.facebook.react.bridge.ReactMethod *; }
