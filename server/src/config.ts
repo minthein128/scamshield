@@ -30,6 +30,10 @@ export interface Config {
   linkCacheTtlMs: number;
   ttsModel: string;
   ttsVoice: string;
+  liveModel: string;
+  liveVoice: string;
+  liveMaxMs: number;
+  liveMaxConcurrent: number;
   intelPepper?: string;
   intelProject?: string;
   thinkingLevel?: 'MINIMAL' | 'LOW' | 'MEDIUM' | 'HIGH';
@@ -80,6 +84,10 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     linkCacheTtlMs: Number(env.LINK_CACHE_TTL_MS ?? 3_600_000),
     ttsModel: env.TTS_MODEL || 'gemini-3.8-flash-tts',
     ttsVoice: env.TTS_VOICE || 'Kore',
+    liveModel: env.LIVE_MODEL || 'gemini-3.8-live',
+    liveVoice: env.LIVE_VOICE || 'Sulafat',
+    liveMaxMs: Number(env.LIVE_MAX_MS ?? 120_000),
+    liveMaxConcurrent: Number(env.LIVE_MAX_CONCURRENT ?? 20),
     intelPepper: env.INTEL_PEPPER || undefined,
     intelProject: env.INTEL_PROJECT || project || 'saferoute-aibc',
     thinkingLevel: thinking(env.THINKING_LEVEL),
