@@ -61,7 +61,7 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
   const [speaking, setSpeaking] = useState(false);
   const [warnOpen, setWarnOpen] = useState(false);
   const [liveOpen, setLiveOpen] = useState(false);
-  const { profile } = useAppState();
+  const { profile, language: settingLanguage } = useAppState();
   const { width } = useWindowDimensions();
   const layout = useLayout();
   const tablet = layout.isTablet;
@@ -293,7 +293,7 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
       <LiveVoiceSheet
         visible={liveOpen}
         result={result}
-        language={language}
+        language={settingLanguage}
         home={profile.homeCountry}
         destination={profile.destinationCountry}
         onClose={() => setLiveOpen(false)}

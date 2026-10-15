@@ -1,7 +1,8 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { CheckResponse, LanguageCode } from '../api/types';
-import { t } from '../i18n';
+import { t, setUiLanguage } from '../i18n';
+import { useUiLanguage } from '../i18n/useUiLanguage';
 import { clearUiLanguage } from '../i18n/storage';
 import { useShieldSync } from '../hooks/useShieldSync';
 import {
@@ -35,6 +36,7 @@ export type SyncState = 'off' | 'syncing' | 'done' | 'error';
 interface AppStateValue {
   ready: boolean;
   profile: Profile;
+  /** The one language setting. Also the UI language. */
   language: LanguageCode;
   setLanguage: (code: LanguageCode) => void;
   updateProfile: (choices: ProfileChoices) => void;
@@ -56,11 +58,12 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const uid = status.kind === 'account' ? status.uid : null;
   const [ready, setReady] = useState(false);
   const [profile, setProfile] = useState<Profile>(DEFAULT_PROFILE);
+  const { uiLanguage: language } = useUiLanguage();
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [contacts, setContacts] = useState<TrustedContact[]>([]);
   const [syncState, setSyncState] = useState<SyncState>('off');
-  const latest = useRef({ profile, history, contacts, uid });
-  latest.current = { profile, history, contacts, uid };
+  const latest = useRef({ profile, history, contacts, uid, language });
+  latest.current = { profile, history, contacts, uid, language };
 
   useEffect(() => {
     Promise.all([loadProfile(), loadHistory(), loadContacts()]).then(([p, h, c]) => {
@@ -87,8 +90,9 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           const adopted = { ...snap.profile, shareSignals: localProfile.shareSignals };
           setProfile(adopted);
           await saveProfile(adopted);
+          if (snap.language) await setUiLanguage(snap.language);
         } else if (localProfile.onboarded) {
-          await cloud.pushProfile(uid, localProfile);
+          await cloud.pushProfile(uid, localProfile, latest.current.language);
         }
         const mergedHistory = mergeHistory(localHistory, snap.history);
         setHistory(mergedHistory);
@@ -113,11 +117,16 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setProfile(next);
     saveProfile(next).catch(() => undefined);
     const id = latest.current.uid;
-    if (id && next.onboarded) cloud.pushProfile(id, next).catch(() => setSyncState('error'));
+    if (id && next.onboarded) cloud.pushProfile(id, next, latest.current.language).catch(() => setSyncState('error'));
   }, []);
 
   const updateProfile = useCallback((choices: ProfileChoices) => persistProfile(applyChoices(latest.current.profile, choices)), [persistProfile]);
-  const setLanguage = useCallback((code: LanguageCode) => updateProfile({ language: code }), [updateProfile]);
+  const setLanguage = useCallback((code: LanguageCode) => {
+    latest.current.language = code;
+    setUiLanguage(code).catch(() => undefined);
+    const { uid: id, profile: current } = latest.current;
+    if (id && current.onboarded) cloud.pushProfile(id, current, code).catch(() => setSyncState('error'));
+  }, []);
   const finishOnboarding = useCallback((choices?: ProfileChoices) => persistProfile(finishProfile(latest.current.profile, choices)), [persistProfile]);
 
   const saveCheck = useCallback(async (result: CheckResponse, lang: LanguageCode, source?: string) => {
@@ -164,13 +173,13 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setProfile(DEFAULT_PROFILE);
   }, []);
 
-  useShieldSync(saveCheck, profile.language);
+  useShieldSync(saveCheck, language);
 
   const value = useMemo(
     () => ({
       ready,
       profile,
-      language: profile.language,
+      language,
       setLanguage,
       updateProfile,
       finishOnboarding,
@@ -183,7 +192,7 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       clearSyncedCopies,
       deleteLocalData,
     }),
-    [ready, profile, setLanguage, updateProfile, finishOnboarding, history, saveCheck, contacts, addContact, removeContact, syncState, clearSyncedCopies, deleteLocalData],
+    [ready, profile, language, setLanguage, updateProfile, finishOnboarding, history, saveCheck, contacts, addContact, removeContact, syncState, clearSyncedCopies, deleteLocalData],
   );
   return <AppStateContext.Provider value={value}>{children}</AppStateContext.Provider>;
 };

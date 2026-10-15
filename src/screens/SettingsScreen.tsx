@@ -7,9 +7,7 @@ import { Screen } from '../components/Screen';
 import { Text } from '../components/Text';
 import { Button, Card, Chip, LinkButton, Notice, ScreenHeader, SectionTitle } from '../components/ui';
 import { COUNTRIES, countryLabel } from '../lib/countries';
-import { LANGUAGES } from '../lib/languages';
-import { UI_LANGUAGES, type UiLanguage } from '../i18n/languages';
-import { useUiLanguage } from '../i18n/useUiLanguage';
+import { UI_LANGUAGES } from '../i18n/languages';
 import { confirmAction, notify } from '../lib/notify';
 import type { RootScreenProps } from '../navigation/types';
 import { authErrorMessage } from '../services/accounts';
@@ -31,16 +29,10 @@ export const PRIVACY_POINTS = ['privacy.p1', 'privacy.p2', 'privacy.p3', 'privac
 
 export const SettingsScreen: React.FC<RootScreenProps<'Settings'>> = ({ navigation }) => {
   const { t } = useTranslation(['settings', 'common']);
-  const { uiLanguage, setUiLanguage, checkLanguageFor } = useUiLanguage();
   const { status, signOut, deleteAccount } = useAuth();
   const { profile, language, setLanguage, updateProfile, syncState, clearSyncedCopies, deleteLocalData } = useAppState();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const chooseAppLanguage = (code: UiLanguage) => {
-    setUiLanguage(code).catch(() => undefined);
-    setLanguage(checkLanguageFor(code));
-  };
 
   const guarded = async (action: () => Promise<void>) => {
     setBusy(true);
@@ -108,20 +100,11 @@ export const SettingsScreen: React.FC<RootScreenProps<'Settings'>> = ({ navigati
       </View>
 
       <View style={{ gap: 8 }}>
-        <SectionTitle>{t('appLanguage.title')}</SectionTitle>
-        <Text style={styles.body}>{t('appLanguage.body')}</Text>
-        <View style={styles.wrap} testID="settings-app-language">
+        <SectionTitle>{t('language.title')}</SectionTitle>
+        <Text style={styles.body}>{t('language.body')}</Text>
+        <View style={styles.wrap} testID="settings-language">
           {UI_LANGUAGES.map(l => (
-            <Chip key={l.code} testID={`app-language-${l.code}`} label={l.label} nativeLabel={l.nativeLabel} selected={uiLanguage === l.code} onPress={() => chooseAppLanguage(l.code)} />
-          ))}
-        </View>
-      </View>
-
-      <View style={{ gap: 8 }}>
-        <SectionTitle>{t('reportLanguage')}</SectionTitle>
-        <View style={styles.wrap}>
-          {LANGUAGES.map(l => (
-            <Chip key={l.code} label={l.label} nativeLabel={l.nativeLabel} selected={language === l.code} onPress={() => setLanguage(l.code)} />
+            <Chip key={l.code} testID={`language-${l.code}`} label={l.label} selected={language === l.code} onPress={() => setLanguage(l.code)} />
           ))}
         </View>
       </View>

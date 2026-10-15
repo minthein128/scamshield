@@ -18,11 +18,10 @@
     "done": "Hasil periksa dan kontak Anda sudah disinkronkan.",
     "error": "Sinkronisasi dijeda. Kami akan mencoba lagi saat Anda membuka aplikasi nanti."
   },
-  "appLanguage": {
-    "title": "Bahasa aplikasi",
-    "body": "Bahasa untuk aplikasi ini. Bahasa laporan juga akan mengikuti jika sudah tersedia."
+  "language": {
+    "title": "Bahasa",
+    "body": "Aplikasi, laporan, peringatan suara, dan Bicara dengan SafeRoute memakai bahasa ini."
   },
-  "reportLanguage": "Bahasa laporan",
   "myCountry": "Negara asal saya",
   "destination": "Tempat saya akan bekerja atau bepergian",
   "privacy": {

@@ -1,20 +1,19 @@
 import type { LanguageCode } from '../api/types';
 
-export type UiLanguage = 'en' | 'my' | 'id' | 'tl' | 'th';
+/** The one language setting: UI, reports, spoken warnings and the Live session all use it. */
+export type UiLanguage = LanguageCode;
 
 export interface UiLanguageOption {
   code: UiLanguage;
   label: string;
-  nativeLabel?: string;
-  checkLanguage: LanguageCode;
 }
 
 export const UI_LANGUAGES: UiLanguageOption[] = [
-  { code: 'en', label: 'English', checkLanguage: 'en' },
-  { code: 'id', label: 'Bahasa Indonesia', checkLanguage: 'id' },
-  { code: 'tl', label: 'Tagalog', checkLanguage: 'tl' },
-  { code: 'my', label: 'Myanmar', checkLanguage: 'my' },
-  { code: 'th', label: 'Thai', checkLanguage: 'th' },
+  { code: 'en', label: 'English' },
+  { code: 'my', label: 'Myanmar' },
+  { code: 'id', label: 'Bahasa Indonesia' },
+  { code: 'tl', label: 'Tagalog' },
+  { code: 'th', label: 'Thai' },
 ];
 
 export const DEFAULT_UI_LANGUAGE: UiLanguage = 'en';
@@ -22,10 +21,6 @@ export const UI_LANGUAGE_CODES: UiLanguage[] = UI_LANGUAGES.map(l => l.code);
 
 export function isUiLanguage(value: unknown): value is UiLanguage {
   return typeof value === 'string' && (UI_LANGUAGE_CODES as string[]).includes(value);
-}
-
-export function checkLanguageFor(ui: UiLanguage): LanguageCode {
-  return UI_LANGUAGES.find(l => l.code === ui)?.checkLanguage ?? 'en';
 }
 
 const ALIASES: Record<string, UiLanguage> = { fil: 'tl', tl: 'tl', in: 'id', id: 'id', my: 'my', th: 'th', en: 'en' };

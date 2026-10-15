@@ -13,6 +13,7 @@ import {
   writeBatch,
   type Firestore,
 } from 'firebase/firestore';
+import type { LanguageCode } from '../api/types';
 import type { TrustedContact } from '../lib/contacts';
 import type { HistoryEntry } from '../lib/history';
 import type { Profile } from '../lib/profile';
@@ -37,6 +38,7 @@ function db(): Firestore {
 
 export interface CloudSnapshot {
   profile: Profile | null;
+  language: LanguageCode | null;
   history: HistoryEntry[];
   contacts: TrustedContact[];
 }
@@ -49,15 +51,17 @@ export async function pullAll(uid: string): Promise<CloudSnapshot> {
     getDocs(collection(d, 'users', uid, 'contacts')),
   ]);
   const profileData = profileSnap.exists() ? profileSnap.data() : null;
+  const remote = profileData ? docToProfile(profileData) : null;
   return {
-    profile: profileData ? docToProfile(profileData) : null,
+    profile: remote?.profile ?? null,
+    language: remote?.language ?? null,
     history: historySnap.docs.flatMap(s => docToHistory(s.id, s.data()) ?? []),
     contacts: contactSnap.docs.flatMap(s => docToContact(s.id, s.data()) ?? []),
   };
 }
 
-export async function pushProfile(uid: string, profile: Profile): Promise<void> {
-  await setDoc(doc(db(), 'users', uid), profileToDoc(profile));
+export async function pushProfile(uid: string, profile: Profile, language: LanguageCode): Promise<void> {
+  await setDoc(doc(db(), 'users', uid), profileToDoc(profile, language));
 }
 
 export async function pushHistory(uid: string, entries: HistoryEntry[]): Promise<void> {

@@ -8,7 +8,6 @@ import { Button, Card, Chip, LinkButton, Notice, ScreenHeader } from '../compone
 import { countryName } from '../lib/countries';
 import { hasInput } from '../api';
 import type { CheckKind } from '../api/types';
-import { LANGUAGES } from '../lib/languages';
 import { PreparedImage, pickScreenshot, prepareImage } from '../lib/image';
 import { KIND_OPTIONS, buildRequest, looksLikeUrl, sourceLabel } from '../lib/request';
 import type { TabScreenProps } from '../navigation/types';
@@ -19,7 +18,7 @@ const { colors, fonts } = theme;
 
 export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, route }) => {
   const { t } = useTranslation(['check', 'common']);
-  const { language, setLanguage, profile } = useAppState();
+  const { language, profile } = useAppState();
   const [kind, setKind] = useState<CheckKind>('job');
   const [text, setText] = useState('');
   const [url, setUrl] = useState('');
@@ -164,15 +163,6 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
           placeholderTextColor={colors.textMuted}
           style={styles.input}
         />
-      </View>
-
-      <View style={{ gap: 8 }}>
-        <Text style={styles.label}>{t('reportLanguage')}</Text>
-        <View style={styles.wrap}>
-          {LANGUAGES.map(l => (
-            <Chip key={l.code} label={l.label} nativeLabel={l.nativeLabel} selected={language === l.code} onPress={() => setLanguage(l.code)} />
-          ))}
-        </View>
       </View>
 
       {notice ? <Notice message={notice} /> : null}

@@ -3,7 +3,6 @@ import type { LanguageCode } from '../api/types';
 export interface LanguageOption {
   code: LanguageCode;
   label: string;
-  nativeLabel?: string;
   speechLocale: string;
 }
 

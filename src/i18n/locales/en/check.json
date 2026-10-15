@@ -29,7 +29,6 @@
     "a11y": "Destination",
     "placeholder": "For example Bangkok, Thailand"
   },
-  "reportLanguage": "Report language",
   "submit": "Check now",
   "errors": {
     "image": "We could not use that picture. Try another screenshot.",

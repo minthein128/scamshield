@@ -15,11 +15,10 @@
     "done": "Your checks and contacts are synced.",
     "error": "Sync is paused. We will try again next time you open the app."
   },
-  "appLanguage": {
-    "title": "App language",
-    "body": "The language of the app. It also sets the report language when we support it."
+  "language": {
+    "title": "Language",
+    "body": "The app, your reports, spoken warnings and Talk to SafeRoute all use this language."
   },
-  "reportLanguage": "Report language",
   "myCountry": "My country",
   "destination": "Where I will work or travel",
   "privacy": {

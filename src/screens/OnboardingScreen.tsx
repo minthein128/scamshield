@@ -10,10 +10,9 @@ import { ShieldCard } from '../components/ShieldCard';
 import { Button, Chip, LinkButton } from '../components/ui';
 import { shieldSupport } from '../hooks/useShieldControl';
 import { COUNTRIES, countryLabel, type CountryCode } from '../lib/countries';
-import { UI_LANGUAGES, checkLanguageFor, type UiLanguage } from '../i18n/languages';
+import { UI_LANGUAGES, type UiLanguage } from '../i18n/languages';
 import { useUiLanguage } from '../i18n/useUiLanguage';
 import { HELP_POINTS, onboardingSteps, type AfterOnboarding } from '../lib/onboarding';
-import type { LanguageCode } from '../api/types';
 import { useAppState } from '../state/AppState';
 import { useLayout } from '../hooks/useLayout';
 import theme, { readable } from '../theme/theme';
@@ -27,18 +26,16 @@ export const OnboardingScreen: React.FC<{ onDone: (next?: AfterOnboarding) => vo
   const { profile, finishOnboarding } = useAppState();
   const steps = onboardingSteps(shieldSupport(Platform.OS, useApiUrl()) === 'ready');
   const [index, setIndex] = useState(0);
-  const [language, setLanguage] = useState<LanguageCode>(checkLanguageFor(uiLanguage));
   const [home, setHome] = useState<CountryCode | undefined>(profile.homeCountry);
   const [destination, setDestination] = useState<CountryCode | undefined>(profile.destinationCountry);
   const step = steps[index];
 
   const chooseLanguage = (code: UiLanguage) => {
     setUiLanguage(code).catch(() => undefined);
-    setLanguage(checkLanguageFor(code));
   };
 
   const finish = (next?: AfterOnboarding) => {
-    finishOnboarding({ language, homeCountry: home, destinationCountry: destination });
+    finishOnboarding({ homeCountry: home, destinationCountry: destination });
     onDone(next);
   };
 
@@ -75,7 +72,7 @@ export const OnboardingScreen: React.FC<{ onDone: (next?: AfterOnboarding) => vo
           <Heading title={t('language.title')} body={t('language.body')} />
           <View style={styles.wrap}>
             {UI_LANGUAGES.map(l => (
-              <Chip key={l.code} testID={`onboarding-language-${l.code}`} label={l.label} nativeLabel={l.nativeLabel} selected={uiLanguage === l.code} onPress={() => chooseLanguage(l.code)} />
+              <Chip key={l.code} testID={`onboarding-language-${l.code}`} label={l.label} selected={uiLanguage === l.code} onPress={() => chooseLanguage(l.code)} />
             ))}
           </View>
         </>
