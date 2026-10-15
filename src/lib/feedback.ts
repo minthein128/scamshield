@@ -1,18 +1,20 @@
+import { t } from '../i18n';
 import type { CheckKind, CheckRequest, CheckResponse, FeedbackRequest, LanguageCode, ScamType } from '../api/types';
 
 export const FEEDBACK_WINDOW_MS = 7 * 86_400_000;
 
 export type ChoosableScam = Exclude<ScamType, 'none'>;
 
-export const SCAM_CHOICES: { type: ChoosableScam; label: string }[] = [
-  { type: 'job_trafficking', label: 'Fake job abroad' },
-  { type: 'romance_pig_butchering', label: 'Romance or crypto' },
-  { type: 'parcel_phishing', label: 'Parcel or fee link' },
-  { type: 'fake_agency', label: 'Fake agency' },
-  { type: 'marketplace_fraud', label: 'Online shop fraud' },
-  { type: 'investment', label: 'Investment or task' },
-  { type: 'other', label: 'Something else' },
-];
+const choice = (type: ChoosableScam): { type: ChoosableScam; label: string } => ({
+  type,
+  get label() {
+    return t(`feedback:choices.${type}`);
+  },
+});
+
+export const SCAM_CHOICES = (
+  ['job_trafficking', 'romance_pig_butchering', 'parcel_phishing', 'fake_agency', 'marketplace_fraud', 'investment', 'other'] as const
+).map(choice);
 
 /** The server accepts feedback for 7 days after a check. */
 export function canGiveFeedback(result: Pick<CheckResponse, 'id' | 'createdAt'>, now: number = Date.now()): boolean {

@@ -73,13 +73,13 @@ Circle fill is the theme surface (`#FFFFFF`, dark `#1E293B`). Ring width is 3dp.
 Gestures:
 
 - Tap: check the screen (idle, error) or show and hide the pill (result states).
-- Drag: the bubble follows the finger. A close target fades in at the bottom center. Within 84dp of it the bubble snaps to it and the target grows. Release there closes the shield. Elsewhere, the bubble springs to the nearest side edge (damping 0.65). A visible pill is hidden while dragging and returns at the new edge.
+- Drag: past the touch slop (the larger of the system slop and 6dp) the pill or sheet collapses into the bubble (120 ms fade and scale toward it) and only the bubble follows the finger. A close target fades in at the bottom center. Within 84dp of it the bubble snaps to it and the target grows. Release there discards the result and closes the shield. Elsewhere, the bubble springs to the nearest side edge (damping 0.65). When the spring settles, the card is anchored again at the new position and comes back with its old state, expanded or collapsed. Moves under the slop stay a tap.
 - Long press (about 0.7 s without moving): closes the shield with a tick.
 - Closing stops the service. Start it again from the app.
 
 ### Result pill and sheet
 
-- Position: below the bubble when the bubble is in the upper half of the screen, above it otherwise. It is anchored to the bubble's side edge with a 12dp margin.
+- Position: the card window is anchored, not tied to the bubble every frame. It is placed once per rest position by `AnchorMath`. It is below the bubble when the bubble is in the upper half of the screen, above it otherwise. It is anchored to the bubble's side edge with a 12dp margin.
 - Enter: alpha 0 to 1 and scale 45% to 100% about the bubble center, 200 ms, `cubic-bezier(0.2, 0, 0, 1)`. Exit is 170 ms.
 - Collapsed: a pill at least 48dp tall with radius 24dp. It holds a verdict chip (12sp bold, 14dp radius), a one-line title (14sp semibold, ellipsized) and a chevron.
 - Expanded (tap, 220 ms): width grows to min(344dp, screen - 48dp), radius goes to 20dp, a detail area opens. It holds a summary (14sp, up to 4 lines), up to 3 flag rows (18dp severity icon, 13sp, up to 2 lines) and two text buttons, "Dismiss" and "Full report" (48dp tall, at least 48dp wide).
@@ -122,9 +122,27 @@ Safe: one 18 ms tick. Careful: one 35 ms pulse. Danger: three strong pulses (45,
   Any state: long press, or drag onto the close target ─► service stops
 ```
 
+Bubble gesture, with a result card showing:
+
+```
+  PRESSED ──move under slop, release──► TAP (check, or toggle the card)
+     │
+     └─move past slop─► DRAGGING   card collapses into the bubble (120 ms), result remembered
+                          │
+                          ├─release on the × target─► CLOSE   result discarded, service stops
+                          │
+                          └─release elsewhere───────► SNAPPING   spring to the edge
+                                                         │ spring settles (or 800 ms)
+                                                         ▼
+                                                      IDLE   card re-anchored on the new side,
+                                                             old expanded or collapsed state restored
+  Grabbing the bubble while it snaps starts a new PRESSED gesture and cancels the pending return.
+  A new result that arrives mid-drag is held and shown after the snap.
+```
+
 ### Preview
 
-`./gradlew :shield-module:testDebugUnitTest` renders every state, light and dark, to `android/build/shield-snapshots/*.png` with Robolectric native graphics. Elevation shadows and the Plus Jakarta Sans fonts are not part of that render (the test has no APK assets), so check those on a device.
+`./gradlew :shield-module:testDebugUnitTest` also runs `ShieldDragTest` (anchor maths for left, right, top, bottom and nav-bar positions, the drag state machine, and drag, close and configuration change against a real overlay). It renders every state, light and dark, to `android/build/shield-snapshots/*.png` with Robolectric native graphics. Elevation shadows and the Plus Jakarta Sans fonts are not part of that render (the test has no APK assets), so check those on a device.
 
 ## Auth token
 

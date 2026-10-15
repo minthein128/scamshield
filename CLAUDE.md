@@ -16,6 +16,7 @@ Expo SDK 52 / React Native, TypeScript strict. Android anti-scam app. The Expo w
 - `src/config/runtime.ts` resolves the API URL at startup: `EXPO_PUBLIC_CONFIG_URL` (default `https://saferoute-aibc.web.app/config.json`, 3 s), then the cached value, then `EXPO_PUBLIC_API_URL`.
 - `src/data/hotlines.ts` verified hotlines with source URLs; the server reads a generated copy (`pnpm sync:hotlines`).
 - `firestore.rules`, `firestore-tests/`: per-user rules and the emulator test (`pnpm test:rules`).
+- `src/i18n/` i18next setup, UI language list, persistence. `pnpm i18n:check` lists missing or unreviewed translations; `pnpm i18n:translate` fills missing keys with Gemini.
 - `src/navigation/` React Navigation: bottom tabs (Home, Check, Contacts, Learn) inside a native stack (Onboarding, Checking, Report, Shield, Settings, Account, GetHelp, DemoBoard).
 - `src/screens/` real screens. `src/screens/demo/` illustrated walkthroughs, listed in `boards.ts` and shown under Learn as "See how scams look".
 - `src/hooks/useSharedDraft.android.ts` Android share intent. The default file is a no-op for web.
@@ -38,7 +39,7 @@ Other env vars: `EXPO_PUBLIC_APK_URL` (download link on web), `EXPO_PUBLIC_FIREB
 
 ## Rules
 
-- All UI copy is English. Only the model response follows the selected report language.
+- UI copy lives in `src/i18n/locales/<lang>/*.json` (English is the source, keys are typed). Use `t()` from react-i18next, never a string literal, and import `Text` from `src/components/Text`. See `docs/i18n.md`. The model response follows the report language, not the UI language.
 - No seeded data in the UI. Every screen needs an empty state.
 - Android only: share intent, shield overlay. Guard with `Platform.OS`; web shows `AndroidNote`.
 - Keep the visual design in `src/theme/theme.ts`. Comments: one line, only when the code is not obvious.

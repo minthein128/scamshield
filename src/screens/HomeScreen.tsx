@@ -1,28 +1,33 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { BrandLockup } from '../components/BrandMark';
 import { Icon, type IconName } from '../components/Icon';
+import { Text } from '../components/Text';
 import { Screen } from '../components/Screen';
 import { ShieldCard } from '../components/ShieldCard';
 import { Button, Card, EmptyState, Pill, SectionTitle } from '../components/ui';
 import type { TabScreenProps } from '../navigation/types';
 import { useAppState } from '../state/AppState';
-import { VERDICT_STYLES, entryLabel } from '../lib/report';
+import { VERDICT_STYLES } from '../lib/report';
+import { entryLabel, verdictLabel } from '../lib/labels';
 import { formatRelative } from '../lib/time';
 import theme from '../theme/theme';
-import { scriptStyle } from '../theme/script';
 
 const { colors, fonts } = theme;
 
 export const HomeScreen: React.FC<TabScreenProps<'Home'>> = ({ navigation }) => {
+  const { t } = useTranslation('home');
   const { history, profile } = useAppState();
   const startCheck = (intent: 'link' | 'image' | 'text') => navigation.navigate('Check', { intent, nonce: Date.now() });
 
   return (
     <Screen>
       <View style={styles.brandRow}>
-        <Icon name="shieldCheck" size={28} color={colors.accent} />
-        <Text accessibilityRole="header" style={styles.brand}>SafeRoute</Text>
-        <TouchableOpacity testID="open-settings" accessibilityRole="button" accessibilityLabel="Settings" activeOpacity={0.7} onPress={() => navigation.navigate('Settings')} style={styles.iconButton}>
+        <View style={{ flex: 1 }}>
+          <BrandLockup header />
+        </View>
+        <TouchableOpacity testID="open-settings" accessibilityRole="button" accessibilityLabel={t('settingsA11y')} activeOpacity={0.7} onPress={() => navigation.navigate('Settings')} style={styles.iconButton}>
           <Icon name="settings" size={24} />
         </TouchableOpacity>
       </View>
@@ -31,21 +36,21 @@ export const HomeScreen: React.FC<TabScreenProps<'Home'>> = ({ navigation }) => 
 
       <Card style={{ gap: 16 }}>
         <View style={{ gap: 4 }}>
-          <Text style={styles.cardTitle}>Check a job offer, message or link</Text>
-          <Text style={styles.cardBody}>Paste it or share a screenshot. We look for trafficking and money-mule warning signs.</Text>
+          <Text style={styles.cardTitle}>{t('check.title')}</Text>
+          <Text style={styles.cardBody}>{t('check.body')}</Text>
         </View>
         <View style={styles.quickRow}>
-          <QuickAction label="Paste link" icon="link" onPress={() => startCheck('link')} />
-          <QuickAction label="Screenshot" icon="image" onPress={() => startCheck('image')} />
-          <QuickAction label="Chat" icon="chat" onPress={() => startCheck('text')} />
+          <QuickAction label={t('quick.link')} icon="link" onPress={() => startCheck('link')} />
+          <QuickAction label={t('quick.image')} icon="image" onPress={() => startCheck('image')} />
+          <QuickAction label={t('quick.chat')} icon="chat" onPress={() => startCheck('text')} />
         </View>
-        <Button label="Start a check" onPress={() => navigation.navigate('Check')} testID="home-check-button" />
+        <Button label={t('check.start')} onPress={() => navigation.navigate('Check')} testID="home-check-button" />
       </Card>
 
       <View style={{ gap: 8 }}>
-        <SectionTitle>Recent checks</SectionTitle>
+        <SectionTitle>{t('recent.title')}</SectionTitle>
         {history.length === 0 ? (
-          <EmptyState testID="recent-empty" title="No checks yet" body="Your checks are saved on this device and show up here." />
+          <EmptyState testID="recent-empty" title={t('recent.emptyTitle')} body={t('recent.emptyBody')} />
         ) : (
           history.slice(0, 5).map(entry => {
             const v = VERDICT_STYLES[entry.result.verdict];
@@ -54,29 +59,29 @@ export const HomeScreen: React.FC<TabScreenProps<'Home'>> = ({ navigation }) => 
                 key={entry.id}
                 testID="recent-check"
                 accessibilityRole="button"
-                accessibilityLabel={`${v.label}: ${entryLabel(entry.result, entry.source)}`}
+                accessibilityLabel={`${verdictLabel(entry.result.verdict)}: ${entryLabel(entry.result, entry.source)}`}
                 activeOpacity={0.7}
                 onPress={() => navigation.navigate('Report', { result: entry.result, language: entry.language })}
                 style={styles.recent}
               >
                 <View style={{ flex: 1, gap: 2 }}>
-                  <Text numberOfLines={1} style={[styles.recentTitle, scriptStyle(entryLabel(entry.result, entry.source), 'semiBold', 22)]}>{entryLabel(entry.result, entry.source)}</Text>
+                  <Text numberOfLines={1} style={styles.recentTitle}>{entryLabel(entry.result, entry.source)}</Text>
                   <Text style={styles.recentMeta}>{formatRelative(entry.createdAt)}</Text>
                 </View>
-                <Pill label={v.label} background={v.chipBackground} color={v.chipForeground} />
+                <Pill label={verdictLabel(entry.result.verdict)} background={v.chipBackground} color={v.chipForeground} />
               </TouchableOpacity>
             );
           })
         )}
       </View>
 
-      <TouchableOpacity testID="home-radar" accessibilityRole="button" accessibilityLabel="Scam radar: what people are reporting" activeOpacity={0.7} onPress={() => navigation.navigate('Radar')} style={styles.radar}>
+      <TouchableOpacity testID="home-radar" accessibilityRole="button" accessibilityLabel={t('radar.a11y')} activeOpacity={0.7} onPress={() => navigation.navigate('Radar')} style={styles.radar}>
         <View style={styles.rowIcon}>
           <Icon name="radar" size={24} color={colors.accent} />
         </View>
         <View style={{ flex: 1, gap: 2 }}>
-          <Text style={styles.radarTitle}>Scam radar</Text>
-          <Text style={styles.radarBody}>See which scams people are reporting right now.</Text>
+          <Text style={styles.radarTitle}>{t('radar.title')}</Text>
+          <Text style={styles.radarBody}>{t('radar.body')}</Text>
         </View>
         <Icon name="chevron" size={22} color={colors.textMuted} />
       </TouchableOpacity>
@@ -84,7 +89,7 @@ export const HomeScreen: React.FC<TabScreenProps<'Home'>> = ({ navigation }) => 
       <TouchableOpacity
         testID="home-get-help"
         accessibilityRole="button"
-        accessibilityLabel="Get help: hotlines and reporting"
+        accessibilityLabel={t('help.a11y')}
         activeOpacity={0.7}
         onPress={() => navigation.navigate('GetHelp')}
         style={styles.help}
@@ -93,9 +98,9 @@ export const HomeScreen: React.FC<TabScreenProps<'Home'>> = ({ navigation }) => 
           <Icon name="phone" size={24} color={colors.danger} />
         </View>
         <View style={{ flex: 1, gap: 2 }}>
-          <Text style={styles.helpTitle}>Get help</Text>
+          <Text style={styles.helpTitle}>{t('help.title')}</Text>
           <Text style={styles.helpBody}>
-            {profile.destinationCountry || profile.homeCountry ? 'Hotlines for your countries.' : 'Hotlines and reporting lines in Southeast Asia.'}
+            {profile.destinationCountry || profile.homeCountry ? t('help.bodyCountries') : t('help.bodyRegion')}
           </Text>
         </View>
         <Icon name="chevron" size={22} color={colors.dangerDark} />
@@ -113,13 +118,12 @@ const QuickAction: React.FC<{ label: string; icon: IconName; onPress: () => void
 
 const styles = StyleSheet.create({
   brandRow: { flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 48 },
-  brand: { flex: 1, color: colors.textPrimary, fontSize: 18, fontFamily: fonts.bold, letterSpacing: -0.2, lineHeight: 24, includeFontPadding: false },
   iconButton: { width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center' },
   cardTitle: { color: colors.textPrimary, fontSize: 18, lineHeight: 24, fontFamily: fonts.bold, includeFontPadding: false },
   cardBody: { color: colors.textSecondary, fontSize: 14, lineHeight: 20, fontFamily: fonts.regular, includeFontPadding: false },
   quickRow: { flexDirection: 'row', gap: 8 },
-  quick: { flex: 1, minHeight: 72, borderRadius: 12, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.background, alignItems: 'center', justifyContent: 'center', gap: 4 },
-  quickText: { color: colors.textPrimary, fontSize: 13, lineHeight: 18, fontFamily: fonts.semiBold, includeFontPadding: false },
+  quick: { flex: 1, paddingHorizontal: 4, minHeight: 72, borderRadius: 12, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.background, alignItems: 'center', justifyContent: 'center', gap: 4 },
+  quickText: { textAlign: 'center', color: colors.textPrimary, fontSize: 13, lineHeight: 18, fontFamily: fonts.semiBold, includeFontPadding: false },
   recent: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 64, paddingVertical: 12, paddingHorizontal: 16, borderRadius: 12, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.border },
   recentTitle: { color: colors.textPrimary, fontSize: 15, lineHeight: 22, fontFamily: fonts.semiBold, includeFontPadding: false },
   recentMeta: { color: colors.textSecondary, fontSize: 13, lineHeight: 18, fontFamily: fonts.regular, includeFontPadding: false },

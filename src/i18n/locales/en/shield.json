@@ -1,0 +1,26 @@
+{
+  "title": "Screen shield",
+  "status": {
+    "web": "Works in the SafeRoute Android app.",
+    "insecure": "This build uses an insecure service address, so the shield is off.",
+    "unavailable": "Not available in this build.",
+    "on": "On. Tap the bubble on anything suspicious.",
+    "off": "Off. Turn it on to check what is on your screen."
+  },
+  "steps": {
+    "overlay": "Step 1 of 4: allow \"Display over other apps\", then come back to SafeRoute.",
+    "notifications": "Step 2 of 4: allow notifications so Android keeps the shield running.",
+    "capture": "Step 3 of 4: allow SafeRoute to see your screen when you tap the bubble.",
+    "starting": "Step 4 of 4: starting the shield."
+  },
+  "body": "A small button floats over other apps. Tap it on a job post, chat or listing and SafeRoute checks what is on your screen.",
+  "download": "Download the Android app",
+  "details": "Details and permissions",
+  "detailsA11y": "Shield details",
+  "errors": {
+    "needsScreen": "The shield needs to see your screen to check it. Try again and tap Start now.",
+    "notStarted": "The shield did not start. Check that \"Display over other apps\" is allowed and try again.",
+    "failed": "The shield did not start. Try again.",
+    "checkFailed": "The check did not start. Turn the shield on and try again."
+  }
+}

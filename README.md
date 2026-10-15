@@ -1,3 +1,8 @@
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/brand/logo-horizontal-dark.png">
+  <img src="assets/brand/logo-horizontal.png" alt="SafeRoute" height="64">
+</picture>
+
 # SafeRoute
 
 An Android app and web demo that checks a job offer, message, link or screenshot for scams and human trafficking, and explains the result in the user's language. Built for the Google Cloud AI Builder Cup 2026.

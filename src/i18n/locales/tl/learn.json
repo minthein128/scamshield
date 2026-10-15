@@ -1,0 +1,255 @@
+{
+  "_meta": {
+    "reviewed": false
+  },
+  "title": "Matuto",
+  "tagline": "Alamin ang mga babala bago ka sumagot, magbayad o bumiyahe.",
+  "scamsHeading": "Mga karaniwang scam",
+  "flagsHeading": "Ang 7 babala",
+  "flagsHint": "Hinahanap ng SafeRoute ang mga babalang ito. Pindutin ang isa para matuto pa.",
+  "flagsHintA11y": "Binubuksan ang paliwanag",
+  "shieldRow": {
+    "title": "Paano gumagana ang Screen shield",
+    "hint": "3 mabilis na hakbang"
+  },
+  "reportRow": "Mag-ulat ng scam",
+  "helpRow": "Humingi ng tulong",
+  "scamCardHint": "Binubuksan ang gabay sa scam",
+  "guide": {
+    "eyebrow": "Gabay sa scam",
+    "howItStarts": "Paano ito nagsisimula",
+    "signs": "Mga babala",
+    "signFallback": "Babala",
+    "example": "Tingnan ang halimbawa",
+    "exampleNote": "Halimbawa lamang. Gawa-gawa lang ang mga pangalan at post.",
+    "exampleEnglish": "Nasa wikang Ingles ang mga halimbawang screen.",
+    "actions": "Dapat gawin"
+  },
+  "shieldHowTo": {
+    "eyebrow": "Screen shield"
+  },
+  "stepper": {
+    "back": "Bumalik",
+    "next": "Susunod",
+    "done": "Tapos na",
+    "backA11y": "Bumalik, sa hakbang {{step}} ng {{total}}",
+    "nextA11y": "Susunod, sa hakbang {{step}} ng {{total}}",
+    "scroller": "Halimbawa, {{total}} na hakbang. Mag-swipe o gamitin ang Susunod at Bumalik.",
+    "progress": "Hakbang {{current}} ng {{total}}: {{title}}",
+    "frame": "Halimbawang screen para sa hakbang {{current}}: {{title}}"
+  },
+  "sheet": {
+    "example": "Maaari mong marinig",
+    "close": "Isara"
+  },
+  "actions": {
+    "noPay": {
+      "title": "Huwag magbayad, huwag magpadala ng dokumento",
+      "body": "Bihirang humingi agad ng pera o ng iyong pasaporte ang totoong trabaho, tindahan at bangko."
+    },
+    "check": {
+      "title": "I-check sa SafeRoute",
+      "body": "I-paste ang mensahe o link, o maglagay ng screenshot."
+    },
+    "help": {
+      "title": "Humingi ng tulong",
+      "body": "Maghanap ng mga hotline at taong makakatulong sa iyo."
+    }
+  },
+  "scams": {
+    "jobs": {
+      "title": "Mapanganib na alok sa trabaho at trafficking",
+      "hook": "Trabaho sa ibang bansa na may malaking sahod, sundo sa border, o paghingi ng iyong pasaporte.",
+      "howItStarts": "Isang post o mensahe ang nag-aalok ng trabaho sa ibang bansa na may malaking sahod. Walang karanasan, walang interview. May hihingi ng litrato ng pasaporte mo para ilaan ang puwesto mo, saka sasabihing makipagkita sa driver.",
+      "signs": {
+        "s1": "Napakalaking sahod para sa madaling trabaho, at hindi kailangan ng karanasan.",
+        "s2": "Iilang puwesto na lang ang natitira. Umalis ngayong linggo.",
+        "s3": "May susundo sa border o airport, at walang mga papeles ng visa.",
+        "s4": "Gusto nilang itago ang iyong pasaporte.",
+        "s5": "Walang pangalan ng kumpanya ang recruiter at pribadong chat app lang ang gamit."
+      }
+    },
+    "romance": {
+      "title": "Romansa at investment",
+      "hook": "Isang palakaibigang estranghero na kalaunan ay nag-aalok ng crypto o trading.",
+      "howItStarts": "May estrangherong nag-message sa iyo nang hindi sinasadya at mabait siya. Pagkaraan ng ilang araw o linggo ng pag-uusap, sasabihin nilang kumikita sila nang malaki sa isang trading app. Pagkatapos ay aayain ka nilang subukan ito gamit ang maliit na deposito.",
+      "signs": {
+        "s1": "May estrangherong nagsasabing \"wrong number\" pero tuloy pa rin sa pakikipag-chat.",
+        "s2": "Nagpapakita sila ng malalaking kita mula sa isang trading o crypto app.",
+        "s3": "Nagpapadala sila ng link sa isang app na hindi mo makikita sa opisyal na app store.",
+        "s4": "Humihingi sila ng deposito, o crypto, para makapagsimula.",
+        "s5": "Sinasabi nilang matatapos na agad ang pagkakataon."
+      }
+    },
+    "parcel": {
+      "title": "Mga mensahe tungkol sa parcel at bangko",
+      "hook": "\"Magbayad ng bayarin\" o \"i-verify ang iyong account\" gamit ang isang link.",
+      "howItStarts": "May text na nagsasabing naipit ang iyong parcel, o naka-lock ang iyong bank account. Mayroon itong maikling link at takdang oras. Nagbubukas ang link ng kopya ng totoong website na humihingi ng iyong card o login.",
+      "signs": {
+        "s1": "Maliit na bayad para makuha ang parcel.",
+        "s2": "Isang maikling link o web address na mukhang may kakaiba.",
+        "s3": "Magbayad ngayon o ibabalik ito. Mag-verify ngayon o mawalan ng access.",
+        "s4": "Hindi kilalang numero ang nagpadala, hindi ang iyong bangko.",
+        "s5": "Ipinadala rin ang parehong mensahe sa marami pang ibang tao."
+      }
+    },
+    "agency": {
+      "title": "Mga mapanganib na recruitment agency",
+      "hook": "Walang lisensya, may paunang bayad.",
+      "howItStarts": "May page na nagsasabing opisyal at lisensyadong ahensya ito. Marami itong trabaho sa ibang bansa na nakalista. Kapag nag-message ka sa kanila, hihingi sila ng registration fee, bayad sa training o deposito bago ang anumang kontrata.",
+      "signs": {
+        "s1": "Walang numero ng lisensya, o numero na hindi mo ma-verify.",
+        "s2": "Mga bayarin para sa registration, training, visa o isang \"puwesto\".",
+        "s3": "Lahat ng trabaho ay malaki ang sahod at hindi kailangan ng kasanayan.",
+        "s4": "Sinasabi nilang magbayad ngayon para maireserba ang iyong puwesto.",
+        "s5": "May ibang mga manggagawa na nag-ulat sa parehong pangalan o numero."
+      }
+    },
+    "shop": {
+      "title": "Mga mapanganib na alok sa online shop",
+      "hook": "Napakababang presyo, magbayad sa labas ng app.",
+      "howItStarts": "May nakita kang telepono o produkto sa napakababang presyo. Sinasabi ng nagbebenta na \"i-chat ako para sa mas magandang tawad\", at humihiling na magbayad sa pamamagitan ng bank transfer. Pagkatapos mong magbayad, hindi na sasagot ang nagbebenta at walang darating.",
+      "signs": {
+        "s1": "Napakababa ng presyo kumpara sa karaniwang presyo.",
+        "s2": "Pinapabayad ka ng nagbebenta sa labas ng shop app.",
+        "s3": "Bagong account ng nagbebenta na walang history o mga review.",
+        "s4": "\"Kailangan agad ng pera.\" \"Huling piraso na lang.\"",
+        "s5": "Inililipat ng nagbebenta ang usapan sa ibang app."
+      }
+    }
+  },
+  "examples": {
+    "jobs": {
+      "e1": {
+        "title": "May nakita kang post tungkol sa trabaho",
+        "caption": "Malaking sahod, libreng lipad at walang kailangang karanasan."
+      },
+      "e2": {
+        "title": "I-tap ang shield",
+        "caption": "Nakikita ng shield ang post sa iyong screen. Humihiling ito na buksan ang nakatagong text."
+      },
+      "e3": {
+        "title": "Sinusuri ito ng SafeRoute",
+        "caption": "Binabasa nito ang buong post at naghahanap ng mga babala."
+      },
+      "e4": {
+        "title": "Ang resulta",
+        "caption": "Ipinapakita ng SafeRoute ang resultang mataas na panganib, kasama ang mga dahilan at kung ano ang susunod na gagawin."
+      }
+    },
+    "romance": {
+      "e1": {
+        "title": "May hindi kakilalang nag-chat",
+        "caption": "Mababait na salita, pagkatapos ay usapan tungkol sa madaling kita."
+      },
+      "e2": {
+        "title": "Pindutin ang shield",
+        "caption": "Kailangan ng SafeRoute ang mga naunang mensahe para makita ang buong kwento."
+      },
+      "e3": {
+        "title": "Mag-scroll pataas at pindutin muli",
+        "caption": "Ang simula ng chat ay nagpapakita ng \"maling numero\"."
+      },
+      "e4": {
+        "title": "Ang resulta",
+        "caption": "Nagpapakita ang chat ng mga senyales ng romance at investment scam."
+      }
+    },
+    "parcel": {
+      "e1": {
+        "title": "May dumating na mensahe",
+        "caption": "Binabalaan ka ng SafeRoute bago mo buksan ang link."
+      },
+      "e2": {
+        "title": "Pindutin para makita kung bakit",
+        "caption": "Makikita mo ang mga dahilan. Huwag buksan ang link."
+      }
+    },
+    "agency": {
+      "e1": {
+        "title": "Nagbukas ka ng page ng ahensya",
+        "caption": "Sinasabi nitong \"opisyal\" at nagpapakita ng numero ng lisensya."
+      },
+      "e2": {
+        "title": "Sinusuri ito ng SafeRoute",
+        "caption": "Hinahanap nito ang lisensya at mga ulat tungkol sa ahensya."
+      }
+    },
+    "shop": {
+      "e1": {
+        "title": "May nakita kang murang alok",
+        "caption": "Isang telepono na mas mababa kaysa sa karaniwang presyo nito."
+      },
+      "e2": {
+        "title": "Pindutin ang pangalan ng nagbebenta",
+        "caption": "Hilingin sa SafeRoute na tingnan kung sino ang nagbebenta."
+      },
+      "e3": {
+        "title": "Buksan ang page ng nagbebenta",
+        "caption": "Bagong account na kakaunti pa ang benta."
+      },
+      "e4": {
+        "title": "Ang resulta",
+        "caption": "Ipinapakita ng SafeRoute ang mga senyales na nagpapakitang mapanganib ang alok na ito."
+      }
+    }
+  },
+  "flags": {
+    "too_good": {
+      "name": "Masyadong maganda",
+      "title": "Masyadong maganda para maging totoo",
+      "explain": "Sahod o benepisyong higit sa karaniwan, nang walang kailangang karanasan.",
+      "phrase": "\"Kumita ng 5,000 bawat buwan. Walang kailangang karanasan.\""
+    },
+    "pressure": {
+      "name": "Pamimilit",
+      "title": "Pamimilit",
+      "explain": "Gusto nilang kumilos ka agad at huwag nang mag-isip o magtanong sa iba.",
+      "phrase": "\"3 puwesto na lang ang natitira. Huwag sabihin kaninuman.\""
+    },
+    "payment_route": {
+      "name": "Kakaibang bayad",
+      "title": "Paraan ng pagbabayad",
+      "explain": "Mga bayarin, deposito, o paglilipat ng pera bago magsimula, o sa labas ng app.",
+      "phrase": "\"Ipadala ang bayad sa account na ito para mai-book ang iyong puwesto.\""
+    },
+    "identity": {
+      "name": "Nakatagong pagkakakilanlan",
+      "title": "Nakatagong pagkakakilanlan",
+      "explain": "Walang malinaw na pangalan o kumpanya. Gumagamit lang sila ng mga pribadong chat app.",
+      "phrase": "\"I-message na lang ako sa Telegram.\""
+    },
+    "link_risk": {
+      "name": "Mapanganib na link",
+      "title": "Mapanganib na link",
+      "explain": "Mga bagong web address, pinaikling link, o mga tracking page na nanggagaya.",
+      "phrase": "\"I-track ang iyong parcel: bit.ly/x7Kd2\""
+    },
+    "known_bad": {
+      "name": "Nai-report na dati",
+      "title": "Nai-report na dati",
+      "explain": "Ang numero, page, o mensahe ay nai-report na ng iba.",
+      "phrase": "\"Mahal naming customer, naka-lock ang iyong account.\""
+    },
+    "trafficking": {
+      "name": "Trafficking",
+      "title": "Mga senyales ng trafficking",
+      "explain": "Walang visa, kukunin ang iyong pasaporte, o susunduin ka sa border.",
+      "phrase": "\"May driver na sasalubong sa iyo sa border. Dalhin mo ang iyong pasaporte.\""
+    }
+  },
+  "shieldSteps": {
+    "s1": {
+      "title": "I-on ang shield",
+      "caption": "May maliit na button sa gilid ng iyong screen."
+    },
+    "s2": {
+      "title": "I-tap ito sa anumang kakaiba",
+      "caption": "Gumagana ito sa mga post, chat, at shop sa iba pang app."
+    },
+    "s3": {
+      "title": "Basahin ang resulta",
+      "caption": "Mababang panganib, Mag-ingat o Mataas na panganib, kasama ang mga dahilan."
+    }
+  }
+}

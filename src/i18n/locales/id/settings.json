@@ -1,0 +1,62 @@
+{
+  "_meta": {
+    "reviewed": false
+  },
+  "title": "Pengaturan",
+  "account": {
+    "title": "Akun",
+    "signOut": "Keluar",
+    "deleteAccount": "Hapus akun",
+    "unavailable": "Anda menggunakan SafeRoute tanpa akun. Akun belum tersedia di versi ini.",
+    "none": "Tanpa akun",
+    "noneBody": "Semua fitur tetap bisa dipakai tanpa akun. Buat akun agar hasil periksa dan kontak Anda tidak hilang jika berganti HP, dan dapat batas periksa per jam lebih banyak.",
+    "create": "Buat akun",
+    "signIn": "Masuk"
+  },
+  "sync": {
+    "syncing": "Menyelaraskan hasil periksa dan kontak Anda...",
+    "done": "Hasil periksa dan kontak Anda sudah diselaraskan.",
+    "error": "Penyelarasan dijeda. Kami akan mencoba lagi saat Anda membuka aplikasi nanti."
+  },
+  "appLanguage": {
+    "title": "Bahasa aplikasi",
+    "body": "Bahasa untuk aplikasi ini. Bahasa laporan juga akan mengikuti jika sudah tersedia."
+  },
+  "reportLanguage": "Bahasa laporan",
+  "myCountry": "Negara asal saya",
+  "destination": "Tempat saya akan bekerja atau bepergian",
+  "privacy": {
+    "title": "Privasi",
+    "share": "Bantu sesama: bagikan pola penipuan tanpa nama",
+    "shareBody": "Tangkapan layar dan teks asli tidak dibagikan. Data pribadi dihapus lebih dulu, lalu nomor HP, akun, dan tautan hanya disimpan dalam bentuk kode acak. Pola akan muncul di Radar penipuan setelah dilaporkan oleh beberapa orang.",
+    "p1": "Hasil periksa Anda disimpan di perangkat ini. Akun yang masuk juga menyelaraskan teks laporan, kontak tepercaya, dan pengaturan. Tangkapan layar tidak pernah disimpan atau diselaraskan.",
+    "p2": "Untuk memeriksa sesuatu, SafeRoute mengirim teks, tautan, atau tangkapan layar ke layanan periksa kami, yang menggunakan model AI Google dan Google Safe Browsing untuk menilainya. Kami tidak mencatat isinya.",
+    "p3": "Setiap pemasangan aplikasi mendapat ID anonim tanpa nama. Kami hanya memakainya untuk membatasi jumlah pemeriksaan per jam bagi setiap orang.",
+    "p4": "Anda dapat menghapus data di perangkat ini kapan saja. Pemilik akun juga dapat menghapus akun dan semua data yang diselaraskan.",
+    "policy": "Kebijakan privasi",
+    "deleteInfo": "Cara menghapus data Anda",
+    "deleteLocal": "Hapus data di perangkat ini"
+  },
+  "confirm": {
+    "signOut": {
+      "title": "Keluar?",
+      "message": "Hasil periksa dan kontak Anda tetap tersimpan di akun Anda. Data di perangkat ini akan dibersihkan.",
+      "action": "Keluar"
+    },
+    "deleteLocal": {
+      "title": "Hapus data di perangkat ini?",
+      "messageSynced": "Tindakan ini menghapus hasil periksa, kontak, dan pengaturan di perangkat ini, lalu mengeluarkan akun Anda. Akun dan data yang tersinkronisasi tetap aman sampai Anda menghapus akun tersebut.",
+      "messageLocal": "Tindakan ini menghapus hasil periksa, kontak tepercaya, dan pengaturan Anda di perangkat ini.",
+      "action": "Hapus"
+    },
+    "deleteAccount": {
+      "title": "Hapus akun Anda?",
+      "message": "Tindakan ini menghapus akun Anda dan semua data yang tersinkronisasi selamanya. Data di perangkat ini juga akan dibersihkan.",
+      "action": "Hapus akun"
+    }
+  },
+  "deleted": {
+    "title": "Akun telah dihapus",
+    "message": "Akun dan data yang tersinkronisasi sudah terhapus."
+  }
+}

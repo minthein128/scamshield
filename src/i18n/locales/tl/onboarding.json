@@ -1,0 +1,45 @@
+{
+  "_meta": {
+    "reviewed": false
+  },
+  "step": "Hakbang {{current}} ng {{total}}",
+  "skipA11y": "Laktawan ang setup",
+  "language": {
+    "title": "Piliin ang iyong wika",
+    "body": "Ipapakita ng SafeRoute ang app at isusulat ang mga ulat at binibigkas na babala sa wikang ito. Maaari mo itong baguhin mamaya."
+  },
+  "countries": {
+    "fromTitle": "Taga-saan ka?",
+    "fromBody": "Ipinapakita nito ang tamang mga hotline muna.",
+    "toTitle": "Saan ka magtatrabaho o pupunta?",
+    "toBody": "Opsyonal. Laktawan ito kung hindi mo pa alam."
+  },
+  "how": {
+    "title": "Paano tumutulong ang SafeRoute",
+    "body": "Tatlong bagay, walang kailangang i-set up.",
+    "check": {
+      "title": "Suriin bago ka pumayag",
+      "body": "I-paste ang alok sa trabaho, chat o link, o magbahagi ng screenshot. Naghahanap ang SafeRoute ng mga babala ng trafficking at scam."
+    },
+    "explain": {
+      "title": "Alamin kung bakit, sa iyong wika",
+      "body": "Makakakuha ka ng malinaw na resulta, ang mga dahilan sa likod nito at binibigkas na babala sa wikang pinili mo."
+    },
+    "warn": {
+      "title": "Magbabala sa pamilya at humingi ng tulong",
+      "body": "Magpadala ng babala sa mga taong pinagkakatiwalaan mo at maghanap ng opisyal na mga hotline para sa mga bansang mahalaga sa iyo."
+    }
+  },
+  "shield": {
+    "title": "I-on ang Screen shield",
+    "body": "Opsyonal. Maaari mo rin itong gawin mamaya mula sa home screen."
+  },
+  "account": {
+    "title": "Gamitin ang SafeRoute sa paraang gusto mo",
+    "body": "Gumagana ang lahat nang walang account. Mananatili ang iyong mga pagsusuri sa device na ito.",
+    "note": "Opsyonal ang pagkakaroon ng account. Sine-save nito ang iyong history at mga pinagkakatiwalaang contact para mabawi mo ang mga ito sa bagong telepono, at tinataasan nito ang limitasyon ng iyong pagsusuri bawat oras.",
+    "anonymous": "Magpatuloy nang walang account",
+    "signUp": "Gumawa ng account",
+    "signIn": "May account na ako"
+  }
+}

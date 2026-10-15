@@ -1,6 +1,8 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { Screen } from '../components/Screen';
+import { Text } from '../components/Text';
 import { BackButton, Card, SectionTitle } from '../components/ui';
 import { Icon } from '../components/Icon';
 import type { RootScreenProps } from '../navigation/types';
@@ -8,14 +10,12 @@ import theme from '../theme/theme';
 import { ACCENTS } from './learn/accents';
 import { DemoStepper } from './learn/DemoStepper';
 import { LinkRow } from './learn/LinkRow';
-import {
-  GUIDE_ACTIONS, GUIDE_EXAMPLE, GUIDE_EXAMPLE_NOTE, GUIDE_HOW_IT_STARTS, GUIDE_SIGNS,
-  findRedFlag, findScamType, type GuideAction,
-} from './learn/content';
+import { findRedFlag, findScamType, type GuideAction } from './learn/content';
 
 const { colors, fonts } = theme;
 
 export const ScamGuideScreen: React.FC<RootScreenProps<'ScamGuide'>> = ({ navigation, route }) => {
+  const { t, i18n } = useTranslation('learn');
   const scam = findScamType(route.params.type);
   if (!scam) return null;
   const { accent, soft } = ACCENTS[scam.id];
@@ -29,7 +29,7 @@ export const ScamGuideScreen: React.FC<RootScreenProps<'ScamGuide'>> = ({ naviga
     <Screen contentStyle={{ gap: 24 }}>
       <View style={styles.top}>
         <BackButton onPress={() => navigation.goBack()} />
-        <Text style={styles.eyebrow}>Scam guide</Text>
+        <Text style={styles.eyebrow}>{t('guide.eyebrow')}</Text>
       </View>
 
       <View style={styles.hero}>
@@ -41,17 +41,17 @@ export const ScamGuideScreen: React.FC<RootScreenProps<'ScamGuide'>> = ({ naviga
       </View>
 
       <View style={styles.section}>
-        <SectionTitle>{GUIDE_HOW_IT_STARTS}</SectionTitle>
+        <SectionTitle>{t('guide.howItStarts')}</SectionTitle>
         <Text style={styles.para}>{scam.howItStarts}</Text>
       </View>
 
       <View style={styles.section}>
-        <SectionTitle>{GUIDE_SIGNS}</SectionTitle>
+        <SectionTitle>{t('guide.signs')}</SectionTitle>
         <Card style={{ gap: 14 }}>
           {scam.signs.map((s, i) => {
             const flag = findRedFlag(s.family);
             return (
-              <View key={i} style={styles.sign} accessible accessibilityLabel={`${flag?.title ?? 'Warning'}: ${s.text}`}>
+              <View key={i} style={styles.sign} accessible accessibilityLabel={`${flag?.title ?? t('guide.signFallback')}: ${s.text}`}>
                 <View style={styles.signIcon}>
                   <Icon name={flag?.icon ?? 'flag'} size={18} color={colors.danger} />
                 </View>
@@ -63,13 +63,13 @@ export const ScamGuideScreen: React.FC<RootScreenProps<'ScamGuide'>> = ({ naviga
       </View>
 
       <View style={styles.section}>
-        <SectionTitle>{GUIDE_EXAMPLE}</SectionTitle>
-        <Text style={styles.note}>{GUIDE_EXAMPLE_NOTE}</Text>
+        <SectionTitle>{t('guide.example')}</SectionTitle>
+        <Text style={styles.note}>{i18n.language === 'en' ? t('guide.exampleNote') : `${t('guide.exampleNote')} ${t('guide.exampleEnglish')}`}</Text>
         <DemoStepper steps={scam.example} accent={accent} testID="scam-stepper" />
       </View>
 
       <View style={styles.section}>
-        <SectionTitle>{GUIDE_ACTIONS}</SectionTitle>
+        <SectionTitle>{t('guide.actions')}</SectionTitle>
         {scam.actions.map(a =>
           a.kind === 'noPay' ? (
             <View key={a.kind} style={styles.stop} accessible accessibilityLabel={`${a.title}. ${a.body}`}>
