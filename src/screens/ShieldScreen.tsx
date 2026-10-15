@@ -40,8 +40,7 @@ export const ShieldScreen: React.FC<RootScreenProps<'Shield'>> = ({ navigation }
   };
 
   return (
-    <Screen>
-      <ScreenHeader title="Screen shield" onBack={() => navigation.goBack()} />
+    <Screen header={<ScreenHeader title="Screen shield" onBack={() => navigation.goBack()} />}>
       <ShieldCardView control={control} />
       <MessageGuardCard />
       <Card style={{ gap: 8 }}>

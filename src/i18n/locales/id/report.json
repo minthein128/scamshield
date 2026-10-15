@@ -5,8 +5,6 @@
   "seen_other": "Dilaporkan {{count}} kali oleh pengguna SafeRoute lain dalam 30 hari terakhir",
   "title": "Laporan risiko",
   "a11yVerdict": "{{verdict}}. Skor {{score}} dari 100.",
-  "listen": "Dengarkan dalam {{language}}",
-  "stop": "Berhenti",
   "warn": "Beri tahu keluarga saya",
   "call": "Hubungi {{number}}",
   "callExt": "lalu minta sambungan lokal {{ext}}",

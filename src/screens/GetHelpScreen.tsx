@@ -48,8 +48,7 @@ export const GetHelpScreen: React.FC<RootScreenProps<'GetHelp'>> = ({ navigation
   const sections = showAll || mine.length === 0 ? allSections() : mine;
 
   return (
-    <Screen wide>
-      <ScreenHeader title={t('title')} onBack={() => navigation.goBack()} />
+    <Screen wide header={<ScreenHeader title={t('title')} onBack={() => navigation.goBack()} />}>
       <Text style={styles.body}>{t('intro')}</Text>
 
       <Button testID="help-report-scam" label={t('reportScam')} variant="secondary" icon="flag" onPress={() => navigation.navigate('ReportScam')} />
