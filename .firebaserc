@@ -1,5 +1,17 @@
 {
   "projects": {
     "default": "saferoute-aibc"
+  },
+  "targets": {
+    "saferoute-aibc": {
+      "hosting": {
+        "app": [
+          "saferoute-aibc"
+        ],
+        "admin": [
+          "saferoute-admin"
+        ]
+      }
+    }
   }
 }
