@@ -156,3 +156,26 @@ export function userFacingText(res: Pick<CheckResponse, 'title' | 'summary' | 's
 export function countCertainty(res: Pick<CheckResponse, 'title' | 'summary' | 'spokenWarning' | 'flags'>, lang: Lang): number {
   return userFacingText(res).reduce((n, t) => n + findCertainty(t, lang).length, 0);
 }
+
+// SafeRoute speaks with a female voice. These are male speaker forms; ผม also means "hair", so this is detect only.
+const MALE_FORMS: Partial<Record<Lang, RegExp>> = {
+  my: /ကျွန်တော်|ခင်ဗျာ|ခင်ဗျ/g,
+  th: /ครับ|ผม/g,
+};
+
+export const genderCounters = { gender_form_hit: 0 };
+
+/** Male speaker forms in text the female voice speaks. Detect only, never rewritten. */
+export function findMaleForms(text: string, lang: Lang): string[] {
+  const re = MALE_FORMS[lang];
+  return re ? [...text.matchAll(new RegExp(re.source, re.flags))].map((m) => m[0]) : [];
+}
+
+/** Male forms in any language, for spoken text whose language is not fixed. */
+export function findMaleFormsAny(text: string): string[] {
+  return (Object.keys(MALE_FORMS) as Lang[]).flatMap((l) => findMaleForms(text, l));
+}
+
+export function countMaleForms(res: Pick<CheckResponse, 'title' | 'summary' | 'spokenWarning' | 'flags'>, lang: Lang): number {
+  return userFacingText(res).reduce((n, t) => n + findMaleForms(t, lang).length, 0);
+}

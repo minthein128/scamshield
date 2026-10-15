@@ -7,7 +7,7 @@ import { z } from 'zod';
 import { clientIp, type Limits } from './app.js';
 import { bearerToken, type TokenVerifier } from './auth.js';
 import type { Config } from './config.js';
-import { findCertainty } from './language-guard.js';
+import { findCertainty, findMaleFormsAny, genderCounters } from './language-guard.js';
 import {
   ACTION_SCREENS,
   type ActionScreen,
@@ -33,7 +33,7 @@ const SESSION_COST = 2;
 const MAX_CONTEXT_BYTES = 64 * 1024;
 const MAX_CONTEXTS = 10;
 
-export const liveCounters = { live_certainty_hit: 0, sessions: 0 };
+export const liveCounters = { live_certainty_hit: 0, gender_form_hit: 0, sessions: 0 };
 
 const country = z
   .string()
@@ -161,18 +161,19 @@ const RECHECK_DECLARATION = {
     'Capture and check the screen again when the listener asks about something new on their screen. The new report arrives later as a NEW CURRENT REPORT message.',
 };
 
+/** No fixed output language: the model answers in the listener's language from the allowed set. */
 export function liveConfig(
   cfg: Pick<Config, 'liveVoice'>,
   systemInstruction: string,
-  language: Lang,
+  allowed: readonly Lang[],
   mode: LiveMode = 'self',
 ): LiveConnectConfig {
   return {
     responseModalities: [Modality.AUDIO],
     systemInstruction,
-    speechConfig: { languageCode: speechLocale(language), voiceConfig: { prebuiltVoiceConfig: { voiceName: cfg.liveVoice } } },
+    speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: cfg.liveVoice } } },
     outputAudioTranscription: {},
-    inputAudioTranscription: {},
+    inputAudioTranscription: { languageCodes: allowed.map(speechLocale) },
     tools: [
       {
         functionDeclarations: [
@@ -230,7 +231,6 @@ export function attachLive(server: Server, deps: LiveDeps) {
     const closed = () => phase === 'done';
     let session: LiveSessionLike | undefined;
     let activeKey: string | undefined;
-    let lang: Lang = 'en';
     let mode: LiveMode = 'self';
     let contexts = 0;
     let checkId: string | undefined;
@@ -249,9 +249,12 @@ export function attachLive(server: Server, deps: LiveDeps) {
     const endModelLine = () => {
       if (!modelText) return;
       send({ type: 'transcript', role: 'model', text: modelText, final: true });
-      const hits = findCertainty(modelText, lang).length;
+      const hits = LANGS.reduce((n, l) => n + findCertainty(modelText, l).length, 0);
       certaintyHits += hits;
       liveCounters.live_certainty_hit += hits;
+      const male = findMaleFormsAny(modelText).length;
+      liveCounters.gender_form_hit += male;
+      genderCounters.gender_form_hit += male;
       turns++;
       modelText = '';
     };
@@ -341,9 +344,9 @@ export function attachLive(server: Server, deps: LiveDeps) {
       const parsed = parseStart(raw);
       if (!parsed.ok) return fail('bad_request', parsed.message);
       const { start } = parsed;
+      if (!cfg.liveLanguages.includes(start.language)) return fail('unsupported_language', 'Voice is not available in this language');
       phase = 'connecting';
       clearTimeout(startTimer);
-      lang = start.language;
       mode = start.mode;
       checkId = start.checkId;
 
@@ -372,12 +375,13 @@ export function attachLive(server: Server, deps: LiveDeps) {
         mode: start.mode,
         home: start.home,
         destination: start.destination,
+        allowed: cfg.liveLanguages,
       });
       try {
         const opened = await deps.connect(
           {
             model: cfg.liveModel,
-            config: liveConfig(cfg, system, start.language, start.mode),
+            config: liveConfig(cfg, system, cfg.liveLanguages, start.mode),
             callbacks: {
               onmessage: onServer,
               onerror: () => fail('upstream', 'Voice service error'),

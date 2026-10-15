@@ -197,6 +197,16 @@ describe('live session', () => {
     expect(h.session.view).toMatchObject({ state: 'error', error: 'rate_limited' });
   });
 
+  it('falls back to Listen when the server does not offer voice in this language', async () => {
+    const h = setup();
+    const p = h.session.start();
+    await jest.advanceTimersByTimeAsync(0);
+    await p;
+    h.sockets[0].open();
+    h.sockets[0].push({ type: 'error', code: 'unsupported_language', message: 'x' });
+    expect(h.session.view).toMatchObject({ state: 'error', error: 'unavailable', fallback: true });
+  });
+
   it('reports a denied microphone without opening a socket', async () => {
     const h = setup({}, false);
     await h.session.start();

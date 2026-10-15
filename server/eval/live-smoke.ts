@@ -28,7 +28,40 @@ const QUESTIONS: Record<string, string> = {
   en: 'Is this job safe? They want me to pay a fee first. What should I do?',
   danger: 'They are keeping my passport and I cannot leave the building. I am scared. Please help me.',
   recheck: 'Okay. Now I opened a different message. Can you check this new message on my screen?',
+  th: 'งานนี้ปลอดภัยไหม เขาให้จ่ายค่าธรรมเนียมก่อน ฉันควรทำอย่างไรดี',
+  myBack: 'ကောင်းပြီ။ ဒါဆို ကျွန်တော် ဘယ်သူ့ကို အကူအညီတောင်းရမလဲ။',
 };
+
+interface LangTurn {
+  q: keyof typeof QUESTIONS;
+  speakAs: Lang;
+  expect: 'my' | 'th' | 'latin';
+}
+
+const LANG_SCENARIOS: { id: string; session: Lang; turns: LangTurn[] }[] = [
+  {
+    id: 'lang-my-en-my',
+    session: 'my',
+    turns: [
+      { q: 'en', speakAs: 'en', expect: 'latin' },
+      { q: 'myBack', speakAs: 'my', expect: 'my' },
+    ],
+  },
+  { id: 'lang-th-en', session: 'th', turns: [{ q: 'en', speakAs: 'en', expect: 'latin' }] },
+  { id: 'lang-en-my', session: 'en', turns: [{ q: 'my', speakAs: 'my', expect: 'my' }] },
+  { id: 'voice-th-th', session: 'th', turns: [{ q: 'th', speakAs: 'th', expect: 'th' }] },
+  { id: 'voice-my-my', session: 'my', turns: [{ q: 'my', speakAs: 'my', expect: 'my' }] },
+];
+
+const scriptOf = (t: string): 'my' | 'th' | 'latin' => {
+  const my = (t.match(/[\u1000-\u109F]/g) ?? []).length;
+  const th = (t.match(/[\u0E00-\u0E7F]/g) ?? []).length;
+  const latin = (t.match(/[A-Za-z]/g) ?? []).length;
+  return my >= th && my >= latin ? 'my' : th >= latin ? 'th' : 'latin';
+};
+
+const FEMALE = /ကျွန်မ|ရှင့်|ရှင်|ค่ะ|คะ|ดิฉัน/g;
+const MALE = /ကျွန်တော်|ခင်ဗျာ|ခင်ဗျ|ครับ|ผม/g;
 
 const SECOND_POST =
   'Hi, this is Kerry Express. Your parcel will arrive tomorrow between 9 and 12. No payment is needed. Track it in the Kerry app.';
@@ -425,6 +458,75 @@ async function runCompanion(ai: GoogleGenAI | undefined) {
   };
 }
 
+/** Live language and voice checks: which language each reply comes back in, and its speaker particles. */
+async function runLanguages(only?: string[]) {
+  const out: Record<string, unknown>[] = [];
+  const reports = new Map<Lang, CheckResponse>();
+  const audioFor = new Map<string, Buffer>();
+  for (const sc of LANG_SCENARIOS.filter((x) => !only || only.includes(x.id) || only.includes('lang'))) {
+    console.log(`\n== ${sc.id}`);
+    if (!reports.has(sc.session)) {
+      const text = sc.session === 'my' ? (POSTS.my as string) : (POSTS.en as string);
+      reports.set(
+        sc.session,
+        (await post('/v1/check', {
+          kind: 'job',
+          text,
+          language: sc.session,
+          shareSignals: false,
+          context: { destination: 'Thailand', home: 'Myanmar' },
+        })) as CheckResponse,
+      );
+    }
+    const report = reports.get(sc.session) as CheckResponse;
+    const ws = new WebSocket(`${API.replace(/^http/, 'ws')}/v1/live`);
+    const l = listen(ws);
+    await new Promise<void>((ok, bad) => {
+      ws.once('open', () => ok());
+      ws.once('error', bad);
+    });
+    ws.send(
+      JSON.stringify({
+        type: 'start',
+        checkId: report.id,
+        report: payload(report),
+        language: sc.session,
+        mode: 'self',
+        home: HOME,
+        destination: DEST,
+      }),
+    );
+    while (!l.ready && !l.errors.length) await sleep(20);
+    const turns: Record<string, unknown>[] = [];
+    for (const t of sc.turns) {
+      if (l.errors.length) break;
+      const key = `${t.speakAs}:${t.q}`;
+      if (!audioFor.has(key)) {
+        const sp = (await post('/v1/speak', { text: QUESTIONS[t.q], language: t.speakAs })) as { audioBase64: string };
+        audioFor.set(key, wavToPcm16k(Buffer.from(sp.audioBase64, 'base64')));
+      }
+      const before = l.finals;
+      const end = await speakAndWait(l, audioFor.get(key) as Buffer, () => l.finals > before);
+      const reply = l.lines.slice(before).join(' ');
+      const got = scriptOf(reply);
+      const female = reply.match(FEMALE) ?? [];
+      const male = reply.match(MALE) ?? [];
+      const ttfa = (l.firstAudioAfter(end) ?? 0) - end;
+      console.log(
+        `asked in ${t.speakAs}: reply script ${got} (expected ${t.expect}) ${got === t.expect ? 'OK' : 'MISMATCH'}; ttfa ${ttfa} ms`,
+      );
+      console.log(`said : ${reply}`);
+      console.log(`particles female ${JSON.stringify(female)} male ${JSON.stringify(male)}`);
+      turns.push({ askedIn: t.speakAs, expected: t.expect, got, ok: got === t.expect, ttfa, female, male, reply });
+    }
+    ws.send(JSON.stringify({ type: 'end' }));
+    await Promise.race([new Promise((r) => ws.once('close', r)), sleep(3000)]);
+    if (l.errors.length) console.log(`errors ${JSON.stringify(l.errors)}`);
+    out.push({ id: sc.id, session: sc.session, turns, errors: l.errors });
+  }
+  return out;
+}
+
 async function main() {
   const key = process.env.GEMINI_API_KEY;
   const ai = key ? new GoogleGenAI({ apiKey: key }) : undefined;
@@ -475,6 +577,8 @@ async function main() {
     });
   }
   if (!ONLY || ONLY.includes('companion')) summary.push(await runCompanion(ai));
+  if (!ONLY || ONLY.some((x) => x === 'lang' || x.startsWith('lang-') || x.startsWith('voice-')))
+    summary.push(...(await runLanguages(ONLY)));
   writeFileSync('/tmp/saferoute-live-smoke.json', JSON.stringify(summary, null, 2));
   console.log('\nsummary written to /tmp/saferoute-live-smoke.json');
 }

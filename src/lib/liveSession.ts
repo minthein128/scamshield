@@ -170,7 +170,8 @@ export function createLiveSession(options: LiveSessionOptions, deps: LiveSession
         if (f.screen === 'WARN_FAMILY' || f.screen === 'HOTLINES') options.onAction?.(f.screen);
         break;
       case 'error':
-        fail(knownError(f.code));
+        if (f.code === 'unsupported_language') fail('unavailable', { fallback: true });
+        else fail(knownError(f.code));
         break;
       case 'closed':
         if (f.reason === 'error' && view.state !== 'error') fail('upstream');

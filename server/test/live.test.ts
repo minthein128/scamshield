@@ -92,11 +92,28 @@ describe('buildSystemInstruction', () => {
     expect(prompt({ home: 'TH', destination: undefined })).toContain(consular?.number as string);
   });
 
-  it('states the language rule and the hedged example for the language', () => {
+  it('answers in the listener language from the allowed set, starting in the session language', () => {
     const p = prompt();
-    expect(p).toContain('Speak ONLY in Burmese (Myanmar script)');
+    expect(p).not.toContain('Speak ONLY');
+    expect(p).toContain('Answer in the language the listener is speaking, if it is one of these');
+    expect(p).toContain('Start in Burmese (Myanmar script)');
+    expect(p).toContain('SafeRoute can talk in မြန်မာ, English, ไทย, Bahasa Indonesia, Tagalog');
     expect(p).toContain('ဒီအလုပ်ကမ်းလှမ်းချက်မှာ');
     expect(p).toContain('Two or three short sentences');
+    const narrow = prompt({ allowed: ['en', 'my'] });
+    expect(narrow).toContain('You can speak Burmese (Myanmar script), English.');
+    expect(narrow).not.toContain('ไทย');
+  });
+
+  it('uses female speaker forms in every mode', () => {
+    for (const mode of ['self', 'family', 'companion'] as const) {
+      const p = prompt({ mode });
+      expect(p).toContain("Your voice is a woman's voice");
+      expect(p).toContain('ကျွန်မ');
+      expect(p).toContain('never ကျွန်တော်');
+      expect(p).toContain('ค่ะ');
+      expect(p).toContain('never ครับ');
+    }
   });
 
   it('carries the likelihood rules, the scope rule and the danger rule', () => {
@@ -156,13 +173,19 @@ describe('buildSystemInstruction', () => {
 
 describe('companion tools and context', () => {
   const names = (mode: 'self' | 'companion') =>
-    (liveConfig({ liveVoice: 'v' }, 'x', 'en', mode).tools ?? []).flatMap((t) =>
+    (liveConfig({ liveVoice: 'v' }, 'x', ['en'], mode).tools ?? []).flatMap((t) =>
       ((t as { functionDeclarations?: { name: string }[] }).functionDeclarations ?? []).map((d) => d.name),
     );
 
   it('declares recheck_screen only in companion mode', () => {
     expect(names('companion')).toEqual(['open_action_sheet', 'recheck_screen']);
     expect(names('self')).toEqual(['open_action_sheet']);
+  });
+
+  it('sets no fixed output language and hints the allowed languages to transcription', () => {
+    const c = liveConfig({ liveVoice: 'Sulafat' }, 'x', ['en', 'my', 'th']);
+    expect(c.speechConfig).toEqual({ voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Sulafat' } } });
+    expect(c.inputAudioTranscription).toEqual({ languageCodes: ['en-US', 'my-MM', 'th-TH'] });
   });
 
   it('validates context frames', () => {
@@ -292,6 +315,36 @@ describe('live relay', () => {
     await c.open;
     c.send(start({ checkId: 'chk_nope', report: REPORT }));
     await c.until((f) => f.type === 'ready');
+  });
+
+  it('refuses a language outside LIVE_LANGUAGES with unsupported_language', async () => {
+    const { url } = await boot({ LIVE_LANGUAGES: 'en,my' });
+    const c = client(url);
+    await c.open;
+    c.send(start({ language: 'th' }));
+    expect(await c.until((f) => f.type === 'error')).toMatchObject({ code: 'unsupported_language' });
+    expect(await c.until((f) => f.type === 'closed')).toMatchObject({ reason: 'error' });
+  });
+
+  it('parses LIVE_LANGUAGES with a full default', () => {
+    expect(loadConfig({}).liveLanguages).toEqual(['en', 'my', 'th', 'id', 'tl']);
+    expect(loadConfig({ LIVE_LANGUAGES: ' MY, en ,xx,my' }).liveLanguages).toEqual(['my', 'en']);
+    expect(loadConfig({ LIVE_LANGUAGES: 'xx' }).liveLanguages).toEqual(['en', 'id', 'tl', 'my', 'th']);
+  });
+
+  it('counts male speaker forms in the spoken text, detect only', async () => {
+    const { url, fake } = await boot();
+    const before = liveCounters.gender_form_hit;
+    const c = client(url);
+    await c.open;
+    c.send(start({ language: 'my' }));
+    await c.until((f) => f.type === 'ready');
+    const cb = fake.sessions[0]?.cb as LiveCallbacks;
+    cb.onmessage({ serverContent: { outputTranscription: { text: 'ကျွန်တော် ပြောပါမယ် ခင်ဗျာ' } } });
+    cb.onmessage({ serverContent: { turnComplete: true } });
+    const line = await c.until((f) => f.type === 'transcript' && f.final === true);
+    expect(line.text).toBe('ကျွန်တော် ပြောပါမယ် ခင်ဗျာ');
+    expect(liveCounters.gender_form_hit - before).toBe(2);
   });
 
   it('rejects a bad start frame with bad_request', async () => {

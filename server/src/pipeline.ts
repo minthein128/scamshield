@@ -7,7 +7,7 @@ import type { StreamOpts } from './extract-stream.js';
 import type { Feedback } from './feedback/service.js';
 import type { Grounder, GroundResult } from './ground.js';
 import { type Intel, NO_LOOKUP } from './intel/service.js';
-import { countCertainty, guardExtraction, guardFlags, isHeavy } from './language-guard.js';
+import { countCertainty, countMaleForms, genderCounters, guardExtraction, guardFlags, isHeavy } from './language-guard.js';
 import { log } from './log.js';
 import { score } from './score.js';
 import { Timings, timingStore } from './timing.js';
@@ -280,6 +280,11 @@ export function createPipeline(deps: PipelineDeps): Pipeline {
         after: countCertainty(response, req.language),
       };
       if (stats.before > 0) log('INFO', 'certainty_rewrite', { ...stats });
+      const maleForms = countMaleForms(response, req.language);
+      if (maleForms > 0) {
+        genderCounters.gender_form_hit += maleForms;
+        log('INFO', 'gender_form_hit', { lang: req.language, hits: maleForms });
+      }
       deps.onLanguage?.(stats);
       tm.meta.scoreExplainMs = Math.round((performance.now() - scoreStart) * 100) / 100;
 
