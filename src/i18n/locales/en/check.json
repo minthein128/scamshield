@@ -9,7 +9,7 @@
     "agency": "Agency"
   },
   "text": {
-    "label": "Paste the text or chat",
+    "title": "Text message",
     "a11y": "Text or chat to check",
     "placeholder": "Job post, chat messages or SMS"
   },
@@ -25,9 +25,13 @@
     "pick": "Pick a screenshot"
   },
   "destination": {
-    "label": "Where will you work or travel? (optional)",
+    "label": "Where do you work or travel?",
     "a11y": "Destination",
     "placeholder": "For example Bangkok, Thailand"
+  },
+  "optional": {
+    "title": "Optional",
+    "language": "Report language"
   },
   "submit": "Check now",
   "errors": {

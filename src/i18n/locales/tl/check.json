@@ -12,7 +12,7 @@
     "agency": "Ahensya"
   },
   "text": {
-    "label": "I-paste ang text o chat",
+    "title": "Mensaheng text",
     "a11y": "Text o chat na susuriin",
     "placeholder": "Post tungkol sa trabaho, mga mensahe sa chat, o SMS"
   },
@@ -28,9 +28,13 @@
     "pick": "Pumili ng screenshot"
   },
   "destination": {
-    "label": "Saan ka magtatrabaho o pupunta? (opsyonal)",
+    "label": "Saan ka nagtatrabaho o bumibiyahe?",
     "a11y": "Pupuntahan",
     "placeholder": "Halimbawa: Bangkok, Thailand"
+  },
+  "optional": {
+    "title": "Opsyonal",
+    "language": "Wika ng ulat"
   },
   "submit": "Suriin ngayon",
   "errors": {
