@@ -23,7 +23,7 @@ export function useReduceMotion(): boolean {
   return reduce;
 }
 
-const SHIELD_PATH = 'M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z';
+export const SHIELD_PATH = 'M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z';
 
 const STAGE_ICONS: { at: number; x: number; y: number; paths: string[] }[] = [
   { at: 0, x: 10, y: 34, paths: ['M7 3h8l4 4v14H7z', 'M15 3v4h4', 'M10 12h6M10 16h6'] },
@@ -32,7 +32,7 @@ const STAGE_ICONS: { at: number; x: number; y: number; paths: string[] }[] = [
   { at: 4, x: 186, y: 150, paths: ['M4 18a8 8 0 1 1 16 0', 'M12 18l4-6'] },
 ];
 
-const Face: React.FC<{ verdict: Verdict | null }> = ({ verdict }) => {
+export const Face: React.FC<{ verdict: Verdict | null }> = ({ verdict }) => {
   const stroke = { stroke: colors.white, strokeWidth: 1.6, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, fill: 'none' };
   if (verdict === 'safe') return <Path d="M8.2 12.2l2.6 2.6 5-5.4" {...stroke} strokeWidth={2.2} />;
   if (verdict === 'danger') {
@@ -62,7 +62,7 @@ const Face: React.FC<{ verdict: Verdict | null }> = ({ verdict }) => {
   );
 };
 
-const shieldColor = (v: Verdict | null) => (v === 'danger' ? colors.danger : v === 'careful' ? colors.warningText : colors.accent);
+export const shieldColor = (v: Verdict | null) => (v === 'danger' ? colors.danger : v === 'careful' ? colors.warningText : colors.accent);
 
 export const ShieldLoader: React.FC<{ step: number; verdict?: Verdict | null }> = ({ step, verdict = null }) => {
   const reduce = useReduceMotion();

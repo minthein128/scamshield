@@ -15,14 +15,33 @@ import { Timings, timingStore } from './timing.js';
 import { ApiError, type CheckResponse } from './types.js';
 import { parseRequest, parseSpeakRequest } from './validate.js';
 
-const clientIp = (forwarded?: string, real?: string) => forwarded?.split(',')[0]?.trim() || real || 'local';
+export const clientIp = (forwarded?: string, real?: string) => forwarded?.split(',')[0]?.trim() || real || 'local';
+
+export interface Limits {
+  ip: ReturnType<typeof createRateLimiter>;
+  hourly: ReturnType<typeof createRateLimiter>;
+}
+
+/** The per-IP and per-uid limiters, shared by the HTTP routes and the live socket. */
+export const createLimits = (cfg: Config): Limits => ({
+  ip: createRateLimiter(cfg.rateLimitPerMin),
+  hourly: createRateLimiter(0, 3_600_000),
+});
 
 const errorBody = (code: string, message: string) => ({ error: { code, message } });
 
-export function createApp(cfg: Config, pipeline: Pipeline, speaker: Speaker, intel?: Intel, verifier?: TokenVerifier, feedback?: Feedback) {
+export function createApp(
+  cfg: Config,
+  pipeline: Pipeline,
+  speaker: Speaker,
+  intel?: Intel,
+  verifier?: TokenVerifier,
+  feedback?: Feedback,
+  limits: Limits = createLimits(cfg),
+) {
   const app = new Hono();
-  const limiter = createRateLimiter(cfg.rateLimitPerMin);
-  const hourly = createRateLimiter(0, 3_600_000);
+  const limiter = limits.ip;
+  const hourly = limits.hourly;
   const feedbackIp = createRateLimiter(cfg.rateLimitPerMin);
   const feedbackHourly = createRateLimiter(0, 3_600_000);
 
