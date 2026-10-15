@@ -205,3 +205,18 @@ describe('pipeline language guard', () => {
     expect(r.spokenWarning).toBe('This looks like a scam.');
   });
 });
+
+describe('pipeline byId', () => {
+  it('returns a finished check by id and drops unknown ids', async () => {
+    const p = createPipeline({
+      extractor: createMockExtractor(),
+      correlator: createMockCorrelator(),
+      grounder: createMockGrounder(),
+      model: 'm',
+      resultCacheTtlMs: 60_000,
+    });
+    const r = await p.run({ kind: 'job', language: 'en', text: 'Great job abroad, pay a fee first' });
+    expect(p.byId?.(r.id)).toEqual(r);
+    expect(p.byId?.('chk_unknown')).toBeUndefined();
+  });
+});

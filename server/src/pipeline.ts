@@ -28,6 +28,8 @@ export interface RunOptions {
 
 export interface Pipeline {
   run(req: CheckRequest, opts?: RunOptions): Promise<CheckResponse>;
+  /** A finished check by id, while it is still in the result cache. */
+  byId?(id: string): CheckResponse | undefined;
 }
 
 export interface LanguageStats {
@@ -42,6 +44,7 @@ const SAFETY_MARGIN_MS = 500;
 const RECORD_TIMEOUT_MS = 2500;
 const REASK_MIN_MS = 5000;
 const DANGER_SCORE = 80;
+const DEFAULT_ID_TTL_MS = 600_000;
 
 const settle = <T>(p: Promise<T>, ms: number, fallback: T, onTimeout?: () => void): Promise<T> =>
   Promise.race([
@@ -103,10 +106,12 @@ export interface PipelineDeps {
 export function createPipeline(deps: PipelineDeps): Pipeline {
   const results = createTtlLru<CheckResponse>({ max: deps.resultCacheMax ?? 500, ttlMs: deps.resultCacheTtlMs ?? 0 });
   const caching = (deps.resultCacheTtlMs ?? 0) > 0;
+  const ids = createTtlLru<CheckResponse>({ max: deps.resultCacheMax ?? 500, ttlMs: deps.resultCacheTtlMs || DEFAULT_ID_TTL_MS });
   const earlyLinks = deps.earlyLinks ?? true;
   const earlyEntities = deps.earlyGrounding ?? true;
 
   return {
+    byId: (id) => ids.get(id),
     async run(req, opts = {}) {
       const tm = timingStore.getStore() ?? new Timings();
       const emit = opts.onEvent;
@@ -321,6 +326,7 @@ export function createPipeline(deps: PipelineDeps): Pipeline {
       }
 
       if (key && !degraded) results.set(key, response);
+      if (!req.reported) ids.set(response.id, response);
       return response;
     },
   };
