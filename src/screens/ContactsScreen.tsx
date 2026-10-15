@@ -84,8 +84,7 @@ export const ContactsScreen: React.FC = () => {
   );
 
   return (
-    <Screen wide>
-      <ScreenHeader title={t('title')} />
+    <Screen wide header={<ScreenHeader title={t('title')} />}>
       <Text style={styles.body}>{t('intro')}</Text>
 
       {layout.isExpanded ? (

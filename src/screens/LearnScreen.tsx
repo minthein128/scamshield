@@ -23,11 +23,8 @@ export const LearnScreen: React.FC<TabScreenProps<'Learn'>> = ({ navigation }) =
   const layout = useLayout();
   const chipColumns = layout.isExpanded ? 4 : layout.isTablet ? 3 : 2;
   return (
-    <Screen wide contentStyle={styles.content}>
-      <View style={{ gap: 6 }}>
-        <ScreenHeader title={t('title')} />
-        <Text style={styles.tagline}>{t('tagline')}</Text>
-      </View>
+    <Screen wide contentStyle={styles.content} header={<ScreenHeader title={t('title')} />}>
+      <Text style={styles.tagline}>{t('tagline')}</Text>
 
       <View style={styles.section}>
         <SectionTitle>{t('scamsHeading')}</SectionTitle>

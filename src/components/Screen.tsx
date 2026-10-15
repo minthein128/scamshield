@@ -1,5 +1,5 @@
-import React from 'react';
-import { ScrollView, StyleSheet, View, StyleProp, ViewStyle } from 'react-native';
+import React, { useState } from 'react';
+import { NativeScrollEvent, NativeSyntheticEvent, ScrollView, StyleSheet, View, StyleProp, ViewStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLayout } from '../hooks/useLayout';
 import theme from '../theme/theme';
@@ -21,6 +21,11 @@ interface ScreenProps {
 
 export const Screen: React.FC<ScreenProps> = ({ children, footer, edges = ['top'], background = theme.colors.background, contentStyle, scroll = true, wide, footerRow, header }) => {
   const layout = useLayout();
+  const [lifted, setLifted] = useState(false);
+  const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const next = e.nativeEvent.contentOffset.y > 2;
+    setLifted(prev => (prev === next ? prev : next));
+  };
   const tablet = layout.isTablet;
   const maxWidth = wide ? layout.wideMaxWidth : layout.contentMaxWidth;
   const column = [styles.column, { maxWidth }];
@@ -37,7 +42,7 @@ export const Screen: React.FC<ScreenProps> = ({ children, footer, edges = ['top'
   return (
     <SafeAreaView edges={edges} style={[styles.root, { backgroundColor: background }]}>
       {header ? (
-        <View style={[styles.header, tablet && [padX, styles.headerTablet], { backgroundColor: background }]}>
+        <View testID="screen-header" style={[styles.header, tablet && [padX, styles.headerTablet], { backgroundColor: background }, lifted && styles.headerLifted]}>
           {tablet ? <View style={[column, styles.inner]}>{header}</View> : header}
         </View>
       ) : null}
@@ -46,6 +51,8 @@ export const Screen: React.FC<ScreenProps> = ({ children, footer, edges = ['top'
           style={styles.flex}
           contentContainerStyle={tablet ? [styles.tabletContent, padX, topPad] : [styles.content, contentStyle, topPad]}
           keyboardShouldPersistTaps="handled"
+          onScroll={header ? onScroll : undefined}
+          scrollEventThrottle={16}
         >
           {body}
         </ScrollView>
@@ -64,7 +71,8 @@ const styles = StyleSheet.create({
   tabletContent: { alignItems: 'center', paddingTop: 28, paddingBottom: 32, flexGrow: 1 },
   column: { width: '100%', alignSelf: 'center' },
   inner: { gap: 16 },
-  header: { paddingTop: 20, paddingHorizontal: 20, paddingBottom: 12, gap: 12, borderBottomWidth: 1, borderBottomColor: theme.colors.border },
+  header: { paddingTop: 20, paddingHorizontal: 20, paddingBottom: 12, gap: 12, zIndex: 1, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: 'transparent' },
+  headerLifted: { borderBottomColor: theme.colors.border, shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 6, shadowOffset: { width: 0, height: 2 }, elevation: 2 },
   headerTablet: { paddingTop: 28 },
   belowHeader: { paddingTop: 16 },
   footer: { paddingTop: 10, paddingHorizontal: 20, paddingBottom: 16, gap: 8 },

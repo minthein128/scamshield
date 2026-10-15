@@ -3,8 +3,6 @@
   "seen_other": "Reported {{count}} times by other SafeRoute users in the last 30 days",
   "title": "Risk report",
   "a11yVerdict": "{{verdict}}. Score {{score}} out of 100.",
-  "listen": "Listen in {{language}}",
-  "stop": "Stop",
   "warn": "Warn my family",
   "call": "Call {{number}}",
   "callExt": "then ask for local {{ext}}",

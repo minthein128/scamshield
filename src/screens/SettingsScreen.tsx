@@ -73,8 +73,7 @@ export const SettingsScreen: React.FC<RootScreenProps<'Settings'>> = ({ navigati
     });
 
   return (
-    <Screen>
-      <ScreenHeader title={t('title')} onBack={() => navigation.goBack()} />
+    <Screen header={<ScreenHeader title={t('title')} onBack={() => navigation.goBack()} />}>
 
       <View style={{ gap: 8 }}>
         <SectionTitle>{t('account.title')}</SectionTitle>

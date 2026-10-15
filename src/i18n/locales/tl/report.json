@@ -6,8 +6,6 @@
   "seen_other": "Iniulat nang {{count}} beses ng iba pang gumagamit ng SafeRoute sa nakaraang 30 araw",
   "title": "Ulat sa panganib",
   "a11yVerdict": "{{verdict}}. Score na {{score}} mula sa 100.",
-  "listen": "Pakinggan sa {{language}}",
-  "stop": "Ihinto",
   "warn": "Balaan ang pamilya ko",
   "call": "Tawagan ang {{number}}",
   "callExt": "tapos hingin ang local {{ext}}",

@@ -65,8 +65,7 @@ export const AccountScreen: React.FC<RootScreenProps<'Account'>> = ({ navigation
 
   if (status.kind === 'unavailable') {
     return (
-      <Screen>
-        <ScreenHeader title={t('title')} onBack={leave} />
+      <Screen header={<ScreenHeader title={t('title')} onBack={leave} />}>
         <Notice tone="info" title={t('unavailable.title')} message={t('unavailable.body')} />
       </Screen>
     );
@@ -74,8 +73,7 @@ export const AccountScreen: React.FC<RootScreenProps<'Account'>> = ({ navigation
 
   if (status.kind === 'account') {
     return (
-      <Screen>
-        <ScreenHeader title={t('title')} onBack={leave} />
+      <Screen header={<ScreenHeader title={t('title')} onBack={leave} />}>
         <Card style={{ gap: 4 }}>
           <Text style={styles.label}>{t('signedInAs')}</Text>
           <Text style={styles.value}>{status.email}</Text>
@@ -86,8 +84,7 @@ export const AccountScreen: React.FC<RootScreenProps<'Account'>> = ({ navigation
   }
 
   return (
-    <Screen footer={<Button testID="account-submit" label={signUpMode ? t('createTitle') : t('signInTitle')} onPress={submit} disabled={busy} />}>
-      <ScreenHeader title={signUpMode ? t('createTitle') : t('signInTitle')} onBack={leave} />
+    <Screen footer={<Button testID="account-submit" label={signUpMode ? t('createTitle') : t('signInTitle')} onPress={submit} disabled={busy} />} header={<ScreenHeader title={signUpMode ? t('createTitle') : t('signInTitle')} onBack={leave} />}>
       <Text style={[styles.body, readable(tablet, 14, 20)]}>
         {signUpMode ? t('introSignUp') : t('introSignIn')}
       </Text>

@@ -46,8 +46,7 @@ export const RadarScreen: React.FC<RootScreenProps<'Radar'>> = ({ navigation }) 
   const domains = data?.domains ?? [];
 
   return (
-    <Screen wide>
-      <ScreenHeader title={t('title')} onBack={() => navigation.goBack()} />
+    <Screen wide header={<ScreenHeader title={t('title')} onBack={() => navigation.goBack()} />}>
       <Text style={styles.body}>{t('intro', { count: data?.k ?? 3 })}</Text>
 
       <View style={styles.wrap}>
