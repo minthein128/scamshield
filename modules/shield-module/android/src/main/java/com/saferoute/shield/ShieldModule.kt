@@ -29,6 +29,10 @@ class ShieldModule : Module() {
             ShieldBridge.eventSink = null
         }
 
+        OnActivityEntersForeground {
+            ShieldService.instance?.armVoice()
+        }
+
         AsyncFunction("hasOverlayPermission") {
             val context = appContext.reactContext ?: return@AsyncFunction false
             Settings.canDrawOverlays(context)
@@ -70,6 +74,10 @@ class ShieldModule : Module() {
             val context = appContext.reactContext ?: return@AsyncFunction false
             if (!Settings.canDrawOverlays(context)) return@AsyncFunction false
             ShieldBridge.authToken = (options?.get("authToken") as? String).orEmpty()
+            ShieldBridge.homeCountry = ShieldBridge.countryCode(options?.get("home"))
+            ShieldBridge.destinationCountry = ShieldBridge.countryCode(options?.get("destination"))
+            @Suppress("UNCHECKED_CAST")
+            (options?.get("strings") as? Map<String, Any?>)?.let { ShieldBridge.strings = ShieldStrings.from(it) }
             val intent = Intent(context, ShieldService::class.java).apply {
                 action = ShieldService.ACTION_START
                 putExtra(ShieldService.EXTRA_API_URL, options?.get("apiUrl") as? String ?: "")

@@ -4,6 +4,7 @@ import { AppState, PermissionsAndroid, Platform } from 'react-native';
 import * as ShieldModule from 'shield-module';
 import { t } from '../i18n';
 import { useApiUrl } from '../config/runtime';
+import { companionStrings } from '../lib/companionStrings';
 import { isCleartext } from '../lib/shield';
 import { getAuthToken } from '../services/token';
 import { useAppState } from '../state/AppState';
@@ -19,10 +20,11 @@ export function shieldSupport(platform: string = Platform.OS, apiUrl: string | n
   return 'ready';
 }
 
-export type ShieldStep = 'idle' | 'overlay' | 'notifications' | 'capture' | 'starting';
+export type ShieldStep = 'idle' | 'overlay' | 'notifications' | 'capture' | 'microphone' | 'starting';
 
 export function stepText(step: ShieldStep): string {
-  return step === 'idle' ? '' : t(`shield:steps.${step}`);
+  if (step === 'idle') return '';
+  return step === 'microphone' ? t('live:companion.permissionStep') : t(`shield:steps.${step}`);
 }
 
 export interface ShieldControl {
@@ -35,7 +37,8 @@ export interface ShieldControl {
 }
 
 export function useShieldControl(): ShieldControl {
-  const { language } = useAppState();
+  const { language, profile } = useAppState();
+  const { homeCountry, destinationCountry } = profile;
   const apiUrl = useApiUrl();
   const support = shieldSupport(Platform.OS, apiUrl);
   const [running, setRunning] = useState(false);
@@ -77,9 +80,20 @@ export function useShieldControl(): ShieldControl {
         setStep('idle');
         return;
       }
+      if (!(await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO))) {
+        setStep('microphone');
+        await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO).catch(() => undefined);
+      }
       setStep('starting');
       const token = await getAuthToken();
-      const ok = await ShieldModule.startShield({ apiUrl: apiUrl ?? '', language, ...(token ? { authToken: token } : {}) });
+      const ok = await ShieldModule.startShield({
+        apiUrl: apiUrl ?? '',
+        language,
+        strings: companionStrings(),
+        ...(homeCountry ? { home: homeCountry } : {}),
+        ...(destinationCountry ? { destination: destinationCountry } : {}),
+        ...(token ? { authToken: token } : {}),
+      });
       if (!ok) setError(t('shield:errors.notStarted'));
       setStep('idle');
       await refresh();
@@ -89,7 +103,7 @@ export function useShieldControl(): ShieldControl {
     } finally {
       busy.current = false;
     }
-  }, [language, refresh, apiUrl]);
+  }, [language, refresh, apiUrl, homeCountry, destinationCountry]);
 
   useEffect(() => {
     refresh().catch(() => undefined);

@@ -7,8 +7,19 @@ import { z } from 'zod';
 import { clientIp, type Limits } from './app.js';
 import { bearerToken, type TokenVerifier } from './auth.js';
 import type { Config } from './config.js';
-import { findCertainty } from './language-guard.js';
-import { ACTION_SCREENS, type ActionScreen, buildSystemInstruction, type LiveMode, type LiveReport, speechLocale } from './live-prompt.js';
+import { findCertainty, findMaleFormsAny, genderCounters } from './language-guard.js';
+import {
+  ACTION_SCREENS,
+  type ActionScreen,
+  buildContextTurn,
+  buildSystemInstruction,
+  LIVE_MODES,
+  type LiveMode,
+  type LiveReport,
+  RECHECK_SCREEN,
+  RECHECK_TOOL,
+  speechLocale,
+} from './live-prompt.js';
 import { log } from './log.js';
 import type { Pipeline } from './pipeline.js';
 import { FAMILIES, LANGS, type Lang, SCAM_TYPES, SEVERITIES } from './types.js';
@@ -19,8 +30,10 @@ const MAX_START_BYTES = 64 * 1024;
 const MAX_AUDIO_B64 = 64 * 1024;
 const MAX_PAYLOAD = 128 * 1024;
 const SESSION_COST = 2;
+const MAX_CONTEXT_BYTES = 64 * 1024;
+const MAX_CONTEXTS = 10;
 
-export const liveCounters = { live_certainty_hit: 0, sessions: 0 };
+export const liveCounters = { live_certainty_hit: 0, gender_form_hit: 0, sessions: 0 };
 
 const country = z
   .string()
@@ -56,7 +69,7 @@ const startSchema = z
     checkId: z.string().min(1).max(64).optional(),
     report: reportSchema.optional(),
     language: z.enum(LANGS).default('en'),
-    mode: z.enum(['self', 'family']).default('self'),
+    mode: z.enum(LIVE_MODES).default('self'),
     home: country.optional(),
     destination: country.optional(),
     token: z.string().max(4096).optional(),
@@ -64,6 +77,33 @@ const startSchema = z
   .refine((v) => Boolean(v.checkId || v.report), { message: 'checkId or report is required' });
 
 export type StartFrame = z.infer<typeof startSchema>;
+
+const contextSchema = z
+  .object({
+    type: z.literal('context'),
+    checkId: z.string().min(1).max(64).optional(),
+    report: reportSchema.optional(),
+    error: z.literal('check_failed').optional(),
+  })
+  .refine((v) => Boolean(v.checkId || v.report || v.error), { message: 'checkId, report or error is required' });
+
+export type ContextFrame = z.infer<typeof contextSchema>;
+
+export type ContextResult = { ok: true; context: ContextFrame } | { ok: false; message: string };
+
+/** Validates a companion `context` frame: a re-checked report the app sends after a RECHECK action. */
+export function parseContext(raw: string): ContextResult {
+  if (raw.length > MAX_CONTEXT_BYTES) return { ok: false, message: 'context frame is too large' };
+  let json: unknown;
+  try {
+    json = JSON.parse(raw);
+  } catch {
+    return { ok: false, message: 'frame must be JSON' };
+  }
+  const r = contextSchema.safeParse(json);
+  if (!r.success) return { ok: false, message: r.error.issues.map((i) => `${i.path.join('.') || 'context'}: ${i.message}`).join('; ') };
+  return { ok: true, context: r.data };
+}
 
 export type StartResult = { ok: true; start: StartFrame } | { ok: false; message: string };
 
@@ -101,6 +141,7 @@ export interface LiveCallbacks {
 export interface LiveSessionLike {
   sendRealtimeInput(p: { audio?: { data: string; mimeType: string }; audioStreamEnd?: boolean }): void;
   sendToolResponse(p: { functionResponses: { id?: string; name?: string; response: Record<string, unknown> }[] }): void;
+  sendClientContent(p: { turns: { role: string; parts: { text: string }[] }[]; turnComplete: boolean }): void;
   close(): void;
 }
 
@@ -114,13 +155,25 @@ export type LiveConnect = (
   ctx: LiveContext,
 ) => Promise<LiveSessionLike>;
 
-export function liveConfig(cfg: Pick<Config, 'liveVoice'>, systemInstruction: string, language: Lang): LiveConnectConfig {
+const RECHECK_DECLARATION = {
+  name: RECHECK_TOOL,
+  description:
+    'Capture and check the screen again when the listener asks about something new on their screen. The new report arrives later as a NEW CURRENT REPORT message.',
+};
+
+/** No fixed output language: the model answers in the listener's language from the allowed set. */
+export function liveConfig(
+  cfg: Pick<Config, 'liveVoice'>,
+  systemInstruction: string,
+  allowed: readonly Lang[],
+  mode: LiveMode = 'self',
+): LiveConnectConfig {
   return {
     responseModalities: [Modality.AUDIO],
     systemInstruction,
-    speechConfig: { languageCode: speechLocale(language), voiceConfig: { prebuiltVoiceConfig: { voiceName: cfg.liveVoice } } },
+    speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: cfg.liveVoice } } },
     outputAudioTranscription: {},
-    inputAudioTranscription: {},
+    inputAudioTranscription: { languageCodes: allowed.map(speechLocale) },
     tools: [
       {
         functionDeclarations: [
@@ -133,6 +186,7 @@ export function liveConfig(cfg: Pick<Config, 'liveVoice'>, systemInstruction: st
               required: ['screen'],
             },
           },
+          ...(mode === 'companion' ? [RECHECK_DECLARATION] : []),
         ],
       },
     ],
@@ -177,7 +231,8 @@ export function attachLive(server: Server, deps: LiveDeps) {
     const closed = () => phase === 'done';
     let session: LiveSessionLike | undefined;
     let activeKey: string | undefined;
-    let lang: Lang = 'en';
+    let mode: LiveMode = 'self';
+    let contexts = 0;
     let checkId: string | undefined;
     let turns = 0;
     let certaintyHits = 0;
@@ -194,9 +249,12 @@ export function attachLive(server: Server, deps: LiveDeps) {
     const endModelLine = () => {
       if (!modelText) return;
       send({ type: 'transcript', role: 'model', text: modelText, final: true });
-      const hits = findCertainty(modelText, lang).length;
+      const hits = LANGS.reduce((n, l) => n + findCertainty(modelText, l).length, 0);
       certaintyHits += hits;
       liveCounters.live_certainty_hit += hits;
+      const male = findMaleFormsAny(modelText).length;
+      liveCounters.gender_form_hit += male;
+      genderCounters.gender_form_hit += male;
       turns++;
       modelText = '';
     };
@@ -263,15 +321,19 @@ export function attachLive(server: Server, deps: LiveDeps) {
       if (c?.turnComplete) endModelLine();
       for (const fc of m.toolCall?.functionCalls ?? []) {
         const screen = fc.args?.screen;
-        const ok = fc.name === 'open_action_sheet' && ACTION_SCREENS.includes(screen as ActionScreen);
+        const recheck = fc.name === RECHECK_TOOL && mode === 'companion';
+        const ok = recheck || (fc.name === 'open_action_sheet' && ACTION_SCREENS.includes(screen as ActionScreen));
         if (ok) {
           actionFired = true;
-          send({ type: 'action', screen });
+          send({ type: 'action', screen: recheck ? RECHECK_SCREEN : screen });
         }
+        const response = recheck
+          ? { result: 'The app is checking the screen again. Wait for the NEW CURRENT REPORT message and do not guess the result.' }
+          : ok
+            ? { result: 'opened' }
+            : { error: 'unknown action' };
         try {
-          session?.sendToolResponse({
-            functionResponses: [{ id: fc.id, name: fc.name, response: ok ? { result: 'opened' } : { error: 'unknown action' } }],
-          });
+          session?.sendToolResponse({ functionResponses: [{ id: fc.id, name: fc.name, response }] });
         } catch {
           // session closed while answering
         }
@@ -282,9 +344,10 @@ export function attachLive(server: Server, deps: LiveDeps) {
       const parsed = parseStart(raw);
       if (!parsed.ok) return fail('bad_request', parsed.message);
       const { start } = parsed;
+      if (!cfg.liveLanguages.includes(start.language)) return fail('unsupported_language', 'Voice is not available in this language');
       phase = 'connecting';
       clearTimeout(startTimer);
-      lang = start.language;
+      mode = start.mode;
       checkId = start.checkId;
 
       const cached = start.checkId ? deps.pipeline.byId?.(start.checkId) : undefined;
@@ -309,15 +372,16 @@ export function attachLive(server: Server, deps: LiveDeps) {
       const system = buildSystemInstruction({
         report,
         language: start.language,
-        mode: start.mode as LiveMode,
+        mode: start.mode,
         home: start.home,
         destination: start.destination,
+        allowed: cfg.liveLanguages,
       });
       try {
         const opened = await deps.connect(
           {
             model: cfg.liveModel,
-            config: liveConfig(cfg, system, start.language),
+            config: liveConfig(cfg, system, cfg.liveLanguages, start.mode),
             callbacks: {
               onmessage: onServer,
               onerror: () => fail('upstream', 'Voice service error'),
@@ -339,8 +403,25 @@ export function attachLive(server: Server, deps: LiveDeps) {
       }
       phase = 'live';
       liveCounters.sessions++;
-      capTimer = setTimeout(() => finish('cap'), cfg.liveMaxMs);
-      send({ type: 'ready', maxMs: cfg.liveMaxMs });
+      const maxMs = mode === 'companion' ? cfg.liveCompanionMaxMs : cfg.liveMaxMs;
+      capTimer = setTimeout(() => finish('cap'), maxMs);
+      send({ type: 'ready', maxMs });
+    }
+
+    function onContext(raw: string) {
+      if (mode !== 'companion') return fail('bad_request', 'context frames need companion mode');
+      const parsed = parseContext(raw);
+      if (!parsed.ok) return fail('bad_request', parsed.message);
+      if (++contexts > MAX_CONTEXTS) return fail('bad_request', 'too many context frames');
+      const { context } = parsed;
+      const cached = context.checkId ? deps.pipeline.byId?.(context.checkId) : undefined;
+      const report: LiveReport | undefined = context.error ? undefined : (cached ?? context.report);
+      if (!report && !context.error) return fail('not_found', 'This check is no longer available. Run it again.');
+      try {
+        session?.sendClientContent({ turns: [{ role: 'user', parts: [{ text: buildContextTurn(report) }] }], turnComplete: true });
+      } catch {
+        fail('upstream', 'Voice service error');
+      }
     }
 
     function onFrame(data: RawData, isBinary: boolean) {
@@ -367,7 +448,8 @@ export function attachLive(server: Server, deps: LiveDeps) {
         } catch {
           fail('upstream', 'Voice service error');
         }
-      } else if (msg.type === 'end') finish('end');
+      } else if (msg.type === 'context') onContext(raw);
+      else if (msg.type === 'end') finish('end');
     }
 
     ws.on('message', onFrame);

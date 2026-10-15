@@ -76,8 +76,10 @@ const ShareIntentBridge: React.FC<{ ready: boolean }> = ({ ready }) => {
 
 const openReport = (result: CheckResponse, language: LanguageCode) => navigationRef.navigate('Report', { result, language });
 
+const openScreen = (screen: 'GetHelp' | 'Shield') => navigationRef.navigate(screen);
+
 const DeepLinkBridge: React.FC<{ ready: boolean }> = ({ ready }) => {
-  useShieldDeepLink(ready, openReport);
+  useShieldDeepLink(ready, openReport, openScreen);
   return null;
 };
 

@@ -1,4 +1,5 @@
 import type { ThinkingLevel } from '@google/genai';
+import { LANGS, type Lang } from './types.js';
 
 export interface Config {
   port: number;
@@ -35,6 +36,8 @@ export interface Config {
   liveModel: string;
   liveVoice: string;
   liveMaxMs: number;
+  liveCompanionMaxMs: number;
+  liveLanguages: Lang[];
   liveMaxConcurrent: number;
   adminAiModel: string;
   adminAiPerHour: number;
@@ -96,6 +99,8 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     liveModel: env.LIVE_MODEL || 'gemini-3.8-live',
     liveVoice: env.LIVE_VOICE || 'Sulafat',
     liveMaxMs: Number(env.LIVE_MAX_MS ?? 120_000),
+    liveCompanionMaxMs: Number(env.LIVE_COMPANION_MAX_MS ?? 300_000),
+    liveLanguages: liveLanguages(env.LIVE_LANGUAGES),
     liveMaxConcurrent: Number(env.LIVE_MAX_CONCURRENT ?? 20),
     adminAiModel: env.ADMIN_AI_MODEL || 'gemini-3.8-flash',
     adminAiPerHour: Number(env.ADMIN_AI_LIMIT_PER_HOUR ?? 30),
@@ -119,4 +124,13 @@ export function pipelineOptions(cfg: Config) {
     recordAfterResponse: cfg.recordAfterResponse,
     resultCacheTtlMs: cfg.cacheEnabled ? cfg.resultCacheTtlMs : 0,
   };
+}
+
+/** LIVE_LANGUAGES: comma list of languages Live may use. Unknown codes are ignored; empty means all. */
+export function liveLanguages(raw: string | undefined): Lang[] {
+  const picked = (raw ?? 'en,my,th,id,tl')
+    .split(',')
+    .map((x) => x.trim().toLowerCase())
+    .filter((x): x is Lang => (LANGS as readonly string[]).includes(x));
+  return picked.length ? [...new Set(picked)] : [...LANGS];
 }

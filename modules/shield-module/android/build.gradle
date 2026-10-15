@@ -32,6 +32,8 @@ android {
 
 dependencies {
     implementation project(':expo-modules-core')
+    implementation project(':live-audio')
+    implementation "com.squareup.okhttp3:okhttp:4.9.2"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     implementation "androidx.core:core-ktx:1.13.1"
     implementation "androidx.dynamicanimation:dynamicanimation:1.0.0"

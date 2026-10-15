@@ -1,6 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import { buildActions, titleFor } from '../src/explain.js';
-import { countCertainty, findCertainty, guardExtraction, guardFlags, isHeavy, rewriteCertainty } from '../src/language-guard.js';
+import {
+  countCertainty,
+  countMaleForms,
+  findCertainty,
+  findMaleForms,
+  findMaleFormsAny,
+  guardExtraction,
+  guardFlags,
+  isHeavy,
+  rewriteCertainty,
+} from '../src/language-guard.js';
 import type { Extraction } from '../src/types.js';
 
 describe('language guard', () => {
@@ -109,5 +119,26 @@ describe('language guard', () => {
   it('counts certainty in a response', () => {
     const res = { title: 'ok', summary: 'It is a scam', spokenWarning: 'fine', flags: [] };
     expect(countCertainty(res, 'en')).toBe(1);
+  });
+});
+
+describe('male speaker forms', () => {
+  it('finds Burmese and Thai male forms', () => {
+    expect(findMaleForms('ကျွန်တော် ကူညီပါမယ် ခင်ဗျာ', 'my')).toEqual(['ကျွန်တော်', 'ခင်ဗျာ']);
+    expect(findMaleForms('ခင်ဗျ ဘာမေးချင်လဲ', 'my')).toEqual(['ခင်ဗျ']);
+    expect(findMaleForms('อย่าเพิ่งโอนเงินนะครับ ผมแนะนำ', 'th')).toEqual(['ครับ', 'ผม']);
+  });
+
+  it('passes female forms and languages without gendered forms', () => {
+    expect(findMaleForms('ကျွန်မ ကူညီပါမယ် ရှင့်', 'my')).toEqual([]);
+    expect(findMaleForms('อย่าเพิ่งโอนเงินนะคะ ดิฉันแนะนำค่ะ', 'th')).toEqual([]);
+    expect(findMaleForms('Saya sarankan jangan transfer.', 'id')).toEqual([]);
+    expect(findMaleFormsAny('ok ครับ and ကျွန်တော်')).toHaveLength(2);
+  });
+
+  it('counts male forms in a check response', () => {
+    const res = { title: 'ระวังค่ะ', summary: 'ผมคิดว่ามีความเสี่ยงครับ', spokenWarning: 'อย่าเพิ่งโอนเงินค่ะ', flags: [] };
+    expect(countMaleForms(res, 'th')).toBe(2);
+    expect(countMaleForms(res, 'en')).toBe(0);
   });
 });

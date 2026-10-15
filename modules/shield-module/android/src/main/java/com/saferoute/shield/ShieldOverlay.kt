@@ -38,6 +38,16 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
         fun onOpenReport()
         fun onDismiss()
         fun onClose()
+        /** Double tap on the bubble, or the accessibility action: start a voice companion session. */
+        fun onBallDoubleTap() {}
+        /** The "Ask" chip on a result pill. */
+        fun onAsk() {}
+        /** End control on the companion pill. */
+        fun onEndCompanion() {}
+        /** Tap on a notice pill that needs the app, for example to allow the microphone. */
+        fun onOpenApp() {}
+        /** Long press. Return true to consume it; otherwise the shield closes. */
+        fun onLongPressBubble(): Boolean = false
     }
 
     enum class State { IDLE, CHECKING, SAFE, CAREFUL, DANGER, ERROR }
@@ -97,7 +107,36 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
     private val machine = DragMachine(max(ViewConfiguration.get(context).scaledTouchSlop, dp(6)))
     private var lastJson: JSONObject? = null
 
+    /** Voice labels in the user's language. */
+    var strings: ShieldStrings = ShieldStrings.DEFAULT
+    /** Companion avatar for the bubble while it thinks or speaks; null keeps the shield. */
+    var companionAvatar: android.graphics.Bitmap?
+        get() = bubble.avatar
+        set(value) {
+            bubble.avatar = value
+        }
+    /** Level shown on the bubble ring while the companion listens or speaks. */
+    var levelSource: (() -> Float)? = null
+    private var companion: CompanionView? = null
+    private var pillRoot: FrameLayout? = null
+    private var pillView: CompanionPillView? = null
+    private var pendingTap = false
+    private val singleTap = Runnable {
+        pendingTap = false
+        listener.onBallTap()
+    }
+    private val ticker = object : Runnable {
+        override fun run() {
+            if (companion == null) return
+            bubble.level = levelSource?.invoke() ?: 0f
+            main.postDelayed(this, LEVEL_TICK_MS)
+        }
+    }
+    val companionActive: Boolean get() = companion != null
+
     private val autoCollapse = Runnable { collapseSafeResult() }
+    private var noticeReturn: CardModel? = null
+    private val noticeTimeout = Runnable { closeNotice() }
     private val tuckLater = Runnable { if (state == State.IDLE && !dragging) tuck(true) }
 
     private val xProperty = object : FloatPropertyCompat<ShieldOverlay>("bubbleX") {
@@ -119,13 +158,17 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
     fun show() {
         if (bubbleAttached) return
         bubble.setOnTouchListener(dragListener())
-        bubble.setOnClickListener { listener.onBallTap() }
+        bubble.setOnClickListener { onBubbleClick() }
         bubble.setOnLongClickListener {
-            closeBubble()
+            if (!listener.onLongPressBubble()) closeBubble()
             true
         }
         ViewCompat.addAccessibilityAction(bubble, "Close shield") { _, _ ->
             closeBubble()
+            true
+        }
+        ViewCompat.addAccessibilityAction(bubble, strings.talkA11y) { _, _ ->
+            listener.onBallDoubleTap()
             true
         }
         describeBubble()
@@ -137,6 +180,9 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
 
     fun remove() {
         main.removeCallbacksAndMessages(null)
+        main.removeCallbacks(ticker)
+        companion = null
+        removePillNow()
         removeCardNow()
         removeTarget()
         xSpring?.cancel()
@@ -155,11 +201,13 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
         bubble.animate().cancel()
         bubble.visibility = View.INVISIBLE
         cardRoot?.visibility = View.INVISIBLE
+        pillRoot?.visibility = View.INVISIBLE
     }
 
     fun setChecking() {
         removeCardNow()
         cardModel = null
+        pillRoot?.visibility = View.VISIBLE
         setState(State.CHECKING)
         untuck()
         bubble.visibility = View.VISIBLE
@@ -191,13 +239,23 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
             summary = summary,
             flags = flagRows(json),
             canOpenReport = true,
-            description = "$chip. $title"
+            description = "$chip. $title",
+            canAsk = true,
+            askLabel = strings.ask,
+            askDescription = strings.askA11y,
         )
-        presentCard(model)
+        noticeReturn = null
+        if (companion != null) {
+            cardModel = model
+            pillRoot?.visibility = View.VISIBLE
+            renderCompanion()
+        } else {
+            presentCard(model)
+        }
         when (next) {
             State.SAFE -> {
                 ShieldHaptics.safe(context)
-                if (resume == null) main.postDelayed(autoCollapse, AUTO_COLLAPSE_MS)
+                if (resume == null && companion == null) main.postDelayed(autoCollapse, AUTO_COLLAPSE_MS)
             }
             State.CAREFUL -> ShieldHaptics.careful(context)
             else -> {
@@ -208,6 +266,13 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
     }
 
     fun setError(message: String) {
+        if (companion != null) {
+            showBubbleNow()
+            pillRoot?.visibility = View.VISIBLE
+            setState(if (cardModel != null) cardModel!!.state else State.IDLE)
+            renderCompanion()
+            return
+        }
         removeCardNow()
         setState(State.ERROR)
         untuck()
@@ -220,6 +285,8 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
 
     fun reset() {
         main.removeCallbacks(autoCollapse)
+        main.removeCallbacks(noticeTimeout)
+        noticeReturn = null
         dismissCard(animated = true)
         cardModel = null
         setState(State.IDLE)
@@ -228,7 +295,138 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
         main.postDelayed(tuckLater, TUCK_DELAY_MS)
     }
 
+    /** A pill with a short message about voice. A tap opens SafeRoute when [opensApp] is set, otherwise it closes. */
+    fun showNotice(message: String, opensApp: Boolean) {
+        main.removeCallbacks(autoCollapse)
+        untuck()
+        showBubbleNow()
+        val chip = strings.voiceChip
+        val previous = cardModel?.takeIf { !it.notice } ?: noticeReturn
+        main.removeCallbacks(noticeTimeout)
+        presentCard(CardModel(State.ERROR, chip, message, message, emptyList(), false, "$chip. $message", notice = true, opensApp = opensApp))
+        noticeReturn = previous
+        main.postDelayed(noticeTimeout, if (opensApp) NOTICE_MS * 2 else NOTICE_MS)
+    }
+
+    /** Closes a voice notice and keeps the check result behind it for the next tap. */
+    fun closeNotice() {
+        main.removeCallbacks(noticeTimeout)
+        if (cardView?.model?.notice == true || cardModel?.notice == true) {
+            dismissCard(animated = true)
+            cardModel = noticeReturn
+        }
+        noticeReturn = null
+        if (resume?.model?.notice == true) resume = null
+    }
+
+    // ---- voice companion ----
+
+    /** Shows or updates the companion presentation: voice glyph on the bubble and the caption pill. */
+    fun showCompanion(view: CompanionView) {
+        val starting = companion == null
+        companion = view
+        if (starting) {
+            main.removeCallbacks(autoCollapse)
+            main.removeCallbacks(tuckLater)
+            untuck()
+            dismissCard(animated = true)
+            showBubbleNow()
+            main.removeCallbacks(ticker)
+            main.post(ticker)
+        }
+        renderCompanion()
+    }
+
+    /** Leaves companion mode. The result pill comes back collapsed when a result is still showing. */
+    fun endCompanion(notice: String? = null, opensApp: Boolean = false) {
+        if (companion == null) return
+        companion = null
+        main.removeCallbacks(ticker)
+        bubble.voice = BubbleView.Voice.NONE
+        bubble.level = 0f
+        removePillNow()
+        describeBubble()
+        when {
+            notice != null -> showNotice(notice, opensApp)
+            cardModel != null && state in VERDICT_STATES -> presentCard(cardModel!!)
+            state == State.CHECKING || state == State.ERROR -> reset()
+            else -> main.postDelayed(tuckLater, TUCK_DELAY_MS)
+        }
+    }
+
+    private fun renderCompanion() {
+        val view = companion ?: return
+        val checking = view.state == CompanionState.CHECKING || view.state == CompanionState.RECHECKING
+        bubble.voice = if (checking) BubbleView.Voice.NONE else CompanionPillView.voiceFor(view)
+        if (!checking && state == State.CHECKING) setState(cardModel?.state ?: State.IDLE)
+        describeBubble()
+        if (pillRoot == null && !dragging && machine.phase == DragMachine.Phase.IDLE) showPill()
+        pillView?.render(view, cardModel?.state ?: State.IDLE)
+    }
+
+    private fun showPill() {
+        removePillNow()
+        val view = CompanionPillView(context, palette, fonts, fontScale(), strings) { listener.onEndCompanion() }
+        val anchor = anchorFor(bubbleParams.x, bubbleParams.y)
+        val width = min(screenW() - dp(48), dp(320))
+        val root = FrameLayout(context).apply {
+            clipChildren = false
+            clipToPadding = false
+            setPadding(pad, pad, pad, pad)
+        }
+        root.addView(view, FrameLayout.LayoutParams(width, FrameLayout.LayoutParams.WRAP_CONTENT))
+        val params = WindowManager.LayoutParams(
+            WindowManager.LayoutParams.WRAP_CONTENT,
+            WindowManager.LayoutParams.WRAP_CONTENT,
+            overlayType,
+            baseFlags,
+            PixelFormat.TRANSLUCENT
+        ).apply {
+            gravity = anchor.gravity
+            x = 0
+            y = anchor.offsetY
+        }
+        try {
+            windowManager.addView(root, params)
+        } catch (_: Exception) {
+            return
+        }
+        pillRoot = root
+        pillView = view
+        if (bubble.visibility != View.VISIBLE) root.visibility = View.INVISIBLE
+    }
+
+    private fun removePillNow() {
+        val root = pillRoot ?: return
+        try {
+            windowManager.removeView(root)
+        } catch (_: Exception) {
+        }
+        pillRoot = null
+        pillView = null
+    }
+
+    private fun onBubbleClick() {
+        if (companion != null) {
+            listener.onBallTap()
+            return
+        }
+        if (state == State.CHECKING) return
+        if (pendingTap) {
+            pendingTap = false
+            main.removeCallbacks(singleTap)
+            listener.onBallDoubleTap()
+            return
+        }
+        pendingTap = true
+        main.postDelayed(singleTap, ViewConfiguration.getDoubleTapTimeout().toLong())
+    }
+
     fun toggleCard() {
+        if (cardView?.model?.notice == true && !cardClosing) {
+            closeNotice()
+            return
+        }
         if (cardRoot != null && !cardClosing) {
             dismissCard(animated = true)
         } else {
@@ -270,6 +468,12 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
     }
 
     private fun describeBubble() {
+        val voice = companion
+        if (voice != null) {
+            val label = CompanionPillView.labelFor(voice, strings)
+            bubble.contentDescription = "SafeRoute. $label. " + if (voice.muted || voice.paused) strings.unmuteA11y else strings.muteA11y
+            return
+        }
         val text = when (state) {
             State.IDLE -> "SafeRoute Shield. Double tap to check the screen."
             State.CHECKING -> "SafeRoute Shield. Checking the screen."
@@ -317,10 +521,15 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
         removeCardNow()
         cardModel = model
         val view = ResultCardView(context, palette, fonts, fontScale(), model, object : CardCallbacks {
-            override fun onRetry() = listener.onBallTap()
+            override fun onRetry() {
+                if (!model.notice) return listener.onBallTap()
+                if (model.opensApp) listener.onOpenApp()
+                closeNotice()
+            }
+            override fun onAsk() = listener.onAsk()
             override fun onFullReport() = listener.onOpenReport()
-            override fun onDismissClicked() = listener.onDismiss()
-            override fun onSwipedAway() = listener.onDismiss()
+            override fun onDismissClicked() = if (model.notice) closeNotice() else listener.onDismiss()
+            override fun onSwipedAway() = if (model.notice) closeNotice() else listener.onDismiss()
         })
         view.onExpandChanged = { expanded -> if (expanded) main.removeCallbacks(autoCollapse) }
         view.prepare(screenW() - dp(48))
@@ -487,6 +696,7 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
     private fun settle(token: Int) {
         if (token != snapToken || machine.phase == DragMachine.Phase.DRAGGING) return
         machine.settled()
+        if (companion != null && pillRoot == null) renderCompanion()
         val pending = resume ?: return
         resume = null
         xSpring?.cancel()
@@ -538,7 +748,7 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
         private val longPress = Runnable {
             if (machine.longPress()) {
                 ShieldHaptics.tick(context)
-                closeBubble()
+                if (!listener.onLongPressBubble()) closeBubble()
             }
         }
 
@@ -594,6 +804,7 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
             resume = ResumeCard(model, view.isExpanded)
         }
         dismissCard(animated = true, duration = 120)
+        removePillNow()
         showTarget()
     }
 
@@ -681,6 +892,7 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
 
     private fun closeBubble() {
         bubbleClosing = true
+        removePillNow()
         resume = null
         main.removeCallbacks(tuckLater)
         main.removeCallbacks(autoCollapse)
@@ -699,6 +911,10 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
     internal val screenForTest: Pair<Int, Int> get() = Pair(screenW(), screenH())
     internal val bubbleParamsForTest: WindowManager.LayoutParams get() = bubbleParams
     internal val hasCardWindow: Boolean get() = cardRoot != null
+    internal val hasPillWindow: Boolean get() = pillRoot != null
+    internal val pillForTest: CompanionPillView? get() = pillView
+    internal val bubbleVoiceForTest: BubbleView.Voice get() = bubble.voice
+    internal val cardModelForTest: CardModel? get() = cardModel
     internal val cardGravityForTest: Int? get() = (cardRoot?.layoutParams as? WindowManager.LayoutParams)?.gravity
     internal val isCardResumePending: Boolean get() = resume != null
     internal val dragPhase: DragMachine.Phase get() = machine.phase
@@ -721,6 +937,9 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
 
     companion object {
         private const val AUTO_COLLAPSE_MS = 8000L
+        private const val NOTICE_MS = 6000L
+        private const val LEVEL_TICK_MS = 33L
+        private val VERDICT_STATES = setOf(State.SAFE, State.CAREFUL, State.DANGER)
         private const val TUCK_DELAY_MS = 1800L
         private const val SETTLE_FALLBACK_MS = 800L
         private const val MAX_FONT_SCALE = 1.3f

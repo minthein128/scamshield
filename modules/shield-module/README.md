@@ -1,6 +1,6 @@
 # shield-module
 
-Expo module for Android. It draws a floating bubble over other apps. A tap captures the screen with MediaProjection, posts one JPEG to `${apiUrl}/v1/check` (kind `screen`, see `docs/api-contract.md`) and shows the verdict on the bubble and in a compact result pill that expands into a sheet.
+Expo module for Android. It draws a floating bubble over other apps. A tap captures the screen with MediaProjection, posts one JPEG to `${apiUrl}/v1/check` (kind `screen`, see `docs/api-contract.md`) and shows the verdict on the bubble and in a compact result pill that expands into a sheet. A double tap (or "Ask" on a result) starts the voice companion: the user talks to SafeRoute about the screen while they keep using the other app.
 
 ## Layout
 
@@ -18,6 +18,11 @@ Expo module for Android. It draws a floating bubble over other apps. A tap captu
 | `ScreenCapturer.kt` | One MediaProjection, one VirtualDisplay, JPEG encoding |
 | `CheckClient.kt` | HttpURLConnection call to `/v1/check` |
 | `ConsentActivity.kt` | Transparent activity that shows the screen-capture consent dialog |
+| `CompanionSession.kt` | Voice companion state machine: check, warning, `/v1/live` in companion mode, recheck, mute, focus, end |
+| `CompanionAudioEngine.kt` | Mic and speaker for a session, built on the `live-audio` engines, plus audio focus events |
+| `CompanionClients.kt` | `/v1/speak` client, WAV to 24 kHz PCM, OkHttp `/v1/live` socket |
+| `CompanionPillView.kt` | One-line companion pill: state chip, latest model line, End |
+| `ShieldStrings.kt` | Companion labels from the app (`startShield({ strings })`), English fallback |
 | `ShieldBridge.kt` | Shared state between module, service and activity |
 | `MessageGuardListener.kt` | `NotificationListenerService` for Message Guard. Drops every app outside the allowlist before reading content |
 | `MessageApps.kt` | Allowlist of messaging apps and the default SMS app |
@@ -173,6 +178,88 @@ The Burmese lists are Unicode text. Zawgyi-encoded messages do not match. Tune t
 
 Notification access (`BIND_NOTIFICATION_LISTENER_SERVICE`) is a sensitive permission, and reading messages falls under Play's User Data and SMS policies. The listing must: describe Message Guard as an optional core feature that warns about scam messages; state that it reads notifications only from the listed messaging apps; state that text is scored on the device and only risky-looking text is sent, with phone numbers, emails and long numbers removed first, and that genuine one-time codes are never sent; point to the privacy policy section that says this; and make the in-app prominent disclosure and consent (the Message Guard card, shown before the system settings screen opens) match the declaration. Do not request `READ_SMS` or `RECEIVE_SMS`. If Play review asks for a video, show the card, the settings screen and a warning notification. Sideloaded builds on Android 13 and up need "Allow restricted settings" in App info before the switch can be turned on.
 
+## Voice companion
+
+The user talks to SafeRoute through the bubble while another app stays in front. The overlay windows stay `NOT_FOCUSABLE`, so touches still reach the app below. Rules: `memory live-voice-rules` and `docs/live-audio-contract.md` (companion mode).
+
+### Start and end
+
+| Action | Effect |
+| --- | --- |
+| Double tap the bubble (idle, error or a result) | Starts a session. A single tap now waits for the double-tap timeout (300 ms) before it checks the screen |
+| "Ask" chip on the result pill or sheet | Starts a session about the result on show |
+| Tap the bubble during a session | Mute or unmute. After a lost audio focus, a tap resumes |
+| End on the pill, or long press the bubble | Ends the session. The shield stays on; a second long press closes it |
+| Session cap (`LIVE_COMPANION_MAX_MS`, 300 s), the shield stops, drag to the close target, server error | Ends the session |
+| TalkBack | Custom action "Talk to SafeRoute" on the bubble |
+
+Double tap was kept over a separate mic badge: it adds no window and no clutter, and 300 ms on a check that takes seconds is not noticeable.
+
+### Flow
+
+```
+            double tap / Ask
+  IDLE ───────────────────────► CHECKING  (normal capture and /v1/check; skipped when a result is on show)
+                                    │ result
+                                    ▼
+                                 WARNING   approved spokenWarning from /v1/speak, played natively
+                                    │ done
+                                    ▼
+                                CONNECTING  /v1/live, start { mode: "companion", report, checkId, home, destination }
+                                    │ ready
+                                    ▼
+             ┌──────────────► LISTENING ◄───── playback drained ─── SPEAKING
+             │                 │   ▲  │ user transcript          ▲
+             │                 │   │  └────────► THINKING ───────┘ model audio
+             │  action RECHECK ▼   │
+             │             RECHECKING  mic gated, capture, /v1/check, new verdict on the bubble
+             │                 │
+             │                 ▼
+             └── context ── WARNING (new approved warning), then { type: "context", report } and THINKING
+  Any live state: End, long press, cap, shield stop, server error ─► ENDED
+```
+
+Barge-in: `interrupted` flushes playback at once. Audio focus: `AUDIOFOCUS_LOSS*` (a call, another app) flushes playback, closes the mic and shows "Paused"; `AUDIOFOCUS_GAIN` resumes. Everything is released on end.
+
+### What the bubble and pill show
+
+| State | Bubble | Pill chip | Pill text |
+| --- | --- | --- | --- |
+| Checking, rechecking | Scanning shield | Checking / Checking again | |
+| Warning | Shield pulsing with the output level | Warning | The approved warning text |
+| Connecting | Shield with three moving dots | Connecting | |
+| Listening | Mic glyph, input-level ring | Listening | Latest model line, or "Ask about what is on your screen" |
+| Thinking | Shield with three moving dots | Thinking | Latest model line |
+| Speaking | Shield pulsing with the output level, level ring | Speaking | Latest model line (cumulative, replaced on update) |
+| Muted, paused | Grey mic with a slash | Muted / Paused | |
+| Ended | Verdict bubble; the result pill returns | | A notice for cap or errors |
+
+The ring keeps the verdict color of the current report. The pill text is one line, ellipsized at the start, so the newest words show.
+
+### Android 14 foreground service
+
+The service type is `specialUse|mediaProjection|microphone`. Starting a while-in-use type (microphone) needs the app to be visible: [developer.android.com, restrictions on starting a foreground service from the background](https://developer.android.com/develop/background-work/services/fgs/restrictions-bg-start). The `SYSTEM_ALERT_WINDOW` exemption on that page covers starting a service from the background, not while-in-use access; on Android 14 `startForeground` with type microphone throws `SecurityException` without it.
+
+So the service adds the microphone type while SafeRoute is visible (`startShield`, and `OnActivityEntersForeground` in the module) whenever `RECORD_AUDIO` is granted, and only calls `startForeground` again at session start if the type is missing. If that call throws, the pill shows "Open SafeRoute once to allow voice"; a tap opens the Shield screen, which re-arms the type. On Android 11 to 13 a blocked mic records silence instead of throwing: 4 s of digital silence shows the same hint in the pill. Missing `RECORD_AUDIO` shows "Open SafeRoute to allow the microphone". The app asks for it as an optional step when the shield turns on and from the "Talk to SafeRoute from the bubble" card.
+
+### Strings
+
+`startShield({ strings })` takes the labels in `COMPANION_STRING_KEYS` (`index.ts`); the app builds them from `live:companion` in the UI language. Unknown keys and blank values are dropped, values are capped at 160 characters, and missing keys fall back to English (`ShieldStrings.DEFAULTS`). The labels are read when the shield starts.
+
+### On-device checklist
+
+- [ ] Shield screen: "Allow microphone" shows the system prompt; the card then says the microphone is allowed.
+- [ ] In another app, double tap the idle bubble: the bubble hides, checks, shows the verdict, the warning plays, then the pill says Listening.
+- [ ] A single tap still checks the screen, about 0.3 s later than before.
+- [ ] Ask a question while the other app is in front; scroll and type in it during the answer (touches pass through).
+- [ ] Talk over the answer: the voice stops within about 100 ms.
+- [ ] Say "what about this one?" on a new message: the bubble hides, checks, shows the new verdict, plays its warning, and the model explains the new result.
+- [ ] Tap the bubble: Muted, the mic indicator goes off; tap again: Listening.
+- [ ] Incoming call or music app: Paused; after the call the session resumes.
+- [ ] End on the pill and a long press both end the session and keep the shield; drag to the close target closes both.
+- [ ] Android 14: kill SafeRoute from recents, start the shield from the Home switch, leave the app, double tap: voice works; if not, the pill says "Open SafeRoute once to allow voice".
+- [ ] "Ask me for the hotline" opens SafeRoute on Get help; TalkBack offers "Talk to SafeRoute".
+
 ## Auth token
 
 `startShield({ apiUrl, language, authToken })` takes an optional Firebase ID token that `CheckClient` sends as `Authorization: Bearer`. `setShieldAuthToken(token)` replaces it while the shield runs. Without a token the server limits by IP. The token is held in memory only (`ShieldBridge.authToken`).
@@ -181,4 +268,5 @@ Notification access (`BIND_NOTIFICATION_LISTENER_SERVICE`) is a sensitive permis
 
 - Android 14 allows one `createVirtualDisplay` per MediaProjection and one `getMediaProjection` per consent result. The capturer keeps one display for the session. Do not create one per tap.
 - On Android 14 `startForeground` with type `mediaProjection` throws before consent. The service starts as `specialUse` and switches type after consent.
-- UI labels are English. Result text comes from the server in the requested language.
+- Check UI labels are English. Voice companion labels come from the app in the user's language. Result text comes from the server in the requested language.
+- `startShield` options also carry `home` and `destination` country codes for the companion's verified hotlines.

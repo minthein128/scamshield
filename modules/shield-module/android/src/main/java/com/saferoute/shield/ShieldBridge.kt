@@ -12,6 +12,13 @@ object ShieldBridge {
     @Volatile var consentCallback: ((Boolean) -> Unit)? = null
     @Volatile var eventSink: ((String, String) -> Unit)? = null
     @Volatile var authToken: String = ""
+    @Volatile var homeCountry: String? = null
+    @Volatile var destinationCountry: String? = null
+    @Volatile var strings: ShieldStrings = ShieldStrings.DEFAULT
+
+    /** ISO 3166 alpha-2, upper case, or null. */
+    fun countryCode(value: Any?): String? =
+        (value as? String)?.trim()?.uppercase()?.takeIf { it.matches(Regex("^[A-Z]{2}$")) }
 
     private val unsynced = ArrayList<String>()
     private val recent = LinkedHashMap<String, String>()
