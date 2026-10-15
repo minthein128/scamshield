@@ -16,6 +16,10 @@ import type { Speaker } from './speak.js';
 import { Timings, timingStore } from './timing.js';
 import { ApiError, type CheckResponse } from './types.js';
 import { parseRequest, parseSpeakRequest } from './validate.js';
+import type { Grounder } from './ground.js';
+import { assessJobOffer } from './job/assess.js';
+import { createJobExtractor } from './job/extract.js';
+import { parseJobAssessRequest, parseJobExtractRequest } from './job/validate.js';
 
 export const clientIp = (forwarded?: string, real?: string) => forwarded?.split(',')[0]?.trim() || real || 'local';
 
@@ -42,6 +46,8 @@ export function createApp(
   limits: Limits = createLimits(cfg),
   admin?: AdminDeps,
   published?: PublishedCache,
+  jobExtractor: ReturnType<typeof createJobExtractor> = createJobExtractor(cfg),
+  grounder?: Grounder,
 ) {
   const app = new Hono();
   const limiter = limits.ip;
@@ -210,6 +216,67 @@ export function createApp(
     c.header('Cache-Control', 'public, max-age=60');
     return c.json(out);
   });
+
+  app.post(
+    '/v1/job/extract',
+    async (c, next) => {
+      if (!limiter.allow(clientIp(c.req.header('x-forwarded-for'), c.req.header('x-real-ip')))) {
+        return c.json(errorBody('rate_limited', 'Too many requests, retry in a minute'), 429, { 'retry-after': '60' });
+      }
+      await next();
+    },
+    bodyLimit({
+      maxSize: cfg.maxBodyBytes,
+      onError: (c) => c.json(errorBody('too_large', `Body exceeds ${cfg.maxBodyBytes} bytes`), 413),
+    }),
+    async (c) => {
+      const started = Date.now();
+      let body: unknown;
+      try {
+        body = await c.req.json();
+      } catch {
+        throw new ApiError(400, 'bad_request', 'Body must be valid JSON');
+      }
+      const req = parseJobExtractRequest(body);
+      const res = await jobExtractor.extract(req);
+      log('INFO', 'job_extract_done', { jobId: res.jobId, language: req.language, ms: Date.now() - started });
+      return c.json(res);
+    },
+  );
+
+  app.post(
+    '/v1/job/assess',
+    async (c, next) => {
+      if (!limiter.allow(clientIp(c.req.header('x-forwarded-for'), c.req.header('x-real-ip')))) {
+        return c.json(errorBody('rate_limited', 'Too many requests, retry in a minute'), 429, { 'retry-after': '60' });
+      }
+      await next();
+    },
+    bodyLimit({
+      maxSize: cfg.maxBodyBytes,
+      onError: (c) => c.json(errorBody('too_large', `Body exceeds ${cfg.maxBodyBytes} bytes`), 413),
+    }),
+    async (c) => {
+      const started = Date.now();
+      let body: unknown;
+      try {
+        body = await c.req.json();
+      } catch {
+        throw new ApiError(400, 'bad_request', 'Body must be valid JSON');
+      }
+      const req = parseJobAssessRequest(body);
+      const res = await assessJobOffer(req, grounder);
+      log('INFO', 'job_assess_done', {
+        id: res.id,
+        verdict: res.verdict,
+        attention: res.attention,
+        conflicts: res.conflicts.length,
+        score: res.score,
+        ms: Date.now() - started,
+      });
+      return c.json(res);
+    },
+  );
 
   app.post(
     '/v1/speak',

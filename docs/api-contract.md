@@ -197,7 +197,78 @@ No auth. Per-IP limit. Every reply carries `Cache-Control: public, max-age=300` 
 
 The app fetches hotlines, notices and content at startup and every 6 hours, caches them, and uses the cache offline. See `docs/admin.md`.
 
-Admin errors extend the error body: codes `unauthorized` (401), `forbidden` (403) and `conflict` (409) join the existing ones. The admin API itself is under `/v1/admin` and is described in `docs/admin.md`.
+## Job Shield endpoints
+
+SafeRoute Job Shield compares advertised terms with recruiter demands before a migrant worker pays, sends documents or travels.
+
+### POST /v1/job/extract
+
+Extracts structured job facts from an ad (flyer, post) and/or a recruiter chat.
+
+Request:
+```json
+{
+  "ad": { "text": "...", "imageBase64": "...", "imageMimeType": "image/jpeg" },
+  "chat": { "text": "...", "imageBase64": "...", "imageMimeType": "image/jpeg" },
+  "language": "en" | "id" | "tl" | "my" | "th",
+  "context": { "home": "Myanmar", "destination": "Thailand" }
+}
+```
+
+At least one of `ad` or `chat` is required.
+
+Response 200:
+```json
+{
+  "jobId": "job_...",
+  "ad": {
+    "employer": { "value": "Bangkok Logistics", "quote": "Bangkok Logistics Ltd", "confidence": 0.9 },
+    "jobTitle": { "value": "Customer Service", "quote": "Customer Service", "confidence": 0.95 },
+    "workplace": { "value": "Bangkok", "quote": "Silom Road", "confidence": 0.9 },
+    "destinationCountry": { "value": "Thailand", "quote": "Thailand", "confidence": 0.9 },
+    "salary": { "value": { "amount": "35000", "currency": "THB", "period": "monthly" }, "quote": "35,000 THB", "confidence": 0.9 },
+    "workerFee": { "value": "none stated", "quote": "No fees", "confidence": 0.9 },
+    "contract": { "value": "official", "quote": "Official contract", "confidence": 0.9 },
+    "visaOrPermit": { "value": "work_visa", "quote": "Non-B visa sponsored", "confidence": 0.9 },
+    "travelArrangedBy": null,
+    "route": null,
+    "meetingPoint": { "value": "workplace", "quote": "Office at Silom", "confidence": 0.9 },
+    "documentRequest": null,
+    "paymentRequest": null,
+    "urgency": null,
+    "contactChannel": { "value": "company_channel", "quote": "hr@bangkoklogistics.example.com", "confidence": 0.9 },
+    "secrecyRequest": null
+  },
+  "chat": null
+}
+```
+
+Every field is either `null` (not mentioned) or an object with `{ value, quote, confidence }`. Extractions are cached in memory for 10 minutes by `jobId`.
+
+### POST /v1/job/assess
+
+Assesses the extracted and user-confirmed facts through deterministic conflict rules, border town protection, grounding, and attention tiers.
+
+Request:
+```json
+{
+  "jobId": "job_...",
+  "facts": {
+    "ad": { ... },
+    "chat": { ... }
+  },
+  "language": "en" | "id" | "tl" | "my" | "th",
+  "context": { "home": "Myanmar", "destination": "Thailand" }
+}
+```
+
+Response 200:
+Extends the standard `CheckResponse` with:
+- `attention`: `"lower" | "verify" | "pause"`
+- `attentionHeadline`: Short headline corresponding to the attention tier
+- `conflicts`: Array of `JobConflict` items showing both quotes and the conflicting terms
+- `stillUnclear`: Array of critical missing information items
+- `adFacts`, `chatFacts`: Confirmed facts
 
 ## GET /healthz
 

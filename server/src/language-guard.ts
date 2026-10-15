@@ -35,6 +35,9 @@ const EN: Rule[] = [
     sub: (_m, w) => `likely ${w === 'sure' || w === 'certain' ? 'concerning' : w}`,
   },
   { re: /\bproves? that\b/gi, sub: 'suggests that' },
+  { re: /\bverified jobs?\b/gi, sub: 'job offer' },
+  { re: /\bscams? confirmed\b/gi, sub: 'scam reported' },
+  { re: /\bno risks? (?:detected|found)\b/gi, sub: 'few warning signs detected' },
 ];
 
 const ID: Rule[] = [
@@ -51,6 +54,9 @@ const ID: Rule[] = [
   { re: /\bterbukti\b/gi, sub: 'tampaknya' },
   { re: /\bterkonfirmasi\b/gi, sub: 'dilaporkan' },
   { re: /\b100\s?%\s*(?:yakin|pasti|penipuan|palsu|aman)/gi, sub: 'kemungkinan besar' },
+  { re: /\bpekerjaan terverifikasi\b/gi, sub: 'tawaran pekerjaan' },
+  { re: /\bpenipuan terkonfirmasi\b/gi, sub: 'laporan penipuan' },
+  { re: /\btidak ada risiko terdeteksi\b/gi, sub: 'sedikit tanda peringatan terdeteksi' },
 ];
 
 const TL: Rule[] = [
@@ -60,6 +66,9 @@ const TL: Rule[] = [
   { re: /\bwalang duda\b/gi, sub: 'posible' },
   { re: /\bkumpirmado\b/gi, sub: 'iniulat' },
   { re: /\b100\s?%\s*(?:sigurado|scam|peke|ligtas)/gi, sub: 'posibleng' },
+  { re: /\bberipikadong trabaho\b/gi, sub: 'alok na trabaho' },
+  { re: /\bkumpirmadong scam\b/gi, sub: 'iniulat na scam' },
+  { re: /\bwalang natukoy na panganib\b/gi, sub: 'kakaunting babala ang natukoy' },
 ];
 
 const SCAM_NOUN = '(လိမ်လည်မှု|လိမ်ညာမှု|လှည့်စားမှု|ထောင်ချောက်|လူကုန်ကူးမှု)';
@@ -69,6 +78,9 @@ const MY: Rule[] = [
   { re: /(၁၀၀\s*(?:%|ရာခိုင်နှုန်း)|100\s?%)/g },
   { re: /(အတည်ပြုပြီး|အတည်ပြုထားသည်)/g, sub: 'ဖော်ပြထားပြီး' },
   { re: /(လိမ်စားသူ|ရာဇဝတ်ကောင်|လူကုန်ကူးသူ)\s*(?:ဖြစ်ပါသည်|ဖြစ်သည်)/g },
+  { re: /(အတည်ပြုပြီးသောအလုပ်)/g, sub: 'ဖော်ပြထားသောအလုပ်' },
+  { re: /(လိမ်လည်မှုအတည်ပြုပြီး)/g, sub: 'လိမ်လည်မှုဖော်ပြထားပြီး' },
+  { re: /(အန္တရာယ်မတွေ့ရှိပါ)/g, sub: 'သတိပေးချက်အနည်းငယ်သာတွေ့ရှိပါသည်' },
 ];
 
 // Thai has no word boundaries: rules use lookbehinds for negation and hedge prefixes instead of \b.
@@ -90,6 +102,9 @@ const TH: Rule[] = [
   { re: new RegExp(`${TH_NOT}(?<!สามารถ)(?:ยืนยันแล้ว|ได้รับการยืนยัน)(?!หรือไม่|หรือยัง)`, 'g'), sub: 'มีรายงาน' },
   { re: new RegExp(`${TH_NOT}(?<!สามารถ)พิสูจน์ได้ว่า`, 'g'), sub: 'บ่งชี้ว่า' },
   { re: new RegExp(`${TH_NOT}(?<!สามารถ)พิสูจน์แล้ว`, 'g'), sub: 'มีรายงาน' },
+  { re: new RegExp(`${TH_NOT}งานได้รับการยืนยัน`, 'g'), sub: 'ข้อเสนองาน' },
+  { re: new RegExp(`${TH_NOT}ยืนยันการหลอกลวง`, 'g'), sub: 'มีรายงานการหลอกลวง' },
+  { re: new RegExp(`${TH_NOT}ไม่พบความเสี่ยง`, 'g'), sub: 'พบสัญญาณเตือนน้อย' },
 ];
 
 const RULES: Record<Lang, Rule[]> = { en: EN, id: ID, tl: TL, my: MY, th: TH };
