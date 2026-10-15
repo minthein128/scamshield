@@ -26,7 +26,7 @@ jobs:
       contents: write
       id-token: write
     env:
-      DISTRIBUTE: ${{ vars.FIREBASE_ANDROID_APP_ID != '' && vars.GCP_WORKLOAD_IDENTITY_PROVIDER != '' && vars.GCP_SERVICE_ACCOUNT != '' && ((github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/feat/production')) || (github.event_name == 'workflow_dispatch' && inputs.force_distribute)) }}
+      DISTRIBUTE: ${{ vars.FIREBASE_ANDROID_APP_ID != '' && vars.GCP_WORKLOAD_IDENTITY_PROVIDER != '' && vars.GCP_SERVICE_ACCOUNT != '' && (github.event_name == 'workflow_dispatch' && inputs.force_distribute) }}
       EXPO_PUBLIC_API_URL: ${{ vars.EXPO_PUBLIC_API_URL }}
       EXPO_PUBLIC_FIREBASE_API_KEY: ${{ vars.EXPO_PUBLIC_FIREBASE_API_KEY }}
       EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ vars.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN }}
