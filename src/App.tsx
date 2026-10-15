@@ -11,6 +11,7 @@ import RootNavigator from './navigation/RootNavigator';
 import { AppStateProvider } from './state/AppState';
 import { AuthProvider } from './state/AuthState';
 import { useApiUrl } from './config/runtime';
+import { startRuntimeConfig } from './lib/runtimeConfig';
 import theme from './theme/theme';
 
 export default function App() {
@@ -20,6 +21,7 @@ export default function App() {
   useEffect(() => {
     restoreUiLanguage().finally(() => setLanguageReady(true));
   }, []);
+  useEffect(() => (languageReady ? startRuntimeConfig() : undefined), [languageReady]);
   const mockMode = __DEV__ && apiUrl === '';
   const [fontsLoaded] = useFonts({
     'PlusJakartaSans-Regular': require('../assets/fonts/PlusJakartaSans-Regular.ttf'),

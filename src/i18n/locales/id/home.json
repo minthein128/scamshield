@@ -28,5 +28,8 @@
     "a11y": "Dapatkan bantuan: saluran bantuan dan pelaporan",
     "bodyCountries": "Saluran bantuan untuk negara Anda.",
     "bodyRegion": "Saluran bantuan dan pelaporan di Asia Tenggara."
+  },
+  "notice": {
+    "dismiss": "Tutup"
   }
 }

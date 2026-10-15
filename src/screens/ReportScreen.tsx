@@ -18,6 +18,7 @@ import {
 import { countryLabel } from '../lib/countries';
 import { scamTypeLabel, verdictLabel } from '../lib/labels';
 import { resolveCallTarget } from '../lib/hotlines';
+import { useRuntimeConfig } from '../lib/runtimeConfig';
 import { seenLine } from '../lib/radar';
 import { callNumber } from '../lib/warn';
 import { WarnFamilySheet } from '../components/WarnFamilySheet';
@@ -77,6 +78,7 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
     await speak(result.spokenWarning, language, () => setSpeaking(false), getApiClient()).catch(() => setSpeaking(false));
   };
 
+  useRuntimeConfig();
   const callAction = result.actions.find(a => a.type === 'call');
   const hotline = resolveCallTarget(callAction?.value, profile.destinationCountry, profile.homeCountry);
 

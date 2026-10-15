@@ -28,5 +28,8 @@
     "a11y": "Humingi ng tulong: mga hotline at pag-report",
     "bodyCountries": "Mga hotline para sa iyong mga bansa.",
     "bodyRegion": "Mga hotline at linya para sa pag-report sa Timog-Silangang Asya."
+  },
+  "notice": {
+    "dismiss": "Isara"
   }
 }
