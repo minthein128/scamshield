@@ -27,7 +27,7 @@ const GLOSSARY = {
   'Low risk (the safe verdict; never "Safe", it must read as a likelihood)': { my: 'အန္တရာယ်နည်း', id: 'Risiko rendah', tl: 'Mababang panganib', th: 'ความเสี่ยงต่ำ' },
   'Be careful (the careful verdict)': { my: 'သတိထားပါ', id: 'Hati-hati', tl: 'Mag-ingat', th: 'ระวัง' },
   'High risk (the danger verdict)': { my: 'အန္တရာယ်မြင့်', id: 'Risiko tinggi', tl: 'Mataas na panganib', th: 'ความเสี่ยงสูง' },
-  'Scam radar': { my: 'လိမ်လည်မှု ရေဒါ', id: 'Radar penipuan', tl: 'Scam radar', th: 'เรดาร์มิจฉาชีพ' },
+  'Scam radar': { my: 'လိမ်လည်မှု ရေဒါ', id: 'Radar penipuan', tl: 'Scam radar', th: 'เรดาร์การหลอกลวง' },
   'Trusted contacts': { my: 'ယုံကြည်ရသူများ', id: 'Kontak tepercaya', tl: 'Mga pinagkakatiwalaang contact', th: 'ผู้ติดต่อที่ไว้ใจ' },
 };
 
