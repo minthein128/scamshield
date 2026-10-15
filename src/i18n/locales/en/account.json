@@ -1,0 +1,25 @@
+{
+  "title": "Account",
+  "signedInAs": "Signed in as",
+  "unavailable": {
+    "title": "Accounts are not available",
+    "body": "This build is not connected to the account service. SafeRoute still works fully without an account."
+  },
+  "createTitle": "Create account",
+  "signInTitle": "Sign in",
+  "introSignUp": "Your checks and trusted contacts so far stay with you and are saved to the new account.",
+  "introSignIn": "Sign in to get your saved checks and trusted contacts back.",
+  "email": "Email",
+  "password": "Password",
+  "passwordHint": "At least 6 characters.",
+  "haveAccount": "I already have an account",
+  "createNew": "Create a new account",
+  "forgot": "Forgot password?",
+  "google": "Continue with Google",
+  "facebook": "Continue with Facebook",
+  "errors": {
+    "missing": "Enter your email and password.",
+    "resetNeedsEmail": "Enter your email first, then tap Forgot password."
+  },
+  "resetSent": "If that email has an account, a reset link is on its way."
+}

@@ -1,17 +1,15 @@
+import { t } from '../i18n';
 import { HOTLINES, type Hotline, type HotlineCategory } from '../data/hotlines';
 import { COUNTRIES, type CountryCode } from '../data/countries';
 
 export { HOTLINES };
 export type { Hotline, HotlineCategory };
 
-export const CATEGORY_ORDER: HotlineCategory[] = ['trafficking', 'police', 'cybercrime', 'consular'];
+export const CATEGORY_ORDER: HotlineCategory[] = ['trafficking', 'police', 'cybercrime', 'consular', 'ngo'];
 
-export const CATEGORY_LABELS: Record<HotlineCategory, string> = {
-  trafficking: 'Anti-trafficking',
-  police: 'Police',
-  cybercrime: 'Scam and cybercrime reporting',
-  consular: 'Help for citizens abroad',
-};
+export function categoryLabel(category: HotlineCategory): string {
+  return t(`help:categories.${category}`);
+}
 
 const categoryRank = (c: HotlineCategory) => CATEGORY_ORDER.indexOf(c);
 

@@ -2,8 +2,10 @@ import { randomUUID } from 'node:crypto';
 import type { Correlator } from './correlate.js';
 import { buildActions, titleFor, withWebRiskNote } from './explain.js';
 import type { Extractor } from './extract.js';
+import type { Feedback } from './feedback/service.js';
 import type { Grounder } from './ground.js';
 import { type Intel, NO_LOOKUP } from './intel/service.js';
+import { countCertainty, guardExtraction, guardFlags, isHeavy } from './language-guard.js';
 import { log } from './log.js';
 import { score } from './score.js';
 import type { CheckRequest, CheckResponse } from './types.js';
@@ -13,10 +15,20 @@ export interface Pipeline {
 }
 
 const SAFETY_MARGIN_MS = 500;
-const RECORD_TIMEOUT_MS = 1500;
+const RECORD_TIMEOUT_MS = 2500;
 
 const settle = <T>(p: Promise<T>, ms: number, fallback: T): Promise<T> =>
   Promise.race([p.catch(() => fallback), new Promise<T>((r) => setTimeout(() => r(fallback), Math.max(ms, 0)))]);
+
+export interface LanguageStats {
+  lang: string;
+  before: number;
+  rewrites: number;
+  reasked: boolean;
+  after: number;
+}
+
+const REASK_MIN_MS = 5000;
 
 export function createPipeline(deps: {
   extractor: Extractor;
@@ -25,12 +37,23 @@ export function createPipeline(deps: {
   model: string;
   budgetMs?: number;
   intel?: Intel;
+  onLanguage?: (s: LanguageStats) => void;
+  feedback?: Pick<Feedback, 'remember' | 'noteReport'>;
 }): Pipeline {
   return {
     async run(req) {
       const deadline = Date.now() + (deps.budgetMs ?? 15000);
-      const extraction = await deps.extractor.extract(req);
       const left = () => deadline - Date.now() - SAFETY_MARGIN_MS;
+      const first = await deps.extractor.extract(req);
+      let guarded = guardExtraction(first, req.language);
+      const before0 = guarded.stats.before;
+      let reasked = false;
+      if (isHeavy(before0) && left() > REASK_MIN_MS) {
+        reasked = true;
+        const again = await settle(deps.extractor.extract(req, { hedgeRetry: true }), left(), undefined);
+        if (again) guarded = guardExtraction(again, req.language);
+      }
+      const extraction = guarded.extraction;
       const prepared = deps.intel?.prepare(req, extraction);
       const [linkChecks, grounded, network] = await Promise.all([
         settle(
@@ -41,7 +64,8 @@ export function createPipeline(deps: {
         settle(deps.grounder.ground(req, extraction, left()), left(), { flags: [], sources: [] }),
         deps.intel && prepared ? settle(deps.intel.lookup(prepared, req.language), left(), NO_LOOKUP) : Promise.resolve(NO_LOOKUP),
       ]);
-      const ownFlags = [...extraction.flags, ...grounded.flags];
+      const groundedGuard = guardFlags(grounded.flags, req.language);
+      const ownFlags = [...extraction.flags, ...groundedGuard.flags];
       const scoreWith = (flags: typeof ownFlags) =>
         score({
           flags,
@@ -52,24 +76,45 @@ export function createPipeline(deps: {
         });
       const scored = network.flags.length ? scoreWith([...ownFlags, ...network.flags]) : scoreWith(ownFlags);
       const scamType = scored.flags.length === 0 ? 'none' : extraction.scamType;
+      const id = `chk_${randomUUID().replaceAll('-', '').slice(0, 20)}`;
       if (deps.intel && prepared && req.shareSignals !== false) {
         const own = network.flags.length ? scoreWith(ownFlags) : scored;
+        const reported = req.reported === true;
+        const ownType = own.flags.length === 0 ? 'none' : extraction.scamType;
         const outcome = {
-          verdict: own.verdict,
+          verdict: reported && own.verdict === 'safe' ? ('careful' as const) : own.verdict,
           score: own.score,
-          scamType: own.flags.length === 0 ? 'none' : extraction.scamType,
+          scamType: reported ? (req.reportedType ?? ownType) : ownType,
           flags: own.flags,
         };
+        const intel = deps.intel;
         await settle(
-          deps.intel
-            .record(prepared, outcome, { uid: req.uid })
-            .catch((err: Error) => log('WARNING', 'intel_record_failed', { error: err.message })),
+          (async () => {
+            const rec = await intel.recordSignal(prepared, outcome, {
+              uid: req.uid,
+              ...(reported ? { confirmed: true, src: 'reported' as const } : {}),
+            });
+            if (reported) {
+              await deps.feedback?.noteReport({ scamType: outcome.scamType, language: prepared.language, lostMoney: req.lostMoney });
+              return;
+            }
+            await deps.feedback?.remember({
+              checkId: id,
+              verdict: own.verdict,
+              scamType: ownType,
+              score: own.score,
+              kind: req.kind,
+              language: prepared.language,
+              sigId: rec.status === 'skipped' ? undefined : rec.signalId,
+              prepared,
+            });
+          })().catch((err: Error) => log('WARNING', 'intel_record_failed', { error: err.message })),
           RECORD_TIMEOUT_MS,
           undefined,
         );
       }
-      return {
-        id: `chk_${randomUUID().replaceAll('-', '').slice(0, 20)}`,
+      const response: CheckResponse = {
+        id,
         createdAt: new Date().toISOString(),
         kind: req.kind,
         verdict: scored.verdict,
@@ -85,6 +130,17 @@ export function createPipeline(deps: {
         model: deps.model,
         ...(network.network ? { network: network.network } : {}),
       };
+      const rewrites = guarded.stats.rewrites + groundedGuard.stats.rewrites;
+      const stats: LanguageStats = {
+        lang: req.language,
+        before: before0 + groundedGuard.stats.before,
+        rewrites,
+        reasked,
+        after: countCertainty(response, req.language),
+      };
+      if (stats.before > 0) log('INFO', 'certainty_rewrite', { ...stats });
+      deps.onLanguage?.(stats);
+      return response;
     },
   };
 }

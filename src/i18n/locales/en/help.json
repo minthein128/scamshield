@@ -1,0 +1,30 @@
+{
+  "title": "Get help",
+  "intro": "Official hotlines and reporting lines. If someone is holding your passport, stopping you from leaving, or you feel in danger, call now.",
+  "pick": {
+    "title": "Pick your countries",
+    "body": "Choose where you are from and where you will work, and we show those hotlines first.",
+    "action": "Choose countries"
+  },
+  "none": {
+    "title": "No hotlines to show",
+    "body": "We could not load hotline details. Try again later."
+  },
+  "whereWork": "{{country}} (where you will work)",
+  "yourCountry": "{{country}} (your country)",
+  "unverified": "We have not verified an official hotline for {{country}} yet. Contact your nearest embassy or the police, or use the lines for the country you are in.",
+  "dialInside": "Dial from inside {{country}}.",
+  "callNumber": "Call {{number}}",
+  "openSite": "Open reporting site",
+  "source": "Official source",
+  "showMine": "Show only my countries",
+  "showAll": "Show all countries",
+  "categories": {
+    "trafficking": "Anti-trafficking",
+    "police": "Police",
+    "cybercrime": "Scam and cybercrime reporting",
+    "consular": "Help for citizens abroad",
+    "ngo": "Support organisations"
+  },
+  "reportScam": "Report a scam"
+}

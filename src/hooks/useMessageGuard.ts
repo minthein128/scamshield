@@ -2,12 +2,10 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { AppState, PermissionsAndroid, Platform } from 'react-native';
 import * as ShieldModule from 'shield-module';
 import type { MessageGuardApp } from 'shield-module';
+import { t } from '../i18n';
 import { useApiUrl } from '../config/runtime';
 import { useAppState } from '../state/AppState';
 import { shieldSupport, type ShieldSupport } from './useShieldControl';
-
-export const ACCESS_HINT =
-  'Notification access is still off. If the switch is greyed out, open SafeRoute in App info, tap the three dots and choose "Allow restricted settings".';
 
 export interface MessageGuardControl {
   support: ShieldSupport;
@@ -69,7 +67,7 @@ export function useMessageGuard(): MessageGuardControl {
       if (!awaitingAccess.current) return;
       awaitingAccess.current = false;
       if (await ShieldModule.hasNotificationAccess()) await turnOn().catch(() => undefined);
-      else setError(ACCESS_HINT);
+      else setError(t('shield:messageGuard.errors.accessOff'));
     });
     return () => sub.remove();
   }, [refresh, support, turnOn]);
@@ -88,7 +86,7 @@ export function useMessageGuard(): MessageGuardControl {
         awaitingAccess.current = true;
         if (!(await ShieldModule.openNotificationAccessSettings())) {
           awaitingAccess.current = false;
-          setError('Could not open the notification access settings.');
+          setError(t('shield:messageGuard.errors.cannotOpen'));
         }
         return;
       }

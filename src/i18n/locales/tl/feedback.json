@@ -1,0 +1,47 @@
+{
+  "_meta": {
+    "reviewed": false
+  },
+  "row": {
+    "label": "Tama ba ito?",
+    "thanks": "Salamat sa feedback",
+    "up": "Oo, tama ito",
+    "down": "Hindi, mali ito",
+    "failed": "Hindi namin naipadala iyon. Subukang muli mamaya."
+  },
+  "sheet": {
+    "titleRisky": "Tungkol saan ito?",
+    "titleSafe": "Anong uri ng scam ito?",
+    "pick": "Piliin ang pinakamalapit.",
+    "sendBody": "Nakatutulong ang sagot mo para mas mabalaan ang iba. Walang anuman sa isinulat mo ang ipapadala.",
+    "itWasSafe": "Sa tingin ko ligtas ito",
+    "different": "Sa tingin ko ibang scam ito",
+    "optional": "Opsyonal. Nakatutulong ang sagot mo para mapansin ito sa susunod.",
+    "scam": "Sa tingin ko scam ito",
+    "send": "Ipadala"
+  },
+  "choices": {
+    "job_trafficking": "Alok na trabaho sa ibang bansa",
+    "romance_pig_butchering": "Romance o crypto",
+    "parcel_phishing": "Parcel o link ng bayarin",
+    "fake_agency": "Recruitment agency",
+    "marketplace_fraud": "Online shop",
+    "investment": "Investment o task",
+    "other": "Iba pa"
+  },
+  "reportScam": {
+    "title": "Mag-ulat ng scam",
+    "intro": "Ibahagi sa amin ang scam na nakita mo. Inaalis namin ang mga pangalan, numero, at link bago itago ang anuman, at nakatutulong ito na magbabala sa iba.",
+    "textLabel": "I-paste ang mensahe o chat",
+    "textA11y": "Mensahe o chat ng scam",
+    "placeholder": "Ang mensahe, job post, o chat",
+    "screenshotLabel": "O kaya ay screenshot",
+    "kindLabel": "Anong uri ng scam ito?",
+    "lostLabel": "Nawalan ka ba ng pera? (opsyonal)",
+    "yes": "Oo",
+    "no": "Hindi",
+    "lostNote": "Oo o hindi lamang. Hindi namin tinatanong kung magkano.",
+    "submit": "Ipadala ang ulat",
+    "source": "Iniulat na scam"
+  }
+}

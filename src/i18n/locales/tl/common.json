@@ -1,0 +1,76 @@
+{
+  "_meta": {
+    "reviewed": false
+  },
+  "actions": {
+    "back": "Bumalik",
+    "close": "Isara",
+    "cancel": "Kanselahin",
+    "done": "Tapos na",
+    "next": "Susunod",
+    "continue": "Magpatuloy",
+    "skip": "Laktawan",
+    "paste": "I-paste",
+    "remove": "Alisin",
+    "call": "Tawagan",
+    "tryAgain": "Subukan muli"
+  },
+  "tabs": {
+    "home": "Home",
+    "check": "Suriin",
+    "contacts": "Mga Contact",
+    "contactsA11y": "Mga pinagkakatiwalaang contact",
+    "learn": "Matuto"
+  },
+  "loading": "Naglo-load ang SafeRoute...",
+  "offlineDemo": "Offline demo mode",
+  "copied": {
+    "title": "Nakopya na",
+    "message": "Nakopya na ang babala. I-paste ito sa kahit anong chat para ibahagi."
+  },
+  "time": {
+    "justNow": "ngayon lang",
+    "minutesAgo": "{{count}} min ang nakalipas",
+    "hoursAgo": "{{count}} h ang nakalipas",
+    "yesterday": "kahapon",
+    "daysAgo_one": "{{count}} araw ang nakalipas",
+    "daysAgo_other": "{{count}} araw ang nakalipas"
+  },
+  "verdict": {
+    "safe": "Mababang panganib",
+    "careful": "Mag-ingat",
+    "danger": "Mataas na panganib"
+  },
+  "families": {
+    "too_good": "Masyadong maganda para maging totoo",
+    "pressure": "Panggigipit",
+    "payment_route": "Paraan ng pagbabayad",
+    "identity": "Pagkakakilanlan",
+    "link_risk": "Panganib sa link",
+    "known_bad": "Tugma sa mga dating ulat",
+    "trafficking": "Mga babala ng trafficking"
+  },
+  "scamTypes": {
+    "job_trafficking": "Malamang na recruitment para sa trafficking",
+    "romance_pig_butchering": "Posibleng romance o investment scam",
+    "parcel_phishing": "Posibleng phishing sa parcel",
+    "fake_agency": "Recruitment agency na mukhang mapanganib",
+    "marketplace_fraud": "Posibleng panloloko sa marketplace",
+    "investment": "Posibleng panloloko sa investment",
+    "other": "Kahina-hinalang mensahe",
+    "none": "Walang nakitang senyales ng panloloko"
+  },
+  "countries": {
+    "MM": "Myanmar",
+    "TH": "Thailand",
+    "KH": "Cambodia",
+    "LA": "Laos",
+    "MY": "Malaysia",
+    "ID": "Indonesia",
+    "PH": "Pilipinas",
+    "VN": "Vietnam"
+  },
+  "languageNote": {
+    "reportsInEnglish": "Nasa Ingles muna ang mga ulat at binibigkas na babala sa ngayon."
+  }
+}

@@ -5,8 +5,9 @@ import { createCorrelator } from '../server/src/correlate.js';
 import { createClient, createGeminiExtractor } from '../server/src/extract.js';
 import { createGrounder } from '../server/src/ground.js';
 import { redactDeterministic } from '../server/src/intel/redact.js';
+import { countCertainty } from '../server/src/language-guard.js';
 import { createPipeline } from '../server/src/pipeline.js';
-import { type CheckResponse, LANGS } from '../server/src/types.js';
+import { type CheckResponse, LANGS, type Lang } from '../server/src/types.js';
 import {
   BENCH_DIR,
   type BenchResult,
@@ -82,6 +83,7 @@ let call: Call;
 let model = 'unknown';
 let mode: BenchResult['mode'];
 
+let lastBefore: number | null = null;
 if (flags.inprocess) {
   mode = 'in-process';
   const cfg = loadConfig({ ...process.env, MOCK: '0', LOG_SILENT: '1' });
@@ -97,6 +99,9 @@ if (flags.inprocess) {
     grounder: createGrounder(cfg, client),
     model,
     budgetMs: cfg.requestBudgetMs,
+    onLanguage: (s) => {
+      lastBefore = s.before;
+    },
   });
   call = (body) => pipeline.run(body as never);
 } else {
@@ -173,6 +178,8 @@ for (const [i, l] of todo.entries()) {
       latencyMs: Date.now() - t,
       correct: isRisky(res.verdict) === (l.expected !== 'safe'),
       piiHits: piiHits(res),
+      certaintyBefore: flags.inprocess ? lastBefore : null,
+      certaintyAfter: countCertainty(res, language as Lang),
     });
   } catch (err) {
     rows.push({

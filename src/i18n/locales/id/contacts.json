@@ -1,0 +1,39 @@
+{
+  "_meta": {
+    "reviewed": false
+  },
+  "title": "Kontak tepercaya",
+  "intro": "Orang yang Anda percaya. Saat hasil pemeriksaan terlihat berisiko, beri tahu mereka dengan satu ketukan, atau telepon dulu.",
+  "emptyTitle": "Belum ada kontak tepercaya",
+  "emptyBody": "Tambahkan keluarga atau teman di bawah. Nomor mereka hanya disimpan di perangkat Anda, kecuali Anda masuk.",
+  "call": "Telepon",
+  "remove": "Hapus",
+  "add": {
+    "title": "Tambah kontak",
+    "name": "Nama",
+    "phone": "Nomor telepon",
+    "phoneHint": "Sertakan kode negara, misalnya +95.",
+    "submit": "Tambah kontak",
+    "pick": "Pilih dari kontak saya"
+  },
+  "footnote": {
+    "synced": "Kontak Anda diselaraskan dengan akun Anda.",
+    "local": "Kontak Anda disimpan di perangkat ini. Masuk agar tetap tersimpan jika Anda ganti ponsel."
+  },
+  "errors": {
+    "permission": "Izinkan akses ke kontak untuk memilih seseorang, atau ketik nomornya di bawah.",
+    "noNumber": "Kontak itu tidak memiliki nomor telepon.",
+    "openFailed": "Kami tidak dapat membuka kontak Anda. Silakan ketik nomornya di bawah.",
+    "nameRequired": "Masukkan nama.",
+    "nameTooLong": "Nama itu terlalu panjang.",
+    "phoneInvalid": "Masukkan nomor telepon dengan 6 sampai 15 angka.",
+    "duplicate": "Nomor itu sudah ada di daftar Anda."
+  },
+  "warn": {
+    "title": "Beri tahu orang tepercaya",
+    "body": "Ini akan membuka pesan teks berisi peringatan. Anda yang menentukan untuk mengirimnya atau tidak.",
+    "addContact": "Tambah kontak tepercaya",
+    "text": "Kirim SMS ke {{name}}",
+    "share": "Bagikan lewat cara lain"
+  }
+}

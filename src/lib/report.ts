@@ -1,8 +1,9 @@
-import type { CheckResponse, FlagFamily, ScamType, Severity, Verdict, WebRisk, Flag } from '../api/types';
+import type { CheckResponse, FlagFamily, Severity, Verdict, Flag } from '../api/types';
+import { t } from '../i18n';
+import { familyLabel, verdictLabel } from './labels';
 import theme from '../theme/theme';
 
 export interface VerdictStyle {
-  label: string;
   background: string;
   foreground: string;
   subtle: string;
@@ -14,41 +15,12 @@ export interface VerdictStyle {
 const { colors } = theme;
 
 export const VERDICT_STYLES: Record<Verdict, VerdictStyle> = {
-  danger: { label: 'High risk', background: colors.danger, foreground: colors.white, subtle: '#FFEDD5', track: colors.dangerBarTrack, chipBackground: theme.verdictRoles.danger.chipBg, chipForeground: theme.verdictRoles.danger.chipText },
-  careful: { label: 'Be careful', background: colors.warningText, foreground: colors.white, subtle: colors.amberLight, track: colors.warningBadge, chipBackground: theme.verdictRoles.careful.chipBg, chipForeground: theme.verdictRoles.careful.chipText },
-  safe: { label: 'Low risk', background: colors.brandBlue, foreground: colors.white, subtle: colors.brandBlueLight, track: '#93B4FF', chipBackground: theme.verdictRoles.safe.chipBg, chipForeground: theme.verdictRoles.safe.chipText },
+  danger: { background: colors.danger, foreground: colors.white, subtle: '#FFEDD5', track: colors.dangerBarTrack, chipBackground: theme.verdictRoles.danger.chipBg, chipForeground: theme.verdictRoles.danger.chipText },
+  careful: { background: colors.warningText, foreground: colors.white, subtle: colors.amberLight, track: colors.warningBadge, chipBackground: theme.verdictRoles.careful.chipBg, chipForeground: theme.verdictRoles.careful.chipText },
+  safe: { background: colors.brandBlue, foreground: colors.white, subtle: colors.brandBlueLight, track: '#93B4FF', chipBackground: theme.verdictRoles.safe.chipBg, chipForeground: theme.verdictRoles.safe.chipText },
 };
 
 export const FAMILY_ORDER: FlagFamily[] = ['trafficking', 'known_bad', 'payment_route', 'link_risk', 'identity', 'pressure', 'too_good'];
-
-export const FAMILY_LABELS: Record<FlagFamily, string> = {
-  too_good: 'Too good to be true',
-  pressure: 'Pressure',
-  payment_route: 'Payment route',
-  identity: 'Identity',
-  link_risk: 'Link risk',
-  known_bad: 'Known bad',
-  trafficking: 'Trafficking',
-};
-
-export const SCAM_TYPE_LABELS: Record<ScamType, string> = {
-  job_trafficking: 'Likely trafficking recruitment',
-  romance_pig_butchering: 'Romance and investment scam',
-  parcel_phishing: 'Parcel phishing',
-  fake_agency: 'Fake recruitment agency',
-  marketplace_fraud: 'Marketplace fraud',
-  investment: 'Investment scam',
-  other: 'Suspicious message',
-  none: 'No scam pattern found',
-};
-
-export const WEB_RISK_LABELS: Record<WebRisk, string> = {
-  clean: 'No known threats',
-  malware: 'Malware',
-  social_engineering: 'Phishing or deception',
-  unwanted_software: 'Unwanted software',
-  unknown: 'Not checked',
-};
 
 const SEVERITY_RANK: Record<Severity, number> = { high: 0, medium: 1, low: 2 };
 
@@ -73,7 +45,7 @@ export function groupFlags(flags: Flag[]): FlagGroup[] {
   for (const flag of flags) groups.set(flag.family, [...(groups.get(flag.family) ?? []), flag]);
   return FAMILY_ORDER.filter(f => groups.has(f)).map(family => ({
     family,
-    label: FAMILY_LABELS[family],
+    label: familyLabel(family),
     flags: [...(groups.get(family) ?? [])].sort((a, b) => SEVERITY_RANK[a.severity] - SEVERITY_RANK[b.severity]),
   }));
 }
@@ -84,15 +56,10 @@ export function telUrl(number: string): string {
 }
 
 export function shareMessage(result: CheckResponse): string {
-  return `SafeRoute check: ${result.title}\n${result.summary}\nRisk score ${result.score}/100.`;
+  return t('report:shareMessage', { title: result.title, summary: result.summary, score: result.score });
 }
 
 export function warnMessage(result: CheckResponse): string {
   const summary = result.summary.length > 280 ? `${result.summary.slice(0, 277)}...` : result.summary;
-  return `SafeRoute warning (${VERDICT_STYLES[result.verdict].label.toLowerCase()}): ${result.title}. ${summary} Please do not pay money or send documents. Call me first.`;
-}
-
-export function entryLabel(result: CheckResponse, source?: string): string {
-  const first = result.flags[0]?.evidence;
-  return source || (first ? first.replace(/^"|"$/g, '').slice(0, 48) : SCAM_TYPE_LABELS[result.scamType]);
+  return t('report:warnMessage', { verdict: verdictLabel(result.verdict).toLowerCase(), title: result.title, summary });
 }

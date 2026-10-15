@@ -1,85 +1,98 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { Screen } from '../components/Screen';
-import { Card, ScreenHeader, SectionTitle } from '../components/ui';
+import { Text } from '../components/Text';
+import { ScreenHeader, SectionTitle } from '../components/ui';
 import { Icon } from '../components/Icon';
-import { BOARDS } from './demo/boards';
 import type { TabScreenProps } from '../navigation/types';
 import theme from '../theme/theme';
+import { FlagSheet } from './learn/FlagSheet';
+import { LinkRow } from './learn/LinkRow';
+import { ScamCard } from './learn/ScamCard';
+import { RED_FLAGS, SCAM_TYPES, type RedFlag } from './learn/content';
+import { openReportScam } from './learn/nav';
 
 const { colors, fonts } = theme;
 
-export const RED_FLAGS = [
-  ['Too good to be true', 'Pay or perks far above normal, no experience needed.'],
-  ['Pressure', 'Act today, limited slots, do not tell anyone.'],
-  ['Payment route', 'Fees, deposits or transfers before you start.'],
-  ['Identity', 'Hidden recruiter, private chat apps only, no company trace.'],
-  ['Link risk', 'New domains, shortened links, fake tracking pages.'],
-  ['Known bad', 'Matches numbers, pages or scripts already reported.'],
-  ['Trafficking', 'No visa, passport kept, pickup at the border.'],
-];
-
-const GROUP_TITLES: Record<string, string> = {
-  'Overlay: shield button': 'The shield button',
-  'Overlay: job post': 'Job posts',
-  'Overlay: strange chat': 'Strange chats',
-  'Overlay: SMS': 'Text messages',
-  'Overlay: agency': 'Recruitment agencies',
-  'Overlay: shop': 'Online shops',
+const pairs = <T,>(items: T[]): (T | null)[][] => {
+  const rows: (T | null)[][] = [];
+  for (let i = 0; i < items.length; i += 2) rows.push([items[i], items[i + 1] ?? null]);
+  return rows;
 };
 
 export const LearnScreen: React.FC<TabScreenProps<'Learn'>> = ({ navigation }) => {
-  const boards = BOARDS.filter(b => GROUP_TITLES[b.group]);
-  const groups = [...new Set(boards.map(b => b.group))];
+  const { t } = useTranslation('learn');
+  const [flag, setFlag] = useState<RedFlag | null>(null);
   return (
-    <Screen>
-      <ScreenHeader title="Learn" />
-
-      <View style={{ gap: 8 }}>
-        <SectionTitle>Seven red flags</SectionTitle>
-        <Card style={{ gap: 16 }}>
-          {RED_FLAGS.map(([title, body]) => (
-            <View key={title} style={{ gap: 4 }}>
-              <Text style={styles.famTitle}>{title}</Text>
-              <Text style={styles.famBody}>{body}</Text>
-            </View>
-          ))}
-        </Card>
+    <Screen contentStyle={styles.content}>
+      <View style={{ gap: 6 }}>
+        <ScreenHeader title={t('title')} />
+        <Text style={styles.tagline}>{t('tagline')}</Text>
       </View>
 
-      <View style={{ gap: 8 }}>
-        <SectionTitle>See how scams look</SectionTitle>
-        <Text style={styles.famBody}>Step-by-step examples of common scams and how SafeRoute flags them. The posts and chats shown are made-up examples.</Text>
-        {groups.map(group => (
-          <View key={group} style={{ gap: 8 }}>
-            <Text style={styles.group}>{GROUP_TITLES[group]}</Text>
-            {boards.filter(b => b.group === group).map(b => (
-              <TouchableOpacity
-                key={b.key}
-                testID={`demo-${b.key}`}
-                accessibilityRole="button"
-                accessibilityLabel={b.title}
-                activeOpacity={0.7}
-                onPress={() => navigation.navigate('DemoBoard', { key: b.key })}
-                style={styles.item}
-              >
-                <Text style={styles.itemText}>{b.title}</Text>
-                <Icon name="chevron" size={20} color={colors.textMuted} />
-              </TouchableOpacity>
-            ))}
+      <View style={styles.section}>
+        <SectionTitle>{t('scamsHeading')}</SectionTitle>
+        {SCAM_TYPES.map(scam => (
+          <ScamCard key={scam.id} scam={scam} onPress={() => navigation.navigate('ScamGuide', { type: scam.id })} />
+        ))}
+      </View>
+
+      <View style={styles.section}>
+        <SectionTitle>{t('flagsHeading')}</SectionTitle>
+        <Text style={styles.hint}>{t('flagsHint')}</Text>
+        {pairs(RED_FLAGS).map(([a, b], i) => (
+          <View key={i} style={styles.chipRow}>
+            {[a, b].map((f, j) =>
+              f ? (
+                <TouchableOpacity
+                  key={f.family}
+                  testID={`flag-${f.family}`}
+                  accessibilityRole="button"
+                  accessibilityLabel={`${f.title}. ${f.explain}`}
+                  accessibilityHint={t('flagsHintA11y')}
+                  activeOpacity={0.7}
+                  onPress={() => setFlag(f)}
+                  style={styles.chip}
+                >
+                  <Icon name={f.icon} size={20} color={colors.danger} />
+                  <Text style={styles.chipText}>{f.name}</Text>
+                </TouchableOpacity>
+              ) : (
+                <View key={j} style={{ flex: 1 }} />
+              ),
+            )}
           </View>
         ))}
       </View>
+
+      <LinkRow
+        testID="learn-shield-howto"
+        icon="shield"
+        label={t('shieldRow.title')}
+        hint={t('shieldRow.hint')}
+        onPress={() => navigation.navigate('ShieldHowTo')}
+      />
+
+      <View style={styles.footer}>
+        <LinkRow quiet testID="learn-report" icon="flag" label={t('reportRow')} onPress={() => { openReportScam(); }} />
+        <LinkRow quiet testID="learn-help" icon="phone" label={t('helpRow')} onPress={() => navigation.navigate('GetHelp')} />
+      </View>
+
+      <FlagSheet flag={flag} onClose={() => setFlag(null)} />
     </Screen>
   );
 };
 
 const styles = StyleSheet.create({
-  famTitle: { color: colors.textPrimary, fontSize: 16, lineHeight: 22, fontFamily: fonts.bold },
-  famBody: { color: colors.textSecondary, fontSize: 14, lineHeight: 20, fontFamily: fonts.regular },
-  group: { color: colors.textPrimary, fontSize: 16, lineHeight: 22, fontFamily: fonts.bold, marginTop: 8 },
-  item: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: 56, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.border, borderRadius: 12, paddingVertical: 12, paddingHorizontal: 16 },
-  itemText: { color: colors.textPrimary, fontSize: 14, lineHeight: 19, fontFamily: fonts.semiBold },
+  content: { gap: 28 },
+  section: { gap: 10 },
+  tagline: { color: colors.textSecondary, fontSize: 16, lineHeight: 24, fontFamily: fonts.regular },
+  hint: { color: colors.textSecondary, fontSize: 14, lineHeight: 20, fontFamily: fonts.regular },
+  chipRow: { flexDirection: 'row', gap: 10 },
+  chip: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 56, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.border, borderRadius: 14, paddingHorizontal: 12, paddingVertical: 8 },
+  chipText: { flex: 1, color: colors.textPrimary, fontSize: 14, lineHeight: 19, fontFamily: fonts.semiBold },
+  footer: { gap: 2, marginTop: -12 },
 });
 
 export default LearnScreen;

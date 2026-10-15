@@ -1,0 +1,50 @@
+{
+  "_meta": {
+    "reviewed": false
+  },
+  "title": "Screen shield",
+  "status": {
+    "web": "ใช้งานได้ในแอป Android ของ SafeRoute",
+    "insecure": "เวอร์ชันนี้ใช้ที่อยู่ระบบที่ไม่ปลอดภัย Screen shield จึงปิดอยู่",
+    "unavailable": "ไม่มีให้ใช้งานในเวอร์ชันนี้",
+    "on": "เปิดอยู่ แตะปุ่มลอยเมื่อเจอสิ่งที่น่าสงสัย",
+    "off": "ปิดอยู่ เปิดใช้งานเพื่อตรวจสอบสิ่งที่อยู่บนหน้าจอ"
+  },
+  "steps": {
+    "overlay": "ขั้นตอนที่ 1 จาก 4: อนุญาต \"แสดงทับแอปอื่น\" แล้วกลับมาที่ SafeRoute",
+    "notifications": "ขั้นตอนที่ 2 จาก 4: อนุญาตการแจ้งเตือน เพื่อให้ Android เปิด Screen shield ทำงานต่อไปได้",
+    "capture": "ขั้นตอนที่ 3 จาก 4: อนุญาตให้ SafeRoute ดูหน้าจอของคุณเมื่อแตะปุ่มลอย",
+    "starting": "ขั้นตอนที่ 4 จาก 4: กำลังเริ่มเปิด Screen shield"
+  },
+  "body": "ปุ่มเล็กๆ จะลอยอยู่เหนือแอปอื่น แตะปุ่มนี้เมื่อดูโพสต์หางาน แชท หรือประกาศ แล้ว SafeRoute จะตรวจสอบสิ่งที่อยู่บนหน้าจอของคุณ",
+  "download": "ดาวน์โหลดแอป Android",
+  "details": "รายละเอียดและการอนุญาต",
+  "detailsA11y": "รายละเอียด Screen shield",
+  "errors": {
+    "needsScreen": "Screen shield ต้องดูหน้าจอเพื่อตรวจสอบ ลองใหม่อีกครั้งแล้วแตะ เริ่มเลย",
+    "notStarted": "Screen shield ไม่เริ่มทำงาน ตรวจสอบว่าอนุญาต \"แสดงทับแอปอื่น\" แล้วหรือยัง แล้วลองใหม่อีกครั้ง",
+    "failed": "Screen shield ไม่เริ่มทำงาน ลองใหม่อีกครั้ง",
+    "checkFailed": "การตรวจสอบไม่เริ่มทำงาน เปิด Screen shield แล้วลองใหม่อีกครั้ง"
+  },
+  "messageGuard": {
+    "title": "Message Guard: warns you about risky messages as they arrive",
+    "privacy": "Only messages that look risky are checked. Codes and personal numbers are removed first.",
+    "a11y": "Message Guard",
+    "status": {
+      "web": "Works in the SafeRoute Android app.",
+      "unavailable": "Not available in this build.",
+      "on": "On. Risky messages from your chat and SMS apps get a warning.",
+      "off": "Off.",
+      "needsAccess": "Off. Turning it on opens Android notification access."
+    },
+    "apps": {
+      "show": "Choose apps ({{count}} on)",
+      "hide": "Hide apps ({{count}} on)",
+      "a11y": "Apps Message Guard watches, {{count}} on"
+    },
+    "errors": {
+      "accessOff": "Notification access is still off. If the switch is greyed out, open SafeRoute in App info, tap the three dots and choose \"Allow restricted settings\".",
+      "cannotOpen": "Could not open the notification access settings."
+    }
+  }
+}

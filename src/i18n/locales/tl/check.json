@@ -1,0 +1,46 @@
+{
+  "_meta": {
+    "reviewed": false
+  },
+  "title": "Suriin ang isang bagay",
+  "whatIsIt": "Ano ito?",
+  "kinds": {
+    "job": "Alok na trabaho",
+    "message": "Mensahe",
+    "link": "Link",
+    "shop": "Tindahan",
+    "agency": "Ahensya"
+  },
+  "text": {
+    "label": "I-paste ang text o chat",
+    "a11y": "Text o chat na susuriin",
+    "placeholder": "Post tungkol sa trabaho, mga mensahe sa chat, o SMS"
+  },
+  "link": {
+    "label": "Link",
+    "a11y": "Link na susuriin"
+  },
+  "screenshot": {
+    "label": "Screenshot",
+    "ready": "{{kb}} KB, handa nang ipadala",
+    "preparing": "Inihahanda ang larawan...",
+    "upload": "Mag-upload ng screenshot",
+    "pick": "Pumili ng screenshot"
+  },
+  "destination": {
+    "label": "Saan ka magtatrabaho o pupunta? (opsyonal)",
+    "a11y": "Pupuntahan",
+    "placeholder": "Halimbawa: Bangkok, Thailand"
+  },
+  "reportLanguage": "Wika ng ulat",
+  "submit": "Suriin ngayon",
+  "errors": {
+    "image": "Hindi magamit ang larawang iyon. Sumubok ng ibang screenshot.",
+    "clipboardEmpty": "Walang nakopya sa iyong clipboard."
+  },
+  "source": {
+    "screenshot": "Screenshot",
+    "screenshotAt": "Screenshot, {{place}}",
+    "fallback": "Pagsusuri"
+  }
+}

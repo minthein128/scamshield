@@ -35,7 +35,7 @@ export const ChatVerdictScreen: React.FC<ChatVerdictScreenProps> = ({ onNavigate
             </View>
             <View style={{ flexDirection: 'column' }}>
               <Text style={{ color: '#9A3412', fontSize: 32, fontFamily: theme.fonts.extraBold, letterSpacing: -0.5, lineHeight: 35, includeFontPadding: false }}>Danger</Text>
-              <Text style={{ color: '#9A3412', fontSize: 15, fontFamily: theme.fonts.semiBold, lineHeight: 20, includeFontPadding: false }}>Love and money trap</Text>
+              <Text style={{ color: '#9A3412', fontSize: 15, fontFamily: theme.fonts.semiBold, lineHeight: 20, includeFontPadding: false }}>Looks like a love and money trap</Text>
             </View>
           </View>
           <Text style={{ backgroundColor: '#EEF2F6', paddingVertical: 6, paddingHorizontal: 10, borderRadius: 999, color: '#334155', fontSize: 13, fontFamily: theme.fonts.bold, lineHeight: 18, includeFontPadding: false }}>2 screens</Text>

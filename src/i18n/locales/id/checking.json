@@ -1,0 +1,23 @@
+{
+  "_meta": {
+    "reviewed": false
+  },
+  "title": "Memeriksa...",
+  "steps": {
+    "read": "Membaca apa yang Anda kirim",
+    "pick": "Mencari nama, nomor, dan tautan",
+    "spot": "Mencari tanda bahaya",
+    "links": "Memeriksa tautan dan perusahaan",
+    "score": "Menilai risiko",
+    "write": "Menulis peringatan untuk Anda"
+  },
+  "verdict": {
+    "safe": "Tampaknya risiko rendah",
+    "careful": "Hmm, hati-hati",
+    "danger": "Tampaknya berisiko"
+  },
+  "createAccount": "Buat akun gratis",
+  "retry": "Coba lagi",
+  "goBack": "Kembali",
+  "cancel": "Batal"
+}

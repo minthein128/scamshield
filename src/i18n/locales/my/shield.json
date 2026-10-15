@@ -1,0 +1,50 @@
+{
+  "_meta": {
+    "reviewed": false
+  },
+  "title": "Screen shield",
+  "status": {
+    "web": "SafeRoute Android အက်ပ်တွင် အသုံးပြုနိုင်ပါသည်။",
+    "insecure": "ဤဗားရှင်းသည် လုံခြုံမှုမရှိသော လိပ်စာကို သုံးထားသောကြောင့် shield ကို ပိတ်ထားပါသည်။",
+    "unavailable": "ဤဗားရှင်းတွင် မရနိုင်သေးပါ။",
+    "on": "ဖွင့်ထားသည်။ မသင်္ကာဖွယ်တစ်ခုခုတွေ့ပါက အဝိုင်းလေးကို နှိပ်ပါ။",
+    "off": "ပိတ်ထားသည်။ မျက်နှာပြင်ပေါ်ရှိအရာများကို စစ်ဆေးရန် ၎င်းကို ဖွင့်ပါ။"
+  },
+  "steps": {
+    "overlay": "အဆင့် ၁/၄ - \"အခြားအက်ပ်များပေါ်တွင် ပြသရန်\" ခွင့်ပြုပြီးနောက် SafeRoute သို့ ပြန်လာပါ။",
+    "notifications": "အဆင့် ၂/၄ - shield ဆက်လက်အလုပ်လုပ်ရန် အသိပေးချက်များကို ခွင့်ပြုပါ။",
+    "capture": "အဆင့် ၃/၄ - အဝိုင်းလေးကို နှိပ်သည့်အခါ SafeRoute အား သင့်မျက်နှာပြင်ကို ကြည့်ခွင့်ပြုပါ။",
+    "starting": "အဆင့် ၄/၄ - shield ကို စတင်နေပါသည်။"
+  },
+  "body": "ခလုတ်လေးတစ်ခု အခြားအက်ပ်များပေါ်တွင် ပေါ်နေပါမည်။ အလုပ်ခေါ်စာ၊ မက်ဆေ့ဂျ် သို့မဟုတ် ကြော်ငြာများပေါ်တွင် ၎င်းကို နှိပ်ပါက SafeRoute က သင့်မျက်နှာပြင်ကို စစ်ဆေးပေးပါမည်။",
+  "download": "Android အက်ပ်ကို ဒေါင်းလုဒ်လုပ်ပါ",
+  "details": "အသေးစိတ်နှင့် ခွင့်ပြုချက်များ",
+  "detailsA11y": "Shield အသေးစိတ်",
+  "errors": {
+    "needsScreen": "စစ်ဆေးရန် သင့်မျက်နှာပြင်ကို shield က ကြည့်ရန် လိုအပ်ပါသည်။ နောက်တစ်ကြိမ် ထပ်စမ်းကြည့်ပြီး ယခုစတင်ပါ (Start now) ကို နှိပ်ပါ။",
+    "notStarted": "Shield မပွင့်သေးပါ။ \"အခြားအက်ပ်များပေါ်တွင် ပြသရန်\" ခွင့်ပြုထားခြင်း ရှိမရှိ စစ်ဆေးပြီး ထပ်စမ်းကြည့်ပါ။",
+    "failed": "Shield မပွင့်သေးပါ။ နောက်တစ်ကြိမ် ထပ်စမ်းကြည့်ပါ။",
+    "checkFailed": "စစ်ဆေးမှု မစတင်နိုင်သေးပါ။ Shield ကို ဖွင့်ပြီး ထပ်စမ်းကြည့်ပါ။"
+  },
+  "messageGuard": {
+    "title": "Message Guard: warns you about risky messages as they arrive",
+    "privacy": "Only messages that look risky are checked. Codes and personal numbers are removed first.",
+    "a11y": "Message Guard",
+    "status": {
+      "web": "Works in the SafeRoute Android app.",
+      "unavailable": "Not available in this build.",
+      "on": "On. Risky messages from your chat and SMS apps get a warning.",
+      "off": "Off.",
+      "needsAccess": "Off. Turning it on opens Android notification access."
+    },
+    "apps": {
+      "show": "Choose apps ({{count}} on)",
+      "hide": "Hide apps ({{count}} on)",
+      "a11y": "Apps Message Guard watches, {{count}} on"
+    },
+    "errors": {
+      "accessOff": "Notification access is still off. If the switch is greyed out, open SafeRoute in App info, tap the three dots and choose \"Allow restricted settings\".",
+      "cannotOpen": "Could not open the notification access settings."
+    }
+  }
+}

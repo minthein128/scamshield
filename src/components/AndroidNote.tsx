@@ -1,11 +1,14 @@
 import React from 'react';
-import { Linking, Platform, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { Linking, Platform, StyleSheet, TouchableOpacity } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { Text } from './Text';
 import { Card } from './ui';
 import theme from '../theme/theme';
 
 const { colors, fonts } = theme;
 
 export const AndroidNote: React.FC<{ text: string }> = ({ text }) => {
+  const { t } = useTranslation('shield');
   if (Platform.OS !== 'web') return null;
   const apkUrl = process.env.EXPO_PUBLIC_APK_URL?.trim();
   return (
@@ -13,7 +16,7 @@ export const AndroidNote: React.FC<{ text: string }> = ({ text }) => {
       <Text style={styles.text}>{text}</Text>
       {apkUrl ? (
         <TouchableOpacity accessibilityRole="link" onPress={() => Linking.openURL(apkUrl)}>
-          <Text style={styles.link}>Download the Android app</Text>
+          <Text style={styles.link}>{t('download')}</Text>
         </TouchableOpacity>
       ) : null}
     </Card>

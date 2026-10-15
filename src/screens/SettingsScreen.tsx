@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
-import { Linking, Switch, Text, StyleSheet, View } from 'react-native';
+import { Linking, Switch, StyleSheet, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { SITE_URL } from '../config/env';
 import Constants from 'expo-constants';
 import { Screen } from '../components/Screen';
+import { Text } from '../components/Text';
 import { Button, Card, Chip, LinkButton, Notice, ScreenHeader, SectionTitle } from '../components/ui';
-import { COUNTRIES } from '../lib/countries';
+import { COUNTRIES, countryLabel } from '../lib/countries';
 import { LANGUAGES } from '../lib/languages';
+import { UI_LANGUAGES, type UiLanguage } from '../i18n/languages';
+import { useUiLanguage } from '../i18n/useUiLanguage';
 import { confirmAction, notify } from '../lib/notify';
 import type { RootScreenProps } from '../navigation/types';
 import { authErrorMessage } from '../services/accounts';
@@ -16,25 +20,27 @@ import theme from '../theme/theme';
 
 const { colors, fonts } = theme;
 
-const SYNC_TEXT: Record<SyncState, string> = {
-  off: '',
-  syncing: 'Syncing your checks and contacts...',
-  done: 'Your checks and contacts are synced.',
-  error: 'Sync is paused. We will try again next time you open the app.',
+const SYNC_KEYS: Record<SyncState, 'sync.syncing' | 'sync.done' | 'sync.error' | null> = {
+  off: null,
+  syncing: 'sync.syncing',
+  done: 'sync.done',
+  error: 'sync.error',
 };
 
-export const PRIVACY_POINTS = [
-  'Your checks are saved on this device. Signed-in accounts also sync the report text, trusted contacts and settings. Screenshots are never saved or synced.',
-  'To check something, SafeRoute sends the text, link or screenshot to our check service, which uses Google AI models and Google Safe Browsing to assess it. We do not log the content.',
-  'Each install gets an anonymous ID. We use it only to limit how many checks one person can run per hour.',
-  'You can delete the data on this device at any time. Account holders can also delete their account and everything synced.',
-];
+export const PRIVACY_POINTS = ['privacy.p1', 'privacy.p2', 'privacy.p3', 'privacy.p4'] as const;
 
 export const SettingsScreen: React.FC<RootScreenProps<'Settings'>> = ({ navigation }) => {
+  const { t } = useTranslation(['settings', 'common']);
+  const { uiLanguage, setUiLanguage, checkLanguageFor } = useUiLanguage();
   const { status, signOut, deleteAccount } = useAuth();
   const { profile, language, setLanguage, updateProfile, syncState, clearSyncedCopies, deleteLocalData } = useAppState();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const chooseAppLanguage = (code: UiLanguage) => {
+    setUiLanguage(code).catch(() => undefined);
+    setLanguage(checkLanguageFor(code));
+  };
 
   const guarded = async (action: () => Promise<void>) => {
     setBusy(true);
@@ -50,7 +56,7 @@ export const SettingsScreen: React.FC<RootScreenProps<'Settings'>> = ({ navigati
 
   const onSignOut = () =>
     guarded(async () => {
-      if (!(await confirmAction('Sign out?', 'Your checks and contacts stay in your account. This device will be cleared.', 'Sign out'))) return;
+      if (!(await confirmAction(t('confirm.signOut.title'), t('confirm.signOut.message'), t('confirm.signOut.action')))) return;
       await signOut();
       await clearSyncedCopies();
     });
@@ -58,45 +64,43 @@ export const SettingsScreen: React.FC<RootScreenProps<'Settings'>> = ({ navigati
   const onDeleteLocal = () =>
     guarded(async () => {
       const synced = status.kind === 'account';
-      const message = synced
-        ? 'This clears checks, contacts and settings on this device and signs you out. Your account and its synced copies stay until you delete the account.'
-        : 'This clears your checks, trusted contacts and settings on this device.';
-      if (!(await confirmAction('Delete data on this device?', message, 'Delete'))) return;
+      const message = synced ? t('confirm.deleteLocal.messageSynced') : t('confirm.deleteLocal.messageLocal');
+      if (!(await confirmAction(t('confirm.deleteLocal.title'), message, t('confirm.deleteLocal.action')))) return;
       if (synced) await signOut();
       await deleteLocalData();
     });
 
   const onDeleteAccount = () =>
     guarded(async () => {
-      if (!(await confirmAction('Delete your account?', 'This permanently deletes your account and everything synced to it. Data on this device is cleared too.', 'Delete account'))) return;
+      if (!(await confirmAction(t('confirm.deleteAccount.title'), t('confirm.deleteAccount.message'), t('confirm.deleteAccount.action')))) return;
       if (status.kind === 'account') await deleteAllRemote(status.uid);
       await deleteAccount();
       await deleteLocalData();
-      notify('Account deleted', 'Your account and synced data are gone.');
+      notify(t('deleted.title'), t('deleted.message'));
     });
 
   return (
     <Screen>
-      <ScreenHeader title="Settings" onBack={() => navigation.goBack()} />
+      <ScreenHeader title={t('title')} onBack={() => navigation.goBack()} />
 
       <View style={{ gap: 8 }}>
-        <SectionTitle>Account</SectionTitle>
+        <SectionTitle>{t('account.title')}</SectionTitle>
         <Card style={{ gap: 10 }}>
           {status.kind === 'account' ? (
             <>
               <Text style={styles.strong}>{status.email}</Text>
-              {SYNC_TEXT[syncState] ? <Text testID="sync-status" style={styles.body}>{SYNC_TEXT[syncState]}</Text> : null}
-              <Button testID="settings-signout" label="Sign out" variant="secondary" onPress={onSignOut} disabled={busy} />
-              <LinkButton testID="settings-delete-account" label="Delete account" color={colors.danger} onPress={onDeleteAccount} />
+              {SYNC_KEYS[syncState] ? <Text testID="sync-status" style={styles.body}>{t(SYNC_KEYS[syncState] as NonNullable<(typeof SYNC_KEYS)[SyncState]>)}</Text> : null}
+              <Button testID="settings-signout" label={t('account.signOut')} variant="secondary" onPress={onSignOut} disabled={busy} />
+              <LinkButton testID="settings-delete-account" label={t('account.deleteAccount')} color={colors.danger} onPress={onDeleteAccount} />
             </>
           ) : status.kind === 'unavailable' ? (
-            <Text style={styles.body}>You are using SafeRoute without an account. Accounts are not available in this build.</Text>
+            <Text style={styles.body}>{t('account.unavailable')}</Text>
           ) : (
             <>
-              <Text style={styles.strong}>No account</Text>
-              <Text style={styles.body}>Everything works without one. Create an account to keep your checks and contacts if you change phone, and to get a higher hourly check limit.</Text>
-              <Button testID="settings-signup" label="Create account" onPress={() => navigation.navigate('Account', { mode: 'signUp' })} />
-              <LinkButton label="Sign in" onPress={() => navigation.navigate('Account', { mode: 'signIn' })} />
+              <Text style={styles.strong}>{t('account.none')}</Text>
+              <Text style={styles.body}>{t('account.noneBody')}</Text>
+              <Button testID="settings-signup" label={t('account.create')} onPress={() => navigation.navigate('Account', { mode: 'signUp' })} />
+              <LinkButton label={t('account.signIn')} onPress={() => navigation.navigate('Account', { mode: 'signIn' })} />
             </>
           )}
           {error ? <Notice message={error} /> : null}
@@ -104,7 +108,18 @@ export const SettingsScreen: React.FC<RootScreenProps<'Settings'>> = ({ navigati
       </View>
 
       <View style={{ gap: 8 }}>
-        <SectionTitle>Language</SectionTitle>
+        <SectionTitle>{t('appLanguage.title')}</SectionTitle>
+        <Text style={styles.body}>{t('appLanguage.body')}</Text>
+        <View style={styles.wrap} testID="settings-app-language">
+          {UI_LANGUAGES.map(l => (
+            <Chip key={l.code} testID={`app-language-${l.code}`} label={l.label} nativeLabel={l.nativeLabel} selected={uiLanguage === l.code} onPress={() => chooseAppLanguage(l.code)} />
+          ))}
+        </View>
+        {uiLanguage === 'th' ? <Text style={styles.body}>{t('common:languageNote.reportsInEnglish')}</Text> : null}
+      </View>
+
+      <View style={{ gap: 8 }}>
+        <SectionTitle>{t('reportLanguage')}</SectionTitle>
         <View style={styles.wrap}>
           {LANGUAGES.map(l => (
             <Chip key={l.code} label={l.label} nativeLabel={l.nativeLabel} selected={language === l.code} onPress={() => setLanguage(l.code)} />
@@ -113,12 +128,12 @@ export const SettingsScreen: React.FC<RootScreenProps<'Settings'>> = ({ navigati
       </View>
 
       <View style={{ gap: 8 }}>
-        <SectionTitle>My country</SectionTitle>
+        <SectionTitle>{t('myCountry')}</SectionTitle>
         <View style={styles.wrap}>
           {COUNTRIES.map(c => (
             <Chip
               key={c.code}
-              label={c.name}
+              label={countryLabel(c.code)}
               selected={profile.homeCountry === c.code}
               onPress={() => updateProfile({ homeCountry: profile.homeCountry === c.code ? undefined : c.code })}
             />
@@ -127,12 +142,12 @@ export const SettingsScreen: React.FC<RootScreenProps<'Settings'>> = ({ navigati
       </View>
 
       <View style={{ gap: 8 }}>
-        <SectionTitle>Where I will work or travel</SectionTitle>
+        <SectionTitle>{t('destination')}</SectionTitle>
         <View style={styles.wrap}>
           {COUNTRIES.map(c => (
             <Chip
               key={c.code}
-              label={c.name}
+              label={countryLabel(c.code)}
               selected={profile.destinationCountry === c.code}
               onPress={() => updateProfile({ destinationCountry: profile.destinationCountry === c.code ? undefined : c.code })}
             />
@@ -141,13 +156,13 @@ export const SettingsScreen: React.FC<RootScreenProps<'Settings'>> = ({ navigati
       </View>
 
       <View style={{ gap: 8 }}>
-        <SectionTitle>Privacy</SectionTitle>
+        <SectionTitle>{t('privacy.title')}</SectionTitle>
         <Card style={{ gap: 8 }}>
           <View style={styles.switchRow}>
-            <Text style={[styles.strong, { flex: 1 }]}>Help others: share anonymous scam patterns</Text>
+            <Text style={[styles.strong, { flex: 1 }]}>{t('privacy.share')}</Text>
             <Switch
               testID="settings-share-signals"
-              accessibilityLabel="Help others: share anonymous scam patterns"
+              accessibilityLabel={t('privacy.share')}
               value={profile.shareSignals}
               onValueChange={v => updateProfile({ shareSignals: v })}
               trackColor={{ false: colors.borderLight, true: colors.accent }}
@@ -155,14 +170,14 @@ export const SettingsScreen: React.FC<RootScreenProps<'Settings'>> = ({ navigati
               {...({ activeThumbColor: colors.white } as object)}
             />
           </View>
-          <Text style={styles.body}>No screenshots and no raw text are shared. Personal details are removed first, and phone numbers, accounts and links are stored only as one-way hashes. Patterns appear on the Scam radar once several people report them.</Text>
+          <Text style={styles.body}>{t('privacy.shareBody')}</Text>
           {PRIVACY_POINTS.map(p => (
-            <Text key={p} style={styles.body}>{p}</Text>
+            <Text key={p} style={styles.body}>{t(p)}</Text>
           ))}
         </Card>
-        <LinkButton testID="settings-privacy-policy" label="Privacy policy" onPress={() => Linking.openURL(`${SITE_URL}/privacy`).catch(() => undefined)} />
-        <LinkButton testID="settings-delete-info" label="How to delete your data" onPress={() => Linking.openURL(`${SITE_URL}/delete-account`).catch(() => undefined)} />
-        <Button testID="settings-delete-local" label="Delete data on this device" variant="secondary" onPress={onDeleteLocal} disabled={busy} />
+        <LinkButton testID="settings-privacy-policy" label={t('privacy.policy')} onPress={() => Linking.openURL(`${SITE_URL}/privacy`).catch(() => undefined)} />
+        <LinkButton testID="settings-delete-info" label={t('privacy.deleteInfo')} onPress={() => Linking.openURL(`${SITE_URL}/delete-account`).catch(() => undefined)} />
+        <Button testID="settings-delete-local" label={t('privacy.deleteLocal')} variant="secondary" onPress={onDeleteLocal} disabled={busy} />
       </View>
 
       <Text style={styles.version}>{`SafeRoute ${Constants.expoConfig?.version ?? ''}`.trim()}</Text>

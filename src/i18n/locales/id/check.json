@@ -1,0 +1,46 @@
+{
+  "_meta": {
+    "reviewed": false
+  },
+  "title": "Periksa sesuatu",
+  "whatIsIt": "Apa ini?",
+  "kinds": {
+    "job": "Lowongan kerja",
+    "message": "Pesan",
+    "link": "Tautan",
+    "shop": "Toko",
+    "agency": "Agensi"
+  },
+  "text": {
+    "label": "Tempel teks atau obrolan",
+    "a11y": "Teks atau obrolan untuk diperiksa",
+    "placeholder": "Lowongan kerja, pesan obrolan, atau SMS"
+  },
+  "link": {
+    "label": "Tautan",
+    "a11y": "Tautan untuk diperiksa"
+  },
+  "screenshot": {
+    "label": "Tangkapan layar",
+    "ready": "{{kb}} KB, siap dikirim",
+    "preparing": "Menyiapkan gambar...",
+    "upload": "Unggah tangkapan layar",
+    "pick": "Pilih tangkapan layar"
+  },
+  "destination": {
+    "label": "Ke mana Anda akan bekerja atau bepergian? (opsional)",
+    "a11y": "Tujuan",
+    "placeholder": "Misalnya Bangkok, Thailand"
+  },
+  "reportLanguage": "Bahasa laporan",
+  "submit": "Periksa sekarang",
+  "errors": {
+    "image": "Gambar tersebut tidak dapat digunakan. Coba tangkapan layar yang lain.",
+    "clipboardEmpty": "Papan klip Anda kosong."
+  },
+  "source": {
+    "screenshot": "Tangkapan layar",
+    "screenshotAt": "Tangkapan layar, {{place}}",
+    "fallback": "Periksa"
+  }
+}

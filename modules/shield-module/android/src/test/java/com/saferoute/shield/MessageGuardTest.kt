@@ -294,6 +294,8 @@ class MessageGuardTest {
         assertEquals(ShieldOverlay.State.DANGER, MessageGuardNotifier.stateFor("danger"))
         assertEquals(ShieldOverlay.State.CAREFUL, MessageGuardNotifier.stateFor("careful"))
         assertNull(MessageGuardNotifier.stateFor("safe"))
+        assertEquals("Looks risky", MessageGuardNotifier.chipFor(ShieldOverlay.State.DANGER))
+        assertEquals("Shows warning signs", MessageGuardNotifier.chipFor(ShieldOverlay.State.CAREFUL))
         assertEquals("saferoute://report/chk_1", MessageGuardNotifier.reportUri("chk_1").toString())
     }
 

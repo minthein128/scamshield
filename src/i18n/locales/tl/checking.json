@@ -1,0 +1,23 @@
+{
+  "_meta": {
+    "reviewed": false
+  },
+  "title": "Sinusuri...",
+  "steps": {
+    "read": "Binabasa ang ipinadala mo",
+    "pick": "Kinukuha ang mga pangalan, numero, at link",
+    "spot": "Naghahanap ng mga babala",
+    "links": "Sinusuri ang mga link at ang kumpanya",
+    "score": "Sinusukat ang panganib",
+    "write": "Isinusulat ang iyong babala"
+  },
+  "verdict": {
+    "safe": "Mukhang mababang panganib",
+    "careful": "Hmm, mag-ingat",
+    "danger": "Mukhang mapanganib"
+  },
+  "createAccount": "Gumawa ng libreng account",
+  "retry": "Subukan muli",
+  "goBack": "Bumalik",
+  "cancel": "Kanselahin"
+}

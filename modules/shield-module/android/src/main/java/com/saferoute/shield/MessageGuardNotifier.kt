@@ -23,6 +23,9 @@ internal object MessageGuardNotifier {
         else -> null
     }
 
+    fun chipFor(state: ShieldOverlay.State): String =
+        if (state == ShieldOverlay.State.DANGER) "Looks risky" else "Shows warning signs"
+
     fun reportUri(id: String): Uri = Uri.parse("saferoute://report/" + Uri.encode(id))
 
     fun post(context: Context, result: JSONObject) {
@@ -33,8 +36,8 @@ internal object MessageGuardNotifier {
         createChannels(context)
 
         val palette = ShieldPalette.forContext(context)
-        val chip = ShieldPalette.chipLabel(state)
-        val title = result.optString("title").ifBlank { "This message looks risky" }.take(80)
+        val chip = chipFor(state)
+        val title = result.optString("title").ifBlank { "This message needs a second look" }.take(80)
         val summary = result.optString("summary").take(160)
         val open = PendingIntent.getActivity(
             context,

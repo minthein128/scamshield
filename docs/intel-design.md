@@ -57,7 +57,31 @@ The network lookup runs in parallel with Web Risk and RDAP, bounded by the reque
 
 A campaign match is capped at low. A campaign sums every template cluster that matches by MinHash or by campaign name. The response gains `network: { seenCount, firstSeen, campaign? }`. The count is real; the value is never shown.
 
-Poisoning is limited by: k=3, same-day dedupe, no signal from safe verdicts, and campaign matches capped at low.
+Poisoning is limited by: k=3, same-day dedupe, no signal from safe verdicts (except confirmed reports and missed-scam feedback), and campaign matches capped at low. Feedback is rate limited per uid and the first answer per check wins.
+
+## Feedback and reports: weighting
+
+Two user signals correct and widen the network. Every counter holds a weighted sum, so a count can be fractional. Public output rounds it to whole reports, and k=3 is tested on the weighted value.
+
+| Signal | Weight |
+| --- | --- |
+| Model verdict, risky (default) | 1 |
+| Reported scam (`reported: true`) | 1, confirmed |
+| Missed-scam feedback ("It was a scam" on a safe verdict) | 1, confirmed |
+| Risky verdict the user marked wrong ("It was safe") | 0.25, contradicted |
+| Risky verdict with the wrong type | type count moves: old type 0.25, named type 1; indicators and domains stay at 1 |
+
+The constants are in `server/src/intel/weights.ts`. A confirmed signal is stored whatever the verdict was, with `confirmed: true` and `src`. Reporters are not special: a report carries the same per-day reporter key, so one reporter counts once per counter and day, and it needs k=3 distinct reporters to surface. Contradiction subtracts 0.75 from every counter the signal touched (floored at zero, 0.25 stays so a lone false alarm still leaves a trace). It applies once per signal.
+
+Storage for the loop, all redacted and written by firebase-admin only:
+
+| Collection | Holds | Retention |
+| --- | --- | --- |
+| `intel_checks` | check id (keyed hash) to signal id, or the redacted prepared data for a safe check; verdict, scam type, language | 7 days |
+| `intel_feedback` | one doc per check: correctness, outcome, actual verdict and type, redacted template | 90 days |
+| `intel_tally` | counters per model scam type and per input language, plus report counts and `lostMoney` yes or no | none (counts only) |
+
+Nothing stores a uid, IP, raw text, image or the check id itself. A check made with `shareSignals: false` writes no link, so it cannot get feedback. `npm run feedback:report` prints the tally (admin only: it needs service credentials, and no HTTP route exposes it). `npm run feedback:export` writes false alarms and misses as labelled eval cases to `server/eval/candidates.json`. That file is gitignored: the text is a redacted model rewrite of a real message, and two redaction passes make a leak unlikely but not impossible, so it must not enter a public repo. A person reviews a case and copies it into `eval/cases.ts` to make it a regression test. `EVAL_CANDIDATES=1 npm run eval` runs the candidates too.
 
 ## API
 

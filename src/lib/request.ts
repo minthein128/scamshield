@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import type { CheckKind, CheckRequest, LanguageCode } from '../api/types';
 
 export interface CheckForm {
@@ -12,13 +13,7 @@ export interface CheckForm {
   language: LanguageCode;
 }
 
-export const KIND_OPTIONS: { kind: CheckKind; label: string }[] = [
-  { kind: 'job', label: 'Job offer' },
-  { kind: 'message', label: 'Message' },
-  { kind: 'link', label: 'Link' },
-  { kind: 'shop', label: 'Shop' },
-  { kind: 'agency', label: 'Agency' },
-];
+export const KIND_OPTIONS: Exclude<CheckKind, 'screen'>[] = ['job', 'message', 'link', 'shop', 'agency'];
 
 export function buildRequest(form: CheckForm): CheckRequest {
   const text = form.text.trim();
@@ -45,6 +40,6 @@ export function sourceLabel(form: Pick<CheckForm, 'text' | 'url' | 'imageBase64'
   const text = form.text.trim();
   if (text) return text.length > 48 ? `${text.slice(0, 48)}...` : text;
   if (form.url.trim()) return form.url.trim().replace(/^https?:\/\//i, '').slice(0, 48);
-  if (form.imageBase64) return form.destination.trim() ? `Screenshot, ${form.destination.trim()}` : 'Screenshot';
-  return 'Check';
+  if (form.imageBase64) return form.destination.trim() ? t('check:source.screenshotAt', { place: form.destination.trim() }) : t('check:source.screenshot');
+  return t('check:source.fallback');
 }

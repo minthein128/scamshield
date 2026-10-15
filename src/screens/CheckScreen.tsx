@@ -1,7 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, TextInput, Image, StyleSheet, Platform } from 'react-native';
+import { View, Image, StyleSheet, Platform } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import * as Clipboard from 'expo-clipboard';
 import { Screen } from '../components/Screen';
+import { Text, TextInput } from '../components/Text';
 import { Button, Card, Chip, LinkButton, Notice, ScreenHeader } from '../components/ui';
 import { countryName } from '../lib/countries';
 import { hasInput } from '../api';
@@ -16,6 +18,7 @@ import theme from '../theme/theme';
 const { colors, fonts } = theme;
 
 export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, route }) => {
+  const { t } = useTranslation(['check', 'common']);
   const { language, setLanguage, profile } = useAppState();
   const [kind, setKind] = useState<CheckKind>('job');
   const [text, setText] = useState('');
@@ -32,22 +35,22 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
       const prepared = await loader();
       if (prepared) setImage(prepared);
     } catch {
-      setNotice('We could not use that picture. Try another screenshot.');
+      setNotice(t('errors.image'));
     } finally {
       setBusy(false);
     }
-  }, []);
+  }, [t]);
 
   const pasteInto = useCallback(async (target: 'text' | 'url') => {
     const value = (await Clipboard.getStringAsync()).trim();
     if (!value) {
-      setNotice('Your clipboard is empty.');
+      setNotice(t('errors.clipboardEmpty'));
       return;
     }
     setNotice(null);
     if (target === 'url' || looksLikeUrl(value)) setUrl(value);
     else setText(value);
-  }, []);
+  }, [t]);
 
   const nonce = route.params?.nonce;
   useEffect(() => {
@@ -80,31 +83,31 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
 
   return (
     <Screen
-      footer={<Button testID="check-submit" label="Check now" onPress={submit} disabled={!ready || busy} />}
+      footer={<Button testID="check-submit" label={t('submit')} onPress={submit} disabled={!ready || busy} />}
     >
-      <ScreenHeader title="Check something" />
+      <ScreenHeader title={t('title')} />
 
       <View style={{ gap: 8 }}>
-        <Text style={styles.label}>What is it?</Text>
+        <Text style={styles.label}>{t('whatIsIt')}</Text>
         <View style={styles.wrap}>
-          {KIND_OPTIONS.map(o => (
-            <Chip key={o.kind} label={o.label} selected={kind === o.kind} onPress={() => setKind(o.kind)} />
+          {KIND_OPTIONS.map(k => (
+            <Chip key={k} label={t(`kinds.${k}`)} selected={kind === k} onPress={() => setKind(k)} />
           ))}
         </View>
       </View>
 
       <View style={{ gap: 6 }}>
         <View style={styles.labelRow}>
-          <Text style={styles.label}>Paste the text or chat</Text>
-          <LinkButton label="Paste" onPress={() => pasteInto('text')} />
+          <Text style={styles.label}>{t('text.label')}</Text>
+          <LinkButton label={t('common:actions.paste')} onPress={() => pasteInto('text')} />
         </View>
         <TextInput
           testID="check-text"
-          accessibilityLabel="Text or chat to check"
+          accessibilityLabel={t('text.a11y')}
           multiline
           value={text}
           onChangeText={setText}
-          placeholder="Job post, chat messages or SMS"
+          placeholder={t('text.placeholder')}
           placeholderTextColor={colors.textMuted}
           style={[styles.input, styles.textArea]}
         />
@@ -112,12 +115,12 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
 
       <View style={{ gap: 6 }}>
         <View style={styles.labelRow}>
-          <Text style={styles.label}>Link</Text>
-          <LinkButton label="Paste" onPress={() => pasteInto('url')} />
+          <Text style={styles.label}>{t('link.label')}</Text>
+          <LinkButton label={t('common:actions.paste')} onPress={() => pasteInto('url')} />
         </View>
         <TextInput
           testID="check-url"
-          accessibilityLabel="Link to check"
+          accessibilityLabel={t('link.a11y')}
           value={url}
           onChangeText={setUrl}
           autoCapitalize="none"
@@ -130,19 +133,19 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
       </View>
 
       <Card style={{ gap: 10 }}>
-        <Text style={styles.label}>Screenshot</Text>
+        <Text style={styles.label}>{t('screenshot.label')}</Text>
         {image ? (
           <View style={styles.imageRow}>
             <Image source={{ uri: image.uri }} style={styles.thumb} resizeMode="cover" />
             <View style={{ flex: 1, gap: 8 }}>
-              <Text style={styles.meta}>{Math.round(image.bytes / 1024)} KB, ready to send</Text>
-              <Button label="Remove" variant="secondary" onPress={() => setImage(null)} style={styles.small} />
+              <Text style={styles.meta}>{t('screenshot.ready', { kb: Math.round(image.bytes / 1024) })}</Text>
+              <Button label={t('common:actions.remove')} variant="secondary" onPress={() => setImage(null)} style={styles.small} />
             </View>
           </View>
         ) : (
           <Button
             testID="check-pick-image"
-            label={busy ? 'Preparing picture...' : Platform.OS === 'web' ? 'Upload a screenshot' : 'Pick a screenshot'}
+            label={busy ? t('screenshot.preparing') : Platform.OS === 'web' ? t('screenshot.upload') : t('screenshot.pick')}
             variant="secondary"
             disabled={busy}
             onPress={() => attachImage(pickScreenshot)}
@@ -151,20 +154,20 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
       </Card>
 
       <View style={{ gap: 6 }}>
-        <Text style={styles.label}>Where will you work or travel? (optional)</Text>
+        <Text style={styles.label}>{t('destination.label')}</Text>
         <TextInput
           testID="check-destination"
-          accessibilityLabel="Destination"
+          accessibilityLabel={t('destination.a11y')}
           value={destination}
           onChangeText={setDestination}
-          placeholder="For example Bangkok, Thailand"
+          placeholder={t('destination.placeholder')}
           placeholderTextColor={colors.textMuted}
           style={styles.input}
         />
       </View>
 
       <View style={{ gap: 8 }}>
-        <Text style={styles.label}>Report language</Text>
+        <Text style={styles.label}>{t('reportLanguage')}</Text>
         <View style={styles.wrap}>
           {LANGUAGES.map(l => (
             <Chip key={l.code} label={l.label} nativeLabel={l.nativeLabel} selected={language === l.code} onPress={() => setLanguage(l.code)} />

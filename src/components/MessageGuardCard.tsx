@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
-import { StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Switch, TouchableOpacity, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { Card } from './ui';
+import { Text } from './Text';
 import { useMessageGuard, type MessageGuardControl } from '../hooks/useMessageGuard';
 import theme from '../theme/theme';
 
 const { colors, fonts } = theme;
 
-export const MESSAGE_GUARD_TITLE = 'Message Guard: warns you about risky messages as they arrive';
-export const MESSAGE_GUARD_PRIVACY = 'Only messages that look risky are checked. Codes and personal numbers are removed first.';
-
 export const MessageGuardCard: React.FC = () => <MessageGuardCardView control={useMessageGuard()} />;
 
 export const MessageGuardCardView: React.FC<{ control: MessageGuardControl }> = ({ control }) => {
+  const { t } = useTranslation('shield');
   const { support, enabled, access, apps, error, setEnabled, toggleApp } = control;
   const [open, setOpen] = useState(false);
 
@@ -19,23 +19,23 @@ export const MessageGuardCardView: React.FC<{ control: MessageGuardControl }> = 
   const unavailable = support !== 'ready';
   const status = unavailable
     ? support === 'web'
-      ? 'Works in the SafeRoute Android app.'
-      : 'Not available in this build.'
+      ? t('messageGuard.status.web')
+      : t('messageGuard.status.unavailable')
     : enabled
-      ? 'On. Risky messages from your chat and SMS apps get a warning.'
+      ? t('messageGuard.status.on')
       : access
-        ? 'Off.'
-        : 'Off. Turning it on opens Android notification access.';
+        ? t('messageGuard.status.off')
+        : t('messageGuard.status.needsAccess');
   const onCount = apps.filter(a => a.enabled).length;
 
   return (
     <Card testID="message-guard-card" style={styles.card}>
       <View style={styles.row}>
-        <Text accessibilityRole="header" style={styles.title}>{MESSAGE_GUARD_TITLE}</Text>
+        <Text accessibilityRole="header" style={styles.title}>{t('messageGuard.title')}</Text>
         {unavailable ? null : (
           <Switch
             testID="message-guard-switch"
-            accessibilityLabel="Message Guard"
+            accessibilityLabel={t('messageGuard.a11y')}
             value={enabled}
             onValueChange={setEnabled}
             trackColor={{ false: colors.borderLight, true: colors.accent }}
@@ -44,7 +44,7 @@ export const MessageGuardCardView: React.FC<{ control: MessageGuardControl }> = 
         )}
       </View>
       <Text testID="message-guard-status" style={styles.body}>{status}</Text>
-      <Text style={styles.privacy}>{MESSAGE_GUARD_PRIVACY}</Text>
+      <Text style={styles.privacy}>{t('messageGuard.privacy')}</Text>
       {error ? <Text style={styles.error}>{error}</Text> : null}
       {!unavailable && apps.length > 0 ? (
         <>
@@ -52,11 +52,11 @@ export const MessageGuardCardView: React.FC<{ control: MessageGuardControl }> = 
             testID="message-guard-apps-toggle"
             accessibilityRole="button"
             accessibilityState={{ expanded: open }}
-            accessibilityLabel={`Apps Message Guard watches, ${onCount} on`}
+            accessibilityLabel={t('messageGuard.apps.a11y', { count: onCount })}
             onPress={() => setOpen(v => !v)}
             style={styles.link}
           >
-            <Text style={styles.linkText}>{`${open ? 'Hide apps' : 'Choose apps'} (${onCount} on)`}</Text>
+            <Text style={styles.linkText}>{t(open ? 'messageGuard.apps.hide' : 'messageGuard.apps.show', { count: onCount })}</Text>
           </TouchableOpacity>
           {open
             ? apps.map(a => (

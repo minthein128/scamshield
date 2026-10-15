@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { Text } from '../components/Text';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ShieldLoader, { useReduceMotion } from '../components/ShieldLoader';
 import type { Verdict } from '../api/types';
@@ -14,19 +16,12 @@ import theme from '../theme/theme';
 
 const { colors, fonts } = theme;
 
-const STEPS = [
-  'Reading what you sent',
-  'Picking out names, numbers and links',
-  'Spotting red flags',
-  'Checking the links and the company',
-  'Scoring the risk',
-  'Writing your warning',
-];
+const STEPS = ['read', 'pick', 'spot', 'links', 'score', 'write'] as const;
 const STEP_MS = 900;
-const VERDICT_TITLES: Record<Verdict, string> = { safe: 'Looks safe', careful: 'Hmm, be careful', danger: 'Warning' };
 
 export const CheckingScreen: React.FC<RootScreenProps<'Checking'>> = ({ navigation, route }) => {
-  const { request, source } = route.params;
+  const { t } = useTranslation('checking');
+  const { request, source, reported } = route.params;
   const { saveCheck } = useAppState();
   const [step, setStep] = useState(0);
   const [verdict, setVerdict] = useState<Verdict | null>(null);
@@ -46,12 +41,12 @@ export const CheckingScreen: React.FC<RootScreenProps<'Checking'>> = ({ navigati
       setVerdict(result.verdict);
       if (!reduceMotion) await new Promise(resolve => setTimeout(resolve, 1100));
       if (controller.signal.aborted) return;
-      navigation.replace('Report', { result, language: request.language, fresh: true });
+      navigation.replace('Report', { result, language: request.language, fresh: true, ...(reported ? { reported } : {}) });
     } catch (e) {
       if (e instanceof ApiError && e.code === 'cancelled') return;
       setError({ ...errorCopy(e), code: e instanceof ApiError ? e.code : undefined });
     }
-  }, [navigation, request, saveCheck, source, reduceMotion]);
+  }, [navigation, request, saveCheck, source, reported, reduceMotion]);
 
   useEffect(() => {
     run();
@@ -72,20 +67,20 @@ export const CheckingScreen: React.FC<RootScreenProps<'Checking'>> = ({ navigati
             <Text accessibilityRole="header" style={styles.errorTitle}>{error.title}</Text>
             <Text testID="checking-error" style={styles.errorText}>{error.message}</Text>
             {error.code === 'rate_limited' && status.kind === 'anonymous' ? (
-              <LinkButton label="Create a free account" color={colors.brandBlueLight} onPress={() => navigation.replace('Account', { mode: 'signUp' })} />
+              <LinkButton label={t('createAccount')} color={colors.brandBlueLight} onPress={() => navigation.replace('Account', { mode: 'signUp' })} />
             ) : null}
           </View>
         ) : (
           <View style={styles.loader}>
             <ShieldLoader step={step} verdict={verdict} />
-            <Text accessibilityRole="header" style={styles.title}>{verdict ? VERDICT_TITLES[verdict] : 'Checking...'}</Text>
-            <Text testID="checking-stage" accessibilityLiveRegion="polite" style={styles.stage}>{verdict ? ' ' : STEPS[step]}</Text>
+            <Text accessibilityRole="header" style={styles.title}>{verdict ? t(`verdict.${verdict}`) : t('title')}</Text>
+            <Text testID="checking-stage" accessibilityLiveRegion="polite" style={styles.stage}>{verdict ? ' ' : t(`steps.${STEPS[step]}`)}</Text>
           </View>
         )}
       </View>
       <View style={styles.footer}>
-        {error ? <Button testID="checking-retry" label="Try again" onPress={run} /> : null}
-        <Button label={error ? 'Go back' : 'Cancel'} variant="secondary" onPress={() => navigation.goBack()} />
+        {error ? <Button testID="checking-retry" label={t('retry')} onPress={run} /> : null}
+        <Button label={error ? t('goBack') : t('cancel')} variant="secondary" onPress={() => navigation.goBack()} />
       </View>
     </SafeAreaView>
   );
