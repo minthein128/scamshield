@@ -66,5 +66,12 @@
     "ID": "Indonesia",
     "PH": "Philippines",
     "VN": "Vietnam"
+  },
+  "languageNames": {
+    "en": "English",
+    "id": "Bahasa Indonesia",
+    "tl": "Tagalog",
+    "my": "Myanmar",
+    "th": "Thai"
   }
 }

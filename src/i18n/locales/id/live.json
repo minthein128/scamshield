@@ -1,44 +1,43 @@
 {
   "_meta": {
-    "reviewed": false,
-    "placeholder": "English text, not translated yet"
+    "reviewed": false
   },
-  "button": "Talk to SafeRoute",
-  "a11yButton": "Talk to SafeRoute about this report",
-  "title": "Talk to SafeRoute",
-  "privacy": "Your voice is sent to Google to answer. Nothing is recorded or saved.",
-  "family": "Explain to my family",
-  "mute": "Mute",
-  "unmute": "Unmute",
-  "end": "End",
-  "close": "Close",
-  "getHelp": "Get help",
-  "listen": "Listen",
-  "retry": "Try again",
-  "countdown": "{{seconds}} s left",
-  "a11yCountdown": "{{seconds}} seconds left",
-  "placeholder": "The answer will show here",
-  "heard": "You said: {{text}}",
+  "button": "Bicara dengan SafeRoute",
+  "a11yButton": "Bicara dengan SafeRoute tentang laporan ini",
+  "title": "Bicara dengan SafeRoute",
+  "privacy": "Suara Anda dikirim ke Google untuk dijawab. Tidak ada yang direkam atau disimpan.",
+  "family": "Jelaskan ke keluarga saya",
+  "mute": "Bisukan",
+  "unmute": "Bunyikan",
+  "end": "Akhiri",
+  "close": "Tutup",
+  "getHelp": "Minta bantuan",
+  "listen": "Dengarkan",
+  "retry": "Coba lagi",
+  "countdown": "Sisa {{seconds}} dtk",
+  "a11yCountdown": "Sisa {{seconds}} detik",
+  "placeholder": "Jawaban akan muncul di sini",
+  "heard": "Anda berkata: {{text}}",
   "state": {
-    "connecting": "Connecting...",
-    "warning": "Playing the warning first...",
-    "listening": "Listening. Ask your question.",
-    "listeningMuted": "The microphone is muted.",
-    "speaking": "SafeRoute is speaking..."
+    "connecting": "Menghubungkan...",
+    "warning": "Memutar peringatan dulu...",
+    "listening": "Mendengarkan. Ajukan pertanyaan Anda.",
+    "listeningMuted": "Mikrofon dibisukan.",
+    "speaking": "SafeRoute sedang berbicara..."
   },
   "ended": {
-    "user": "Conversation ended.",
-    "cap": "Time is up. Start again to ask more.",
-    "server": "Conversation ended."
+    "user": "Percakapan selesai.",
+    "cap": "Waktu habis. Mulai lagi untuk bertanya lebih banyak.",
+    "server": "Percakapan selesai."
   },
   "errors": {
-    "mic_denied": "The microphone is off. Allow it to talk, or tap Listen to hear the warning.",
-    "unavailable": "Live voice is not available right now. Tap Listen to hear the warning again.",
-    "rate_limited": "You have used many checks this hour. Try again later.",
-    "busy": "Another voice conversation is open. Close it and try again.",
-    "not_found": "This report is no longer available. Run the check again.",
-    "upstream": "The voice service had a problem. Try again.",
-    "bad_request": "The voice service could not start. Try again.",
-    "audio": "Audio is not available on this device."
+    "mic_denied": "Mikrofon mati. Izinkan untuk berbicara, atau ketuk Dengarkan untuk mendengar peringatan.",
+    "unavailable": "Suara langsung belum tersedia sekarang. Ketuk Dengarkan untuk mendengar peringatan lagi.",
+    "rate_limited": "Anda sudah memakai banyak pemeriksaan jam ini. Coba lagi nanti.",
+    "busy": "Percakapan suara lain sedang terbuka. Tutup lalu coba lagi.",
+    "not_found": "Laporan ini tidak tersedia lagi. Jalankan pemeriksaan lagi.",
+    "upstream": "Layanan suara bermasalah. Coba lagi.",
+    "bad_request": "Layanan suara tidak dapat dimulai. Coba lagi.",
+    "audio": "Audio tidak tersedia di perangkat ini."
   }
 }

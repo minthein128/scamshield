@@ -7,7 +7,6 @@ import { Text } from '../components/Text';
 import { Button, Card, LinkButton, Pill, ScreenHeader, SectionTitle } from '../components/ui';
 import { getApiClient } from '../api';
 import type { CheckAction } from '../api/types';
-import { languageOption } from '../lib/languages';
 import {
   VERDICT_STYLES,
   filledSegments,
@@ -87,7 +86,7 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
   const hotline = resolveCallTarget(callAction?.value, profile.destinationCountry, profile.homeCountry);
 
   const call = hotline ? callLabel(hotline, { call: number => t('call', { number }), ext: ext => t('callExt', { ext }) }) : { label: '' };
-  const listenLabel = speaking ? t('stop') : t('listen', { language: languageOption(language).label });
+  const listenLabel = speaking ? t('stop') : t('listen', { language: t(`common:languageNames.${language}`) });
   const talkLabel = t('live:button');
   const stackVoice = voiceRowStacks(width, [listenLabel, talkLabel], PixelRatio.getFontScale());
 

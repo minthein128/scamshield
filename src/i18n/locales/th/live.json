@@ -1,44 +1,43 @@
 {
   "_meta": {
-    "reviewed": false,
-    "placeholder": "English text, not translated yet"
+    "reviewed": false
   },
-  "button": "Talk to SafeRoute",
-  "a11yButton": "Talk to SafeRoute about this report",
-  "title": "Talk to SafeRoute",
-  "privacy": "Your voice is sent to Google to answer. Nothing is recorded or saved.",
-  "family": "Explain to my family",
-  "mute": "Mute",
-  "unmute": "Unmute",
-  "end": "End",
-  "close": "Close",
-  "getHelp": "Get help",
-  "listen": "Listen",
-  "retry": "Try again",
-  "countdown": "{{seconds}} s left",
-  "a11yCountdown": "{{seconds}} seconds left",
-  "placeholder": "The answer will show here",
-  "heard": "You said: {{text}}",
+  "button": "คุยกับ SafeRoute",
+  "a11yButton": "คุยกับ SafeRoute เกี่ยวกับรายงานนี้",
+  "title": "คุยกับ SafeRoute",
+  "privacy": "เสียงของคุณจะถูกส่งไปยัง Google เพื่อตอบกลับ ไม่มีการบันทึกหรือเก็บไว้",
+  "family": "อธิบายให้ครอบครัวฟัง",
+  "mute": "ปิดเสียง",
+  "unmute": "เปิดเสียง",
+  "end": "จบ",
+  "close": "ปิด",
+  "getHelp": "ขอความช่วยเหลือ",
+  "listen": "ฟัง",
+  "retry": "ลองอีกครั้ง",
+  "countdown": "เหลือ {{seconds}} วิ",
+  "a11yCountdown": "เหลืออีก {{seconds}} วินาที",
+  "placeholder": "คำตอบจะแสดงที่นี่",
+  "heard": "คุณพูดว่า: {{text}}",
   "state": {
-    "connecting": "Connecting...",
-    "warning": "Playing the warning first...",
-    "listening": "Listening. Ask your question.",
-    "listeningMuted": "The microphone is muted.",
-    "speaking": "SafeRoute is speaking..."
+    "connecting": "กำลังเชื่อมต่อ...",
+    "warning": "กำลังเล่นคำเตือนก่อน...",
+    "listening": "กำลังฟังอยู่ ถามได้เลย",
+    "listeningMuted": "ปิดเสียงไมโครโฟนอยู่",
+    "speaking": "SafeRoute กำลังพูด..."
   },
   "ended": {
-    "user": "Conversation ended.",
-    "cap": "Time is up. Start again to ask more.",
-    "server": "Conversation ended."
+    "user": "จบการสนทนาแล้ว",
+    "cap": "หมดเวลาแล้ว เริ่มใหม่เพื่อถามเพิ่มได้",
+    "server": "จบการสนทนาแล้ว"
   },
   "errors": {
-    "mic_denied": "The microphone is off. Allow it to talk, or tap Listen to hear the warning.",
-    "unavailable": "Live voice is not available right now. Tap Listen to hear the warning again.",
-    "rate_limited": "You have used many checks this hour. Try again later.",
-    "busy": "Another voice conversation is open. Close it and try again.",
-    "not_found": "This report is no longer available. Run the check again.",
-    "upstream": "The voice service had a problem. Try again.",
-    "bad_request": "The voice service could not start. Try again.",
-    "audio": "Audio is not available on this device."
+    "mic_denied": "ไมโครโฟนปิดอยู่ อนุญาตให้ใช้เพื่อพูดคุย หรือแตะ ฟัง เพื่อฟังคำเตือน",
+    "unavailable": "เสียงสดยังใช้ไม่ได้ในตอนนี้ แตะ ฟัง เพื่อฟังคำเตือนอีกครั้ง",
+    "rate_limited": "คุณใช้การตรวจสอบหลายครั้งแล้วในชั่วโมงนี้ ลองใหม่ภายหลัง",
+    "busy": "มีการสนทนาด้วยเสียงอีกรายการเปิดอยู่ ปิดแล้วลองใหม่",
+    "not_found": "ไม่มีรายงานนี้แล้ว ตรวจสอบอีกครั้ง",
+    "upstream": "บริการเสียงมีปัญหา ลองอีกครั้ง",
+    "bad_request": "เริ่มบริการเสียงไม่ได้ ลองอีกครั้ง",
+    "audio": "อุปกรณ์นี้ใช้เสียงไม่ได้"
   }
 }
