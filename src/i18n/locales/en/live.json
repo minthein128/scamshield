@@ -10,7 +10,6 @@
   "end": "End",
   "close": "Close",
   "getHelp": "Get help",
-  "listen": "Listen",
   "retry": "Try again",
   "countdown": "{{seconds}} s left",
   "a11yCountdown": "{{seconds}} seconds left",
@@ -21,7 +20,7 @@
     "warning": "Playing the warning first...",
     "listening": "Listening. Ask your question.",
     "listeningMuted": "The microphone is muted.",
-    "speaking": "SafeRoute is speaking..."
+    "speaking": "Pyit Taing Htaung is speaking..."
   },
   "ended": {
     "user": "Conversation ended.",
@@ -29,8 +28,8 @@
     "server": "Conversation ended."
   },
   "errors": {
-    "mic_denied": "The microphone is off. Allow it to talk, or tap Listen to hear the warning.",
-    "unavailable": "Live voice is not available right now. Tap Listen to hear the warning again.",
+    "mic_denied": "The microphone is off. Allow it in your phone settings to talk, or close this and read the report.",
+    "unavailable": "Live voice is not available right now. Try again later, or close this and read the report.",
     "rate_limited": "You have used many checks this hour. Try again later.",
     "busy": "Another voice conversation is open. Close it and try again.",
     "not_found": "This report is no longer available. Run the check again.",
