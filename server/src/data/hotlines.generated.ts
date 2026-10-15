@@ -571,17 +571,6 @@ export const HOTLINES: Hotline[] = [
     "verifiedOn": "2026-10-15"
   },
   {
-    "id": "mm-embassy-vientiane",
-    "country": "MM",
-    "category": "consular",
-    "name": "Myanmar Embassy Vientiane",
-    "number": "+856 21 314 910",
-    "dial": "+85621314910",
-    "notes": "Other lines: +856 21 314 911, +856 21 353 491. Myanmar foreign ministry mission directory, republished by the Myanmar Consulate General in Kolkata. The page has no date and names an older head of mission, so call to check.",
-    "sourceUrl": "https://mcgkolkata.org/?p=151",
-    "verifiedOn": "2026-10-15"
-  },
-  {
     "id": "mm-dol-migrant-section",
     "country": "MM",
     "category": "consular",
