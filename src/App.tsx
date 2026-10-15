@@ -28,8 +28,8 @@ export default function App() {
     'PlusJakartaSans-Bold': require('../assets/fonts/PlusJakartaSans-Bold.ttf'),
     'PlusJakartaSans-ExtraBold': require('../assets/fonts/PlusJakartaSans-ExtraBold.ttf'),
     'IBMPlexMono-Medium': require('../assets/fonts/IBMPlexMono-Medium.ttf'),
-    'NotoSansMyanmar-Regular': require('../assets/fonts/NotoSansMyanmar-Regular.ttf'),
-    'NotoSansMyanmar-Bold': require('../assets/fonts/NotoSansMyanmar-Bold.ttf'),
+    'A10YoeShin-Regular': require('../assets/fonts/A10_YoeShin-Regular.ttf'),
+    'A10YoeShin-Bold': require('../assets/fonts/A10_YoeShin-Bold.ttf'),
     'NotoSansThai-Regular': require('../assets/fonts/NotoSansThai-Regular.ttf'),
     'NotoSansThai-Bold': require('../assets/fonts/NotoSansThai-Bold.ttf'),
   });

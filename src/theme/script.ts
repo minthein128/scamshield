@@ -20,6 +20,6 @@ export function scriptStyle(text: string | undefined | null, weight: FontWeight 
   const heavy = weight === 'bold' || weight === 'extraBold' || weight === 'semiBold';
   if (script === 'latin') return { fontFamily: fonts[weight], ...(lineHeight ? { lineHeight } : {}) };
   const family = script === 'myanmar' ? (heavy ? fonts.myanmarBold : fonts.myanmar) : heavy ? fonts.thaiBold : fonts.thai;
-  const scale = script === 'myanmar' ? 1.35 : 1.15;
+  const scale = script === 'myanmar' ? 1.2 : 1.15;
   return { fontFamily: family, ...(lineHeight ? { lineHeight: Math.round(lineHeight * scale) } : {}) };
 }

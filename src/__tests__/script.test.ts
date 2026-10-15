@@ -9,7 +9,7 @@ describe('script fonts', () => {
   });
 
   it('picks the font and widens line height for Burmese', () => {
-    expect(scriptStyle('မြန်မာ', 'bold', 20)).toEqual({ fontFamily: 'NotoSansMyanmar-Bold', lineHeight: 27 });
+    expect(scriptStyle('မြန်မာ', 'bold', 20)).toEqual({ fontFamily: 'A10YoeShin-Bold', lineHeight: 24 });
     expect(scriptStyle('hello', 'semiBold', 20)).toEqual({ fontFamily: 'PlusJakartaSans-SemiBold', lineHeight: 20 });
   });
 });
