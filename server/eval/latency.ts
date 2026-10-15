@@ -27,6 +27,7 @@ const imageDir = resolve(opt('images', '../bench/public/synthetic') as string);
 const jsonOut = opt('json');
 const stream = args.includes('--stream');
 const only = opt('only')?.split(',');
+const share = args.includes('--share');
 
 interface Item {
   id: string;
@@ -40,7 +41,7 @@ if (sets.includes('text')) {
     items.push({
       id: c.id,
       expectRisky: c.expect === 'risky',
-      body: { kind: c.kind, language: c.lang, text: c.text, shareSignals: false },
+      body: { kind: c.kind, language: c.lang, text: c.text, shareSignals: share },
     });
 }
 if (sets.includes('images')) {
