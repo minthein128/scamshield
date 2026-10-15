@@ -2,7 +2,7 @@
   "_meta": {
     "reviewed": false
   },
-  "title": "Suriin ang isang bagay",
+  "title": "May nais suriin?",
   "whatIsIt": "Ano ito?",
   "kinds": {
     "job": "Alok na trabaho",
@@ -12,9 +12,9 @@
     "agency": "Ahensya"
   },
   "text": {
-    "title": "Mensaheng text",
-    "a11y": "Text o chat na susuriin",
-    "placeholder": "Post tungkol sa trabaho, mga mensahe sa chat, o SMS"
+    "title": "Mensahe",
+    "a11y": "Teksto o mensaheng susuriin",
+    "placeholder": "Patalastas ng trabaho, mensahe sa chat o SMS"
   },
   "link": {
     "label": "Link",
@@ -28,9 +28,9 @@
     "pick": "Pumili ng screenshot"
   },
   "destination": {
-    "label": "Saan ka nagtatrabaho o bumibiyahe?",
-    "a11y": "Pupuntahan",
-    "placeholder": "Halimbawa: Bangkok, Thailand"
+    "label": "Saan ka magtatrabaho o maglalakbay?",
+    "a11y": "Patutunguhan",
+    "placeholder": "Halimbawa Bangkok, Thailand"
   },
   "optional": {
     "title": "Opsyonal",
@@ -38,12 +38,58 @@
   },
   "submit": "Suriin ngayon",
   "errors": {
-    "image": "Hindi magamit ang larawang iyon. Sumubok ng ibang screenshot.",
-    "clipboardEmpty": "Walang nakopya sa iyong clipboard."
+    "image": "Hindi magamit ang larawang iyon. Subukan ang ibang screenshot.",
+    "clipboardEmpty": "Walang laman ang iyong clipboard."
   },
   "source": {
     "screenshot": "Screenshot",
     "screenshotAt": "Screenshot, {{place}}",
     "fallback": "Pagsusuri"
+  },
+  "job": {
+    "bannerTitle": "SafeRoute Job Shield",
+    "bannerBody": "Ikumpara ang ipinapangako ng patalastas sa aktwal na hinihingi ng recruiter, bago ka magbayad, magpadala ng dokumento, o bumiyahe.",
+    "adSectionTitle": "1. Ang Patalastas ng Trabaho",
+    "adPlaceholder": "I-paste ang teksto ng trabaho o flyer...",
+    "adTextA11y": "Teksto ng patalastas ng trabaho",
+    "uploadFlyer": "Mag-upload ng larawan ng flyer",
+    "pickFlyer": "Pumili ng screenshot ng flyer",
+    "chatSectionTitle": "2. Hiningi ng recruiter sa iyo (Opsyonal)",
+    "chatHelper": "I-paste ang chat o i-upload ang screenshot mula sa WhatsApp, Telegram, o Facebook. Sinusuri ng SafeRoute ang mga nakatagong bayarin, pasaporte, o pagbabago sa ruta.",
+    "chatPlaceholder": "I-paste ang mga mensahe mula sa recruiter...",
+    "chatTextA11y": "Teksto ng chat ng recruiter",
+    "uploadChat": "Mag-upload ng screenshot ng chat",
+    "pickChat": "Pumili ng screenshot ng chat",
+    "submit": "Suriin ang mga datos at ikumpara",
+    "extracting": "Kinukuha ang mga datos ng trabaho..."
+  },
+  "jobFacts": {
+    "title": "Tama ba ito?",
+    "reviewTitle": "Suriin ang nakuhang datos",
+    "reviewBody": "Nakuha ng SafeRoute ang mga datos na ito mula sa ad at chat. Suriin kung tama o i-tap para itama.",
+    "adSection": "Ang Patalastas ng Trabaho",
+    "chatSection": "Ang Hiningi ng Recruiter",
+    "noChatProvided": "Walang ibinigay na usapan sa recruiter. Susuriin lamang ng SafeRoute ang patalastas.",
+    "submit": "Mukhang tama, suriin na",
+    "checking": "Sinusuri kung may mga salungat...",
+    "unclear": "Hindi malinaw",
+    "extracted": "Nakuha",
+    "notMentioned": "Hindi nabanggit",
+    "editA11y": "I-edit ang {{label}}",
+    "editTitle": "I-edit ang {{label}}",
+    "placeholder": "Ilagay ang kumpirmadong impormasyon",
+    "saveCorrection": "I-save ang pagwawasto",
+    "markNotMentioned": "Markahan bilang Hindi Nabanggit",
+    "fields": {
+      "employer": "Employer",
+      "jobTitle": "Posisyon sa Trabaho",
+      "workplace": "Lugar ng Trabaho",
+      "salary": "Sahod",
+      "workerFee": "Bayarin ng Manggagawa",
+      "contract": "Kontrata",
+      "visaOrPermit": "Visa / Permit",
+      "documentRequest": "Pasaporte / Mga Dokumento",
+      "meetingPoint": "Lugar ng Tagpuan"
+    }
   }
 }

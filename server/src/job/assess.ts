@@ -4,54 +4,42 @@ import type { Grounder } from '../ground.js';
 import { rewriteCertainty } from '../language-guard.js';
 import { score } from '../score.js';
 import type { Flag, Lang, Source, Verdict } from '../types.js';
-import {
-  applyBorderProtection,
-  detectConflicts,
-  extractSingleSourceFlags,
-  getStillUnclear,
-  mapToAttentionTier,
-} from './rules.js';
-import type { JobAssessRequest, JobAssessResponse, JobConflict, JobFacts } from './types.js';
+import { applyBorderProtection, detectConflicts, extractSingleSourceFlags, getStillUnclear, mapToAttentionTier } from './rules.js';
+import type { JobAssessRequest, JobAssessResponse } from './types.js';
 
-const SUMMARY_TEMPLATES: Record<
-  'pause' | 'verify' | 'lower',
-  Record<Lang, (conflictsCount: number, unclearCount: number) => string>
-> = {
+const SUMMARY_TEMPLATES: Record<'pause' | 'verify' | 'lower', Record<Lang, (conflictsCount: number, unclearCount: number) => string>> = {
   pause: {
-    en: (c, u) =>
+    en: (c, _u) =>
       `Significant discrepancies and coercive instructions detected between the advertised job and recruiter demands (${c} conflict${c === 1 ? '' : 's'}). Pause before making payments, sending documents, or traveling.`,
-    id: (c, u) =>
+    id: (c, _u) =>
       `Ditemukan perbedaan mencolok dan instruksi berisiko antara iklan pekerjaan dan permintaan perekrut (${c} konflik). Tunda sebelum melakukan pembayaran, mengirim dokumen, atau bepergian.`,
-    tl: (c, u) =>
+    tl: (c, _u) =>
       `May nakitang malaking pagkakaiba at mga mapanganib na tagubilin sa pagitan ng ad ng trabaho at mga hinihingi ng recruiter (${c} salungatan). Huminto muna bago magbayad, magpadala ng dokumento, o bumiyahe.`,
-    my: (c, u) =>
+    my: (c, _u) =>
       `ကြော်ငြာထားသောအလုပ်နှင့် အလုပ်ခေါ်သူ၏ တောင်းဆိုချက်များအကြား သိသာထင်ရှားသော ကွဲလွဲချက်များနှင့် သတိပေးချက်များ တွေ့ရှိရပါသည် (${c} ချက် မကိုက်ညီပါ)။ ငွေလွှဲခြင်း၊ စာရွက်စာတမ်းပို့ခြင်း သို့မဟုတ် ခရီးထွက်ခြင်း မပြုမီ ရပ်တန့်စဉ်းစားပါ။`,
-    th: (c, u) =>
+    th: (c, _u) =>
       `พบข้อขัดแย้งที่สำคัญและคำสั่งที่น่าสงสัยระหว่างโฆษณางานและข้อเรียกร้องของผู้รับสมัคร (${c} จุดไม่ตรงกัน) โปรดหยุดคิดก่อนโอนเงิน ส่งเอกสาร หรือออกเดินทาง`,
   },
   verify: {
-    en: (c, u) =>
+    en: (_c, _u) =>
       `Some details do not match or remain unconfirmed between the job ad and chat messages. Verify the recruitment agency's official licence before proceeding.`,
-    id: (c, u) =>
+    id: (_c, _u) =>
       `Beberapa rincian tidak cocok atau belum terkonfirmasi antara iklan pekerjaan dan percakapan. Periksa izin resmi agensi perekrutan sebelum melanjutkan.`,
-    tl: (c, u) =>
+    tl: (_c, _u) =>
       `Ilang detalye ay hindi tugma o hindi pa nakumpirma sa pagitan ng job ad at chat. I-verify ang opisyal na lisensya ng ahensya bago magpatuloy.`,
-    my: (c, u) =>
+    my: (_c, _u) =>
       `အလုပ်ကြော်ငြာနှင့် စကားပြောဆိုချက်များအကြား အချို့သောအချက်အလက်များ မကိုက်ညီခြင်း သို့မဟုတ် ရှင်းလင်းမှုမရှိခြင်း တွေ့ရပါသည်။ ဆက်လက်မလုပ်ဆောင်မီ တရားဝင်အေဂျင်စီလိုင်စင်ကို အတည်ပြုစစ်ဆေးပါ။`,
-    th: (c, u) =>
+    th: (_c, _u) =>
       `รายละเอียดบางอย่างไม่ตรงกันหรือไม่ได้รับการยืนยันระหว่างโฆษณางานและการสนทนา โปรดตรวจสอบใบอนุญาตอย่างเป็นทางการของหน่วยงานก่อนดำเนินการต่อ`,
   },
   lower: {
-    en: (c, u) =>
-      `Few warning signs found between the ad and chat, though critical details may still need independent verification.`,
-    id: (c, u) =>
+    en: (_c, _u) => `Few warning signs found between the ad and chat, though critical details may still need independent verification.`,
+    id: (_c, _u) =>
       `Sedikit tanda peringatan ditemukan antara iklan dan percakapan, meskipun rincian penting mungkin masih memerlukan verifikasi mandiri.`,
-    tl: (c, u) =>
+    tl: (_c, _u) =>
       `Kakaunting babala ang natukoy sa pagitan ng ad at chat, ngunit maaaring kailangan pa rin ng independiyenteng beripikasyon ang ilang mahalagang detalye.`,
-    my: (c, u) =>
-      `ကြော်ငြာနှင့် စကားပြောဆိုချက်များအကြား သတိပေးချက် အနည်းငယ်သာ တွေ့ရှိရသော်လည်း အရေးကြီးသောအချက်များကို သီးခြားစစ်ဆေးရန် လိုအပ်နိုင်ပါသည်။`,
-    th: (c, u) =>
-      `พบสัญญาณเตือนน้อยระหว่างโฆษณาและการสนทนา แม้ว่ารายละเอียดสำคัญอาจยังต้องได้รับการตรวจสอบเพิ่มเติม`,
+    my: (_c, _u) => `ကြော်ငြာနှင့် စကားပြောဆိုချက်များအကြား သတိပေးချက် အနည်းငယ်သာ တွေ့ရှိရသော်လည်း အရေးကြီးသောအချက်များကို သီးခြားစစ်ဆေးရန် လိုအပ်နိုင်ပါသည်။`,
+    th: (_c, _u) => `พบสัญญาณเตือนน้อยระหว่างโฆษณาและการสนทนา แม้ว่ารายละเอียดสำคัญอาจยังต้องได้รับการตรวจสอบเพิ่มเติม`,
   },
 };
 
@@ -79,11 +67,7 @@ const SPOKEN_WARNINGS: Record<'pause' | 'verify' | 'lower', Record<Lang, string>
   },
 };
 
-export async function assessJobOffer(
-  req: JobAssessRequest,
-  grounder?: Grounder,
-  timeoutMs = 5000,
-): Promise<JobAssessResponse> {
+export async function assessJobOffer(req: JobAssessRequest, grounder?: Grounder, timeoutMs = 5000): Promise<JobAssessResponse> {
   const ad = req.facts.ad ?? null;
   const chat = req.facts.chat ?? null;
   const lang = req.language || 'en';
@@ -114,16 +98,12 @@ export async function assessJobOffer(
     try {
       const entities = {
         companies: [employerName],
-        phones: (chat?.contactChannel?.value === 'phone' && chat.contactChannel.quote ? [chat.contactChannel.quote] : []),
+        phones: chat?.contactChannel?.value === 'phone' && chat.contactChannel.quote ? [chat.contactChannel.quote] : [],
         domains: [],
         role: ad?.jobTitle?.value || chat?.jobTitle?.value || undefined,
         country: ad?.destinationCountry?.value || chat?.destinationCountry?.value || undefined,
       };
-      const groundRes = await grounder.ground(
-        { kind: 'job', language: lang, context: req.context },
-        { entities } as never,
-        timeoutMs,
-      );
+      const groundRes = await grounder.ground({ kind: 'job', language: lang, context: req.context }, { entities } as never, timeoutMs);
       flags.push(...groundRes.flags);
       sources.push(...groundRes.sources);
 

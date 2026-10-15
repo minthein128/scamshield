@@ -123,18 +123,52 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
 
   const otherActions = result.actions.filter(a => a.type !== 'call' && a.type !== 'share' && !(result.verdict === 'safe' && a.type === 'learn'));
 
+  const isJob = Boolean(result.attention);
+  const attentionTier = result.attention;
+  const bannerBackground = isJob
+    ? attentionTier === 'pause'
+      ? colors.danger
+      : attentionTier === 'verify'
+        ? colors.warningText
+        : colors.brandBlue
+    : style.background;
+  const bannerIconName: IconName = isJob
+    ? attentionTier === 'pause'
+      ? 'octagon'
+      : attentionTier === 'verify'
+        ? 'alert'
+        : 'shieldCheck'
+    : result.verdict === 'safe'
+      ? 'shieldCheck'
+      : result.verdict === 'danger'
+        ? 'octagon'
+        : 'alert';
+  const bannerTitle = isJob
+    ? attentionTier === 'pause'
+      ? t('attention.pause')
+      : attentionTier === 'verify'
+        ? t('attention.verify')
+        : t('attention.lower')
+    : verdictLabel(result.verdict);
+  const bannerSub = isJob
+    ? (result.attentionHeadline || scamTypeLabel(result.scamType))
+    : scamTypeLabel(result.scamType);
+
   const leftTop = (
     <>
-      <ScreenHeader title={t('title')} onBack={() => (navigation.canGoBack() ? navigation.goBack() : navigation.navigate('Tabs'))} />
+      <View style={styles.topBar}>
+        <ScreenHeader title={t('title')} onBack={() => (navigation.canGoBack() ? navigation.goBack() : navigation.navigate('Tabs'))} />
+        <LinkButton label={t('leaveQuickly')} onPress={() => navigation.reset({ index: 0, routes: [{ name: 'Tabs' }] })} />
+      </View>
 
-      <View style={[styles.banner, narrow && styles.bannerNarrow, { backgroundColor: style.background }]} testID={`verdict-${result.verdict}`} accessible accessibilityLabel={t('a11yVerdict', { verdict: verdictLabel(result.verdict), score: result.score })}>
+      <View style={[styles.banner, narrow && styles.bannerNarrow, { backgroundColor: bannerBackground }]} testID={`verdict-${result.verdict}`} accessible accessibilityLabel={t('a11yVerdict', { verdict: bannerTitle, score: result.score })}>
         <View style={styles.bannerIcon}>
-          <Icon name={result.verdict === 'safe' ? 'shieldCheck' : result.verdict === 'danger' ? 'octagon' : 'alert'} size={36} color={colors.white} />
+          <Icon name={bannerIconName} size={36} color={colors.white} />
         </View>
         {narrow ? score : null}
         <View style={narrow ? styles.bannerTextNarrow : styles.bannerText}>
-          <Text style={styles.bannerTitle}>{verdictLabel(result.verdict)}</Text>
-          <Text style={[styles.bannerSub, { color: style.subtle }]}>{scamTypeLabel(result.scamType)}</Text>
+          <Text style={styles.bannerTitle}>{bannerTitle}</Text>
+          <Text style={[styles.bannerSub, { color: style.subtle }]}>{bannerSub}</Text>
         </View>
         {narrow ? null : score}
       </View>
@@ -181,6 +215,56 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
         <Text style={[styles.reportTitle, readable(tablet, 20, 28)]}>{result.title}</Text>
         <Text style={[styles.summary, readable(tablet, 16, 24)]}>{result.summary}</Text>
       </Card>
+
+      {result.conflicts && result.conflicts.length > 0 ? (
+        <View style={{ gap: 12 }}>
+          <SectionTitle>{t('conflictsTitle')}</SectionTitle>
+          {result.conflicts.map((conflict, i) => {
+            const sev = SEVERITY[conflict.severity];
+            return (
+              <View key={`${conflict.field}-${i}`} style={styles.conflictCard}>
+                <View style={styles.conflictHeader}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 }}>
+                    <View style={[styles.conflictDot, { backgroundColor: sev.bar }]} />
+                    <Text style={[styles.conflictField, readable(tablet, 16, 22)]}>{conflict.fieldLabel}</Text>
+                  </View>
+                  <Pill label={t(`severity.${conflict.severity}`)} background={sev.bg} color={sev.fg} />
+                </View>
+                <Text style={[styles.conflictDesc, readable(tablet, 14, 20)]}>{conflict.description}</Text>
+                <View style={styles.conflictCompare}>
+                  <View style={styles.compareBox}>
+                    <Text style={styles.compareLabel}>{t('adSaid')}</Text>
+                    <Text style={[styles.compareValue, readable(tablet, 14, 20)]}>{conflict.adValue}</Text>
+                    {conflict.adQuote ? <Text style={[styles.compareQuote, readable(tablet, 13, 18)]}>{`"${conflict.adQuote}"`}</Text> : null}
+                  </View>
+                  <View style={[styles.compareBox, styles.compareBoxChat]}>
+                    <Text style={styles.compareLabel}>{t('recruiterSaid')}</Text>
+                    <Text style={[styles.compareValue, { color: colors.dangerSoftText }, readable(tablet, 14, 20)]}>{conflict.chatValue}</Text>
+                    {conflict.chatQuote ? <Text style={[styles.compareQuote, readable(tablet, 13, 18)]}>{`"${conflict.chatQuote}"`}</Text> : null}
+                  </View>
+                </View>
+              </View>
+            );
+          })}
+        </View>
+      ) : null}
+
+      {result.stillUnclear && result.stillUnclear.length > 0 ? (
+        <View style={{ gap: 8 }}>
+          <SectionTitle>{t('stillUnclearTitle')}</SectionTitle>
+          <Card style={{ gap: 10, backgroundColor: colors.codeBg, borderColor: colors.borderLight }}>
+            <Text style={[styles.unclearAdvice, readable(tablet, 13, 18)]}>
+              {t('stillUnclearAdvice')}
+            </Text>
+            {result.stillUnclear.map((item, idx) => (
+              <View key={idx} style={styles.unclearRow}>
+                <Icon name="info" size={16} color={colors.textSecondary} />
+                <Text style={[styles.unclearItem, readable(tablet, 14, 20)]}>{item}</Text>
+              </View>
+            ))}
+          </Card>
+        </View>
+      ) : null}
 
     </>
   );
@@ -358,6 +442,21 @@ const styles = StyleSheet.create({
   flagLabel: { fontSize: 15, lineHeight: 22, fontFamily: fonts.bold, color: colors.textPrimary },
   flagEvidence: { fontSize: 14, lineHeight: 20, fontFamily: fonts.regular, color: colors.textSecondary },
   link: { fontSize: 13, lineHeight: 18, fontFamily: fonts.mono, color: colors.codeText },
+  topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  conflictCard: { backgroundColor: colors.white, borderWidth: 1, borderColor: colors.border, borderRadius: 16, padding: 16, gap: 10 },
+  conflictHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  conflictDot: { width: 8, height: 8, borderRadius: 4 },
+  conflictField: { fontSize: 16, lineHeight: 22, fontFamily: fonts.bold, color: colors.textPrimary },
+  conflictDesc: { fontSize: 14, lineHeight: 20, fontFamily: fonts.medium, color: colors.textSecondary },
+  conflictCompare: { gap: 8 },
+  compareBox: { backgroundColor: colors.background, borderRadius: 10, padding: 10, gap: 2 },
+  compareBoxChat: { backgroundColor: colors.dangerSoftBg, borderWidth: 1, borderColor: colors.borderLight },
+  compareLabel: { fontSize: 12, lineHeight: 16, fontFamily: fonts.bold, color: colors.textMuted },
+  compareValue: { fontSize: 14, lineHeight: 20, fontFamily: fonts.semiBold, color: colors.textPrimary },
+  compareQuote: { fontSize: 13, lineHeight: 18, fontFamily: fonts.regular, fontStyle: 'italic', color: colors.textSecondary },
+  unclearAdvice: { fontSize: 13, lineHeight: 18, fontFamily: fonts.medium, color: colors.textSecondary },
+  unclearRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 8 },
+  unclearItem: { flex: 1, fontSize: 14, lineHeight: 20, fontFamily: fonts.medium, color: colors.textPrimary },
 });
 
 export default ReportScreen;

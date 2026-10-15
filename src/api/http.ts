@@ -1,6 +1,24 @@
 import { ApiError, codeFromStatus } from './errors';
 import { createSseParser } from './sse';
-import type { ApiErrorBody, ApiErrorCode, CheckClient, CheckRequest, CheckResponse, CheckStage, CheckUpdate, FeedbackRequest, HealthResponse, Insights, RequestOptions, SpeakRequest, SpeakResponse } from './types';
+import type {
+  ApiErrorBody,
+  ApiErrorCode,
+  CheckClient,
+  CheckRequest,
+  CheckResponse,
+  CheckStage,
+  CheckUpdate,
+  FeedbackRequest,
+  HealthResponse,
+  Insights,
+  JobAssessRequest,
+  JobAssessResponse,
+  JobExtractRequest,
+  JobExtractResponse,
+  RequestOptions,
+  SpeakRequest,
+  SpeakResponse,
+} from './types';
 import { hasInput, isCheckResponse, normalizeResponse } from './validate';
 
 export interface HttpClientConfig {
@@ -166,6 +184,44 @@ export function createHttpClient(config: HttpClientConfig): CheckClient {
     },
     async health(options?: RequestOptions): Promise<HealthResponse> {
       return (await send('/healthz', { method: 'GET' }, options)) as HealthResponse;
+    },
+    async extractJob(request: JobExtractRequest, options?: RequestOptions): Promise<JobExtractResponse> {
+      const hasAd = Boolean(request.ad?.text?.trim() || request.ad?.imageBase64);
+      const hasChat = Boolean(request.chat?.text?.trim() || request.chat?.imageBase64);
+      if (!hasAd && !hasChat) throw new ApiError('bad_request', 'Nothing to extract');
+      const body = (await send(
+        '/v1/job/extract',
+        { method: 'POST', body: JSON.stringify(request) },
+        options,
+        readJson,
+        'application/json',
+        fetchImpl,
+        checkTimeoutMs
+      )) as JobExtractResponse | null;
+      if (!body || typeof body.jobId !== 'string') throw new ApiError('invalid_response', 'Unexpected response shape');
+      return body;
+    },
+    async assessJob(request: JobAssessRequest, options?: RequestOptions): Promise<JobAssessResponse> {
+      const body = (await send(
+        '/v1/job/assess',
+        { method: 'POST', body: JSON.stringify(request) },
+        options,
+        readJson,
+        'application/json',
+        fetchImpl,
+        checkTimeoutMs
+      )) as JobAssessResponse | null;
+      if (!body || !isCheckResponse(body)) throw new ApiError('invalid_response', 'Unexpected response shape');
+      const normalized = normalizeResponse(body);
+      return {
+        ...normalized,
+        attention: body.attention ?? 'lower',
+        attentionHeadline: body.attentionHeadline ?? normalized.title,
+        conflicts: Array.isArray(body.conflicts) ? body.conflicts : [],
+        stillUnclear: Array.isArray(body.stillUnclear) ? body.stillUnclear : [],
+        adFacts: body.adFacts ?? null,
+        chatFacts: body.chatFacts ?? null,
+      };
     },
   };
 }

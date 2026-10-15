@@ -3,19 +3,7 @@ import { type GoogleGenAI, type Schema, Type } from '@google/genai';
 import { createTtlLru, type TtlLru } from '../cache.js';
 import type { Config } from '../config.js';
 import { ApiError } from '../types.js';
-import type {
-  ContactChannelType,
-  ContractType,
-  DocumentRequestType,
-  FactField,
-  JobExtractRequest,
-  JobExtractResponse,
-  JobFacts,
-  MeetingPointType,
-  PaymentRequestType,
-  SalaryValue,
-  VisaType,
-} from './types.js';
+import type { JobExtractRequest, JobExtractResponse, JobFacts } from './types.js';
 
 const TEN_MINUTES_MS = 600_000;
 
@@ -147,11 +135,22 @@ export function mockExtractJob(req: JobExtractRequest): JobExtractResponse {
   };
 
   const hasChat = Boolean(req.chat?.text || req.chat?.imageBase64);
-  const chatFee = chatText.toLowerCase().includes('deposit') || chatText.toLowerCase().includes('fee') || chatText.toLowerCase().includes('pay') || chatText.toLowerCase().includes('ငွေ');
+  const chatFee =
+    chatText.toLowerCase().includes('deposit') ||
+    chatText.toLowerCase().includes('fee') ||
+    chatText.toLowerCase().includes('pay') ||
+    chatText.toLowerCase().includes('ငွေ');
   const chatPassport = chatText.toLowerCase().includes('passport') || chatText.toLowerCase().includes('ပတ်စပို့');
   const chatTourist = chatText.toLowerCase().includes('tourist') || chatText.toLowerCase().includes('ဗီဇာမလို');
-  const chatBorder = chatText.toLowerCase().includes('border') || chatText.toLowerCase().includes('driver') || chatText.toLowerCase().includes('mae sot') || chatText.toLowerCase().includes('မဲဆောက်');
-  const chatSecret = chatText.toLowerCase().includes('secret') || chatText.toLowerCase().includes('do not tell') || chatText.toLowerCase().includes('မပြောပါနှင့်');
+  const chatBorder =
+    chatText.toLowerCase().includes('border') ||
+    chatText.toLowerCase().includes('driver') ||
+    chatText.toLowerCase().includes('mae sot') ||
+    chatText.toLowerCase().includes('မဲဆောက်');
+  const chatSecret =
+    chatText.toLowerCase().includes('secret') ||
+    chatText.toLowerCase().includes('do not tell') ||
+    chatText.toLowerCase().includes('မပြောပါနှင့်');
 
   const chat: JobFacts | null = hasChat
     ? {
@@ -240,7 +239,7 @@ export function createJobExtractor(cfg: Config, client?: GoogleGenAI, store: Job
         };
         store.save(jobId, { ad: result.ad, chat: result.chat });
         return result;
-      } catch (err) {
+      } catch (_err) {
         // Fallback to mock extraction on API error to keep service reliable
         const mock = mockExtractJob(req);
         store.save(mock.jobId, { ad: mock.ad, chat: mock.chat });

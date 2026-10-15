@@ -14,7 +14,7 @@
   "text": {
     "title": "Pesan teks",
     "a11y": "Teks atau obrolan untuk diperiksa",
-    "placeholder": "Lowongan kerja, pesan obrolan, atau SMS"
+    "placeholder": "Postingan lowongan, pesan obrolan, atau SMS"
   },
   "link": {
     "label": "Tautan",
@@ -38,12 +38,58 @@
   },
   "submit": "Periksa sekarang",
   "errors": {
-    "image": "Gambar tersebut tidak dapat digunakan. Coba tangkapan layar yang lain.",
+    "image": "Gambar ini tidak dapat digunakan. Coba tangkapan layar lain.",
     "clipboardEmpty": "Papan klip Anda kosong."
   },
   "source": {
     "screenshot": "Tangkapan layar",
     "screenshotAt": "Tangkapan layar, {{place}}",
-    "fallback": "Periksa"
+    "fallback": "Pemeriksaan"
+  },
+  "job": {
+    "bannerTitle": "SafeRoute Job Shield",
+    "bannerBody": "Bandingkan apa yang dijanjikan iklan lowongan dengan apa yang sebenarnya diminta perekrut, sebelum Anda membayar, mengirim dokumen, atau bepergian.",
+    "adSectionTitle": "1. Iklan Lowongan Kerja",
+    "adPlaceholder": "Tempel teks iklan atau deskripsi pamflet...",
+    "adTextA11y": "Teks iklan lowongan kerja",
+    "uploadFlyer": "Unggah gambar pamflet",
+    "pickFlyer": "Pilih tangkapan layar pamflet",
+    "chatSectionTitle": "2. Permintaan Perekrut (Opsional)",
+    "chatHelper": "Tempel obrolan atau unggah tangkapan layar WhatsApp, Telegram, atau Facebook. SafeRoute memeriksa biaya tersembunyi, penahanan paspor, atau perubahan rute.",
+    "chatPlaceholder": "Tempel pesan dari perekrut...",
+    "chatTextA11y": "Teks obrolan perekrut",
+    "uploadChat": "Unggah tangkapan layar obrolan",
+    "pickChat": "Pilih tangkapan layar obrolan",
+    "submit": "Tinjau fakta & bandingkan",
+    "extracting": "Mengekstrak fakta lowongan..."
+  },
+  "jobFacts": {
+    "title": "Apakah ini benar?",
+    "reviewTitle": "Tinjau fakta yang diekstrak",
+    "reviewBody": "SafeRoute mengekstrak fakta ini dari iklan dan obrolan. Periksa kebenarannya atau ketuk untuk mengubahnya.",
+    "adSection": "Iklan Lowongan Kerja",
+    "chatSection": "Permintaan Perekrut",
+    "noChatProvided": "Tidak ada obrolan perekrut yang diberikan. SafeRoute hanya akan memverifikasi iklan.",
+    "submit": "Sudah benar, periksa sekarang",
+    "checking": "Memeriksa pertentangan...",
+    "unclear": "Tidak jelas",
+    "extracted": "Diekstrak",
+    "notMentioned": "Tidak disebutkan",
+    "editA11y": "Ubah {{label}}",
+    "editTitle": "Ubah {{label}}",
+    "placeholder": "Masukkan nilai yang dikonfirmasi",
+    "saveCorrection": "Simpan koreksi",
+    "markNotMentioned": "Tandai Tidak Disebutkan",
+    "fields": {
+      "employer": "Pemberi Kerja",
+      "jobTitle": "Judul Pekerjaan",
+      "workplace": "Alamat Tempat Kerja",
+      "salary": "Gaji",
+      "workerFee": "Biaya Pekerja",
+      "contract": "Kontrak",
+      "visaOrPermit": "Visa / Izin Kerja",
+      "documentRequest": "Paspor / Dokumen",
+      "meetingPoint": "Titik Pertemuan"
+    }
   }
 }

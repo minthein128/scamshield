@@ -31,6 +31,13 @@ export type RootStackParamList = {
   ReportScam: undefined;
   Checking: { request: CheckRequest; source?: string; reported?: boolean };
   Report: { result: CheckResponse; language: LanguageCode; fresh?: boolean; reported?: boolean };
+  JobFacts: {
+    jobId: string;
+    ad: import('../api/types').JobFacts | null;
+    chat: import('../api/types').JobFacts | null;
+    language: LanguageCode;
+    context?: { home?: string; destination?: string; route?: string };
+  };
   Shield: undefined;
   ScamGuide: { type: ScamTypeId };
   ShieldHowTo: undefined;

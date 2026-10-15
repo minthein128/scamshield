@@ -38,5 +38,20 @@
   },
   "shareMessage": "Pemeriksaan SafeRoute: {{title}}\n{{summary}}\nSkor risiko {{score}}/100.",
   "warnMessage": "Peringatan SafeRoute ({{verdict}}): {{title}}. {{summary}} Mohon jangan kirim uang atau berkas apa pun. Hubungi saya dulu.",
-  "thanks": "Terima kasih, ini membantu melindungi orang lain"
+  "thanks": "Terima kasih, ini membantu melindungi orang lain",
+  "leaveQuickly": "Keluar cepat",
+  "conflictsTitle": "Ketidaksesuaian yang ditemukan",
+  "conflictsSubtitle": "Perbedaan antara janji iklan dan instruksi perekrut",
+  "adSaid": "Iklan menyebutkan:",
+  "recruiterSaid": "Perekrut meminta:",
+  "stillUnclearTitle": "Masih belum jelas",
+  "stillUnclearAdvice": "Detail penting ini tidak disebutkan dalam iklan atau obrolan. Tanyakan kepada perekrut secara tertulis sebelum membayar atau berangkat:",
+  "attention": {
+    "pause": "Berhenti sejenak",
+    "verify": "Verifikasi",
+    "lower": "Lanjutkan dengan hati-hati",
+    "pauseSub": "Permintaan berisiko tinggi terdeteksi",
+    "verifySub": "Ketentuan yang bertentangan terdeteksi",
+    "lowerSub": "Tidak ada konflik besar yang terdeteksi"
+  }
 }

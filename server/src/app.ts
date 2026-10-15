@@ -8,7 +8,11 @@ import { bearerToken, type TokenVerifier } from './auth.js';
 import type { Config } from './config.js';
 import type { Feedback } from './feedback/service.js';
 import { parseFeedback } from './feedback/validate.js';
+import type { Grounder } from './ground.js';
 import { type Intel, isCountry } from './intel/service.js';
+import { assessJobOffer } from './job/assess.js';
+import { createJobExtractor } from './job/extract.js';
+import { parseJobAssessRequest, parseJobExtractRequest } from './job/validate.js';
 import { log } from './log.js';
 import type { Pipeline } from './pipeline.js';
 import { createRateLimiter } from './ratelimit.js';
@@ -16,10 +20,6 @@ import type { Speaker } from './speak.js';
 import { Timings, timingStore } from './timing.js';
 import { ApiError, type CheckResponse } from './types.js';
 import { parseRequest, parseSpeakRequest } from './validate.js';
-import type { Grounder } from './ground.js';
-import { assessJobOffer } from './job/assess.js';
-import { createJobExtractor } from './job/extract.js';
-import { parseJobAssessRequest, parseJobExtractRequest } from './job/validate.js';
 
 export const clientIp = (forwarded?: string, real?: string) => forwarded?.split(',')[0]?.trim() || real || 'local';
 

@@ -1,4 +1,4 @@
-import type { CheckResponse, Family, Lang, Severity, Verdict } from '../types.js';
+import type { CheckResponse, Family, Lang, Severity } from '../types.js';
 
 export interface FactField<T> {
   value: T;

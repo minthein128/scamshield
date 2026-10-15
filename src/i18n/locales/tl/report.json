@@ -40,5 +40,20 @@
   },
   "shareMessage": "Pagsusuri ng SafeRoute: {{title}}\n{{summary}}\nRisk score na {{score}}/100.",
   "warnMessage": "Babala mula sa SafeRoute ({{verdict}}): {{title}}. {{summary}} Huwag munang magbayad ng pera o magpadala ng mga dokumento. Tawagan muna ako.",
-  "thanks": "Salamat, nakakatulong ito na maprotektahan ang iba"
+  "thanks": "Salamat, nakakatulong ito na maprotektahan ang iba",
+  "leaveQuickly": "Mabilisang umalis",
+  "conflictsTitle": "Ang mga hindi tugma",
+  "conflictsSubtitle": "Pagkakaiba sa pagitan ng ipinangako sa ad at ng hiningi ng recruiter",
+  "adSaid": "Sabi sa patalastas:",
+  "recruiterSaid": "Hiningi ng recruiter:",
+  "stillUnclearTitle": "Hindi pa rin malinaw",
+  "stillUnclearAdvice": "Ang mga mahalagang detalyeng ito ay hindi nabanggit. Itanong ito sa recruiter nang nakasulat bago magbayad o bumiyahe:",
+  "attention": {
+    "pause": "Huminto muna",
+    "verify": "I-verify",
+    "lower": "Magpatuloy nang may pag-iingat",
+    "pauseSub": "May natukoy na mga kahilingang may mataas na peligro",
+    "verifySub": "May natukoy na magkasalungat na mga tuntunin",
+    "lowerSub": "Walang malalaking salungat na natukoy"
+  }
 }

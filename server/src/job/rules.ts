@@ -1,5 +1,5 @@
 import type { Flag } from '../types.js';
-import type { AttentionTier, FactField, JobConflict, JobFacts } from './types.js';
+import type { AttentionTier, JobConflict, JobFacts } from './types.js';
 
 const BORDER_TOWNS = [
   'mae sot',
@@ -98,8 +98,7 @@ export function detectConflicts(ad: JobFacts | null, chat: JobFacts | null): Job
     const adContract = ad.contract.value;
     const chatContract = chat.contract.value;
     const adOfficial = adContract === 'official';
-    const chatLaterOrNone =
-      chatContract === 'later' || chatContract === 'none' || chat.paymentRequest?.value === 'before_contract';
+    const chatLaterOrNone = chatContract === 'later' || chatContract === 'none' || chat.paymentRequest?.value === 'before_contract';
 
     if (adOfficial && chatLaterOrNone) {
       conflicts.push({
@@ -109,7 +108,8 @@ export function detectConflicts(ad: JobFacts | null, chat: JobFacts | null): Job
         adQuote: ad.contract.quote,
         chatValue: chat.contract.value,
         chatQuote: chat.contract.quote,
-        description: 'The ad promised an official employment contract, but the recruiter says it will be signed later or demands prior payment.',
+        description:
+          'The ad promised an official employment contract, but the recruiter says it will be signed later or demands prior payment.',
         family: 'payment_route',
         severity: 'high',
       });
@@ -153,7 +153,8 @@ export function detectConflicts(ad: JobFacts | null, chat: JobFacts | null): Job
         adQuote: ad.meetingPoint.quote,
         chatValue: chat.meetingPoint.value,
         chatQuote: chat.meetingPoint.quote,
-        description: 'The ad stated a formal office or workplace address, but the chat arranges an informal driver pickup or border crossing.',
+        description:
+          'The ad stated a formal office or workplace address, but the chat arranges an informal driver pickup or border crossing.',
         family: 'trafficking',
         severity: 'medium',
       });
@@ -286,25 +287,23 @@ export function extractSingleSourceFlags(facts: JobFacts, sourceName: 'ad' | 'ch
 export function getStillUnclear(ad: JobFacts | null, chat: JobFacts | null): string[] {
   const missing: string[] = [];
 
-  const workplaceGiven = (ad?.workplace && ad.workplace.value) || (chat?.workplace && chat.workplace.value);
+  const workplaceGiven = ad?.workplace?.value || chat?.workplace?.value;
   if (!workplaceGiven) {
     missing.push('No verifiable workplace address or physical facility location was provided.');
   }
 
-  const contractGiven =
-    (ad?.contract && ad.contract.value === 'official') || (chat?.contract && chat.contract.value === 'official');
+  const contractGiven = (ad?.contract && ad.contract.value === 'official') || (chat?.contract && chat.contract.value === 'official');
   if (!contractGiven) {
     missing.push('No written employment contract or official terms of service were provided.');
   }
 
   const visaGiven =
-    (ad?.visaOrPermit && ad.visaOrPermit.value === 'work_visa') ||
-    (chat?.visaOrPermit && chat.visaOrPermit.value === 'work_visa');
+    (ad?.visaOrPermit && ad.visaOrPermit.value === 'work_visa') || (chat?.visaOrPermit && chat.visaOrPermit.value === 'work_visa');
   if (!visaGiven) {
     missing.push('No legal work visa or registered work permit pathway was confirmed.');
   }
 
-  const employerGiven = (ad?.employer && ad.employer.value) || (chat?.employer && chat.employer.value);
+  const employerGiven = ad?.employer?.value || chat?.employer?.value;
   if (!employerGiven) {
     missing.push('Company registration number or verified corporate identity was not identified.');
   }
@@ -315,9 +314,7 @@ export function getStillUnclear(ad: JobFacts | null, chat: JobFacts | null): str
 export function applyBorderProtection(flags: Flag[], scoreValue: number): { flags: Flag[]; score: number } {
   // A route through a border town must never raise the result to danger unless another non-geographic family is present.
   const nonGeoFlags = flags.filter(
-    (f) =>
-      f.family !== 'trafficking' ||
-      (!isBorderLocation(f.evidence) && !isBorderLocation(f.label) && !f.label.includes('border')),
+    (f) => f.family !== 'trafficking' || (!isBorderLocation(f.evidence) && !isBorderLocation(f.label) && !f.label.includes('border')),
   );
 
   const hasNonGeoRisks = nonGeoFlags.some(
@@ -344,7 +341,6 @@ export function mapToAttentionTier(verdict: 'safe' | 'careful' | 'danger'): { ti
         tier: 'verify',
         headline: 'Some details do not add up, check them before you go',
       };
-    case 'safe':
     default:
       return {
         tier: 'lower',
