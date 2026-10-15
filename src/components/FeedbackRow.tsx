@@ -67,8 +67,8 @@ export const FeedbackRow: React.FC<{ result: CheckResponse }> = ({ result }) => 
 };
 
 const styles = StyleSheet.create({
-  row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, minHeight: 48, paddingVertical: 4 },
-  label: { color: colors.textSecondary, fontSize: 14, lineHeight: 20, fontFamily: fonts.medium },
+  row: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: 10, minHeight: 48, paddingVertical: 4 },
+  label: { color: colors.textSecondary, fontSize: 14, lineHeight: 20, fontFamily: fonts.medium, flexShrink: 1, textAlign: 'center' },
   thumbs: { flexDirection: 'row', gap: 6 },
   thumb: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: colors.borderLight, backgroundColor: colors.white },
   error: { color: colors.dangerDark, fontSize: 13, lineHeight: 18, fontFamily: fonts.regular, textAlign: 'center' },

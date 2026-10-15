@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, TextInputProps, TouchableOpacity, StyleSheet, ViewStyle, StyleProp } from 'react-native';
+import { View, TextInputProps, TouchableOpacity, StyleSheet, ViewStyle, StyleProp, PixelRatio } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import theme from '../theme/theme';
 import { Text, TextInput } from './Text';
 import { Icon, type IconName } from './Icon';
+import { scriptStyle } from '../theme/script';
 
 const { colors, fonts } = theme;
 
@@ -27,29 +28,45 @@ export const ScreenHeader: React.FC<{ title: string; onBack?: () => void }> = ({
 
 interface ButtonProps {
   label: string;
+  /** Smaller second line under the label. */
+  subLabel?: string;
   onPress: () => void;
   variant?: 'primary' | 'secondary' | 'danger' | 'dark';
   disabled?: boolean;
   style?: StyleProp<ViewStyle>;
   testID?: string;
   icon?: IconName;
+  /** Label lines before it is ellipsized. */
+  maxLines?: number;
 }
 
-export const Button: React.FC<ButtonProps> = ({ label, onPress, variant = 'primary', disabled, style, testID, icon }) => {
+const LABEL_LINE = 20;
+
+export const Button: React.FC<ButtonProps> = ({ label, subLabel, onPress, variant = 'primary', disabled, style, testID, icon, maxLines = 2 }) => {
   const v = BUTTON_VARIANTS[variant];
+  const firstLine = Math.round((scriptStyle(label, 'bold', LABEL_LINE).lineHeight ?? LABEL_LINE) * PixelRatio.getFontScale());
   return (
     <TouchableOpacity
       testID={testID}
       accessibilityRole="button"
-      accessibilityLabel={label}
+      accessibilityLabel={subLabel ? `${label}. ${subLabel}` : label}
       accessibilityState={{ disabled: Boolean(disabled) }}
       activeOpacity={0.7}
       disabled={disabled}
       onPress={onPress}
       style={[styles.button, v.container, disabled && { opacity: 0.45 }, style]}
     >
-      {icon ? <Icon name={icon} size={22} color={v.color} /> : null}
-      <Text style={[styles.buttonText, { color: v.color }]}>{label}</Text>
+      <View style={styles.buttonRow}>
+        {icon ? (
+          <View style={[styles.buttonIcon, { height: firstLine }]}>
+            <Icon name={icon} size={22} color={v.color} />
+          </View>
+        ) : null}
+        <View style={styles.buttonBody}>
+          <Text numberOfLines={maxLines} ellipsizeMode="tail" style={[styles.buttonText, { color: v.color }]}>{label}</Text>
+          {subLabel ? <Text numberOfLines={1} ellipsizeMode="tail" style={[styles.buttonSub, { color: v.color }]}>{subLabel}</Text> : null}
+        </View>
+      </View>
     </TouchableOpacity>
   );
 };
@@ -94,7 +111,7 @@ export const Pill: React.FC<{ label: string; background: string; color: string }
 
 export const LinkButton: React.FC<{ label: string; onPress: () => void; testID?: string; color?: string }> = ({ label, onPress, testID, color = colors.accent }) => (
   <TouchableOpacity testID={testID} accessibilityRole="button" accessibilityLabel={label} activeOpacity={0.7} onPress={onPress} style={styles.linkButton}>
-    <Text style={[styles.linkText, { color }]}>{label}</Text>
+    <Text numberOfLines={2} style={[styles.linkText, { color }]}>{label}</Text>
   </TouchableOpacity>
 );
 
@@ -157,13 +174,17 @@ const styles = StyleSheet.create({
   back: { width: 48, height: 48, borderRadius: 24, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.border, alignItems: 'center', justifyContent: 'center' },
   header: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 48 },
   headerTitle: { fontSize: 22, lineHeight: 28, fontFamily: fonts.bold, color: colors.textPrimary, includeFontPadding: false },
-  button: { minHeight: 56, borderRadius: 16, flexDirection: 'row', gap: 8, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 16, paddingVertical: 8 },
-  buttonText: { fontSize: 16, lineHeight: 20, textAlign: 'center', fontFamily: fonts.bold, includeFontPadding: false },
+  button: { minHeight: 48, maxWidth: '100%', borderRadius: 16, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 16, paddingVertical: 14 },
+  buttonRow: { flexDirection: 'row', gap: 8, alignItems: 'flex-start', maxWidth: '100%' },
+  buttonIcon: { justifyContent: 'center', flexShrink: 0 },
+  buttonBody: { flexShrink: 1, minWidth: 0, alignItems: 'center', gap: 2 },
+  buttonText: { fontSize: 16, lineHeight: 20, textAlign: 'center', fontFamily: fonts.bold, flexShrink: 1, includeFontPadding: false },
+  buttonSub: { fontSize: 13, lineHeight: 18, textAlign: 'center', fontFamily: fonts.medium, opacity: 0.8, flexShrink: 1, includeFontPadding: false },
   chip: { minHeight: 48, paddingHorizontal: 16, flexDirection: 'row', gap: 6, borderRadius: 999, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
   chipOn: { backgroundColor: colors.textPrimary, borderColor: colors.textPrimary },
   chipOff: { backgroundColor: colors.white, borderColor: colors.borderLight },
   chipText: { fontSize: 14, lineHeight: 20, fontFamily: fonts.semiBold, includeFontPadding: false },
   card: { backgroundColor: colors.white, borderWidth: 1, borderColor: colors.border, borderRadius: 16, padding: 16 },
-  pill: { alignSelf: 'flex-start', paddingVertical: 4, paddingHorizontal: 12, borderRadius: 999, fontSize: 13, lineHeight: 18, fontFamily: fonts.bold, overflow: 'hidden', includeFontPadding: false },
+  pill: { alignSelf: 'flex-start', maxWidth: '100%', paddingVertical: 4, paddingHorizontal: 12, borderRadius: 999, fontSize: 13, lineHeight: 18, fontFamily: fonts.bold, overflow: 'hidden', includeFontPadding: false },
   sectionTitle: { fontSize: 18, lineHeight: 24, fontFamily: fonts.bold, color: colors.textPrimary, includeFontPadding: false },
 });
