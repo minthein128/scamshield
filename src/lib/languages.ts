@@ -12,6 +12,7 @@ export const LANGUAGES: LanguageOption[] = [
   { code: 'id', label: 'Bahasa Indonesia', speechLocale: 'id-ID' },
   { code: 'tl', label: 'Tagalog', speechLocale: 'fil-PH' },
   { code: 'my', label: 'Myanmar', speechLocale: 'my-MM' },
+  { code: 'th', label: 'Thai', speechLocale: 'th-TH' },
 ];
 
 export function languageOption(code: LanguageCode): LanguageOption {

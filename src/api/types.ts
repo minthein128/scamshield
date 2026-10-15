@@ -1,5 +1,5 @@
 export type CheckKind = 'job' | 'message' | 'link' | 'shop' | 'agency' | 'screen';
-export type LanguageCode = 'en' | 'id' | 'tl' | 'my';
+export type LanguageCode = 'en' | 'id' | 'tl' | 'my' | 'th';
 export type Verdict = 'safe' | 'careful' | 'danger';
 export type ScamType =
   | 'job_trafficking'

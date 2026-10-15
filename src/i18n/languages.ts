@@ -14,7 +14,7 @@ export const UI_LANGUAGES: UiLanguageOption[] = [
   { code: 'id', label: 'Bahasa Indonesia', checkLanguage: 'id' },
   { code: 'tl', label: 'Tagalog', checkLanguage: 'tl' },
   { code: 'my', label: 'Myanmar', checkLanguage: 'my' },
-  { code: 'th', label: 'Thai', checkLanguage: 'en' },
+  { code: 'th', label: 'Thai', checkLanguage: 'th' },
 ];
 
 export const DEFAULT_UI_LANGUAGE: UiLanguage = 'en';
@@ -24,7 +24,6 @@ export function isUiLanguage(value: unknown): value is UiLanguage {
   return typeof value === 'string' && (UI_LANGUAGE_CODES as string[]).includes(value);
 }
 
-/** The backend only checks in en, id, tl and my, so Thai gets English verdicts. */
 export function checkLanguageFor(ui: UiLanguage): LanguageCode {
   return UI_LANGUAGES.find(l => l.code === ui)?.checkLanguage ?? 'en';
 }

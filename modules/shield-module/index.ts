@@ -30,7 +30,7 @@ export interface ShieldCheckResult {
 export interface ShieldStartOptions {
   /** Defaults to EXPO_PUBLIC_API_URL. */
   apiUrl?: string;
-  language?: 'en' | 'id' | 'tl' | 'my';
+  language?: 'en' | 'id' | 'tl' | 'my' | 'th';
   /** Firebase ID token sent as a Bearer header. Optional; without it the server limits by IP. */
   authToken?: string;
 }
@@ -44,7 +44,7 @@ export interface MessageGuardApp {
 
 export interface MessageGuardConfig {
   apiUrl?: string;
-  language?: 'en' | 'id' | 'tl' | 'my';
+  language?: 'en' | 'id' | 'tl' | 'my' | 'th';
   shareSignals?: boolean;
 }
 

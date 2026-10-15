@@ -89,8 +89,8 @@ describe('language switch', () => {
     expect(await restoreUiLanguage()).toBe('en');
   });
 
-  it('keeps Thai UI with English check results', () => {
-    expect(checkLanguageFor('th')).toBe('en');
+  it('checks in Thai for the Thai UI', () => {
+    expect(checkLanguageFor('th')).toBe('th');
     expect(checkLanguageFor('my')).toBe('my');
   });
 });
