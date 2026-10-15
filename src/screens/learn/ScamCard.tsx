@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleProp, StyleSheet, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Text } from '../../components/Text';
 import { Icon } from '../../components/Icon';
@@ -9,7 +9,7 @@ import type { ScamType } from './content';
 
 const { colors, fonts } = theme;
 
-export const ScamCard: React.FC<{ scam: ScamType; onPress: () => void }> = ({ scam, onPress }) => {
+export const ScamCard: React.FC<{ scam: ScamType; onPress: () => void; style?: StyleProp<ViewStyle> }> = ({ scam, onPress, style }) => {
   const { t } = useTranslation('learn');
   const { accent, soft } = ACCENTS[scam.id];
   return (
@@ -20,7 +20,7 @@ export const ScamCard: React.FC<{ scam: ScamType; onPress: () => void }> = ({ sc
       accessibilityHint={t('scamCardHint')}
       activeOpacity={0.7}
       onPress={onPress}
-      style={styles.card}
+      style={[styles.card, style]}
     >
       <View style={[styles.bar, { backgroundColor: accent }]} />
       <View style={[styles.icon, { backgroundColor: soft }]}>

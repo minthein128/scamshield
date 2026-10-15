@@ -12,6 +12,7 @@ export const Grid: React.FC<GridProps> = ({ columns, gap = 12, children }) => {
   const items = React.Children.toArray(children).map(child =>
     React.isValidElement<{ style?: StyleProp<ViewStyle> }>(child) ? React.cloneElement(child, { style: [child.props.style, styles.fill] }) : child,
   );
+  if (items.length === 0) return null;
   if (columns <= 1) return <View style={{ gap }}>{items}</View>;
   const rows: React.ReactNode[][] = [];
   for (let i = 0; i < items.length; i += columns) rows.push(items.slice(i, i + columns));

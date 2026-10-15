@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { Linking, StyleSheet, View } from 'react-native';
+import { Linking, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Screen } from '../components/Screen';
+import { Grid } from '../components/Grid';
+import { useLayout } from '../hooks/useLayout';
 import { Text } from '../components/Text';
 import { Button, Card, EmptyState, LinkButton, Notice, Pill, ScreenHeader, SectionTitle } from '../components/ui';
 import { countryLabel } from '../lib/countries';
@@ -14,10 +16,10 @@ import theme from '../theme/theme';
 
 const { colors, fonts } = theme;
 
-const HotlineCard: React.FC<{ h: Hotline }> = ({ h }) => {
+const HotlineCard: React.FC<{ h: Hotline; style?: StyleProp<ViewStyle> }> = ({ h, style }) => {
   const { t } = useTranslation('help');
   return (
-    <Card testID={`hotline-${h.id}`} style={{ gap: 8 }}>
+    <Card testID={`hotline-${h.id}`} style={[{ gap: 8 }, style]}>
       <View style={styles.rowBetween}>
         <Text style={styles.name}>{h.name}</Text>
       </View>
@@ -38,6 +40,7 @@ const HotlineCard: React.FC<{ h: Hotline }> = ({ h }) => {
 export const GetHelpScreen: React.FC<RootScreenProps<'GetHelp'>> = ({ navigation }) => {
   const { t } = useTranslation('help');
   const { profile } = useAppState();
+  const layout = useLayout();
   useRuntimeConfig();
   const [showAll, setShowAll] = useState(false);
   const mine = helpSections(profile.destinationCountry, profile.homeCountry);
@@ -45,7 +48,7 @@ export const GetHelpScreen: React.FC<RootScreenProps<'GetHelp'>> = ({ navigation
   const sections = showAll || mine.length === 0 ? allSections() : mine;
 
   return (
-    <Screen>
+    <Screen wide>
       <ScreenHeader title={t('title')} onBack={() => navigation.goBack()} />
       <Text style={styles.body}>{t('intro')}</Text>
 
@@ -79,9 +82,11 @@ export const GetHelpScreen: React.FC<RootScreenProps<'GetHelp'>> = ({ navigation
                 message={t('unverified', { country: countryLabel(section.country) })}
               />
             ) : null}
-            {section.entries.map(h => (
-              <HotlineCard key={h.id} h={h} />
-            ))}
+            <Grid columns={Math.min(layout.columns, 2)} gap={16}>
+              {section.entries.map(h => (
+                <HotlineCard key={h.id} h={h} />
+              ))}
+            </Grid>
           </View>
         ))
       )}

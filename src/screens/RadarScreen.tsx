@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { errorCopy, getApiClient } from '../api';
 import type { Insights } from '../api/types';
 import { Screen } from '../components/Screen';
+import { Grid } from '../components/Grid';
+import { useLayout } from '../hooks/useLayout';
 import { Text } from '../components/Text';
 import { Card, Chip, EmptyState, Notice, ScreenHeader, SectionTitle } from '../components/ui';
 import { COUNTRIES, countryLabel } from '../lib/countries';
@@ -17,6 +19,7 @@ const { colors, fonts } = theme;
 export const RadarScreen: React.FC<RootScreenProps<'Radar'>> = ({ navigation }) => {
   const { t } = useTranslation(['radar', 'common']);
   const { profile } = useAppState();
+  const layout = useLayout();
   const [scope, setScope] = useState<RadarScope>(defaultScope(profile.destinationCountry, profile.homeCountry));
   const [data, setData] = useState<Insights | null>(null);
   const [error, setError] = useState<{ title: string; message: string } | null>(null);
@@ -43,7 +46,7 @@ export const RadarScreen: React.FC<RootScreenProps<'Radar'>> = ({ navigation }) 
   const domains = data?.domains ?? [];
 
   return (
-    <Screen>
+    <Screen wide>
       <ScreenHeader title={t('title')} onBack={() => navigation.goBack()} />
       <Text style={styles.body}>{t('intro', { count: data?.k ?? 3 })}</Text>
 
@@ -62,6 +65,7 @@ export const RadarScreen: React.FC<RootScreenProps<'Radar'>> = ({ navigation }) 
         <EmptyState icon="radar" testID="radar-empty" title={t('empty.title')} body={t('empty.body')} />
       ) : null}
 
+      <Grid columns={Math.min(layout.columns, 2)} gap={16}>
       {risks.map(r => (
         <Card key={r.scamType} testID={`radar-risk-${r.scamType}`} style={{ gap: 6 }}>
           <View style={styles.row}>
@@ -72,6 +76,7 @@ export const RadarScreen: React.FC<RootScreenProps<'Radar'>> = ({ navigation }) 
           {r.example ? <Text style={styles.quote}>{`“${r.example}”`}</Text> : null}
         </Card>
       ))}
+      </Grid>
 
       {domains.length > 0 ? (
         <View style={{ gap: 8 }}>
