@@ -2,6 +2,8 @@ import { Hono } from 'hono';
 import { bodyLimit } from 'hono/body-limit';
 import { cors } from 'hono/cors';
 import { streamSSE } from 'hono/streaming';
+import { createConfigRoutes, type PublishedCache } from './admin/published.js';
+import { type AdminDeps, createAdminRoutes } from './admin/routes.js';
 import { bearerToken, type TokenVerifier } from './auth.js';
 import type { Config } from './config.js';
 import type { Feedback } from './feedback/service.js';
@@ -38,6 +40,8 @@ export function createApp(
   verifier?: TokenVerifier,
   feedback?: Feedback,
   limits: Limits = createLimits(cfg),
+  admin?: AdminDeps,
+  published?: PublishedCache,
 ) {
   const app = new Hono();
   const limiter = limits.ip;
@@ -45,7 +49,17 @@ export function createApp(
   const feedbackIp = createRateLimiter(cfg.rateLimitPerMin);
   const feedbackHourly = createRateLimiter(0, 3_600_000);
 
-  app.use('*', cors({ origin: cfg.allowedOrigins.includes('*') ? '*' : cfg.allowedOrigins }));
+  const anyOrigin = cfg.allowedOrigins.includes('*');
+  const adminAllowed = new Set([...cfg.adminOrigins, ...cfg.allowedOrigins]);
+  app.use(
+    '*',
+    cors({
+      origin: (origin, c) => {
+        if (c.req.path.startsWith('/v1/admin')) return anyOrigin || adminAllowed.has(origin) ? origin : null;
+        return anyOrigin ? '*' : cfg.allowedOrigins.includes(origin) ? origin : null;
+      },
+    }),
+  );
 
   app.get('/healthz', (c) => c.json({ ok: true, model: cfg.model, mock: cfg.mock }));
 
@@ -218,6 +232,17 @@ export function createApp(
       return c.json(out);
     },
   );
+
+  if (published) {
+    app.use('/v1/config/*', async (c, next) => {
+      if (!limiter.allow(clientIp(c.req.header('x-forwarded-for'), c.req.header('x-real-ip')))) {
+        return c.json(errorBody('rate_limited', 'Too many requests, retry in a minute'), 429, { 'retry-after': '60' });
+      }
+      await next();
+    });
+    app.route('/v1/config', createConfigRoutes(published));
+  }
+  if (admin) app.route('/v1/admin', createAdminRoutes(admin));
 
   app.notFound((c) => c.json(errorBody('bad_request', `No route for ${c.req.method} ${c.req.path}`), 404 as never));
 

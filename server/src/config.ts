@@ -10,6 +10,7 @@ export interface Config {
   geminiApiKey?: string;
   webRiskApiKey?: string;
   allowedOrigins: string[];
+  adminOrigins: string[];
   rateLimitPerMin: number;
   firebaseProjectId: string;
   anonPerHour: number;
@@ -34,6 +35,8 @@ export interface Config {
   liveVoice: string;
   liveMaxMs: number;
   liveMaxConcurrent: number;
+  adminAiModel: string;
+  adminAiPerHour: number;
   intelPepper?: string;
   intelProject?: string;
   thinkingLevel?: 'MINIMAL' | 'LOW' | 'MEDIUM' | 'HIGH';
@@ -64,6 +67,10 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
       .split(',')
       .map((s) => s.trim())
       .filter(Boolean),
+    adminOrigins: (env.ADMIN_ORIGINS ?? 'https://saferoute-admin.web.app,http://localhost:5173,http://localhost:5174')
+      .split(',')
+      .map((x) => x.trim())
+      .filter(Boolean),
     rateLimitPerMin: Number(env.RATE_LIMIT_PER_MIN ?? 30),
     firebaseProjectId: env.FIREBASE_PROJECT_ID || 'saferoute-aibc',
     anonPerHour: Number(env.ANON_LIMIT_PER_HOUR ?? 20),
@@ -88,6 +95,8 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     liveVoice: env.LIVE_VOICE || 'Sulafat',
     liveMaxMs: Number(env.LIVE_MAX_MS ?? 120_000),
     liveMaxConcurrent: Number(env.LIVE_MAX_CONCURRENT ?? 20),
+    adminAiModel: env.ADMIN_AI_MODEL || 'gemini-3.8-flash',
+    adminAiPerHour: Number(env.ADMIN_AI_LIMIT_PER_HOUR ?? 30),
     intelPepper: env.INTEL_PEPPER || undefined,
     intelProject: env.INTEL_PROJECT || project || 'saferoute-aibc',
     thinkingLevel: thinking(env.THINKING_LEVEL),

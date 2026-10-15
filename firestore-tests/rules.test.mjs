@@ -61,4 +61,20 @@ describe('firestore rules', () => {
     await assertFails(setDoc(doc(account('alice'), 'public/anything'), { a: 1 }));
     await assertFails(getDoc(doc(account('alice'), 'users/alice/other/doc')));
   });
+  it('denies every client access to admin config, drafts, audit and admins', async () => {
+    await env.withSecurityRulesDisabled(async ctx => {
+      const db = ctx.firestore();
+      await setDoc(doc(db, 'config/hotlines'), { version: 1, items: [] });
+      await setDoc(doc(db, 'config_drafts/d1'), { status: 'pending' });
+      await setDoc(doc(db, 'config_audit/a1'), { action: 'seed' });
+      await setDoc(doc(db, 'admins/alice'), { email: 'a@example.org', role: 'admin' });
+    });
+    for (const db of [account('alice'), anonymous('anon'), guest()]) {
+      for (const path of ['config/hotlines', 'config/notices', 'config_drafts/d1', 'config_audit/a1', 'admins/alice']) {
+        await assertFails(getDoc(doc(db, path)));
+        await assertFails(setDoc(doc(db, path), { version: 99, role: 'admin' }));
+        await assertFails(deleteDoc(doc(db, path)));
+      }
+    }
+  });
 });

@@ -25,5 +25,8 @@
     "a11y": "Get help: hotlines and reporting",
     "bodyCountries": "Hotlines for your countries.",
     "bodyRegion": "Hotlines and reporting lines in Southeast Asia."
+  },
+  "notice": {
+    "dismiss": "Dismiss"
   }
 }

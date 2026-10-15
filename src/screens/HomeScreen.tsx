@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { NoticeCard } from '../components/NoticeCard';
 import { BrandLockup } from '../components/BrandMark';
 import { Icon, type IconName } from '../components/Icon';
 import { Text } from '../components/Text';
@@ -31,6 +32,8 @@ export const HomeScreen: React.FC<TabScreenProps<'Home'>> = ({ navigation }) => 
           <Icon name="settings" size={24} />
         </TouchableOpacity>
       </View>
+
+      <NoticeCard />
 
       <ShieldCard onDetails={() => navigation.navigate('Shield')} />
 

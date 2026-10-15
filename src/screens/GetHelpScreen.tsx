@@ -6,6 +6,7 @@ import { Text } from '../components/Text';
 import { Button, Card, EmptyState, LinkButton, Notice, Pill, ScreenHeader, SectionTitle } from '../components/ui';
 import { countryLabel } from '../lib/countries';
 import { categoryLabel, allSections, helpSections, type Hotline } from '../lib/hotlines';
+import { useRuntimeConfig } from '../lib/runtimeConfig';
 import { callNumber } from '../lib/warn';
 import type { RootScreenProps } from '../navigation/types';
 import { useAppState } from '../state/AppState';
@@ -37,6 +38,7 @@ const HotlineCard: React.FC<{ h: Hotline }> = ({ h }) => {
 export const GetHelpScreen: React.FC<RootScreenProps<'GetHelp'>> = ({ navigation }) => {
   const { t } = useTranslation('help');
   const { profile } = useAppState();
+  useRuntimeConfig();
   const [showAll, setShowAll] = useState(false);
   const mine = helpSections(profile.destinationCountry, profile.homeCountry);
   const chosen = Boolean(profile.destinationCountry || profile.homeCountry);

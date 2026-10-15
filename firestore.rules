@@ -45,5 +45,18 @@ service cloud.firestore {
           && text(request.resource.data.updatedAt, 40);
       }
     }
+
+    match /config/{doc} {
+      allow read, write: if false;
+    }
+    match /config_drafts/{id} {
+      allow read, write: if false;
+    }
+    match /config_audit/{id} {
+      allow read, write: if false;
+    }
+    match /admins/{uid} {
+      allow read, write: if false;
+    }
   }
 }

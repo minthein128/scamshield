@@ -1,4 +1,4 @@
-import { COUNTRIES, HOTLINES, type HotlineCategory } from './data/hotlines.generated.js';
+import { COUNTRIES, HOTLINES, type Hotline, type HotlineCategory } from './data/hotlines.generated.js';
 import type { Action, Lang, LinkCheck, ScamType, Verdict } from './types.js';
 
 const TITLES: Record<Verdict, Record<Lang, string>> = {
@@ -63,9 +63,16 @@ export function countryOf(destination: string | undefined): string | undefined {
   return d ? COUNTRIES.find((c) => c.aliases.some((a) => d.includes(a)))?.code : undefined;
 }
 
+let hotlineSource: () => Hotline[] = () => HOTLINES;
+
+/** Points hotline lookups at the published list. The bundled list stays the default. */
+export function setHotlineSource(source: () => Hotline[]): void {
+  hotlineSource = source;
+}
+
 export function hotlineFor(destination: string | undefined, env: NodeJS.ProcessEnv = process.env): string | undefined {
   const country = countryOf(destination);
-  const pick = (category: HotlineCategory) => HOTLINES.find((h) => h.country === country && h.category === category && h.dial);
+  const pick = (category: HotlineCategory) => hotlineSource().find((h) => h.country === country && h.category === category && h.dial);
   const hit = country ? (pick('trafficking') ?? pick('police')) : undefined;
   return hit?.dial ?? (env.DEFAULT_HOTLINE || undefined);
 }
