@@ -8,6 +8,7 @@ import enFeedback from './locales/en/feedback.json';
 import enHelp from './locales/en/help.json';
 import enHome from './locales/en/home.json';
 import enLearn from './locales/en/learn.json';
+import enLive from './locales/en/live.json';
 import enOnboarding from './locales/en/onboarding.json';
 import enRadar from './locales/en/radar.json';
 import enReport from './locales/en/report.json';
@@ -29,6 +30,7 @@ export const en = {
   help: enHelp,
   home: enHome,
   learn: enLearn,
+  live: enLive,
   onboarding: enOnboarding,
   radar: enRadar,
   report: enReport,

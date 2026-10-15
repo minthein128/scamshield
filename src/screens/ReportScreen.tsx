@@ -21,6 +21,7 @@ import { resolveCallTarget } from '../lib/hotlines';
 import { seenLine } from '../lib/radar';
 import { callNumber } from '../lib/warn';
 import { WarnFamilySheet } from '../components/WarnFamilySheet';
+import { LiveVoiceSheet } from '../components/LiveVoiceSheet';
 import { FeedbackRow } from '../components/FeedbackRow';
 import { canGiveFeedback } from '../lib/feedback';
 import { useAppState } from '../state/AppState';
@@ -48,13 +49,14 @@ const FAMILY_ICONS: Record<string, IconName> = {
 };
 
 export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, route }) => {
-  const { t } = useTranslation(['report', 'common']);
+  const { t } = useTranslation(['report', 'common', 'live']);
   const { result, language, fresh, reported } = route.params;
   const style = VERDICT_STYLES[result.verdict];
   const flags = groupFlags(result.flags).flatMap(g => g.flags);
   const sources = result.sources ?? [];
   const [speaking, setSpeaking] = useState(false);
   const [warnOpen, setWarnOpen] = useState(false);
+  const [liveOpen, setLiveOpen] = useState(false);
   const { profile } = useAppState();
 
   useEffect(() => {
@@ -125,6 +127,23 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
         onClose={() => setWarnOpen(false)}
         onAddContact={() => navigation.navigate('Tabs', { screen: 'Contacts' })}
       />
+      <LiveVoiceSheet
+        visible={liveOpen}
+        result={result}
+        language={language}
+        home={profile.homeCountry}
+        destination={profile.destinationCountry}
+        onClose={() => setLiveOpen(false)}
+        onGetHelp={() => {
+          setLiveOpen(false);
+          navigation.navigate('GetHelp');
+        }}
+        onAction={screen => {
+          setLiveOpen(false);
+          if (screen === 'HOTLINES') navigation.navigate('GetHelp');
+          else setWarnOpen(true);
+        }}
+      />
       <ScreenHeader title={t('title')} onBack={() => (navigation.canGoBack() ? navigation.goBack() : navigation.navigate('Tabs'))} />
 
       <View style={[styles.banner, { backgroundColor: style.background }]} testID={`verdict-${result.verdict}`} accessible accessibilityLabel={t('a11yVerdict', { verdict: verdictLabel(result.verdict), score: result.score })}>
@@ -150,13 +169,27 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
         </View>
       ) : null}
 
-      <Button
-        testID="report-listen"
-        icon={speaking ? 'stop' : 'speaker'}
-        label={speaking ? t('stop') : t('listen', { language: languageOption(language).label })}
-        variant="dark"
-        onPress={toggleSpeech}
-      />
+      <View style={styles.voiceRow}>
+        <Button
+          testID="report-listen"
+          icon={speaking ? 'stop' : 'speaker'}
+          label={speaking ? t('stop') : t('listen', { language: languageOption(language).label })}
+          variant="dark"
+          onPress={toggleSpeech}
+          style={styles.voiceButton}
+        />
+        <Button
+          testID="report-talk"
+          icon="mic"
+          label={t('live:button')}
+          onPress={() => {
+            stopSpeaking();
+            setSpeaking(false);
+            setLiveOpen(true);
+          }}
+          style={styles.voiceButton}
+        />
+      </View>
 
       {seenLine(result.network?.seenCount) ? (
         <Text testID="report-network" style={styles.network}>{seenLine(result.network?.seenCount)}</Text>
@@ -243,6 +276,8 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
 };
 
 const styles = StyleSheet.create({
+  voiceRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
+  voiceButton: { flexGrow: 1, flexBasis: 150 },
   banner: { flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: 24, paddingVertical: 24, paddingHorizontal: 20 },
   bannerIcon: { width: 56, height: 56, borderRadius: 28, backgroundColor: 'rgba(255,255,255,0.18)', alignItems: 'center', justifyContent: 'center' },
   bannerTitle: { fontSize: 28, lineHeight: 34, fontFamily: fonts.extraBold, letterSpacing: -0.3, color: colors.white, includeFontPadding: false },

@@ -5,7 +5,7 @@ import theme from '../theme/theme';
 export type IconName =
   | 'shield' | 'shieldCheck' | 'alert' | 'chevron' | 'settings' | 'link' | 'image' | 'chat' | 'speaker' | 'stop'
   | 'gift' | 'clock' | 'card' | 'user' | 'flag' | 'octagon' | 'radar' | 'phone' | 'people' | 'info'
-  | 'thumbUp' | 'thumbDown' | 'check';
+  | 'thumbUp' | 'thumbDown' | 'check' | 'mic' | 'micOff';
 
 const SHAPES: Record<IconName, React.ReactNode> = {
   shield: <Path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z" />,
@@ -104,6 +104,18 @@ const SHAPES: Record<IconName, React.ReactNode> = {
   thumbUp: <Path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.3a2 2 0 0 0 2-1.7l1.4-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" />,
   thumbDown: <Path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.7a2 2 0 0 0-2 1.7l-1.4 9a2 2 0 0 0 2 2.3zM17 2h2.7A2.3 2.3 0 0 1 22 4v7a2.3 2.3 0 0 1-2.3 2H17" />,
   check: <Path d="M5 12.5l4.5 4.5L19 7.5" />,
+  mic: (
+    <>
+      <Rect x={9} y={3} width={6} height={11} rx={3} />
+      <Path d="M5 11a7 7 0 0 0 14 0M12 18v3" />
+    </>
+  ),
+  micOff: (
+    <>
+      <Path d="M4 4l16 16" />
+      <Path d="M9 9v2a3 3 0 0 0 5 2.2M15 10V6a3 3 0 0 0-5.7-1.3M5 11a7 7 0 0 0 11 5.7M19 11a7 7 0 0 1-.6 2.8M12 18v3" />
+    </>
+  ),
 };
 
 interface IconProps {
