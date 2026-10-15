@@ -6,6 +6,7 @@ import {
   findCertainty,
   findMaleForms,
   findMaleFormsAny,
+  findPromises,
   guardExtraction,
   guardFlags,
   isHeavy,
@@ -140,5 +141,22 @@ describe('male speaker forms', () => {
     const res = { title: 'ระวังค่ะ', summary: 'ผมคิดว่ามีความเสี่ยงครับ', spokenWarning: 'อย่าเพิ่งโอนเงินค่ะ', flags: [] };
     expect(countMaleForms(res, 'th')).toBe(2);
     expect(countMaleForms(res, 'en')).toBe(0);
+  });
+});
+
+describe('promises SafeRoute cannot keep', () => {
+  it('finds promises in each language', () => {
+    expect(findPromises('We will send you the numbers later.')).toHaveLength(1);
+    expect(findPromises("I'll call the agency for you.")).toHaveLength(1);
+    expect(findPromises('Kami akan menghubungi polisi.')).toHaveLength(1);
+    expect(findPromises('Tatawagan ko sila.')).toHaveLength(1);
+    expect(findPromises('ကျွန်မတို့ ဖုန်းနံပါတ်တွေကို ပေးပို့ပေးပါမယ်။')).toHaveLength(1);
+    expect(findPromises('ดิฉันจะส่งเบอร์ให้ค่ะ')).toHaveLength(1);
+  });
+
+  it('passes advice that points to the screen', () => {
+    expect(findPromises('You can press Get help to call a verified hotline.')).toEqual([]);
+    expect(findPromises('Get help ခလုတ်ကို နှိပ်ပြီး ဖုန်းဆက်နိုင်ပါတယ်ရှင်။')).toEqual([]);
+    expect(findPromises('กด Get help เพื่อโทรหาสายด่วนได้ค่ะ')).toEqual([]);
   });
 });

@@ -165,6 +165,22 @@ const MALE_FORMS: Partial<Record<Lang, RegExp>> = {
 
 export const genderCounters = { gender_form_hit: 0 };
 
+// Promises of actions SafeRoute cannot take (send, call, contact, report, follow up). Detect only.
+const PROMISES: Record<Lang, RegExp> = {
+  en: /\b(?:we|i)(?:'ll| will| are going to| am going to) (?:send|call|contact|message|text|report|follow up|notify|get back|reach out)/gi,
+  id: /\b(?:kami|saya) akan (?:mengirim|kirim|menelepon|menghubungi|melaporkan|mengabari)/gi,
+  tl: /\b(?:ipapadala|tatawagan|kokontakin|ire-report|ipapaalam) (?:namin|ko)\b/gi,
+  my: /(?:ပို့ပေးပါမယ်|ပေးပို့ပေးပါမယ်|ဖုန်းဆက်ပေးပါမယ်|ဆက်သွယ်ပေးပါမယ်|သတင်းပို့ပေးပါမယ်|တိုင်ကြားပေးပါမယ်|ပို့ပေးပါ့မယ်|ဆက်သွယ်ပေးပါ့မယ်)/g,
+  th: /(?:เรา|ดิฉัน|ฉัน|ทางเรา)จะ(?:ส่ง|โทร|ติดต่อ|แจ้ง|รายงาน)/g,
+};
+
+export const promiseCounters = { promise_hit: 0 };
+
+/** Promises of actions SafeRoute cannot take, in any language. Detect only, never rewritten. */
+export function findPromises(text: string): string[] {
+  return (Object.values(PROMISES) as RegExp[]).flatMap((re) => [...text.matchAll(new RegExp(re.source, re.flags))].map((m) => m[0]));
+}
+
 /** Male speaker forms in text the female voice speaks. Detect only, never rewritten. */
 export function findMaleForms(text: string, lang: Lang): string[] {
   const re = MALE_FORMS[lang];

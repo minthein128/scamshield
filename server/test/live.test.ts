@@ -105,6 +105,15 @@ describe('buildSystemInstruction', () => {
     expect(narrow).not.toContain('ไทย');
   });
 
+  it('forbids promising actions SafeRoute cannot take, in every mode', () => {
+    for (const mode of ['self', 'family', 'companion'] as const) {
+      const p = prompt({ mode, language: 'en' });
+      expect(p).toContain('Never promise anything SafeRoute cannot do');
+      expect(p).toContain('Never say "we will send"');
+      expect(p).toContain('Warn my family');
+    }
+  });
+
   it('uses female speaker forms in every mode', () => {
     for (const mode of ['self', 'family', 'companion'] as const) {
       const p = prompt({ mode });
@@ -330,6 +339,20 @@ describe('live relay', () => {
     expect(loadConfig({}).liveLanguages).toEqual(['en', 'my', 'th', 'id', 'tl']);
     expect(loadConfig({ LIVE_LANGUAGES: ' MY, en ,xx,my' }).liveLanguages).toEqual(['my', 'en']);
     expect(loadConfig({ LIVE_LANGUAGES: 'xx' }).liveLanguages).toEqual(['en', 'id', 'tl', 'my', 'th']);
+  });
+
+  it('counts promises in the spoken text, detect only', async () => {
+    const { url, fake } = await boot();
+    const before = liveCounters.promise_hit;
+    const c = client(url);
+    await c.open;
+    c.send(start({ language: 'my' }));
+    await c.until((f) => f.type === 'ready');
+    const cb = fake.sessions[0]?.cb as LiveCallbacks;
+    cb.onmessage({ serverContent: { outputTranscription: { text: 'ဖုန်းနံပါတ်တွေကို ပေးပို့ပေးပါမယ်။' } } });
+    cb.onmessage({ serverContent: { turnComplete: true } });
+    await c.until((f) => f.type === 'transcript' && f.final === true);
+    expect(liveCounters.promise_hit - before).toBe(1);
   });
 
   it('counts male speaker forms in the spoken text, detect only', async () => {
