@@ -1,0 +1,1829 @@
+{
+  "generated": "2026-10-15T07:54:57.641Z",
+  "commit": "3d1bf79ac321d599c39aa4113b5e8c02778f4317",
+  "method": "Live pipeline, local server build of this commit, model gemini-3.5-flash-lite, kind as listed, shareSignals false, network intel disabled. Inputs are English text. Back-translations and flags are gemini-3.7-flash and gemini-3.8-flash (machine pre-screen, not native review). reviewer_* fields are for native reviewers.",
+  "samples": [
+    {
+      "language": "my",
+      "scenario": "trafficking_job",
+      "input_kind": "job",
+      "input": "URGENT HIRING!! Online customer service / crypto marketing staff for our new office in Thailand border area (Mae Sot). Salary 1500 USD + bonus. No experience, no degree needed. Free flight, free housing, free visa. A driver will pick you up at the border and take you across by car. Please bring your passport, we will keep it safe for the work permit. Only 5 places left, apply this week. Message Mr. Kevin on Telegram @kevin_hr_2024. Do not tell your family until the contract is signed.",
+      "verdict": "danger",
+      "score": 100,
+      "scamType": "job_trafficking",
+      "latency_ms": 3328,
+      "machine_assessment": {
+        "hedging": "hedged",
+        "naturalness": 4,
+        "register_note": "Title uses formal written ending 'သည်', while summary and spoken warning use spoken particle 'ပါတယ်'."
+      },
+      "fields": [
+        {
+          "field": "title",
+          "text": "သတိပေးလက္ခဏာ များစွာ တွေ့ရသည်: ခဏရပ်ပြီး စစ်ဆေးပါ",
+          "back_translation": "Many warning signs are found: pause and check",
+          "machine_flag": "check",
+          "machine_note": "Uses formal written marker 'သည်', whereas subsequent fields use colloquial/spoken 'ပါတယ်', creating a slight register inconsistency.",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "summary",
+          "text": "ဒီအလုပ်ကမ်းလှမ်းချက်မှာ လူကုန်ကူးမှုနဲ့ ဆက်နွှယ်နိုင်တဲ့ သတိပေးလက္ခဏာပြင်းထန်စွာ တွေ့နေရပါတယ်။ လစာအလွန်ကောင်းပြီး နယ်စပ်ဖြတ်ကျော်ခေါ်ဆောင်ကာ ပတ်စပို့သိမ်းမည့်အပြင် မိသားစုကိုပါ အသိမပေးခိုင်းပါ။ ငွေမလွှဲပါနဲ့၊ ပတ်စပို့ကို သူများလက်ထဲ မပေးပါနဲ့ဦး။ ယုံကြည်ရတဲ့သူနဲ့ အရင်တိုင်ပင်ပါ။",
+          "back_translation": "In this job offer, strong warning signs that could be related to human trafficking are being found. The salary is very good, and besides taking across the border and confiscating the passport, they also instruct not to inform family. Do not transfer money, do not give the passport into others' hands yet. Consult with a trusted person first.",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "spokenWarning",
+          "text": "ဒီအလုပ်ကမ်းလှမ်းချက်မှာ လူကုန်ကူးမှုနဲ့ ဆက်နွှယ်တဲ့ သတိပေးလက္ခဏာတွေ တွေ့ရပါတယ်။ ငွေမလွှဲပါနဲ့၊ ပတ်စပို့ကို မပေးပါနဲ့ဦး။",
+          "back_translation": "In this job offer, warning signs related to human trafficking are found. Do not transfer money, do not give the passport yet.",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[0].label (too_good, high)",
+          "text": "အတွေ့အကြုံမလိုဘဲ လစာအလွန်ကောင်းကာ လေယာဉ်၊ အိမ်ရာနှင့် ဗီဇာ အခမဲ့ပေးခြင်း",
+          "back_translation": "No experience needed, salary is very good, and providing flight, housing, and visa for free",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[1].label (pressure, high)",
+          "text": "နေရာအကန့်အမြတ်ရှိပြီး မိသားစုကို အသိမပေးရန် တားမြစ်ကာ Telegram သို့ ပြောင်းခိုင်းခြင်း",
+          "back_translation": "Limited spots, prohibiting informing family, and telling to switch to Telegram",
+          "machine_flag": "check",
+          "machine_note": "Typo in 'အကန့်အမြတ်' (profit); the correct word for 'limited' is 'အကန့်အသတ်'.",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[2].label (trafficking, high)",
+          "text": "ထိုင်းနယ်စပ် မဲဆောက်သို့ ကားဖြင့်ခေါ်ဆောင်ရန်နှင့် ပတ်စပို့သိမ်းဆည်းမည့် အလုပ်ကမ်းလှမ်းချက်",
+          "back_translation": "A job offer to take by car to the Thai border Mae Sot and confiscate the passport",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        }
+      ],
+      "evidence_quotes": [
+        "Salary 1500 USD + bonus. No experience, no degree needed. Free flight, free housing, free visa.",
+        "Only 5 places left, apply this week. Message Mr. Kevin on Telegram @kevin_hr_2024. Do not tell your family until the contract is signed.",
+        "new office in Thailand border area (Mae Sot)... A driver will pick you up at the border and take you across by car. Please bring your passport, we will keep it safe for the work permit."
+      ]
+    },
+    {
+      "language": "my",
+      "scenario": "pig_butchering_chat",
+      "input_kind": "message",
+      "input": "[10:02] Hi, is this still Anna's number? Sorry, wrong number maybe.\n[10:03] Oh sorry! You seem nice though. I am new in town, I work in finance.\n[Day 6] My uncle runs a crypto trading platform and I made 3,200 USD last week with just 500 to start. Download the app here: https://gold-trade-app.xyz/apk and I will guide you. You can withdraw anytime.\n[Day 9] To withdraw you need to pay 15% tax first, then the funds will be released today.",
+      "verdict": "danger",
+      "score": 100,
+      "scamType": "romance_pig_butchering",
+      "latency_ms": 2990,
+      "machine_assessment": {
+        "hedging": "hedged",
+        "naturalness": 4,
+        "register_note": "Title uses written style ('တွေ့ရသည်'), whereas the summary and warning use spoken style ('တွေ့ရပါတယ်')."
+      },
+      "fields": [
+        {
+          "field": "title",
+          "text": "သတိပေးလက္ခဏာ များစွာ တွေ့ရသည်: ခဏရပ်ပြီး စစ်ဆေးပါ",
+          "back_translation": "Many warning signs are found: Pause for a moment and check",
+          "machine_flag": "check",
+          "machine_note": "Uses formal written ending 'သည်', while body text uses spoken 'ပါတယ်'. Consider standardizing to spoken register for low-literacy users.",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "summary",
+          "text": "ဒီမက်ဆေ့ချ်မှာ အမည်မသိသူက မှားယွင်းတဲ့နံပါတ်ဖြင့် စတင်ဆက်သွယ်ပြီး ရင်းနှီးမြှုပ်နှံမှုအမြတ်အစွန်း မြင့်မားတယ်လို့ လှည့်စားကာ ငွေကြေးတောင်းခံတဲ့ သတိပေးလက္ခဏာတွေ တွေ့ရပါတယ်။ ငွေမလွှဲပါနဲ့၊ သံသယဖြစ်ဖွယ်လင့်ခ်တွေကို မနှိပ်ပါနဲ့။",
+          "back_translation": "In this message, warning signs of an unknown person initiating contact with a wrong number, deceiving that investment profits are high, and demanding money are found. Do not transfer money, do not click suspicious links.",
+          "machine_flag": "check",
+          "machine_note": "Using 'လှည့်စားကာ' (deceiving) directly asserts intentional deceit rather than hedging with likelihood language.",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "spokenWarning",
+          "text": "ဒီဆက်သွယ်မှုမှာ အွန်လိုင်းရင်းနှီးမြှုပ်နှံမှု လိမ်လည်မှုလက္ခဏာများ တွေ့ရပါတယ်။ ငွေမလွှဲပါနဲ့၊ လင့်ခ်ကို မနှိပ်ပါနဲ့။",
+          "back_translation": "In this communication, online investment fraud signs are found. Do not transfer money, do not click the link.",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[0].label (identity, medium)",
+          "text": "အမည်မသိသူက မှားယွင်းတဲ့နံပါတ်ဖြင့် စတင်ဆက်သွယ်ပြီး ခင်မင်ရင်းနှီးမှု တည်ဆောက်ခြင်း",
+          "back_translation": "An unknown person initiating contact with a wrong number and building friendship",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[1].label (too_good, high)",
+          "text": "ရင်းနှီးမြှုပ်နှံမှုမှ မြင့်မားသော အမြတ်အစွန်းရရှိမည်ဟု ကတိပေးခြင်း",
+          "back_translation": "Promising that high profits will be received from investment",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[2].label (link_risk, high)",
+          "text": "သံသယဖြစ်ဖွယ် ဒိုမိန်းအမည်ပါသော အက်ပ်ဒေါင်းလုဒ်လင့်ခ်",
+          "back_translation": "App download link with a suspicious domain name",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[3].label (payment_route, high)",
+          "text": "ငွေထုတ်ယူရန်အတွက် အခွန် သို့မဟုတ် ကြိုတင်ငွေ ဦးစွာပေးဆောင်ခိုင်းခြင်း",
+          "back_translation": "Ordering to pay tax or advance money first in order to withdraw money",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        }
+      ],
+      "evidence_quotes": [
+        "Hi, is this still Anna's number? Sorry, wrong number maybe.",
+        "I made 3,200 USD last week with just 500 to start.",
+        "https://gold-trade-app.xyz/apk",
+        "To withdraw you need to pay 15% tax first"
+      ]
+    },
+    {
+      "language": "my",
+      "scenario": "parcel_sms",
+      "input_kind": "message",
+      "input": "J&T Express: Your parcel 8841-2290 is held at the depot. Pay a re-delivery fee of 1.50 USD today or it will be returned: http://jt-express-redeliver.top/pay Reply Y to activate the link.",
+      "verdict": "danger",
+      "score": 77,
+      "scamType": "parcel_phishing",
+      "latency_ms": 3585,
+      "machine_assessment": {
+        "hedging": "hedged",
+        "naturalness": 5,
+        "register_note": "Title uses formal written sentence ending (သည်), while body text uses polite spoken style (ပါတယ်), which is standard for Burmese UI."
+      },
+      "fields": [
+        {
+          "field": "title",
+          "text": "သတိပေးလက္ခဏာ များစွာ တွေ့ရသည်: ခဏရပ်ပြီး စစ်ဆေးပါ",
+          "back_translation": "Many warning signs are found: Pause and check",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "summary",
+          "text": "ဒီမက်ဆေ့ခ်ျမှာ ပါဆယ်ထုပ်အတွက် ငွေအနည်းငယ် ကြိုပေးခိုင်းတာ၊ အချိန်အကန့်အသတ်နဲ့ ဖိအားပေးတာနဲ့ သံသယဖြစ်ဖွယ်လင့်ခ်တစ်ခု ပါဝင်နေတာ တွေ့ရပါတယ်။ ထိခိုက်နစ်နာနိုင်ခြေရှိတဲ့အတွက် ငွေမပေးပါနဲ့၊ လင့်ခ်ကိုလည်း မနှိပ်ပါနဲ့။",
+          "back_translation": "In this message, it is found that asking to pay a small amount of money in advance for a parcel, pressuring with a time limit, and a suspicious link are included. Because there is a possibility of damage, do not pay money, and also do not click the link.",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "spokenWarning",
+          "text": "ဒီမက်ဆေ့ခ်ျမှာ သတိပေးလက္ခဏာတချို့ တွေ့ရပါတယ်။ ငွေမပေးပါနဲ့၊ လင့်ခ်ကိုလည်း မနှိပ်ပါနဲ့။",
+          "back_translation": "Some warning signs are found in this message. Do not pay money, and also do not click the link.",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[0].label (payment_route, medium)",
+          "text": "ပစ္စည်းပို့ဆောင်ခ ကြိုတင်ပေးဆောင်ရန် တောင်းဆိုခြင်း",
+          "back_translation": "Requesting to pay delivery fee in advance",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[1].label (pressure, medium)",
+          "text": "ယနေ့အတွင်း အမြန်ဆုံးလုပ်ဆောင်ရန် ဖိအားပေးခြင်း",
+          "back_translation": "Pressuring to act as quickly as possible within today",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[2].label (link_risk, high)",
+          "text": "ပုံမှန်မဟုတ်သော ဝဘ်ဆိုက်လိပ်စာကို အသုံးပြုထားခြင်း",
+          "back_translation": "Using an unusual website address",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        }
+      ],
+      "evidence_quotes": [
+        "Pay a re-delivery fee of 1.50 USD",
+        "today or it will be returned",
+        "http://jt-express-redeliver.top/pay"
+      ]
+    },
+    {
+      "language": "my",
+      "scenario": "fake_agency",
+      "input_kind": "agency",
+      "input": "Golden Bridge Overseas Employment Agency - OFFICIAL & LICENSED. Jobs in Malaysia, Taiwan, Korea and Dubai: factory, hotel, caregiver. No skills needed, salary 1,200-2,500 USD. Registration fee 300 USD, training fee 200 USD, visa fee 450 USD, pay today to keep your seat. Send payment to personal e-wallet 0912-345-6789. Contact us on WhatsApp +60 11 2345 6789. Licence number available on request.",
+      "verdict": "danger",
+      "score": 98,
+      "scamType": "fake_agency",
+      "latency_ms": 3003,
+      "machine_assessment": {
+        "hedging": "hedged",
+        "naturalness": 5,
+        "register_note": "Title uses formal written ending (သည်) while body text uses polite spoken form (ပါတယ်), which is standard and acceptable in Burmese app UI."
+      },
+      "fields": [
+        {
+          "field": "title",
+          "text": "သတိပေးလက္ခဏာ များစွာ တွေ့ရသည်: ခဏရပ်ပြီး စစ်ဆေးပါ",
+          "back_translation": "Many warning signs are found: Pause and check",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "summary",
+          "text": "ဒီအလုပ်ကမ်းလှမ်းချက်မှာ အလုပ်မစခင် ကြိုတင်ငွေတောင်းတာနဲ့ ကိုယ်ပိုင်အကောင့်ကို လွှဲခိုင်းတာလိုမျိုး သတိထားရမယ့် လက္ခဏာတွေ တွေ့နေရပါတယ်။ ငွေကြိုမလွှဲပါနဲ့၊ ယုံကြည်ရတဲ့သူနဲ့ အရင်တိုင်ပင်ပါ။",
+          "back_translation": "In this job offer, warning signs such as asking for advance money before starting work and telling to transfer to a personal account are being seen. Do not transfer money in advance, consult with a trusted person first.",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "spokenWarning",
+          "text": "ဒီအလုပ်ကမ်းလှမ်းချက်မှာ ကြိုတင်ငွေတောင်းတဲ့ သတိပေးလက္ခဏာတွေ တွေ့ရပါတယ်။ ငွေမလွှဲပါနဲ့။",
+          "back_translation": "Warning signs of asking for advance money are found in this job offer. Do not transfer money.",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[0].label (too_good, medium)",
+          "text": "အတွေ့အကြုံမလိုဘဲ လစာအလွန်ကောင်းခြင်း",
+          "back_translation": "Extremely good salary without needing experience",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[1].label (pressure, medium)",
+          "text": "ချက်ချင်းငွေပေးဆောင်ရန် ဖိအားပေးခြင်း",
+          "back_translation": "Pressuring to pay money immediately",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[2].label (payment_route, high)",
+          "text": "အလုပ်မစခင် ကိုယ်ပိုင်ငွေစာရင်းသို့ ကြိုတင်ငွေတောင်းခံခြင်း",
+          "back_translation": "Demanding advance money to a personal bank account before starting work",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[3].label (identity, medium)",
+          "text": "လိုင်စင်နံပါတ် ချက်ချင်းမပြနိုင်ဘဲ တောင်းမှပြမည်ဆိုခြင်း",
+          "back_translation": "Not being able to show license number immediately and saying will show only when requested",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        }
+      ],
+      "evidence_quotes": [
+        "No skills needed, salary 1,200-2,500 USD",
+        "pay today to keep your seat",
+        "Registration fee 300 USD, training fee 200 USD, visa fee 450 USD, pay today to keep your seat. Send payment to personal e-wallet 0912-345-6789.",
+        "Licence number available on request."
+      ]
+    },
+    {
+      "language": "my",
+      "scenario": "marketplace_listing",
+      "input_kind": "shop",
+      "input": "iPhone 16 Pro Max 256GB brand new sealed, only 120 USD. Need money fast, last one! Seller account created 2 days ago, 0 reviews. Buyer please pay by direct bank transfer outside the app to avoid platform fee, then I ship today. Chat me on Telegram @phone_deal_fast.",
+      "verdict": "danger",
+      "score": 100,
+      "scamType": "marketplace_fraud",
+      "latency_ms": 3882,
+      "machine_assessment": {
+        "hedging": "hedged",
+        "naturalness": 5,
+        "register_note": "Title uses formal 'သည်' and labels use 'ခြင်း', while summary and spoken warning use polite spoken 'ပါတယ်'; standard and appropriate for app UI."
+      },
+      "fields": [
+        {
+          "field": "title",
+          "text": "သတိပေးလက္ခဏာ များစွာ တွေ့ရသည်: ခဏရပ်ပြီး စစ်ဆေးပါ",
+          "back_translation": "Many warning signs are found: Pause and check",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "summary",
+          "text": "ဒီကြော်ငြာမှာ ဈေးနှုန်းအလွန်ချိုသာတာ၊ ပလက်ဖောင်းပြင်ပကနေ ငွေလွှဲခိုင်းတာနဲ့ အကောင့်အသစ်ဖြစ်နေတာ စတဲ့ သတိပေးလက္ခဏာတွေ တွေ့ရပါတယ်။ ထိခိုက်နစ်နာနိုင်ခြေ များတဲ့အတွက် ငွေမလွှဲပါနဲ့၊ ပလက်ဖောင်းပြင်ပမှာ မဆက်သွယ်ပါနဲ့။",
+          "back_translation": "In this advertisement, warning signs such as the price being extremely cheap, asking to transfer money from outside the platform, and being a new account are found. Because the risk of damage/loss is high, do not transfer money, do not contact outside the platform.",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "spokenWarning",
+          "text": "ဒီအရောင်းအဝယ်က သတိထားစရာ လက္ခဏာတွေ တွေ့ရပါတယ်။ ငွေကြိုမလွှဲပါနဲ့၊ ယုံကြည်ရတဲ့သူနဲ့ အရင်တိုင်ပင်ပါ။",
+          "back_translation": "Signs to be cautious of are found in this transaction. Do not transfer money in advance, consult with a trusted person first.",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[0].label (too_good, high)",
+          "text": "ဈေးနှုန်းမှာ ပုံမှန်ထက် များစွာ ချိုသာနေခြင်း",
+          "back_translation": "The price being much cheaper than normal",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[1].label (pressure, medium)",
+          "text": "အမြန်ဆုံး ငွေပေးချေခိုင်းပြီး တယ်လီဂရမ်သို့ ပြောင်းလဲဆက်သွယ်ခိုင်းခြင်း",
+          "back_translation": "Asking to make payment as quickly as possible and asking to switch communication to Telegram",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[2].label (payment_route, high)",
+          "text": "ပလက်ဖောင်းပြင်ပမှ တိုက်ရိုက်ဘဏ်ငွေလွှဲခိုင်းခြင်း",
+          "back_translation": "Asking for a direct bank transfer from outside the platform",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[3].label (identity, medium)",
+          "text": "ရောင်းသူ၏ အကောင့်မှာ အသစ်ဖြစ်ပြီး သုံးသပ်ချက်မရှိခြင်း",
+          "back_translation": "The seller's account being new and having no reviews",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        }
+      ],
+      "evidence_quotes": [
+        "iPhone 16 Pro Max 256GB brand new sealed, only 120 USD",
+        "Need money fast, last one! ... Chat me on Telegram @phone_deal_fast",
+        "pay by direct bank transfer outside the app",
+        "Seller account created 2 days ago, 0 reviews"
+      ]
+    },
+    {
+      "language": "my",
+      "scenario": "legitimate_message",
+      "input_kind": "message",
+      "input": "Hi, this is Maria from the dormitory office. The rent for October is due on the 25th. You can pay at the front desk or by bank transfer to the company account on your payslip. Please bring your room key for the yearly inspection on Friday at 3 pm. Thanks!",
+      "verdict": "safe",
+      "score": 0,
+      "scamType": "none",
+      "latency_ms": 2088,
+      "machine_assessment": {
+        "hedging": "hedged",
+        "naturalness": 5,
+        "register_note": "Summary correctly uses formal written endings, while spokenWarning appropriately uses spoken conversational markers."
+      },
+      "fields": [
+        {
+          "field": "title",
+          "text": "အရေးကြီးသော သတိပေးချက် မတွေ့ရပါ",
+          "back_translation": "Important warning is not found.",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "summary",
+          "text": "ဒီမက်ဆေ့ခ်ျမှာ သံသယဖြစ်စရာ လက္ခဏာကြီးကြီးမားမား မတွေ့ရပါ။ ပုံမှန် အဆောင်ခနှင့် စစ်ဆေးရေးအကြောင်း ဖြစ်ပုံရပါသည်။",
+          "back_translation": "In this message, major suspicious signs are not found. It seems to be about normal dormitory fees and inspection.",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "spokenWarning",
+          "text": "ဒီမက်ဆေ့ခ်ျမှာ သိသာတဲ့ သတိပေးလက္ခဏာ မတွေ့ရပါဘူး။ သို့သော် သေချာအောင် ရုံးခန်းမှာ ထပ်မေးကြည့်ပါ။",
+          "back_translation": "In this message, noticeable warning signs are not found. However, to be sure, try asking again at the office.",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        }
+      ],
+      "evidence_quotes": []
+    },
+    {
+      "language": "id",
+      "scenario": "trafficking_job",
+      "input_kind": "job",
+      "input": "URGENT HIRING!! Online customer service / crypto marketing staff for our new office in Thailand border area (Mae Sot). Salary 1500 USD + bonus. No experience, no degree needed. Free flight, free housing, free visa. A driver will pick you up at the border and take you across by car. Please bring your passport, we will keep it safe for the work permit. Only 5 places left, apply this week. Message Mr. Kevin on Telegram @kevin_hr_2024. Do not tell your family until the contract is signed.",
+      "verdict": "danger",
+      "score": 100,
+      "scamType": "job_trafficking",
+      "latency_ms": 2126,
+      "machine_assessment": {
+        "hedging": "hedged",
+        "naturalness": 5,
+        "register_note": "Clear, accessible standard Indonesian with a kind and cautious tone appropriate for migrant workers."
+      },
+      "fields": [
+        {
+          "field": "title",
+          "text": "Banyak tanda bahaya: berhenti dulu dan periksa",
+          "back_translation": "Many danger signs: stop first and check",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "summary",
+          "text": "Tawaran pekerjaan ini menunjukkan beberapa tanda bahaya perdagangan orang seperti gaji sangat tinggi tanpa pengalaman, penahanan paspor, penyeberangan perbatasan tidak resmi, dan permintaan untuk merahasiakannya. Jangan berangkat atau serahkan paspor Anda.",
+          "back_translation": "This job offer shows several danger signs of human trafficking such as very high salary without experience, passport withholding, unofficial border crossing, and requests to keep it secret. Do not depart or hand over your passport.",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "spokenWarning",
+          "text": "Tawaran ini menunjukkan tanda bahaya perdagangan orang. Jangan serahkan paspor dan bicarakan dengan orang yang Anda percayai.",
+          "back_translation": "This offer shows danger signs of human trafficking. Do not hand over passport and talk with a person you trust.",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[0].label (too_good, high)",
+          "text": "Gaji tinggi tanpa pengalaman dan fasilitas gratis",
+          "back_translation": "High salary without experience and free facilities",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[1].label (pressure, high)",
+          "text": "Tekanan waktu mendesak dan kerahasiaan",
+          "back_translation": "Urgent time pressure and secrecy",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[2].label (trafficking, high)",
+          "text": "Pekerjaan di perbatasan dengan penahanan paspor dan penjemputan",
+          "back_translation": "Job at the border with passport withholding and pickup",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        }
+      ],
+      "evidence_quotes": [
+        "Salary 1500 USD + bonus. No experience, no degree needed. Free flight, free housing, free visa.",
+        "Only 5 places left, apply this week. Do not tell your family until the contract is signed.",
+        "Thailand border area (Mae Sot). A driver will pick you up at the border and take you across by car. Please bring your passport, we will keep it safe for the work permit."
+      ]
+    },
+    {
+      "language": "id",
+      "scenario": "pig_butchering_chat",
+      "input_kind": "message",
+      "input": "[10:02] Hi, is this still Anna's number? Sorry, wrong number maybe.\n[10:03] Oh sorry! You seem nice though. I am new in town, I work in finance.\n[Day 6] My uncle runs a crypto trading platform and I made 3,200 USD last week with just 500 to start. Download the app here: https://gold-trade-app.xyz/apk and I will guide you. You can withdraw anytime.\n[Day 9] To withdraw you need to pay 15% tax first, then the funds will be released today.",
+      "verdict": "danger",
+      "score": 100,
+      "scamType": "romance_pig_butchering",
+      "latency_ms": 2931,
+      "machine_assessment": {
+        "hedging": "hedged",
+        "naturalness": 4,
+        "register_note": "Standard, clear Indonesian appropriate for migrant workers. No mixed registers detected."
+      },
+      "fields": [
+        {
+          "field": "title",
+          "text": "Banyak tanda bahaya: berhenti dulu dan periksa",
+          "back_translation": "Many danger signs: stop first and check",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "summary",
+          "text": "Pesan ini menunjukkan tanda-tanda penipuan investasi crypto berkedok salah kirim nomor. Kami melihat janji keuntungan besar dan permintaan biaya pajak untuk mencairkan dana. Sebaiknya jangan transfer uang atau unduh aplikasi tersebut.",
+          "back_translation": "This message shows signs of a crypto investment scam disguised as sending to the wrong number. We see promises of big profits and requests for tax fees to disburse funds. It is best not to transfer money or download that application.",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "spokenWarning",
+          "text": "Pesan ini menunjukkan tanda-tanda penipuan investasi crypto. Jangan transfer uang atau bayar pajak apa pun.",
+          "back_translation": "This message shows signs of a crypto investment scam. Do not transfer money or pay any tax.",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[0].label (identity, medium)",
+          "text": "Nomor salah palsu sebagai awal perkenalan",
+          "back_translation": "Fake wrong number as the beginning of an introduction",
+          "machine_flag": "check",
+          "machine_note": "'Nomor salah palsu' sounds slightly unnatural; native speakers typically say 'pura-pura salah nomor' or 'modus salah sambung'.",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[1].label (too_good, high)",
+          "text": "Keuntungan investasi crypto yang sangat tinggi",
+          "back_translation": "Very high crypto investment profits",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[2].label (link_risk, high)",
+          "text": "Tautan unduhan aplikasi mencurigakan",
+          "back_translation": "Suspicious application download link",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[3].label (payment_route, high)",
+          "text": "Permintaan pembayaran pajak untuk penarikan dana",
+          "back_translation": "Request for tax payment for withdrawal of funds",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        }
+      ],
+      "evidence_quotes": [
+        "Hi, is this still Anna's number? Sorry, wrong number maybe.",
+        "I made 3,200 USD last week with just 500 to start.",
+        "https://gold-trade-app.xyz/apk",
+        "To withdraw you need to pay 15% tax first"
+      ]
+    },
+    {
+      "language": "id",
+      "scenario": "parcel_sms",
+      "input_kind": "message",
+      "input": "J&T Express: Your parcel 8841-2290 is held at the depot. Pay a re-delivery fee of 1.50 USD today or it will be returned: http://jt-express-redeliver.top/pay Reply Y to activate the link.",
+      "verdict": "danger",
+      "score": 100,
+      "scamType": "parcel_phishing",
+      "latency_ms": 4122,
+      "machine_assessment": {
+        "hedging": "hedged",
+        "naturalness": 4,
+        "register_note": "Natural formal Indonesian, though terms like 'TLD' and 'phishing' are overly technical for low-literacy audiences."
+      },
+      "fields": [
+        {
+          "field": "title",
+          "text": "Banyak tanda bahaya: berhenti dulu dan periksa",
+          "back_translation": "Many danger signs: stop first and check",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "summary",
+          "text": "Pesan ini mengaku dari jasa kurir dan meminta biaya kecil dengan tenggat waktu hari ini lewat tautan yang tidak biasa. Kami menyarankan agar Anda tidak mengklik tautan tersebut karena menunjukkan tanda-tanda phising.",
+          "back_translation": "This message claims to be from a courier service and asks for a small fee with a deadline of today through an unusual link. We advise that you do not click the link because it shows signs of phishing.",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "spokenWarning",
+          "text": "Pesan kurir ini meminta pembayaran lewat tautan asing. Jangan klik tautan atau bayar apa pun.",
+          "back_translation": "This courier message asks for payment through an unfamiliar link. Do not click the link or pay anything.",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[0].label (pressure, medium)",
+          "text": "Tenggat waktu yang mendesak untuk membayar hari ini",
+          "back_translation": "Urgent deadline to pay today",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[1].label (payment_route, medium)",
+          "text": "Permintaan biaya pengiriman ulang secara online",
+          "back_translation": "Request for redelivery fee online",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[2].label (link_risk, high)",
+          "text": "Domain tautan mencurigakan dengan TLD .top",
+          "back_translation": "Suspicious link domain with TLD .top",
+          "machine_flag": "check",
+          "machine_note": "'TLD .top' is technical jargon that low-literacy users will likely not understand.",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[3].label (known_bad, low)",
+          "text": "Domain tersebut diasosiasikan dengan penipuan phishing pengiriman yang menyamar sebagai J&T Express.",
+          "back_translation": "The domain is associated with a delivery phishing scam disguised as J&T Express.",
+          "machine_flag": "check",
+          "machine_note": "Uses explicit 'penipuan' (scam) and technical term 'phishing', which borders on certainty wording and complex jargon.",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        }
+      ],
+      "evidence_quotes": [
+        "Pay a re-delivery fee of 1.50 USD today",
+        "Pay a re-delivery fee of 1.50 USD",
+        "http://jt-express-redeliver.top/pay",
+        "Laporan online menunjukkan bahwa domain tidak resmi yang menyerupai layanan kurir sering digunakan untuk penipuan biaya pengiriman ulang."
+      ]
+    },
+    {
+      "language": "id",
+      "scenario": "fake_agency",
+      "input_kind": "agency",
+      "input": "Golden Bridge Overseas Employment Agency - OFFICIAL & LICENSED. Jobs in Malaysia, Taiwan, Korea and Dubai: factory, hotel, caregiver. No skills needed, salary 1,200-2,500 USD. Registration fee 300 USD, training fee 200 USD, visa fee 450 USD, pay today to keep your seat. Send payment to personal e-wallet 0912-345-6789. Contact us on WhatsApp +60 11 2345 6789. Licence number available on request.",
+      "verdict": "danger",
+      "score": 98,
+      "scamType": "fake_agency",
+      "latency_ms": 2944,
+      "machine_assessment": {
+        "hedging": "hedged",
+        "naturalness": 5,
+        "register_note": "Clear, natural standard Indonesian suitable for low-literacy users with appropriate hedging throughout."
+      },
+      "fields": [
+        {
+          "field": "title",
+          "text": "Banyak tanda bahaya: berhenti dulu dan periksa",
+          "back_translation": "Many danger signs: stop first and check",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "summary",
+          "text": "Pesan ini menawarkan pekerjaan dengan gaji besar tanpa keahlian, tetapi meminta berbagai biaya awal yang dikirim ke e-wallet pribadi dengan alasan mendesak. Tawaran ini menunjukkan beberapa tanda bahaya penipuan agensi. Jangan transfer uang dan verifikasi izin resmi terlebih dahulu.",
+          "back_translation": "This message offers a job with a large salary without skills, but asks for various initial fees sent to a personal e-wallet for urgent reasons. This offer shows several danger signs of agency fraud. Do not transfer money and verify the official permit first.",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "spokenWarning",
+          "text": "Tawaran ini meminta biaya di awal dan menunjukkan tanda bahaya, jadi mohon jangan transfer uang dan pastikan periksa izinnya.",
+          "back_translation": "This offer asks for fees upfront and shows danger signs, so please do not transfer money and make sure to check its permit.",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[0].label (too_good, medium)",
+          "text": "Gaji sangat tinggi tanpa pengalaman",
+          "back_translation": "Very high salary without experience",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[1].label (pressure, medium)",
+          "text": "Tekanan untuk membayar segera",
+          "back_translation": "Pressure to pay immediately",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[2].label (payment_route, high)",
+          "text": "Permintaan biaya awal ke e-wallet pribadi",
+          "back_translation": "Request for initial fees to a personal e-wallet",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[3].label (identity, medium)",
+          "text": "Nomor izin tidak dicantumkan secara transparan",
+          "back_translation": "Permit number is not listed transparently",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        }
+      ],
+      "evidence_quotes": [
+        "No skills needed, salary 1,200-2,500 USD",
+        "pay today to keep your seat",
+        "Registration fee 300 USD, training fee 200 USD, visa fee 450 USD, pay today to keep your seat. Send payment to personal e-wallet",
+        "Licence number available on request"
+      ]
+    },
+    {
+      "language": "id",
+      "scenario": "marketplace_listing",
+      "input_kind": "shop",
+      "input": "iPhone 16 Pro Max 256GB brand new sealed, only 120 USD. Need money fast, last one! Seller account created 2 days ago, 0 reviews. Buyer please pay by direct bank transfer outside the app to avoid platform fee, then I ship today. Chat me on Telegram @phone_deal_fast.",
+      "verdict": "danger",
+      "score": 100,
+      "scamType": "marketplace_fraud",
+      "latency_ms": 2148,
+      "machine_assessment": {
+        "hedging": "hedged",
+        "naturalness": 5,
+        "register_note": "Natural, clear Indonesian suitable for low-literacy users with consistent polite neutral register."
+      },
+      "fields": [
+        {
+          "field": "title",
+          "text": "Banyak tanda bahaya: berhenti dulu dan periksa",
+          "back_translation": "Many danger signs: stop first and check",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "summary",
+          "text": "Penawaran ini menunjukkan beberapa tanda bahaya seperti harga yang tidak realistis, permintaan transfer di luar aplikasi, dan akun penjual yang baru dibuat. Kemungkinan penipuan tinggi. Jangan mengirim uang di luar platform resmi.",
+          "back_translation": "This offer shows several danger signs such as an unrealistic price, transfer requests outside the application, and a seller account that was just created. Possibility of fraud is high. Do not send money outside the official platform.",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "spokenWarning",
+          "text": "Penawaran ini menunjukkan beberapa tanda bahaya. Jangan transfer uang di luar aplikasi resmi.",
+          "back_translation": "This offer shows several danger signs. Do not transfer money outside the official application.",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[0].label (too_good, high)",
+          "text": "Harga jauh di bawah pasaran",
+          "back_translation": "Price far below the market",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[1].label (pressure, high)",
+          "text": "Mendesak dan mengalihkan obrolan ke Telegram",
+          "back_translation": "Urging and redirecting the chat to Telegram",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[2].label (payment_route, high)",
+          "text": "Meminta pembayaran di luar aplikasi",
+          "back_translation": "Requesting payment outside the application",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[3].label (identity, medium)",
+          "text": "Akun penjual sangat baru tanpa ulasan",
+          "back_translation": "Seller account is very new without reviews",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        }
+      ],
+      "evidence_quotes": [
+        "iPhone 16 Pro Max 256GB brand new sealed, only 120 USD",
+        "Need money fast, last one! ... Chat me on Telegram @phone_deal_fast.",
+        "Buyer please pay by direct bank transfer outside the app to avoid platform fee",
+        "Seller account created 2 days ago, 0 reviews"
+      ]
+    },
+    {
+      "language": "id",
+      "scenario": "legitimate_message",
+      "input_kind": "message",
+      "input": "Hi, this is Maria from the dormitory office. The rent for October is due on the 25th. You can pay at the front desk or by bank transfer to the company account on your payslip. Please bring your room key for the yearly inspection on Friday at 3 pm. Thanks!",
+      "verdict": "safe",
+      "score": 0,
+      "scamType": "none",
+      "latency_ms": 2289,
+      "machine_assessment": {
+        "hedging": "hedged",
+        "naturalness": 4,
+        "register_note": "Natural, clear, and polite Indonesian appropriate for low-literacy users, with standard informal-polite register."
+      },
+      "fields": [
+        {
+          "field": "title",
+          "text": "Kami tidak menemukan tanda bahaya besar",
+          "back_translation": "We did not find big danger signs",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "summary",
+          "text": "Pesan ini tampak biasa saja mengenai pembayaran sewa kamar dan jadwal inspeksi dari kantor asrama. Kami tidak menemukan tanda-tanda ancaman yang mencurigakan.",
+          "back_translation": "This message seems ordinary regarding room rent payment and inspection schedule from the dormitory office. We did not find suspicious threat signs.",
+          "machine_flag": "check",
+          "machine_note": "'tanda-tanda ancaman' means 'threat signs' rather than 'scam/warning signs'. Consider 'tanda-tanda penipuan' or 'tanda bahaya'.",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "spokenWarning",
+          "text": "Pesan ini terlihat wajar dari kantor asrama. Tetap pastikan untuk memverifikasi detail pembayaran dengan pihak pengelola.",
+          "back_translation": "This message looks normal from the dormitory office. Still make sure to verify payment details with the management party.",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        }
+      ],
+      "evidence_quotes": []
+    },
+    {
+      "language": "tl",
+      "scenario": "trafficking_job",
+      "input_kind": "job",
+      "input": "URGENT HIRING!! Online customer service / crypto marketing staff for our new office in Thailand border area (Mae Sot). Salary 1500 USD + bonus. No experience, no degree needed. Free flight, free housing, free visa. A driver will pick you up at the border and take you across by car. Please bring your passport, we will keep it safe for the work permit. Only 5 places left, apply this week. Message Mr. Kevin on Telegram @kevin_hr_2024. Do not tell your family until the contract is signed.",
+      "verdict": "danger",
+      "score": 100,
+      "scamType": "job_trafficking",
+      "latency_ms": 2568,
+      "machine_assessment": {
+        "hedging": "hedged",
+        "naturalness": 5,
+        "register_note": "Natural, clear, and consistent Tagalog register suitable for low-literacy users."
+      },
+      "fields": [
+        {
+          "field": "title",
+          "text": "Maraming babala: huminto muna at mag-verify",
+          "back_translation": "Many warnings: stop first and verify",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "summary",
+          "text": "Ang alok na ito ay nagpapakita ng maraming senyales ng posibleng trafficking: mataas na suweldo sa border area, paghawak sa pasaporte, libreng sakay sa hindi kilalang drayber, at pagbabawal na sabihin sa pamilya. Malamang na mapanganib ito. Huwag magpadala ng pasaporte o pumunta.",
+          "back_translation": "This offer shows many signs of possible trafficking: high salary in border area, holding the passport, free ride with an unknown driver, and prohibition to tell family. This is likely dangerous. Do not send passport or go.",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "spokenWarning",
+          "text": "May malalaking senyales ng trafficking ang alok na ito. Huwag ibigay ang pasaporte o pumunta.",
+          "back_translation": "This offer has big signs of trafficking. Do not give the passport or go.",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[0].label (too_good, high)",
+          "text": "Mataas na suweldo nang walang karanasan at libreng visa at flight",
+          "back_translation": "High salary without experience and free visa and flight",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[1].label (pressure, high)",
+          "text": "Nagmamadali at pinagbabawal sabihin sa pamilya",
+          "back_translation": "In a rush and prohibited to tell family",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[2].label (trafficking, high)",
+          "text": "Trabaho sa hangganan ng Thailand, kukunin ang pasaporte, at dadaan sa impormal na tawiran",
+          "back_translation": "Work at the border of Thailand, will take the passport, and will pass through an informal crossing",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        }
+      ],
+      "evidence_quotes": [
+        "Salary 1500 USD + bonus. No experience, no degree needed. Free flight, free housing, free visa.",
+        "Only 5 places left, apply this week. Message Mr. Kevin on Telegram @kevin_hr_2024. Do not tell your family until the contract is signed.",
+        "new office in Thailand border area (Mae Sot)... A driver will pick you up at the border and take you across by car. Please bring your passport, we will keep it safe for the work permit."
+      ]
+    },
+    {
+      "language": "tl",
+      "scenario": "pig_butchering_chat",
+      "input_kind": "message",
+      "input": "[10:02] Hi, is this still Anna's number? Sorry, wrong number maybe.\n[10:03] Oh sorry! You seem nice though. I am new in town, I work in finance.\n[Day 6] My uncle runs a crypto trading platform and I made 3,200 USD last week with just 500 to start. Download the app here: https://gold-trade-app.xyz/apk and I will guide you. You can withdraw anytime.\n[Day 9] To withdraw you need to pay 15% tax first, then the funds will be released today.",
+      "verdict": "danger",
+      "score": 100,
+      "scamType": "romance_pig_butchering",
+      "latency_ms": 2782,
+      "machine_assessment": {
+        "hedging": "hedged",
+        "naturalness": 4,
+        "register_note": "Clear, accessible Tagalog appropriate for low-literacy users, balancing formal terms with common loanwords like 'scam' and 'app'."
+      },
+      "fields": [
+        {
+          "field": "title",
+          "text": "Maraming babala: huminto muna at mag-verify",
+          "back_translation": "Many warnings: stop first and verify",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "summary",
+          "text": "Ang mensaheng ito ay nagpapakita ng mga palatandaan ng isang huwad na ugnayan at pamumuhunan. Nagsimula ito sa maling numero at humantong sa pag-aalok ng crypto app at paghingi ng bayad bago makuha ang pondo. Posibleng magdulot ito ng malaking kawalan ng pera, kaya huwag magpadala ng anuman.",
+          "back_translation": "This message shows signs of a fake relationship and investment. It started from a wrong number and led to offering a crypto app and asking for payment before getting the funds. It is possible this will cause a large loss of money, so do not send anything.",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "spokenWarning",
+          "text": "Mukhang may senyales ito ng pamumuhunan o scam sa pag-ibig. Huwag magbayad o mag-download ng anuman.",
+          "back_translation": "It looks like this has signs of an investment or love scam. Do not pay or download anything.",
+          "machine_flag": "check",
+          "machine_note": "'Pamumuhunan o scam sa pag-ibig' is slightly awkward phrasing; 'investment scam o romance scam' is more natural in everyday spoken Tagalog.",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[0].label (identity, medium)",
+          "text": "Maling numero o bagong dating sa bayan ang simula ng usapan",
+          "back_translation": "Wrong number or new arrival in town is the start of the conversation",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[1].label (too_good, high)",
+          "text": "Malaking kita sa maikling panahon at garantisadong tubo",
+          "back_translation": "Big earnings in a short time and guaranteed profit",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[2].label (link_risk, high)",
+          "text": "Kahina-hinalang link para mag-download ng app",
+          "back_translation": "Suspicious link to download an app",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[3].label (payment_route, high)",
+          "text": "Hinihingian ng bayad o buwis bago makuha ang pera",
+          "back_translation": "Being asked for payment or tax before getting the money",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        }
+      ],
+      "evidence_quotes": [
+        "Hi, is this still Anna's number? Sorry, wrong number maybe.",
+        "I made 3,200 USD last week with just 500 to start",
+        "https://gold-trade-app.xyz/apk",
+        "To withdraw you need to pay 15% tax first"
+      ]
+    },
+    {
+      "language": "tl",
+      "scenario": "parcel_sms",
+      "input_kind": "message",
+      "input": "J&T Express: Your parcel 8841-2290 is held at the depot. Pay a re-delivery fee of 1.50 USD today or it will be returned: http://jt-express-redeliver.top/pay Reply Y to activate the link.",
+      "verdict": "danger",
+      "score": 100,
+      "scamType": "parcel_phishing",
+      "latency_ms": 4919,
+      "machine_assessment": {
+        "hedging": "hedged",
+        "naturalness": 4,
+        "register_note": "Natural, respectful Tagalog throughout, though field 7 reads slightly formal and verbose for a UI label."
+      },
+      "fields": [
+        {
+          "field": "title",
+          "text": "Maraming babala: huminto muna at mag-verify",
+          "back_translation": "Many warnings: stop first and verify",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "summary",
+          "text": "Ang mensaheng ito ay nagpapakita ng mga senyales ng parcel phishing: humihingi ito ng maliit na bayad at may kahina-hinalang link na may kakaibang domain. Huwag i-click ang link at huwag magbayad.",
+          "back_translation": "This message shows signs of parcel phishing: it asks for a small payment and has a suspicious link with a strange domain. Do not click the link and do not pay.",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "spokenWarning",
+          "text": "May mga senyales ito ng phishing. Huwag i-click ang link o magbayad ng anuman.",
+          "back_translation": "It has signs of phishing. Do not click the link or pay anything.",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[0].label (pressure, medium)",
+          "text": "Maikling deadline para sa pagbabayad",
+          "back_translation": "Short deadline for payment",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[1].label (payment_route, medium)",
+          "text": "Humihingi ng bayad para sa muling pagpapadala",
+          "back_translation": "Asking for payment for resending",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[2].label (link_risk, high)",
+          "text": "Kahina-hinalang domain para sa pagbabayad",
+          "back_translation": "Suspicious domain for payment",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[3].label (known_bad, low)",
+          "text": "May mga ulat online na nag-uugnay sa katulad na mga mensahe ng paghahatid sa pamamagitan ng kahina-hinalang domain sa mga phishing scam.",
+          "back_translation": "There are reports online linking similar delivery messages through a suspicious domain to phishing scams.",
+          "machine_flag": "check",
+          "machine_note": "Text is unusually long and stiff for a flag label; could be simplified for low-literacy users.",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        }
+      ],
+      "evidence_quotes": [
+        "today",
+        "Pay a re-delivery fee of 1.50 USD",
+        "http://jt-express-redeliver.top/pay",
+        "Iniulat ng mga awtoridad at balita na ang mga scammer ay nagpapadala ng mga pekeng mensahe ng paghahatid na nagpapanggap bilang J&T Express gamit ang mga hindi opisyal na link."
+      ]
+    },
+    {
+      "language": "tl",
+      "scenario": "fake_agency",
+      "input_kind": "agency",
+      "input": "Golden Bridge Overseas Employment Agency - OFFICIAL & LICENSED. Jobs in Malaysia, Taiwan, Korea and Dubai: factory, hotel, caregiver. No skills needed, salary 1,200-2,500 USD. Registration fee 300 USD, training fee 200 USD, visa fee 450 USD, pay today to keep your seat. Send payment to personal e-wallet 0912-345-6789. Contact us on WhatsApp +60 11 2345 6789. Licence number available on request.",
+      "verdict": "danger",
+      "score": 100,
+      "scamType": "fake_agency",
+      "latency_ms": 2660,
+      "machine_assessment": {
+        "hedging": "hedged",
+        "naturalness": 5,
+        "register_note": "Clear, natural everyday Tagalog suitable for low-literacy readers with consistent hedging."
+      },
+      "fields": [
+        {
+          "field": "title",
+          "text": "Maraming babala: huminto muna at mag-verify",
+          "back_translation": "Many warnings: stop first and verify",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "summary",
+          "text": "Ang alok na ito ay nagpapakita ng mga senyales ng huwad na ahensya dahil humihingi ito ng iba't ibang bayad bago magsimula at sa personal na e-wallet pinapadala ang pera. Mayroon ding presyon na magbayad agad.",
+          "back_translation": "This offer shows signs of a fake agency because it asks for various fees before starting and the money is sent to a personal e-wallet. There is also pressure to pay immediately.",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "spokenWarning",
+          "text": "May mga senyales ng huwad na ahensya ang alok na ito. Huwag magbayad sa personal na e-wallet.",
+          "back_translation": "This offer has signs of a fake agency. Do not pay to a personal e-wallet.",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[0].label (too_good, medium)",
+          "text": "Masyadong mataas na sweldo para sa trabahong walang kailangang karanasan",
+          "back_translation": "Too high salary for a job with no needed experience",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[1].label (pressure, high)",
+          "text": "Pilit na pinagbabayad agad para mapanatili ang pwesto",
+          "back_translation": "Forced to pay immediately to keep the position",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[2].label (payment_route, high)",
+          "text": "Hinihingi ang bayad sa personal na e-wallet bago magsimula ang trabaho",
+          "back_translation": "Payment is being asked to a personal e-wallet before work starts",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[3].label (identity, medium)",
+          "text": "Walang malinaw na pruweba ng lisensya at sa personal na e-wallet dumadaan ang bayad",
+          "back_translation": "No clear proof of license and the payment passes through a personal e-wallet",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        }
+      ],
+      "evidence_quotes": [
+        "No skills needed, salary 1,200-2,500 USD",
+        "pay today to keep your seat",
+        "Registration fee 300 USD, training fee 200 USD, visa fee 450 USD, pay today to keep your seat. Send payment to personal e-wallet 0912-345-6789",
+        "Licence number available on request"
+      ]
+    },
+    {
+      "language": "tl",
+      "scenario": "marketplace_listing",
+      "input_kind": "shop",
+      "input": "iPhone 16 Pro Max 256GB brand new sealed, only 120 USD. Need money fast, last one! Seller account created 2 days ago, 0 reviews. Buyer please pay by direct bank transfer outside the app to avoid platform fee, then I ship today. Chat me on Telegram @phone_deal_fast.",
+      "verdict": "danger",
+      "score": 100,
+      "scamType": "marketplace_fraud",
+      "latency_ms": 2551,
+      "machine_assessment": {
+        "hedging": "hedged",
+        "naturalness": 5,
+        "register_note": "Natural, polite, and accessible Tagalog throughout. Well-suited for low-literacy users without awkward phrasing or register clash."
+      },
+      "fields": [
+        {
+          "field": "title",
+          "text": "Maraming babala: huminto muna at mag-verify",
+          "back_translation": "Many warnings: stop first and verify",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "summary",
+          "text": "Nagpapakita ang alok na ito ng ilang senyales ng posibleng panloloko sa marketplace, tulad ng napakamurang presyo, paghingi ng bayad sa labas ng app, at bagong account. Mataas ang posibilidad ng panganib. Huwag magbayad o makipag-transaksiyon sa labas ng opisyal na platform.",
+          "back_translation": "This offer shows several signs of possible scam in the marketplace, such as a very cheap price, asking for payment outside the app, and a new account. The possibility of danger is high. Do not pay or transact outside the official platform.",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "spokenWarning",
+          "text": "May mga senyales ng panloloko ang alok na ito. Huwag magbayad sa labas ng opisyal na app.",
+          "back_translation": "This offer has signs of scam. Do not pay outside the official app.",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[0].label (too_good, high)",
+          "text": "Masyadong mura ang presyo ng item kaysa sa tunay na halaga",
+          "back_translation": "The price of the item is too cheap compared to the real value",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[1].label (pressure, medium)",
+          "text": "Nagmamadali at pinipilit ang mamimili",
+          "back_translation": "Rushing and forcing the buyer",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[2].label (identity, medium)",
+          "text": "Bagong account na walang mga review",
+          "back_translation": "New account with no reviews",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[3].label (payment_route, high)",
+          "text": "Humihingi ng direktang bayad sa labas ng opisyal na app",
+          "back_translation": "Asking for direct payment outside the official app",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "flag[4].label (pressure, medium)",
+          "text": "Inililipat ang usapan sa ibang messaging app",
+          "back_translation": "Moving the conversation to another messaging app",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        }
+      ],
+      "evidence_quotes": [
+        "iPhone 16 Pro Max 256GB brand new sealed, only 120 USD",
+        "Need money fast, last one!",
+        "Seller account created 2 days ago, 0 reviews",
+        "pay by direct bank transfer outside the app",
+        "Chat me on Telegram @phone_deal_fast"
+      ]
+    },
+    {
+      "language": "tl",
+      "scenario": "legitimate_message",
+      "input_kind": "message",
+      "input": "Hi, this is Maria from the dormitory office. The rent for October is due on the 25th. You can pay at the front desk or by bank transfer to the company account on your payslip. Please bring your room key for the yearly inspection on Friday at 3 pm. Thanks!",
+      "verdict": "safe",
+      "score": 0,
+      "scamType": "none",
+      "latency_ms": 1957,
+      "machine_assessment": {
+        "hedging": "hedged",
+        "naturalness": 5,
+        "register_note": "Natural and clear conversational Tagalog appropriate for low-literacy users."
+      },
+      "fields": [
+        {
+          "field": "title",
+          "text": "Wala kaming nakitang malaking babala",
+          "back_translation": "We did not see any big warning",
+          "machine_flag": "ok",
+          "machine_note": "",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "summary",
+          "text": "Mukhang normal at ligtas ang mensaheng ito mula sa dorm office tungkol sa upa at inspeksyon. Walang nakitang mapanganib na palatandaan.",
+          "back_translation": "This message from the dorm office about rent and inspection looks normal and safe. No dangerous signs were seen.",
+          "machine_flag": "check",
+          "machine_note": "Uses 'ligtas' (safe); app guidelines specify phrasing as 'no major warning signs' rather than calling content safe.",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        },
+        {
+          "field": "spokenWarning",
+          "text": "Mukhang ligtas ang mensaheng ito, ngunit mabuting i-verify pa rin sa opisyal na tanggapan.",
+          "back_translation": "This message looks safe, but it is still good to verify with the official office.",
+          "machine_flag": "check",
+          "machine_note": "Uses 'Mukhang ligtas' (looks safe); prefer emphasizing 'no major warning signs' over calling it safe.",
+          "reviewer_verdict": null,
+          "reviewer_correction": null,
+          "reviewer_note": null
+        }
+      ],
+      "evidence_quotes": []
+    }
+  ],
+  "server_static_copy": {
+    "my": [
+      {
+        "field": "title_danger",
+        "english": "Many warning signs: please pause and check first",
+        "text": "သတိပေးလက္ခဏာ များစွာ တွေ့ရသည်: ခဏရပ်ပြီး စစ်ဆေးပါ",
+        "back_translation": "Many warning signs are found: Pause and check",
+        "machine_flag": "ok",
+        "machine_note": "",
+        "reviewer_verdict": null,
+        "reviewer_correction": null,
+        "reviewer_note": null
+      },
+      {
+        "field": "title_careful",
+        "english": "Some warning signs: please verify first",
+        "text": "သတိပေးလက္ခဏာ အချို့ တွေ့ရသည်: အရင်စစ်ဆေးပါ",
+        "back_translation": "Some warning signs are found: Check first",
+        "machine_flag": "ok",
+        "machine_note": "",
+        "reviewer_verdict": null,
+        "reviewer_correction": null,
+        "reviewer_note": null
+      },
+      {
+        "field": "title_safe",
+        "english": "We found no major warning signs",
+        "text": "အရေးကြီးသော သတိပေးချက် မတွေ့ရပါ",
+        "back_translation": "No important warning is found",
+        "machine_flag": "ok",
+        "machine_note": "",
+        "reviewer_verdict": null,
+        "reviewer_correction": null,
+        "reviewer_note": null
+      },
+      {
+        "field": "action_call",
+        "english": "Call hotline",
+        "text": "ဟော့လိုင်း ခေါ်ဆိုရန်",
+        "back_translation": "To call hotline",
+        "machine_flag": "ok",
+        "machine_note": "",
+        "reviewer_verdict": null,
+        "reviewer_correction": null,
+        "reviewer_note": null
+      },
+      {
+        "field": "action_share",
+        "english": "Warn family or friends",
+        "text": "မိသားစု သို့မဟုတ် သူငယ်ချင်းကို သတိပေးရန်",
+        "back_translation": "To warn family or friend",
+        "machine_flag": "ok",
+        "machine_note": "",
+        "reviewer_verdict": null,
+        "reviewer_correction": null,
+        "reviewer_note": null
+      },
+      {
+        "field": "action_block",
+        "english": "Block and report this sender",
+        "text": "ပို့သူကို ပိတ်ပင်ပြီး တိုင်ကြားရန်",
+        "back_translation": "To block sender and report",
+        "machine_flag": "ok",
+        "machine_note": "",
+        "reviewer_verdict": null,
+        "reviewer_correction": null,
+        "reviewer_note": null
+      },
+      {
+        "field": "action_learn",
+        "english": "Learn how scams like this work",
+        "text": "ဤကဲ့သို့သော လိမ်လည်မှုများ လုပ်ပုံကို လေ့လာရန်",
+        "back_translation": "To learn how scams like this work",
+        "machine_flag": "ok",
+        "machine_note": "",
+        "reviewer_verdict": null,
+        "reviewer_correction": null,
+        "reviewer_note": null
+      },
+      {
+        "field": "web_risk_note",
+        "english": "Google Web Risk flags a link in this message as unsafe.",
+        "text": "ဤစာထဲရှိ လင့်ခ်တစ်ခုကို Google Web Risk က မလုံခြုံဟု အမှတ်အသားပြုထားသည်။",
+        "back_translation": "Google Web Risk has marked a link in this message as unsafe.",
+        "machine_flag": "ok",
+        "machine_note": "",
+        "reviewer_verdict": null,
+        "reviewer_correction": null,
+        "reviewer_note": null
+      }
+    ],
+    "id": [
+      {
+        "field": "title_danger",
+        "english": "Many warning signs: please pause and check first",
+        "text": "Banyak tanda bahaya: berhenti dulu dan periksa",
+        "back_translation": "Many danger signs: stop first and check",
+        "machine_flag": "ok",
+        "machine_note": "",
+        "reviewer_verdict": null,
+        "reviewer_correction": null,
+        "reviewer_note": null
+      },
+      {
+        "field": "title_careful",
+        "english": "Some warning signs: please verify first",
+        "text": "Ada beberapa tanda bahaya: periksa dulu",
+        "back_translation": "There are several danger signs: check first",
+        "machine_flag": "ok",
+        "machine_note": "",
+        "reviewer_verdict": null,
+        "reviewer_correction": null,
+        "reviewer_note": null
+      },
+      {
+        "field": "title_safe",
+        "english": "We found no major warning signs",
+        "text": "Kami tidak menemukan tanda bahaya besar",
+        "back_translation": "We did not find big danger signs",
+        "machine_flag": "ok",
+        "machine_note": "",
+        "reviewer_verdict": null,
+        "reviewer_correction": null,
+        "reviewer_note": null
+      },
+      {
+        "field": "action_call",
+        "english": "Call hotline",
+        "text": "Hubungi hotline",
+        "back_translation": "Contact hotline",
+        "machine_flag": "ok",
+        "machine_note": "",
+        "reviewer_verdict": null,
+        "reviewer_correction": null,
+        "reviewer_note": null
+      },
+      {
+        "field": "action_share",
+        "english": "Warn family or friends",
+        "text": "Peringatkan keluarga atau teman",
+        "back_translation": "Warn family or friends",
+        "machine_flag": "ok",
+        "machine_note": "",
+        "reviewer_verdict": null,
+        "reviewer_correction": null,
+        "reviewer_note": null
+      },
+      {
+        "field": "action_block",
+        "english": "Block and report this sender",
+        "text": "Blokir dan laporkan pengirim",
+        "back_translation": "Block and report sender",
+        "machine_flag": "ok",
+        "machine_note": "",
+        "reviewer_verdict": null,
+        "reviewer_correction": null,
+        "reviewer_note": null
+      },
+      {
+        "field": "action_learn",
+        "english": "Learn how scams like this work",
+        "text": "Pelajari cara kerja penipuan seperti ini",
+        "back_translation": "Learn how scams like this work",
+        "machine_flag": "ok",
+        "machine_note": "",
+        "reviewer_verdict": null,
+        "reviewer_correction": null,
+        "reviewer_note": null
+      },
+      {
+        "field": "web_risk_note",
+        "english": "Google Web Risk flags a link in this message as unsafe.",
+        "text": "Google Web Risk menandai tautan dalam pesan ini sebagai tidak aman.",
+        "back_translation": "Google Web Risk marked the link in this message as unsafe.",
+        "machine_flag": "ok",
+        "machine_note": "",
+        "reviewer_verdict": null,
+        "reviewer_correction": null,
+        "reviewer_note": null
+      }
+    ],
+    "tl": [
+      {
+        "field": "title_danger",
+        "english": "Many warning signs: please pause and check first",
+        "text": "Maraming babala: huminto muna at mag-verify",
+        "back_translation": "Many warnings: stop first and verify",
+        "machine_flag": "ok",
+        "machine_note": "",
+        "reviewer_verdict": null,
+        "reviewer_correction": null,
+        "reviewer_note": null
+      },
+      {
+        "field": "title_careful",
+        "english": "Some warning signs: please verify first",
+        "text": "May ilang babala: i-verify muna",
+        "back_translation": "There are some warnings: verify first",
+        "machine_flag": "ok",
+        "machine_note": "",
+        "reviewer_verdict": null,
+        "reviewer_correction": null,
+        "reviewer_note": null
+      },
+      {
+        "field": "title_safe",
+        "english": "We found no major warning signs",
+        "text": "Wala kaming nakitang malaking babala",
+        "back_translation": "We did not see any big warning",
+        "machine_flag": "ok",
+        "machine_note": "",
+        "reviewer_verdict": null,
+        "reviewer_correction": null,
+        "reviewer_note": null
+      },
+      {
+        "field": "action_call",
+        "english": "Call hotline",
+        "text": "Tawagan ang hotline",
+        "back_translation": "Call the hotline",
+        "machine_flag": "ok",
+        "machine_note": "",
+        "reviewer_verdict": null,
+        "reviewer_correction": null,
+        "reviewer_note": null
+      },
+      {
+        "field": "action_share",
+        "english": "Warn family or friends",
+        "text": "Balaan ang pamilya o kaibigan",
+        "back_translation": "Warn family or friend",
+        "machine_flag": "ok",
+        "machine_note": "",
+        "reviewer_verdict": null,
+        "reviewer_correction": null,
+        "reviewer_note": null
+      },
+      {
+        "field": "action_block",
+        "english": "Block and report this sender",
+        "text": "I-block at i-report ang nagpadala",
+        "back_translation": "Block and report the sender",
+        "machine_flag": "ok",
+        "machine_note": "",
+        "reviewer_verdict": null,
+        "reviewer_correction": null,
+        "reviewer_note": null
+      },
+      {
+        "field": "action_learn",
+        "english": "Learn how scams like this work",
+        "text": "Alamin kung paano gumagana ang mga scam na tulad nito",
+        "back_translation": "Learn how scams like this work",
+        "machine_flag": "ok",
+        "machine_note": "",
+        "reviewer_verdict": null,
+        "reviewer_correction": null,
+        "reviewer_note": null
+      },
+      {
+        "field": "web_risk_note",
+        "english": "Google Web Risk flags a link in this message as unsafe.",
+        "text": "Namarkahan ng Google Web Risk na hindi ligtas ang isang link sa mensaheng ito.",
+        "back_translation": "Google Web Risk marked a link in this message as not safe.",
+        "machine_flag": "ok",
+        "machine_note": "",
+        "reviewer_verdict": null,
+        "reviewer_correction": null,
+        "reviewer_note": null
+      }
+    ]
+  },
+  "speak": [
+    {
+      "language": "my",
+      "text": "ဒီအလုပ်ကမ်းလှမ်းချက်မှာ လူကုန်ကူးမှုနဲ့ ဆက်နွှယ်တဲ့ သတိပေးလက္ခဏာတွေ တွေ့ရပါတယ်။ ငွေမလွှဲပါနဲ့၊ ပတ်စပို့ကို မပေးပါနဲ့ဦး။",
+      "http": 200,
+      "latency_ms": 4388,
+      "duration_s": 8.85,
+      "sample_rate": 24000,
+      "model": "gemini-3.8-flash-tts",
+      "bytes": 424672,
+      "machine_transcript_check": {
+        "language": "my",
+        "transcript": "ဒီအလုပ်ကမ်းလှမ်းချက်မှာ လူကုန်ကူးမှုနဲ့ဆက်နွယ်တဲ့ သတိပေးလက္ခဏာတွေတွေ့ရပါတယ်။ ငွေမလွှဲပါနဲ့၊ ပတ်စ်ပို့ကို မပေးပါနဲ့ဦး။"
+      }
+    },
+    {
+      "language": "id",
+      "text": "Tawaran ini menunjukkan tanda bahaya perdagangan orang. Jangan serahkan paspor dan bicarakan dengan orang yang Anda percayai.",
+      "http": 200,
+      "latency_ms": 4177,
+      "duration_s": 8.05,
+      "sample_rate": 24000,
+      "model": "gemini-3.8-flash-tts",
+      "bytes": 386272,
+      "machine_transcript_check": {
+        "language": "ind",
+        "transcript": "Tawaran ini menunjukkan tanda bahaya perdagangan orang. Jangan serahkan paspor, dan bicarakan dengan orang yang Anda percayai."
+      }
+    },
+    {
+      "language": "tl",
+      "text": "May malalaking senyales ng trafficking ang alok na ito. Huwag ibigay ang pasaporte o pumunta.",
+      "http": 200,
+      "latency_ms": 3207,
+      "duration_s": 6.97,
+      "sample_rate": 24000,
+      "model": "gemini-3.8-flash-tts",
+      "bytes": 334432,
+      "machine_transcript_check": {
+        "language": "fil",
+        "transcript": "May malalaking senyales ng trafficking ang alok na ito. Huwag ibigay ang pasaporte o pumunta."
+      }
+    }
+  ]
+}
