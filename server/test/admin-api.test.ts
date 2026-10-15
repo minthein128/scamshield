@@ -167,4 +167,51 @@ describe('admin API', () => {
     expect((await store.getDoc('content'))?.items['report:flags.too_good']).toEqual({ en: content.en, my: 'x' });
     expect((await draft('editor', { collection: 'notices', item: { ...notice, id: 'x', severity: 'critical' } })).status).toBe(400);
   });
+
+  it('approve returns the draft with the new version', async () => {
+    const created = (await (await draft('editor')).json()) as { id: string };
+    const out = (await (await call('POST', `/drafts/${created.id}/approve`, 'admin')).json()) as {
+      id: string;
+      status: string;
+      version: number;
+    };
+    expect(out).toMatchObject({ id: created.id, status: 'approved', version: 2 });
+  });
+
+  it('lists drafts by status and the admin roles', async () => {
+    await draft('editor');
+    const pending = (await (await call('GET', '/drafts?status=pending', 'editor')).json()) as { drafts: unknown[] };
+    expect(pending.drafts).toHaveLength(1);
+    expect(((await (await call('GET', '/drafts?status=approved', 'editor')).json()) as { drafts: unknown[] }).drafts).toHaveLength(0);
+    expect((await call('GET', '/drafts?status=bogus', 'editor')).status).toBe(400);
+    const admins = (await (await call('GET', '/admins', 'editor')).json()) as { admins: Array<{ uid: string; role: string }> };
+    expect(admins.admins.map((a) => a.uid)).toEqual(['u-admin', 'u-editor']);
+  });
+
+  it('allows the admin console origins even when CORS_ORIGINS is restricted', async () => {
+    const cfg = loadConfig({ MOCK: '1', CORS_ORIGINS: 'https://saferoute-aibc.web.app' });
+    const pipeline = createPipeline({
+      extractor: createMockExtractor(),
+      correlator: createMockCorrelator(),
+      grounder: createMockGrounder(),
+      model: cfg.model,
+    });
+    const strict = createApp(cfg, pipeline, createMockSpeaker(cfg), undefined, verifier, undefined, undefined, { store, verifier });
+    const preflight = (path: string, origin: string) =>
+      strict.request(path, {
+        method: 'OPTIONS',
+        headers: { origin, 'access-control-request-method': 'POST', 'access-control-request-headers': 'authorization,content-type' },
+      });
+    expect((await preflight('/v1/admin/drafts', 'https://saferoute-admin.web.app')).headers.get('access-control-allow-origin')).toBe(
+      'https://saferoute-admin.web.app',
+    );
+    expect((await preflight('/v1/admin/drafts', 'http://localhost:5173')).headers.get('access-control-allow-origin')).toBe(
+      'http://localhost:5173',
+    );
+    expect((await preflight('/v1/admin/drafts', 'https://evil.example')).headers.get('access-control-allow-origin')).toBeNull();
+    expect((await preflight('/v1/check', 'https://saferoute-admin.web.app')).headers.get('access-control-allow-origin')).toBeNull();
+    expect((await preflight('/v1/check', 'https://saferoute-aibc.web.app')).headers.get('access-control-allow-origin')).toBe(
+      'https://saferoute-aibc.web.app',
+    );
+  });
 });

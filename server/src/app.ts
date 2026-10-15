@@ -49,7 +49,17 @@ export function createApp(
   const feedbackIp = createRateLimiter(cfg.rateLimitPerMin);
   const feedbackHourly = createRateLimiter(0, 3_600_000);
 
-  app.use('*', cors({ origin: cfg.allowedOrigins.includes('*') ? '*' : cfg.allowedOrigins }));
+  const anyOrigin = cfg.allowedOrigins.includes('*');
+  const adminAllowed = new Set([...cfg.adminOrigins, ...cfg.allowedOrigins]);
+  app.use(
+    '*',
+    cors({
+      origin: (origin, c) => {
+        if (c.req.path.startsWith('/v1/admin')) return anyOrigin || adminAllowed.has(origin) ? origin : null;
+        return anyOrigin ? '*' : cfg.allowedOrigins.includes(origin) ? origin : null;
+      },
+    }),
+  );
 
   app.get('/healthz', (c) => c.json({ ok: true, model: cfg.model, mock: cfg.mock }));
 

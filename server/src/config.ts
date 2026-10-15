@@ -10,6 +10,7 @@ export interface Config {
   geminiApiKey?: string;
   webRiskApiKey?: string;
   allowedOrigins: string[];
+  adminOrigins: string[];
   rateLimitPerMin: number;
   firebaseProjectId: string;
   anonPerHour: number;
@@ -65,6 +66,10 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     allowedOrigins: (env.CORS_ORIGINS ?? '*')
       .split(',')
       .map((s) => s.trim())
+      .filter(Boolean),
+    adminOrigins: (env.ADMIN_ORIGINS ?? 'https://saferoute-admin.web.app,http://localhost:5173,http://localhost:5174')
+      .split(',')
+      .map((x) => x.trim())
       .filter(Boolean),
     rateLimitPerMin: Number(env.RATE_LIMIT_PER_MIN ?? 30),
     firebaseProjectId: env.FIREBASE_PROJECT_ID || 'saferoute-aibc',

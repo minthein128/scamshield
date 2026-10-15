@@ -37,6 +37,7 @@ export interface ConfigStore {
   listAudit(limit: number): Promise<AuditEntry[]>;
   getAdmin(uid: string): Promise<AdminRecord | undefined>;
   setAdmin(rec: AdminRecord): Promise<void>;
+  listAdmins(): Promise<AdminRecord[]>;
 }
 
 export function emptyDoc<C extends Collection>(name: C, at?: string): DocOf<C> {
@@ -141,6 +142,9 @@ export function createMemoryStore(now: () => string = () => new Date().toISOStri
     async setAdmin(rec) {
       admins.set(rec.uid, rec);
     },
+    async listAdmins() {
+      return [...admins.values()];
+    },
   };
 }
 
@@ -241,6 +245,9 @@ export function createFirestoreConfigStore(opts: { projectId?: string; db?: Fire
     async setAdmin(rec) {
       const { uid, ...data } = rec;
       await db.collection(ADMINS).doc(uid).set(data);
+    },
+    async listAdmins() {
+      return (await db.collection(ADMINS).limit(200).get()).docs.map((s) => ({ ...(s.data() as object), uid: s.id }) as AdminRecord);
     },
   };
 }

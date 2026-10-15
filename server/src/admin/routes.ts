@@ -125,7 +125,7 @@ export function createAdminRoutes(deps: AdminDeps) {
         collection: out.draft.collection,
         version: out.version,
       });
-      return c.json(out);
+      return c.json({ ...out.draft, version: out.version, audit: out.audit });
     } catch (err) {
       return mapError(err);
     }
@@ -139,6 +139,15 @@ export function createAdminRoutes(deps: AdminDeps) {
       const draft = await store.rejectDraft(c.req.param('id'), admin.uid, note);
       log('INFO', 'admin_draft_rejected', { uid: admin.uid, draftId: draft.id, collection: draft.collection });
       return c.json(draft);
+    } catch (err) {
+      return mapError(err);
+    }
+  });
+
+  app.get('/admins', async (c) => {
+    try {
+      const admins = await store.listAdmins();
+      return c.json({ admins: admins.sort((a, b) => a.email.localeCompare(b.email)) });
     } catch (err) {
       return mapError(err);
     }

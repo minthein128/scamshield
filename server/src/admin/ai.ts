@@ -48,10 +48,14 @@ export interface VerifyResult {
 
 export interface AiAssist {
   model: string;
-  findHotline(req: FindRequest): Promise<{ candidates: Candidate[] }>;
-  verifyHotline(item: VerifyItem): Promise<VerifyResult>;
-  draftContent(req: { key: string; instruction: string; language: Lang }): Promise<{ text: string; note: string }>;
-  translate(req: { text: string; from: Lang; to: Lang[] }): Promise<{ translations: Record<string, string>; warnings: string[] }>;
+  findHotline(req: FindRequest): Promise<{ candidates: Candidate[]; model: string }>;
+  verifyHotline(item: VerifyItem): Promise<VerifyResult & { model: string }>;
+  draftContent(req: { key: string; instruction: string; language: Lang }): Promise<{ text: string; note: string; model: string }>;
+  translate(req: {
+    text: string;
+    from: Lang;
+    to: Lang[];
+  }): Promise<{ translations: Record<string, string>; warnings: string[]; note: string; model: string }>;
 }
 
 export interface VerifyItem {
@@ -257,7 +261,7 @@ export function createAiAssist(deps: AiDeps): AiAssist {
       }
       const rank = { high: 0, medium: 1, low: 2 } as const;
       candidates.sort((a, b) => rank[a.confidence] - rank[b.confidence]);
-      return { candidates };
+      return { candidates, model };
     },
 
     async verifyHotline(item) {
@@ -275,7 +279,7 @@ export function createAiAssist(deps: AiDeps): AiAssist {
         }
       }
       if (verdict === 'conflict' && !sources.length) verdict = 'unverified';
-      return { verdict, sources, note };
+      return { verdict, sources, note, model };
     },
 
     async draftContent({ key, instruction, language }) {
@@ -293,7 +297,7 @@ export function createAiAssist(deps: AiDeps): AiAssist {
         note = `Certainty wording was rewritten automatically (${hits.join(', ')}). Read it again before publishing.`;
       }
       if (!text) throw new ApiError(502, 'upstream', 'The AI service returned no text');
-      return { text, note };
+      return { text, note, model };
     },
 
     async translate({ text, from, to }) {
@@ -317,7 +321,12 @@ export function createAiAssist(deps: AiDeps): AiAssist {
         if (hits.length) warnings.push(`${lang}: certainty wording found (${hits.join(', ')})`);
         translations[lang] = out.trim();
       }
-      return { translations, warnings };
+      return {
+        translations,
+        warnings,
+        note: warnings.length ? warnings.join('; ') : 'Translated with the SafeRoute glossary. Review before publishing.',
+        model,
+      };
     },
   };
 }
