@@ -28,11 +28,15 @@ export const ScamGuideScreen: React.FC<RootScreenProps<'ScamGuide'>> = ({ naviga
   };
 
   return (
-    <Screen contentStyle={{ gap: 24 }}>
-      <View style={styles.top}>
-        <BackButton onPress={() => navigation.goBack()} />
-        <Text style={styles.eyebrow}>{t('guide.eyebrow')}</Text>
-      </View>
+    <Screen
+      contentStyle={{ gap: 24 }}
+      header={
+        <View style={styles.top}>
+          <BackButton onPress={() => navigation.goBack()} />
+          <Text style={styles.eyebrow}>{t('guide.eyebrow')}</Text>
+        </View>
+      }
+    >
 
       <View style={styles.hero}>
         <View style={[styles.heroIcon, { backgroundColor: soft }]}>

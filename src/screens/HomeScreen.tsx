@@ -41,16 +41,19 @@ export const HomeScreen: React.FC<TabScreenProps<'Home'>> = ({ navigation }) => 
   );
 
   return (
-    <Screen wide>
-      <View style={styles.brandRow}>
-        <View style={{ flex: 1 }}>
-          <BrandLockup header />
+    <Screen
+      wide
+      header={
+        <View style={styles.brandRow}>
+          <View style={{ flex: 1 }}>
+            <BrandLockup header />
+          </View>
+          <TouchableOpacity testID="open-settings" accessibilityRole="button" accessibilityLabel={t('settingsA11y')} activeOpacity={0.7} onPress={() => navigation.navigate('Settings')} style={styles.iconButton}>
+            <Icon name="settings" size={24} />
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity testID="open-settings" accessibilityRole="button" accessibilityLabel={t('settingsA11y')} activeOpacity={0.7} onPress={() => navigation.navigate('Settings')} style={styles.iconButton}>
-          <Icon name="settings" size={24} />
-        </TouchableOpacity>
-      </View>
-
+      }
+    >
       <NoticeCard />
 
       {layout.isExpanded ? (

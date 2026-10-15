@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Linking, TouchableOpacity, PixelRatio, useWindowDimensions } from 'react-native';
+import { View, StyleSheet, Linking, TouchableOpacity, useWindowDimensions } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Icon, type IconName } from '../components/Icon';
 import { Screen } from '../components/Screen';
@@ -15,7 +15,6 @@ import {
   warnMessage,
 } from '../lib/report';
 import { callLabel } from '../lib/callLabel';
-import { voiceRowStacks } from '../lib/voiceRow';
 import { scamTypeLabel, verdictLabel } from '../lib/labels';
 import { resolveCallTarget } from '../lib/hotlines';
 import { useLayout } from '../hooks/useLayout';
@@ -58,7 +57,6 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
   const style = VERDICT_STYLES[result.verdict];
   const flags = groupFlags(result.flags).flatMap(g => g.flags);
   const sources = result.sources ?? [];
-  const [speaking, setSpeaking] = useState(false);
   const [warnOpen, setWarnOpen] = useState(false);
   const [liveOpen, setLiveOpen] = useState(false);
   const { profile, language: settingLanguage } = useAppState();
@@ -70,33 +68,17 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
 
   useEffect(() => {
     if (fresh && result.verdict !== 'safe') {
-      setSpeaking(true);
-      speak(result.spokenWarning, language, () => setSpeaking(false), getApiClient()).catch(() => setSpeaking(false));
+      speak(result.spokenWarning, language, () => undefined, getApiClient()).catch(() => undefined);
     }
     return () => stopSpeaking();
   }, [fresh, result, language]);
-
-  const toggleSpeech = async () => {
-    if (speaking) {
-      stopSpeaking();
-      setSpeaking(false);
-      return;
-    }
-    setSpeaking(true);
-    await speak(result.spokenWarning, language, () => setSpeaking(false), getApiClient()).catch(() => setSpeaking(false));
-  };
 
   useRuntimeConfig();
   const callAction = result.actions.find(a => a.type === 'call');
   const hotline = resolveCallTarget(callAction?.value, profile.destinationCountry, profile.homeCountry);
 
   const call = hotline ? callLabel(hotline, { call: number => t('call', { number }), ext: ext => t('callExt', { ext }) }) : { label: '' };
-  const listenLabel = speaking ? t('stop') : t('listen', { language: t(`common:languageNames.${language}`) });
   const talkLabel = t('live:button');
-  const paneWidth = layout.isExpanded
-    ? (layout.wideMaxWidth - layout.gutter * 2 - PANE_GAP) / 2
-    : Math.min(layout.contentMaxWidth, layout.width - layout.gutter * 2);
-  const stackVoice = voiceRowStacks(tablet ? paneWidth + 40 : width, [listenLabel, talkLabel], PixelRatio.getFontScale());
   const footerButton = tablet ? styles.footerButton : undefined;
 
   const shareResult = async () => {
@@ -125,8 +107,6 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
 
   const leftTop = (
     <>
-      <ScreenHeader title={t('title')} onBack={() => (navigation.canGoBack() ? navigation.goBack() : navigation.navigate('Tabs'))} />
-
       <View style={[styles.banner, narrow && styles.bannerNarrow, { backgroundColor: style.background }]} testID={`verdict-${result.verdict}`} accessible accessibilityLabel={t('a11yVerdict', { verdict: verdictLabel(result.verdict), score: result.score })}>
         <View style={styles.bannerIcon}>
           <Icon name={result.verdict === 'safe' ? 'shieldCheck' : result.verdict === 'danger' ? 'octagon' : 'alert'} size={36} color={colors.white} />
@@ -151,25 +131,16 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
         </View>
       ) : null}
 
-      <View style={stackVoice ? styles.voiceStack : styles.voiceRow}>
-        <Button
-          testID="report-listen"
-          icon={speaking ? 'stop' : 'speaker'}
-          label={listenLabel}
-          variant="dark"
-          onPress={toggleSpeech}
-          style={stackVoice ? styles.voiceButtonStacked : styles.voiceButton}
-        />
+      <View>
         <Button
           testID="report-talk"
           icon="mic"
           label={talkLabel}
           onPress={() => {
             stopSpeaking();
-            setSpeaking(false);
             setLiveOpen(true);
           }}
-          style={stackVoice ? styles.voiceButtonStacked : styles.voiceButton}
+          style={styles.talkButton}
         />
       </View>
 
@@ -268,6 +239,7 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
   return (
     <Screen
       edges={['top']}
+      header={<ScreenHeader title={t('title')} onBack={() => (navigation.canGoBack() ? navigation.goBack() : navigation.navigate('Tabs'))} />}
       wide={layout.isExpanded}
       footerRow={tablet}
       footer={
@@ -330,10 +302,7 @@ const styles = StyleSheet.create({
   panes: { flexDirection: 'row', alignItems: 'flex-start', gap: PANE_GAP },
   pane: { flex: 1, flexBasis: 0, minWidth: 0, gap: 16 },
   footerButton: { flex: 1, flexBasis: 0, minWidth: 0 },
-  voiceRow: { flexDirection: 'row', gap: 10 },
-  voiceStack: { gap: 10 },
-  voiceButton: { flex: 1, flexBasis: 0, minHeight: 64, paddingHorizontal: 10 },
-  voiceButtonStacked: { alignSelf: 'stretch', minHeight: 56 },
+  talkButton: { alignSelf: 'stretch', minHeight: 56 },
   banner: { flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: 24, paddingVertical: 24, paddingHorizontal: 20 },
   bannerIcon: { width: 56, height: 56, borderRadius: 28, backgroundColor: 'rgba(255,255,255,0.18)', alignItems: 'center', justifyContent: 'center' },
   bannerTitle: { fontSize: 28, lineHeight: 34, fontFamily: fonts.extraBold, letterSpacing: -0.3, color: colors.white, includeFontPadding: false },

@@ -14,11 +14,14 @@ const { colors, fonts } = theme;
 export const ShieldHowToScreen: React.FC<RootScreenProps<'ShieldHowTo'>> = ({ navigation }) => {
   const { t } = useTranslation('learn');
   return (
-    <Screen>
-      <View style={styles.top}>
-        <BackButton onPress={() => navigation.goBack()} />
-        <Text style={styles.eyebrow}>{t('shieldHowTo.eyebrow')}</Text>
-      </View>
+    <Screen
+      header={
+        <View style={styles.top}>
+          <BackButton onPress={() => navigation.goBack()} />
+          <Text style={styles.eyebrow}>{t('shieldHowTo.eyebrow')}</Text>
+        </View>
+      }
+    >
       <Text accessibilityRole="header" style={styles.title}>{t('shieldRow.title')}</Text>
       <DemoStepper steps={SHIELD_STEPS} onDone={() => navigation.goBack()} testID="shield-stepper" />
     </Screen>
