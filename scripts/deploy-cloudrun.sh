@@ -63,7 +63,7 @@ deploy_web() {
   mkdir -p dist/dl
   if [ -n "${1:-}" ]; then cp "$1" dist/dl/saferoute.pkg
   else curl -fsS "$APK_URL" -o dist/dl/saferoute.pkg || rm -f dist/dl/saferoute.pkg; fi
-  firebase deploy --only hosting
+  firebase deploy --only hosting:app
 }
 deploy_web
 
