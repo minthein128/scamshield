@@ -55,6 +55,7 @@
     "react-native-screens": "~4.4.0",
     "react-native-svg": "15.8.0",
     "react-native-web": "~0.19.13",
+    "live-audio": "file:./modules/live-audio",
     "shield-module": "file:./modules/shield-module"
   },
   "devDependencies": {
@@ -84,7 +85,7 @@
       "/server/"
     ],
     "transformIgnorePatterns": [
-      "node_modules/(?!((jest-)?react-native|@react-native(-community)?|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|react-native-svg|shield-module))"
+      "node_modules/(?!((jest-)?react-native|@react-native(-community)?|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|react-native-svg|shield-module|live-audio))"
     ]
   }
 }
