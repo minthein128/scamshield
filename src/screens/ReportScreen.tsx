@@ -329,7 +329,7 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
 const styles = StyleSheet.create({
   panes: { flexDirection: 'row', alignItems: 'flex-start', gap: PANE_GAP },
   pane: { flex: 1, flexBasis: 0, minWidth: 0, gap: 16 },
-  footerButton: { flex: 1, flexBasis: 0, minWidth: 220 },
+  footerButton: { flex: 1, flexBasis: 0, minWidth: 0 },
   voiceRow: { flexDirection: 'row', gap: 10 },
   voiceStack: { gap: 10 },
   voiceButton: { flex: 1, flexBasis: 0, minHeight: 64, paddingHorizontal: 10 },

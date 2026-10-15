@@ -58,5 +58,5 @@ const styles = StyleSheet.create({
   inner: { gap: 16 },
   footer: { paddingTop: 10, paddingHorizontal: 20, paddingBottom: 16, gap: 8 },
   footerCol: { gap: 8 },
-  footerRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, alignItems: 'stretch' },
+  footerRow: { flexDirection: 'row', gap: 10, alignItems: 'stretch' },
 });
