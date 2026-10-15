@@ -20,7 +20,7 @@ export function readFirebaseConfig(env: Record<string, string | undefined> = {})
   };
 }
 
-export const STABLE_API_URL = 'https://api.akkhayar.com';
+export const STABLE_API_URL = 'https://saferoute-api.akkhayar.com';
 // Dev builds without a URL keep using the offline mock.
 export const API_URL = process.env.EXPO_PUBLIC_API_URL?.trim() || (__DEV__ ? '' : STABLE_API_URL);
 

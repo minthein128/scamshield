@@ -28,7 +28,7 @@ beforeEach(() => AsyncStorage.clear());
 describe('config sources', () => {
   it('parses a comma list and defaults to the two Hosting domains', () => {
     expect(parseConfigUrls(' https://x.example/c.json, junk ,http://y.example/c.json ')).toEqual(['https://x.example/c.json', 'http://y.example/c.json']);
-    expect(parseConfigUrls(undefined)).toEqual(['https://api.akkhayar.com/config.json', 'https://saferoute-aibc.web.app/config.json', 'https://saferoute-aibc.firebaseapp.com/config.json']);
+    expect(parseConfigUrls(undefined)).toEqual(['https://saferoute-api.akkhayar.com/config.json', 'https://saferoute-aibc.web.app/config.json', 'https://saferoute-aibc.firebaseapp.com/config.json']);
   });
 
   it('takes the second source when the first is blocked', async () => {

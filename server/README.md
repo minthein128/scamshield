@@ -42,6 +42,7 @@ Link results add flags: a Web Risk hit adds `known_bad` (high); a domain under 1
 - `POST /v1/check`: see the contract. 400 `bad_request`, 413 `too_large` (body over 6 MB, image over ~4 MB), 429 `rate_limited`, 502 `upstream`.
 - `POST /v1/speak`: `{text, language}` returns a base64 WAV from Gemini TTS (`TTS_MODEL`, default `gemini-3.8-flash-tts`; unverified, see CLAUDE.md).
 - `GET /healthz`: `{ ok, model, mock }`.
+- `GET /config.json`: `{ apiUrl }` from `PUBLIC_API_URL` (default `https://saferoute-api.akkhayar.com`), `Cache-Control: no-cache`. The app reads it as its first config source.
 
 ## Environment
 
