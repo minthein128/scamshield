@@ -25,26 +25,5 @@
     "notStarted": "Hindi nagsimula ang shield. Tiyaking pinapayagan ang \"Display over other apps\" at subukang muli.",
     "failed": "Hindi nagsimula ang shield. Subukang muli.",
     "checkFailed": "Hindi nagsimula ang pagsusuri. I-on ang shield at subukang muli."
-  },
-  "messageGuard": {
-    "title": "Message Guard: binababalaan ka tungkol sa mga mensaheng mukhang mapanganib pagdating ng mga ito",
-    "privacy": "Mga mensaheng mukhang mapanganib lamang ang sinusuri. Inaalis muna ang mga code at personal na numero.",
-    "a11y": "Message Guard",
-    "status": {
-      "web": "Gumagana sa SafeRoute Android app.",
-      "unavailable": "Hindi available sa build na ito.",
-      "on": "Naka-on. Makatatanggap ng babala ang mga mensaheng mukhang mapanganib mula sa iyong mga chat at SMS app.",
-      "off": "Naka-off",
-      "needsAccess": "Naka-off. Ang pag-on nito ay magbubukas ng Android notification access."
-    },
-    "apps": {
-      "show": "Pumili ng mga app ({{count}} naka-on)",
-      "hide": "Itago ang mga app ({{count}} naka-on)",
-      "a11y": "Mga app na binabantayan ng Message Guard, {{count}} naka-on"
-    },
-    "errors": {
-      "accessOff": "Naka-off pa rin ang notification access. Kung kulay abo ang switch, buksan ang SafeRoute sa App info, pindutin ang tatlong tuldok at piliin ang \"Allow restricted settings\".",
-      "cannotOpen": "Hindi mabuksan ang mga setting ng notification access."
-    }
   }
 }

@@ -1,11 +1,8 @@
 package com.saferoute.shield
 
-import android.content.ComponentName
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.provider.Settings
-import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import expo.modules.kotlin.Promise
 import expo.modules.kotlin.exception.CodedException
@@ -102,73 +99,10 @@ class ShieldModule : Module() {
 
         AsyncFunction("getShieldResult") { id: String ->
             ShieldBridge.recentResult(id)
-                ?: appContext.reactContext?.let { MessageGuardStore(it).result(id) }
         }
 
         AsyncFunction("takeUnsyncedResults") {
             ShieldBridge.takeUnsynced()
-        }
-
-        AsyncFunction("hasNotificationAccess") {
-            val context = appContext.reactContext ?: return@AsyncFunction false
-            NotificationManagerCompat.getEnabledListenerPackages(context).contains(context.packageName)
-        }
-
-        AsyncFunction("openNotificationAccessSettings") {
-            val context = appContext.currentActivity ?: appContext.reactContext ?: return@AsyncFunction false
-            val detail = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                Intent(Settings.ACTION_NOTIFICATION_LISTENER_DETAIL_SETTINGS).putExtra(
-                    Settings.EXTRA_NOTIFICATION_LISTENER_COMPONENT_NAME,
-                    ComponentName(context, MessageGuardListener::class.java).flattenToString()
-                )
-            } else {
-                null
-            }
-            val list = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
-            for (intent in listOfNotNull(detail, list)) {
-                try {
-                    context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-                    return@AsyncFunction true
-                } catch (e: Exception) {
-                    continue
-                }
-            }
-            false
-        }
-
-        AsyncFunction("setMessageGuardEnabled") { enabled: Boolean ->
-            val context = appContext.reactContext ?: return@AsyncFunction false
-            MessageGuardStore(context).enabled = enabled
-            if (enabled) MessageGuardListener.rebind(context)
-            true
-        }
-
-        AsyncFunction("isMessageGuardEnabled") {
-            val context = appContext.reactContext ?: return@AsyncFunction false
-            MessageGuardStore(context).enabled
-        }
-
-        AsyncFunction("setMessageGuardApps") { ids: List<String> ->
-            val context = appContext.reactContext ?: return@AsyncFunction false
-            val known = MessageApps.catalog.map { it.id } + MessageApps.SMS_ID
-            MessageGuardStore(context).enabledApps = ids.filter { it in known }.toSet()
-            true
-        }
-
-        AsyncFunction("getMessageGuardApps") {
-            val context = appContext.reactContext ?: return@AsyncFunction emptyList<Map<String, Any>>()
-            MessageApps.rows(context, MessageGuardStore(context).enabledApps).map { (id, label, enabled) ->
-                mapOf("id" to id, "label" to label, "enabled" to enabled)
-            }
-        }
-
-        AsyncFunction("configureMessageGuard") { options: Map<String, Any?> ->
-            val context = appContext.reactContext ?: return@AsyncFunction false
-            val store = MessageGuardStore(context)
-            (options["apiUrl"] as? String)?.let { store.apiUrl = it }
-            (options["language"] as? String)?.let { if (it.isNotBlank()) store.language = it }
-            (options["shareSignals"] as? Boolean)?.let { store.shareSignals = it }
-            true
         }
     }
 }

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Text, StyleSheet } from 'react-native';
 import * as ShieldModule from 'shield-module';
 import { Screen } from '../components/Screen';
-import { MessageGuardCard } from '../components/MessageGuardCard';
 import { ShieldCardView } from '../components/ShieldCard';
 import { Button, Card, ScreenHeader } from '../components/ui';
 import { useShieldControl } from '../hooks/useShieldControl';
@@ -43,7 +42,6 @@ export const ShieldScreen: React.FC<RootScreenProps<'Shield'>> = ({ navigation }
     <Screen>
       <ScreenHeader title="Screen shield" onBack={() => navigation.goBack()} />
       <ShieldCardView control={control} />
-      <MessageGuardCard />
       <Card style={{ gap: 8 }}>
         <Text style={styles.title}>What the shield needs</Text>
         {STEPS.map((s, i) => (

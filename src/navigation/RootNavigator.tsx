@@ -22,7 +22,6 @@ import GetHelpScreen from '../screens/GetHelpScreen';
 import RadarScreen from '../screens/RadarScreen';
 import { navigationRef } from './ref';
 import { useAppState } from '../state/AppState';
-import { useMessageGuardConfigSync } from '../hooks/useMessageGuard';
 import { useShieldTokenSync } from '../hooks/useShieldTokenSync';
 import LearnScreen from '../screens/LearnScreen';
 import ShieldScreen from '../screens/ShieldScreen';
@@ -85,7 +84,6 @@ export const RootNavigator: React.FC = () => {
   const [ready, setReady] = useState(false);
   const { ready: loaded, profile } = useAppState();
   useShieldTokenSync();
-  useMessageGuardConfigSync();
   const onOnboardingDone = (next?: AfterOnboarding) => {
     if (next) setTimeout(() => navigationRef.navigate('Account', { mode: next }), 150);
   };

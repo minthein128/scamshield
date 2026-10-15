@@ -19,13 +19,6 @@ Expo module for Android. It draws a floating bubble over other apps. A tap captu
 | `CheckClient.kt` | HttpURLConnection call to `/v1/check` |
 | `ConsentActivity.kt` | Transparent activity that shows the screen-capture consent dialog |
 | `ShieldBridge.kt` | Shared state between module, service and activity |
-| `MessageGuardListener.kt` | `NotificationListenerService` for Message Guard. Drops every app outside the allowlist before reading content |
-| `MessageApps.kt` | Allowlist of messaging apps and the default SMS app |
-| `MessagePrefilter.kt`, `GuardKeywords.kt`, `MessageLinks.kt` | On-device scoring. Keywords live in `res/raw/message_guard_keywords.json` |
-| `MessageRedactor.kt` | Replaces phone numbers, emails and long numbers before sending |
-| `MessageGuardEngine.kt`, `MessageGuardLimiter.kt` | Prefilter, redaction, duplicate check and the 20 per hour cap |
-| `MessageCheckClient.kt` | `/v1/check` call with `kind: "message"` |
-| `MessageGuardNotifier.kt`, `MessageGuardStore.kt` | Warning notification and app-private settings and recent results |
 
 ## Build and verify
 
@@ -151,27 +144,6 @@ Bubble gesture, with a result card showing:
 
 `./gradlew :shield-module:testDebugUnitTest` also runs `ShieldDragTest` (anchor maths for left, right, top, bottom and nav-bar positions, the drag state machine, and drag, close and configuration change against a real overlay). It renders every state, light and dark, to `android/build/shield-snapshots/*.png` with Robolectric native graphics. Elevation shadows and the Plus Jakarta Sans fonts are not part of that render (the test has no APK assets), so check those on a device.
 
-## Message Guard
-
-Opt-in. The user grants notification access in system Settings (`openNotificationAccessSettings()`), then turns the feature on (`setMessageGuardEnabled(true)`). Nothing is read while it is off.
-
-Flow for each notification:
-
-1. Drop it unless the package is on the allowlist and enabled: the default SMS app (`Telephony.Sms.getDefaultSmsPackage`), Google Messages, WhatsApp (and Business), Viber, Telegram, LINE, Messenger, Zalo and Signal. Group summaries and ongoing notifications are dropped too.
-2. Score it on the device. Signals and weights are in `message_guard_keywords.json` (link 2, shortener +1, payment 2, OTP 2, account 2, urgency 1, parcel 2, bank 2, job 2, chat-app move 1, unknown sender 1). A score of 3 or more passes. English, Bahasa, Tagalog and Burmese lists are scanned for every message, whatever the app language.
-3. A short message with a code word, a 4 to 8 digit code, no link and no phone number is a genuine OTP. It is skipped before scoring and never leaves the device.
-4. Redact, then send `{ kind: "message", text, language, shareSignals }` with the Firebase token if the app set one. The sender title never leaves the device.
-5. `careful` or `danger`: post a warning notification (channel "SafeRoute warnings", high importance for danger) with the hedged chip "Looks risky" (danger) or "Shows warning signs" (careful) and an "Open report" action for `saferoute://report/<id>`. `safe` shows nothing. The result also goes through `ShieldBridge.publishResult`, so it reaches `onShieldResult` and `takeUnsyncedResults` with `kind: "message"`, and is stored in app-private preferences so the deep link still works after the process was killed.
-
-Redaction: emails become `[EMAIL]`, phone numbers `[PHONE]`, digit runs of 6 or more `[NUMBER]`, and a code next to a code word `[CODE]`. Links keep host and path, lose query, fragment and user info. Amounts like `1.500.000` and dates stay. Names in the body are not removed. Text is cut to 1000 characters.
-
-Limits: the same message (ignoring digits and spacing) is checked once per 10 minutes. At most 20 checks leave the device per hour. The auth token is held in memory only, so a check after the app process died goes out without it and the server limits by IP.
-
-The Burmese lists are Unicode text. Zawgyi-encoded messages do not match. Tune the JSON, then run `./gradlew :shield-module:testDebugUnitTest`.
-
-### Google Play declaration
-
-Notification access (`BIND_NOTIFICATION_LISTENER_SERVICE`) is a sensitive permission, and reading messages falls under Play's User Data and SMS policies. The listing must: describe Message Guard as an optional core feature that warns about scam messages; state that it reads notifications only from the listed messaging apps; state that text is scored on the device and only risky-looking text is sent, with phone numbers, emails and long numbers removed first, and that genuine one-time codes are never sent; point to the privacy policy section that says this; and make the in-app prominent disclosure and consent (the Message Guard card, shown before the system settings screen opens) match the declaration. Do not request `READ_SMS` or `RECEIVE_SMS`. If Play review asks for a video, show the card, the settings screen and a warning notification. Sideloaded builds on Android 13 and up need "Allow restricted settings" in App info before the switch can be turned on.
 
 ## Auth token
 

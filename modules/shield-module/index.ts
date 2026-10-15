@@ -35,19 +35,6 @@ export interface ShieldStartOptions {
   authToken?: string;
 }
 
-/** One messaging app Message Guard can watch. */
-export interface MessageGuardApp {
-  id: string;
-  label: string;
-  enabled: boolean;
-}
-
-export interface MessageGuardConfig {
-  apiUrl?: string;
-  language?: 'en' | 'id' | 'tl' | 'my' | 'th';
-  shareSignals?: boolean;
-}
-
 export interface ShieldSubscription {
   remove(): void;
 }
@@ -63,13 +50,6 @@ interface ShieldModuleType {
   checkScreenNow(): Promise<void>;
   getShieldResult(id: string): Promise<string | null>;
   takeUnsyncedResults(): Promise<string[]>;
-  hasNotificationAccess(): Promise<boolean>;
-  openNotificationAccessSettings(): Promise<boolean>;
-  setMessageGuardEnabled(enabled: boolean): Promise<boolean>;
-  isMessageGuardEnabled(): Promise<boolean>;
-  setMessageGuardApps(ids: string[]): Promise<boolean>;
-  getMessageGuardApps(): Promise<MessageGuardApp[]>;
-  configureMessageGuard(config: MessageGuardConfig): Promise<boolean>;
   addListener(
     event: 'onShieldResult',
     listener: (e: { id: string; json: string }) => void
@@ -107,19 +87,6 @@ const MOCK_RESULT: ShieldCheckResult = {
 let mockRunning = false;
 let mockOverlayGranted = false;
 let mockCaptureGranted = false;
-let mockNotificationAccess = false;
-let mockGuardEnabled = false;
-const MOCK_GUARD_APPS: MessageGuardApp[] = [
-  { id: 'messages', label: 'Google Messages', enabled: true },
-  { id: 'whatsapp', label: 'WhatsApp', enabled: true },
-  { id: 'viber', label: 'Viber', enabled: true },
-  { id: 'telegram', label: 'Telegram', enabled: true },
-  { id: 'line', label: 'LINE', enabled: true },
-  { id: 'messenger', label: 'Messenger', enabled: true },
-  { id: 'zalo', label: 'Zalo', enabled: true },
-  { id: 'signal', label: 'Signal', enabled: true },
-];
-let mockGuardApps: MessageGuardApp[] = MOCK_GUARD_APPS.map(a => ({ ...a }));
 const mockListeners = new Set<(r: ShieldCheckResult) => void>();
 
 export async function hasOverlayPermission(): Promise<boolean> {
@@ -259,89 +226,6 @@ export async function takeUnsyncedResults(): Promise<ShieldCheckResult[]> {
   }
 }
 
-/** True when the user has granted SafeRoute notification access in system Settings. */
-export async function hasNotificationAccess(): Promise<boolean> {
-  if (nativeShieldModule) {
-    try {
-      return await nativeShieldModule.hasNotificationAccess();
-    } catch {
-      return false;
-    }
-  }
-  return mockNotificationAccess;
-}
-
-/** Opens the system notification access screen. The user turns SafeRoute on there. */
-export async function openNotificationAccessSettings(): Promise<boolean> {
-  if (nativeShieldModule) {
-    try {
-      return await nativeShieldModule.openNotificationAccessSettings();
-    } catch {
-      return false;
-    }
-  }
-  mockNotificationAccess = true;
-  return true;
-}
-
-/** Turns Message Guard on or off. It reads nothing while off. Needs notification access to do anything. */
-export async function setMessageGuardEnabled(enabled: boolean): Promise<boolean> {
-  if (nativeShieldModule) {
-    try {
-      return await nativeShieldModule.setMessageGuardEnabled(enabled);
-    } catch {
-      return false;
-    }
-  }
-  mockGuardEnabled = enabled;
-  return true;
-}
-
-export async function isMessageGuardEnabled(): Promise<boolean> {
-  if (nativeShieldModule) {
-    try {
-      return await nativeShieldModule.isMessageGuardEnabled();
-    } catch {
-      return false;
-    }
-  }
-  return mockGuardEnabled;
-}
-
-/** Sets which apps are watched, by id from getMessageGuardApps(). Apps not listed are ignored. */
-export async function setMessageGuardApps(ids: string[]): Promise<boolean> {
-  if (nativeShieldModule) {
-    try {
-      return await nativeShieldModule.setMessageGuardApps(ids);
-    } catch {
-      return false;
-    }
-  }
-  mockGuardApps = mockGuardApps.map(a => ({ ...a, enabled: ids.includes(a.id) }));
-  return true;
-}
-
-export async function getMessageGuardApps(): Promise<MessageGuardApp[]> {
-  if (nativeShieldModule) {
-    try {
-      return await nativeShieldModule.getMessageGuardApps();
-    } catch {
-      return [];
-    }
-  }
-  return mockGuardApps.map(a => ({ ...a }));
-}
-
-/** Stores the server address, language and signal sharing choice the background listener uses. */
-export async function configureMessageGuard(config: MessageGuardConfig): Promise<boolean> {
-  if (!nativeShieldModule) return true;
-  try {
-    return await nativeShieldModule.configureMessageGuard(config);
-  } catch {
-    return false;
-  }
-}
-
 export default {
   hasOverlayPermission,
   requestOverlayPermission,
@@ -354,11 +238,4 @@ export default {
   addShieldResultListener,
   getShieldResult,
   takeUnsyncedResults,
-  hasNotificationAccess,
-  openNotificationAccessSettings,
-  setMessageGuardEnabled,
-  isMessageGuardEnabled,
-  setMessageGuardApps,
-  getMessageGuardApps,
-  configureMessageGuard,
 };

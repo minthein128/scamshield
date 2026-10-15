@@ -25,26 +25,5 @@
     "notStarted": "Shield tidak berjalan. Pastikan izin \"Tampilkan di atas aplikasi lain\" aktif, lalu coba lagi.",
     "failed": "Shield tidak berjalan. Coba lagi.",
     "checkFailed": "Pemeriksaan tidak berjalan. Nyalakan shield dan coba lagi."
-  },
-  "messageGuard": {
-    "title": "Message Guard: memberi Anda peringatan tentang pesan yang tampak berisiko saat pesan tiba",
-    "privacy": "Hanya pesan yang tampak berisiko yang diperiksa. Kode dan nomor pribadi dihapus terlebih dahulu.",
-    "a11y": "Message Guard",
-    "status": {
-      "web": "Berfungsi di aplikasi Android SafeRoute.",
-      "unavailable": "Tidak tersedia pada versi ini.",
-      "on": "Aktif. Pesan yang tampak berisiko dari aplikasi chat dan SMS Anda akan diberi peringatan.",
-      "off": "Mati",
-      "needsAccess": "Mati. Mengaktifkannya akan membuka akses notifikasi Android."
-    },
-    "apps": {
-      "show": "Pilih aplikasi ({{count}} aktif)",
-      "hide": "Sembunyikan aplikasi ({{count}} aktif)",
-      "a11y": "Aplikasi yang diawasi Message Guard, {{count}} aktif"
-    },
-    "errors": {
-      "accessOff": "Akses notifikasi masih nonaktif. Jika tombol berwarna abu-abu, buka SafeRoute di Info aplikasi, ketuk titik tiga dan pilih \"Izinkan setelan terbatas\".",
-      "cannotOpen": "Tidak dapat membuka pengaturan akses notifikasi."
-    }
   }
 }

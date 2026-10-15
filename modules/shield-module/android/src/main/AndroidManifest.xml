@@ -16,15 +16,6 @@
         android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
         android:value="Floating overlay button that checks the screen for scams on tap" />
     </service>
-    <service
-      android:name="com.saferoute.shield.MessageGuardListener"
-      android:label="SafeRoute Message Guard"
-      android:exported="true"
-      android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
-      <intent-filter>
-        <action android:name="android.service.notification.NotificationListenerService" />
-      </intent-filter>
-    </service>
     <activity
       android:name="com.saferoute.shield.ConsentActivity"
       android:exported="false"
