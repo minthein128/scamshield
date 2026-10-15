@@ -6,6 +6,8 @@ import { hasInput, isCheckResponse, normalizeResponse } from './validate';
 export interface HttpClientConfig {
   baseUrl: string;
   timeoutMs?: number;
+  /** Timeout for /v1/check, which may upload a screenshot on a slow link. Defaults to timeoutMs when set, else 75 s. */
+  checkTimeoutMs?: number;
   fetchImpl?: typeof fetch;
   getToken?: () => Promise<string | null>;
   /** Set false to never ask for a streamed check. Default true. */
@@ -15,6 +17,7 @@ export interface HttpClientConfig {
 }
 
 export const DEFAULT_TIMEOUT_MS = 30000;
+export const CHECK_TIMEOUT_MS = 75000;
 
 function isErrorBody(value: unknown): value is ApiErrorBody {
   return Boolean(value && typeof value === 'object' && 'error' in value && (value as ApiErrorBody).error?.code);
@@ -78,6 +81,7 @@ async function readCheckStream(response: Response, onUpdate: (u: CheckUpdate) =>
 export function createHttpClient(config: HttpClientConfig): CheckClient {
   const baseUrl = config.baseUrl.replace(/\/+$/, '');
   const timeoutMs = config.timeoutMs ?? DEFAULT_TIMEOUT_MS;
+  const checkTimeoutMs = config.checkTimeoutMs ?? config.timeoutMs ?? CHECK_TIMEOUT_MS;
   const fetchImpl = config.fetchImpl ?? fetch;
   const streaming = config.stream !== false;
 
@@ -87,14 +91,15 @@ export function createHttpClient(config: HttpClientConfig): CheckClient {
     options?: RequestOptions,
     readOk: (response: Response) => Promise<unknown> = readJson,
     accept = 'application/json',
-    doFetch: typeof fetch = fetchImpl
+    doFetch: typeof fetch = fetchImpl,
+    limitMs: number = timeoutMs
   ): Promise<unknown> {
     const controller = new AbortController();
     let timedOut = false;
     const timer = setTimeout(() => {
       timedOut = true;
       controller.abort();
-    }, timeoutMs);
+    }, limitMs);
     const onAbort = () => controller.abort();
     options?.signal?.addEventListener('abort', onAbort);
 
@@ -139,9 +144,10 @@ export function createHttpClient(config: HttpClientConfig): CheckClient {
               options,
               r => readCheckStream(r, onUpdate),
               'text/event-stream, application/json',
-              config.streamFetchImpl ?? fetchImpl
+              config.streamFetchImpl ?? fetchImpl,
+              checkTimeoutMs
             )
-          : await send('/v1/check', { method: 'POST', body: JSON.stringify(request) }, options);
+          : await send('/v1/check', { method: 'POST', body: JSON.stringify(request) }, options, readJson, 'application/json', fetchImpl, checkTimeoutMs);
       if (!isCheckResponse(body)) throw new ApiError('invalid_response', 'Unexpected response shape');
       return normalizeResponse(body);
     },

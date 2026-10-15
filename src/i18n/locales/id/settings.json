@@ -31,7 +31,9 @@
     "unhealthy": "Server tidak menjawab",
     "checking": "Memeriksa...",
     "none": "Tidak ada alamat server",
-    "recheck": "Periksa ulang koneksi"
+    "recheck": "Periksa ulang koneksi",
+    "copyReport": "Salin laporan koneksi",
+    "copied": "Laporan koneksi disalin. Tempel ke pesan untuk tim SafeRoute."
   },
   "privacy": {
     "title": "Privasi",

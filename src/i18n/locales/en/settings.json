@@ -28,7 +28,9 @@
     "unhealthy": "Server does not answer",
     "checking": "Checking...",
     "none": "No server address",
-    "recheck": "Re-check connection"
+    "recheck": "Re-check connection",
+    "copyReport": "Copy connection report",
+    "copied": "Connection report copied. Paste it in a message to the SafeRoute team."
   },
   "privacy": {
     "title": "Privacy",

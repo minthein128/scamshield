@@ -1,4 +1,4 @@
-import { ensureApiUrl, hasInternet, refreshApiUrl } from '../config/runtime';
+import { ensureApiUrl, hasInternet, recentlyReached, refreshApiUrl } from '../config/runtime';
 import { getAuthToken } from '../services/token';
 import { ApiError } from './errors';
 import { createHttpClient } from './http';
@@ -48,7 +48,7 @@ export interface RuntimeClientDeps {
 
 export function createRuntimeClient(resolve: () => Promise<string> = ensureApiUrl, allowMock: boolean = __DEV__, deps: RuntimeClientDeps = {}): CheckClient {
   const refresh = deps.refresh ?? refreshApiUrl;
-  const internet = deps.internet ?? (() => hasInternet());
+  const internet = deps.internet ?? (async () => recentlyReached() || (await hasInternet()));
   const make = deps.makeClient ?? createClientFromEnv;
   let built: { url: string; client: CheckClient } | null = null;
   const clientFor = (url: string): CheckClient => {
