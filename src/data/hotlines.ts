@@ -436,6 +436,17 @@ export const HOTLINES: Hotline[] = [
     verifiedOn: '2026-10-14',
   },
   {
+    id: 'mm-embassy-vientiane',
+    country: 'MM',
+    category: 'consular',
+    name: 'Myanmar Embassy Vientiane',
+    number: '+856 21 314 910',
+    dial: '+85621314910',
+    notes: 'Other lines: +856 21 314 911, +856 21 353 491. The embassy website lists no date.',
+    sourceUrl: 'https://www.myanmarembassy-vte.org/index.php/en/contact-us',
+    verifiedOn: '2026-10-15',
+  },
+  {
     id: 'mm-embassy-phnompenh',
     country: 'MM',
     category: 'consular',
