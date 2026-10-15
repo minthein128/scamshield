@@ -111,7 +111,7 @@ export const draftInputSchema = z.object({
     .object({
       prompt: z.string().max(500),
       model: z.string().max(100),
-      sources: z.array(z.object({ title: z.string().max(300), url: httpsUrl })).max(10),
+      sources: z.array(z.object({ title: z.string().max(300), url: z.string().max(500), quote: z.string().max(500).optional() })).max(10),
     })
     .optional(),
 });
@@ -147,7 +147,7 @@ export function validateItem(collection: Collection, op: 'add' | 'update' | 'del
 export interface AiSource {
   prompt: string;
   model: string;
-  sources: Array<{ title: string; url: string }>;
+  sources: Array<{ title: string; url: string; quote?: string }>;
 }
 
 export interface Draft {
