@@ -25,5 +25,7 @@ export async function createIntelFromConfig(cfg: Config): Promise<Intel | undefi
       .catch((e: Error) => log('WARNING', 'intel_sweep_failed', { error: e.message }));
   setTimeout(sweep, 30_000).unref();
   setInterval(sweep, 6 * 3_600_000).unref();
-  return createIntel({ store, pepper: cfg.intelPepper });
+  const intel = createIntel({ store, pepper: cfg.intelPepper });
+  intel.warm().catch((e: Error) => log('WARNING', 'intel_warm_failed', { error: e.message }));
+  return intel;
 }

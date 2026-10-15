@@ -8,6 +8,7 @@ GH_REPO="${GH_REPO:-minthein128/scamshield}"
 BRANCH="${BRANCH:-feat/deploy}"
 ENV_FILE="${ENV_FILE:-$HOME/work/scamshield-secrets/.env}"
 GEMINI_MODEL="${GEMINI_MODEL:-gemini-3.5-flash-lite}"
+MIN_INSTANCES="${MIN_INSTANCES:-0}"
 SECRET=gemini-api-key
 SA="saferoute-api@${PROJECT}.iam.gserviceaccount.com"
 APK_URL="https://${PROJECT}.web.app/saferoute.apk"
@@ -45,7 +46,7 @@ gcloud secrets add-iam-policy-binding "$SECRET" --member "serviceAccount:$SA" \
 
 gcloud run deploy "$SERVICE" --source server --region "$REGION" \
   --service-account "$SA" --allow-unauthenticated \
-  --memory 512Mi --cpu 1 --concurrency 40 --max-instances 5 --timeout 60 \
+  --memory 512Mi --cpu 1 --cpu-boost --concurrency 40 --min-instances "$MIN_INSTANCES" --max-instances 5 --timeout 60 \
   --set-secrets "GEMINI_API_KEY=${SECRET}:latest" \
   --set-env-vars "^|^GOOGLE_CLOUD_PROJECT=${PROJECT}|GEMINI_MODEL=${GEMINI_MODEL}|CORS_ORIGINS=https://${PROJECT}.web.app,https://${PROJECT}.firebaseapp.com|RATE_LIMIT_PER_MIN=30"
 

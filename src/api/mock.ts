@@ -124,10 +124,10 @@ export function buildMockResponse(request: CheckRequest, now: Date = new Date())
 export function createMockClient(options: MockOptions = {}): CheckClient {
   const delayMs = options.delayMs ?? 3200;
 
-  const wait = (signal?: AbortSignal) =>
+  const wait = (signal?: AbortSignal, ms = delayMs) =>
     new Promise<void>((resolve, reject) => {
       if (signal?.aborted) return reject(new ApiError('cancelled', 'Request cancelled'));
-      const timer = setTimeout(resolve, delayMs);
+      const timer = setTimeout(resolve, ms);
       signal?.addEventListener('abort', () => {
         clearTimeout(timer);
         reject(new ApiError('cancelled', 'Request cancelled'));
@@ -138,8 +138,18 @@ export function createMockClient(options: MockOptions = {}): CheckClient {
     isMock: true,
     async check(request, opts) {
       if (!hasInput(request)) throw new ApiError('bad_request', 'Nothing to check');
-      await wait(opts?.signal);
-      return buildMockResponse(request);
+      const onUpdate = opts?.onUpdate;
+      if (!onUpdate) {
+        await wait(opts?.signal);
+        return buildMockResponse(request);
+      }
+      const first = Math.round(delayMs * 0.4);
+      await wait(opts?.signal, first);
+      const result = buildMockResponse(request);
+      onUpdate({ type: 'verdict', response: { ...result, sources: [] } });
+      await wait(opts?.signal, delayMs - first);
+      onUpdate({ type: 'final', response: result });
+      return result;
     },
     async speak() {
       throw new ApiError('upstream', 'No speech service in mock mode');

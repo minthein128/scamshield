@@ -102,3 +102,51 @@ describe('app', () => {
     expect(res.headers.get('access-control-allow-origin')).toBe('*');
   });
 });
+
+describe('streaming check', () => {
+  const events = (text: string) =>
+    text
+      .trim()
+      .split('\n\n')
+      .map((b) => ({ event: /^event: (.*)$/m.exec(b)?.[1], data: JSON.parse(/^data: (.*)$/m.exec(b)?.[1] ?? 'null') }));
+
+  it('streams stage events, an early verdict and a final result', async () => {
+    const res = await make().request('/v1/check?stream=1', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ kind: 'job', text: 'Great job abroad', language: 'en' }),
+    });
+    expect(res.headers.get('content-type')).toContain('text/event-stream');
+    const ev = events(await res.text());
+    const names = ev.map((e) => e.event);
+    expect(names.indexOf('verdict')).toBeGreaterThan(names.indexOf('stage'));
+    expect(names.at(-1)).toBe('final');
+    const verdict = ev.find((e) => e.event === 'verdict')?.data;
+    const final = ev.at(-1)?.data;
+    expect(final.id).toBe(verdict.id);
+    expect(final.verdict).toBe('danger');
+    expect(final.timings).toBeUndefined();
+  });
+
+  it('still answers validation errors as plain JSON', async () => {
+    const res = await make().request('/v1/check?stream=1', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ kind: 'job' }),
+    });
+    expect(res.status).toBe(400);
+  });
+
+  it('adds timings only with debug=1', async () => {
+    const send = (q: string) =>
+      make().request(`/v1/check${q}`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ kind: 'message', text: 'hello', language: 'en' }),
+      });
+    expect((await (await send('')).json()).timings).toBeUndefined();
+    const t = (await (await send('?debug=1')).json()).timings;
+    expect(t.spans.extract.ms).toBeGreaterThanOrEqual(0);
+    expect(t.meta.imageBytes).toBe(0);
+  });
+});

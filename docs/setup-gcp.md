@@ -101,3 +101,19 @@ A quick tunnel gets a new URL on every start. The app is to read `https://safero
 ## Firebase App Distribution
 
 The `Android` workflow uploads the signed APK to the `dev-testers` group on pushes to `main` and `feat/production`, or on a manual run with `force_distribute` set. It needs the variables `FIREBASE_ANDROID_APP_ID`, `GCP_WORKLOAD_IDENTITY_PROVIDER` and `GCP_SERVICE_ACCOUNT`, and `roles/firebaseappdistro.admin` on the deployer account. Each build sets `versionCode` to the run number so testers see an update. Add testers with `firebase appdistribution:testers:add --group-alias dev-testers <email>`.
+
+## Latency and cost settings
+
+Measured on a loaded dev machine; list prices are approximate (tier 2 region, check the pricing page).
+
+| Setting | Recommendation | Cost note |
+|---|---|---|
+| `--cpu-boost` | on (set in the script) | Extra CPU only during startup. Process start measured at 0.5 to 1.6 s. |
+| `--min-instances` | 0 for the demo, 1 before a live pitch (`MIN_INSTANCES=1`) | Idle instance about 10 to 13 USD per month. Removes the container cold start (image pull plus about 1 s boot). |
+| CPU always allocated (`--no-cpu-throttling`) | off | About 50 to 65 USD per month per instance. Only needed if `RECORD_AFTER_RESPONSE=1` is used; the write costs about 80 ms, so keep it off. |
+| `--concurrency` | keep 40 | Requests wait on Google APIs, not on CPU. |
+| Region | keep asia-southeast1 | Firestore `(default)` is in asia-southeast1; intel reads stay in region. |
+| HTTP/2 | no change | The server speaks HTTP/1.1; Cloud Run's front end already serves clients over HTTP/2. |
+| Keep-alive to Google APIs | no change | A 6 s idle gap vs 1 s gave the same latency (p50 828 vs 820 ms). The SDK reuses one client. |
+
+SSE: Cloud Run supports streaming responses; keep `--timeout` above the 15 s budget.

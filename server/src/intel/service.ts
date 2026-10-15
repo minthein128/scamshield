@@ -1,3 +1,4 @@
+import { timingStore } from '../timing.js';
 import type { CheckRequest, Extraction, Flag, Lang, ScamType, Severity } from '../types.js';
 import { COUNTRY_CODES } from './countries.js';
 import { createHasher, type Hasher } from './indicators.js';
@@ -36,6 +37,8 @@ export interface Intel {
   /** Lowers a signal to the contradicted weight, or moves its type count to the type the user named. */
   reweight(signalId: string, change: Reweight): Promise<'applied' | 'unchanged' | 'missing'>;
   insights(country?: string, days?: number): Promise<Insights>;
+  /** Loads the cluster cache so the first check does not pay for it. */
+  warm(): Promise<void>;
   readonly store: IntelStore;
 }
 
@@ -61,16 +64,36 @@ export function createIntel(opts: { store: IntelStore; pepper: string; cacheMs?:
 
   const insightCache = new Map<string, { at: number; value: Insights }>();
   let clusterCache: { at: number; docs: AggDoc[] } | undefined;
+  let clusterLoad: Promise<AggDoc[]> | undefined;
 
+  function loadClusters(): Promise<AggDoc[]> {
+    clusterLoad ??= store
+      .listAggs('cluster', GLOBAL, 400)
+      .then((docs) => {
+        clusterCache = { at: Date.now(), docs };
+        return docs;
+      })
+      .finally(() => {
+        clusterLoad = undefined;
+      });
+    return clusterLoad;
+  }
+
+  /** Stale-while-revalidate: an expired cache is served at once and refreshed in the background. */
   async function clusters(): Promise<AggDoc[]> {
-    if (clusterCache && Date.now() - clusterCache.at < cacheMs) return clusterCache.docs;
-    const docs = await store.listAggs('cluster', GLOBAL, 400);
-    clusterCache = { at: Date.now(), docs };
-    return docs;
+    if (clusterCache) {
+      if (Date.now() - clusterCache.at >= cacheMs) loadClusters().catch(() => {});
+      return clusterCache.docs;
+    }
+    return loadClusters();
   }
 
   return {
     store,
+
+    async warm() {
+      await loadClusters();
+    },
 
     prepare: (req, ex) =>
       prepare(
@@ -85,7 +108,8 @@ export function createIntel(opts: { store: IntelStore; pepper: string; cacheMs?:
         ...p.ind.map((i) => aggId('ind', GLOBAL, i.h)),
         ...p.domains.map((d) => aggId('dom', GLOBAL, hasher.hash('dom', d).slice(0, 24))),
       ];
-      const docs = await store.getAggs(ids);
+      const tm = timingStore.getStore();
+      const docs = await (tm ? tm.span('intel.aggs', () => store.getAggs(ids)) : store.getAggs(ids));
       const flags: Flag[] = [];
       const seen: Array<{ n: number; first?: string }> = [];
       const bySubject = new Map<string, { n: number; first?: string }>();
@@ -109,7 +133,8 @@ export function createIntel(opts: { store: IntelStore; pepper: string; cacheMs?:
 
       let campaign: NetworkInfo['campaign'];
       if (p.sig || p.campaign) {
-        const matches = matchClusters(p.sig, p.campaign, await clusters());
+        const cl = await (tm ? tm.span('intel.clusters', clusters) : clusters());
+        const matches = matchClusters(p.sig, p.campaign, cl);
         if (matches.length > 0) {
           const days = sumDays(...matches.flatMap((m) => [m.real.days, m.seed.days]));
           const week = countIn(days, now, 7);

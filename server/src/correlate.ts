@@ -1,4 +1,5 @@
 import { GoogleAuth } from 'google-auth-library';
+import { createTtlLru, memoize } from './cache.js';
 import type { Config } from './config.js';
 import { log } from './log.js';
 import type { LinkCheck, WebRiskResult } from './types.js';
@@ -19,6 +20,8 @@ async function adcToken(): Promise<string | undefined> {
   return (await auth.getAccessToken()) ?? undefined;
 }
 
+type RdapInfo = { domainAgeDays?: number; registrar?: string };
+
 export interface Correlator {
   checkAll(urls: string[]): Promise<LinkCheck[]>;
 }
@@ -31,8 +34,11 @@ export interface CorrelatorDeps {
 export function createCorrelator(cfg: Config, deps: CorrelatorDeps = {}): Correlator {
   const fetchFn = deps.fetchFn ?? fetch;
   const getToken = deps.getToken ?? adcToken;
+  const caching = cfg.cacheEnabled && cfg.linkCacheTtlMs > 0;
+  const wrCache = createTtlLru<Promise<WebRiskResult>>({ max: 2000, ttlMs: cfg.linkCacheTtlMs });
+  const rdapCache = createTtlLru<Promise<RdapInfo>>({ max: 2000, ttlMs: cfg.linkCacheTtlMs });
 
-  async function webRisk(url: string): Promise<WebRiskResult> {
+  async function webRiskLookup(url: string): Promise<WebRiskResult> {
     try {
       const qs = new URLSearchParams({ uri: url });
       for (const t of Object.keys(THREAT_MAP)) qs.append('threatTypes', t);
@@ -62,7 +68,7 @@ export function createCorrelator(cfg: Config, deps: CorrelatorDeps = {}): Correl
     }
   }
 
-  async function rdap(url: string): Promise<{ domainAgeDays?: number; registrar?: string }> {
+  async function rdapLookup(url: string): Promise<RdapInfo> {
     try {
       const res = await fetchFn(`https://rdap.org/domain/${registrableDomain(url)}`, {
         headers: { accept: 'application/rdap+json, application/json', 'user-agent': 'SafeRoute/1.0 (scam-check)' },
@@ -76,6 +82,25 @@ export function createCorrelator(cfg: Config, deps: CorrelatorDeps = {}): Correl
       return {};
     }
   }
+
+  const webRisk = (url: string) =>
+    caching
+      ? memoize(
+          wrCache,
+          url,
+          () => webRiskLookup(url),
+          (v) => v !== 'unknown',
+        )
+      : webRiskLookup(url);
+  const rdap = (url: string) =>
+    caching
+      ? memoize(
+          rdapCache,
+          registrableDomain(url),
+          () => rdapLookup(url),
+          (v) => Object.keys(v).length > 0,
+        )
+      : rdapLookup(url);
 
   return {
     checkAll(urls) {

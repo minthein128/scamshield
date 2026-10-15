@@ -2,7 +2,8 @@ import * as ImageManipulator from 'expo-image-manipulator';
 import * as ImagePicker from 'expo-image-picker';
 
 export const MAX_IMAGE_BYTES = 1_500_000;
-const WIDTHS = [1280, 1024, 800, 640];
+// The Android overlay sends 1080 px wide JPEG at quality 70; the app matches it and never upscales.
+const WIDTHS = [1080, 900, 720, 540];
 const QUALITIES = [0.7, 0.55, 0.4];
 
 export interface PreparedImage {
@@ -30,13 +31,20 @@ const defaultManipulate: Manipulate = (uri, width, quality) =>
     base64: true,
   });
 
+export function widthsFor(sourceWidth?: number): number[] {
+  if (!sourceWidth || sourceWidth <= 0) return WIDTHS;
+  const fit = WIDTHS.filter(w => w < sourceWidth);
+  return sourceWidth <= WIDTHS[0] ? [sourceWidth, ...fit] : fit;
+}
+
 export async function prepareImage(
   uri: string,
   maxBytes: number = MAX_IMAGE_BYTES,
-  manipulate: Manipulate = defaultManipulate
+  manipulate: Manipulate = defaultManipulate,
+  sourceWidth?: number
 ): Promise<PreparedImage> {
   let last: PreparedImage | null = null;
-  for (const width of WIDTHS) {
+  for (const width of widthsFor(sourceWidth)) {
     for (const quality of QUALITIES) {
       const out = await manipulate(uri, width, quality);
       if (!out.base64) continue;
@@ -55,5 +63,5 @@ export async function pickScreenshot(): Promise<PreparedImage | null> {
     quality: 1,
   });
   if (result.canceled || !result.assets[0]) return null;
-  return prepareImage(result.assets[0].uri);
+  return prepareImage(result.assets[0].uri, MAX_IMAGE_BYTES, undefined, result.assets[0].width);
 }

@@ -1,7 +1,8 @@
 import { existsSync, readFileSync } from 'node:fs';
-import { loadConfig } from '../src/config.js';
+import { loadConfig, pipelineOptions } from '../src/config.js';
 import { createCorrelator } from '../src/correlate.js';
-import { createClient, createGeminiExtractor } from '../src/extract.js';
+import { createClient } from '../src/extract.js';
+import { createExtractor } from '../src/extract-stream.js';
 import { createGrounder } from '../src/ground.js';
 import { createPipeline, type LanguageStats } from '../src/pipeline.js';
 import type { CheckResponse } from '../src/types.js';
@@ -23,11 +24,12 @@ const only = process.env.EVAL_ONLY?.split(',');
 let lastStats: LanguageStats | undefined;
 const client = createClient(cfg);
 const pipeline = createPipeline({
-  extractor: createGeminiExtractor(cfg, client),
+  extractor: createExtractor(cfg, client),
   correlator: createCorrelator(cfg, { getToken: async () => undefined }),
   grounder: createGrounder(cfg, client),
-  model: cfg.model,
+  ...pipelineOptions(cfg),
   budgetMs: Number(process.env.EVAL_BUDGET_MS ?? cfg.requestBudgetMs),
+  resultCacheTtlMs: 0,
   onLanguage: (s) => {
     lastStats = s;
   },
