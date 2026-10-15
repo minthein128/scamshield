@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Text } from '../../components/Text';
 import { Button } from '../../components/ui';
 import { Icon } from '../../components/Icon';
+import { useSheetLayout } from '../../components/useSheetLayout';
 import theme from '../../theme/theme';
 import type { RedFlag } from './content';
 
@@ -17,13 +18,14 @@ interface Props {
 export const FlagSheet: React.FC<Props> = ({ flag, onClose }) => {
   const { t } = useTranslation('learn');
   const { height } = useWindowDimensions();
+  const sheet = useSheetLayout();
   return (
     <Modal visible={flag !== null} transparent animationType="slide" onRequestClose={onClose}>
-      <View style={[styles.overlay, { height }]}>
+      <View style={[styles.overlay, { height }, sheet.overlay]}>
         <Pressable accessibilityLabel={t('sheet.close')} accessibilityRole="button" style={styles.backdrop} onPress={onClose} />
         {flag ? (
-          <View style={styles.sheet} testID="flag-sheet" accessibilityViewIsModal>
-            <View style={styles.grab} />
+          <View style={[styles.sheet, sheet.sheet]} testID="flag-sheet" accessibilityViewIsModal>
+            {sheet.tablet ? null : <View style={styles.grab} />}
             <View style={styles.head}>
               <View style={styles.icon}>
                 <Icon name={flag.icon} size={24} color={colors.danger} />
