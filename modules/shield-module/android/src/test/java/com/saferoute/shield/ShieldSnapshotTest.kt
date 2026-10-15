@@ -89,7 +89,7 @@ class ShieldSnapshotTest {
 
     private fun render(dark: Boolean) {
         val palette = ShieldPalette(dark)
-        val bitmap = Bitmap.createBitmap((380 * d).toInt(), (660 * d).toInt(), Bitmap.Config.ARGB_8888)
+        val bitmap = Bitmap.createBitmap((380 * d).toInt(), (750 * d).toInt(), Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
         canvas.drawColor(if (dark) 0xFF0F1B2D.toInt() else 0xFFF4F6F8.toInt())
 
@@ -98,6 +98,19 @@ class ShieldSnapshotTest {
             val bubble = BubbleView(context, palette).also { it.shieldState = s }
             draw(canvas, bubble, 8 * d + i * 60 * d, y)
         }
+        y += 84 * d
+
+        val doll = android.graphics.BitmapFactory.decodeResource(context.resources, R.drawable.companion_doll)
+        listOf(BubbleView.Voice.LISTENING, BubbleView.Voice.THINKING, BubbleView.Voice.SPEAKING, BubbleView.Voice.MUTED)
+            .forEachIndexed { i, v ->
+                val bubble = BubbleView(context, palette).also {
+                    it.shieldState = ShieldOverlay.State.DANGER
+                    it.avatar = doll
+                    it.voice = v
+                    it.level = 0.6f
+                }
+                draw(canvas, bubble, 8 * d + i * 60 * d, y)
+            }
         y += 84 * d
 
         val rows = listOf(

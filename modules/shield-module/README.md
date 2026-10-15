@@ -180,7 +180,7 @@ Notification access (`BIND_NOTIFICATION_LISTENER_SERVICE`) is a sensitive permis
 
 ## Voice companion
 
-The user talks to SafeRoute through the bubble while another app stays in front. The overlay windows stay `NOT_FOCUSABLE`, so touches still reach the app below. Rules: `memory live-voice-rules` and `docs/live-audio-contract.md` (companion mode).
+The user talks to Pyit Taing Htaung (ပစ်တိုင်းထောင်), SafeRoute's roly-poly doll companion, through the bubble while another app stays in front. The overlay windows stay `NOT_FOCUSABLE`, so touches still reach the app below. Rules: `memory live-voice-rules` and `docs/live-audio-contract.md` (companion mode).
 
 ### Start and end
 
@@ -191,7 +191,7 @@ The user talks to SafeRoute through the bubble while another app stays in front.
 | Tap the bubble during a session | Mute or unmute. After a lost audio focus, a tap resumes |
 | End on the pill, or long press the bubble | Ends the session. The shield stays on; a second long press closes it |
 | Session cap (`LIVE_COMPANION_MAX_MS`, 300 s), the shield stops, drag to the close target, server error | Ends the session |
-| TalkBack | Custom action "Talk to SafeRoute" on the bubble |
+| TalkBack | Custom action "Talk to Pyit Taing Htaung" on the bubble |
 
 Double tap was kept over a separate mic badge: it adds no window and no clutter, and 300 ms on a check that takes seconds is not noticeable.
 
@@ -226,21 +226,21 @@ Barge-in: `interrupted` flushes playback at once. Audio focus: `AUDIOFOCUS_LOSS*
 | State | Bubble | Pill chip | Pill text |
 | --- | --- | --- | --- |
 | Checking, rechecking | Scanning shield | Checking / Checking again | |
-| Warning | Shield pulsing with the output level | Warning | The approved warning text |
-| Connecting | Shield with three moving dots | Connecting | |
-| Listening | Mic glyph, input-level ring | Listening | Latest model line, or "Ask about what is on your screen" |
-| Thinking | Shield with three moving dots | Thinking | Latest model line |
-| Speaking | Shield pulsing with the output level, level ring | Speaking | Latest model line (cumulative, replaced on update) |
+| Warning | Doll rocking with the output level | Warning | The approved warning text |
+| Connecting | Doll with three moving dots | Connecting | |
+| Listening | Doll with a mic badge, input-level ring | Listening | Latest model line, or "Ask Pyit Taing Htaung about your screen" |
+| Thinking | Doll with three moving dots | Thinking | Latest model line |
+| Speaking | Doll rocking and growing with the output level, level ring | Speaking | Latest model line (cumulative, replaced on update) |
 | Muted, paused | Grey mic with a slash | Muted / Paused | |
 | Ended | Verdict bubble; the result pill returns | | A notice for cap or errors |
 
-The ring keeps the verdict color of the current report. The pill text is one line, ellipsized at the start, so the newest words show.
+The doll is `res/drawable-nodpi/companion_doll.png` (192 px, rendered from `assets/avatar/doll.svg`), clipped to the circle inside the ring. Idle and check states keep the shield glyph. The ring keeps the verdict color of the current report. TalkBack and the pill name the companion with the `name` string. The pill text is one line, ellipsized at the start, so the newest words show.
 
 ### Android 14 foreground service
 
 The service type is `specialUse|mediaProjection|microphone`. Starting a while-in-use type (microphone) needs the app to be visible: [developer.android.com, restrictions on starting a foreground service from the background](https://developer.android.com/develop/background-work/services/fgs/restrictions-bg-start). The `SYSTEM_ALERT_WINDOW` exemption on that page covers starting a service from the background, not while-in-use access; on Android 14 `startForeground` with type microphone throws `SecurityException` without it.
 
-So the service adds the microphone type while SafeRoute is visible (`startShield`, and `OnActivityEntersForeground` in the module) whenever `RECORD_AUDIO` is granted, and only calls `startForeground` again at session start if the type is missing. If that call throws, the pill shows "Open SafeRoute once to allow voice"; a tap opens the Shield screen, which re-arms the type. On Android 11 to 13 a blocked mic records silence instead of throwing: 4 s of digital silence shows the same hint in the pill. Missing `RECORD_AUDIO` shows "Open SafeRoute to allow the microphone". The app asks for it as an optional step when the shield turns on and from the "Talk to SafeRoute from the bubble" card.
+So the service adds the microphone type while SafeRoute is visible (`startShield`, and `OnActivityEntersForeground` in the module) whenever `RECORD_AUDIO` is granted, and only calls `startForeground` again at session start if the type is missing. If that call throws, the pill shows "Open SafeRoute once to allow voice"; a tap opens the Shield screen, which re-arms the type. On Android 11 to 13 a blocked mic records silence instead of throwing: 4 s of digital silence shows the same hint in the pill. Missing `RECORD_AUDIO` shows "Open SafeRoute to allow the microphone". The app asks for it as an optional step when the shield turns on and from the "Talk to Pyit Taing Htaung from the bubble" card.
 
 ### Strings
 
@@ -258,7 +258,7 @@ So the service adds the microphone type while SafeRoute is visible (`startShield
 - [ ] Incoming call or music app: Paused; after the call the session resumes.
 - [ ] End on the pill and a long press both end the session and keep the shield; drag to the close target closes both.
 - [ ] Android 14: kill SafeRoute from recents, start the shield from the Home switch, leave the app, double tap: voice works; if not, the pill says "Open SafeRoute once to allow voice".
-- [ ] "Ask me for the hotline" opens SafeRoute on Get help; TalkBack offers "Talk to SafeRoute".
+- [ ] "Ask me for the hotline" opens SafeRoute on Get help; TalkBack offers "Talk to Pyit Taing Htaung".
 
 ## Auth token
 

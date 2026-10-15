@@ -39,7 +39,7 @@ internal data class CardModel(
     /** Shows the "Ask" mic chip that starts a voice companion session about this result. */
     val canAsk: Boolean = false,
     val askLabel: String = "Ask",
-    val askDescription: String = "Talk to SafeRoute about this result",
+    val askDescription: String = "Ask Pyit Taing Htaung about this result",
     /** A voice notice rather than a check result. Dismissing it keeps the result. */
     val notice: Boolean = false,
     /** Notice pill: a tap opens SafeRoute. */

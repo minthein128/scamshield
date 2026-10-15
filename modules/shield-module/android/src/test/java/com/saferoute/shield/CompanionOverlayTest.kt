@@ -101,6 +101,12 @@ class CompanionOverlayTest {
     }
 
     @Test
+    fun theDollIsBundledForTheBubble() {
+        val doll = overlay.companionAvatar
+        assertTrue(doll != null && doll.width == 192 && doll.height == 192)
+    }
+
+    @Test
     fun resultPillCarriesTheAskChip() {
         overlay.setResult(result("danger"))
         advance(400)
@@ -119,6 +125,8 @@ class CompanionOverlayTest {
         assertEquals(BubbleView.Voice.LISTENING, overlay.bubbleVoiceForTest)
         assertEquals("Nar htaung nay", overlay.pillForTest!!.chipText)
         assertEquals(ShieldStrings.DEFAULTS["captionHint"], overlay.pillForTest!!.captionText)
+        assertTrue(overlay.pillForTest!!.contentDescription.startsWith("Pyit Taing Htaung. Nar htaung nay"))
+        assertTrue(overlay.bubbleViewForTest.contentDescription.startsWith("Pyit Taing Htaung."))
 
         overlay.showCompanion(CompanionView(CompanionState.SPEAKING, caption = "It looks risky."))
         assertEquals(BubbleView.Voice.SPEAKING, overlay.bubbleVoiceForTest)

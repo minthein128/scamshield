@@ -90,7 +90,7 @@ internal class CompanionPillView(
         captionText = line
         caption.text = line
         caption.setTextColor(if (view.caption.isNotBlank()) palette.textPrimary else palette.textMuted)
-        contentDescription = "$label. $line"
+        contentDescription = "${strings.name}. $label. $line"
     }
 
     private fun text(sp: Float, color: Int, face: Typeface) = TextView(context).apply {

@@ -29,6 +29,7 @@ export interface ShieldCheckResult {
 
 /** Labels the voice companion shows on the bubble pill. Missing keys fall back to English. */
 export const COMPANION_STRING_KEYS = [
+  'name',
   'ask',
   'askA11y',
   'talkA11y',
