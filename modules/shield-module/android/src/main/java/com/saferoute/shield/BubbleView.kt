@@ -32,6 +32,13 @@ internal class BubbleView(context: Context, palette: ShieldPalette) : View(conte
             invalidate()
         }
 
+    /** Companion avatar drawn instead of the shield while thinking or speaking. Null keeps the shield. */
+    var avatar: android.graphics.Bitmap? = null
+        set(value) {
+            field = value
+            invalidate()
+        }
+
     /** 0..1 input level while listening, output level while speaking. */
     var level: Float = 0f
         set(value) {
@@ -74,6 +81,7 @@ internal class BubbleView(context: Context, palette: ShieldPalette) : View(conte
     private var markAlpha = 1f
     private val scanPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val levelRing = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE }
+    private val avatarPaint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
     private val micPath = Path()
     private var thinker: ValueAnimator? = null
     private var thinkPhase = 0f
@@ -195,6 +203,13 @@ internal class BubbleView(context: Context, palette: ShieldPalette) : View(conte
             }
             Voice.THINKING, Voice.SPEAKING -> {
                 val scale = if (voice == Voice.SPEAKING) 1f + 0.14f * level else 1f
+                val face = avatar
+                if (face != null) {
+                    val half = 17f * d * scale
+                    arcBounds.set(cx - half, cy - half, cx + half, cy + half)
+                    canvas.drawBitmap(face, null, arcBounds, avatarPaint)
+                    return
+                }
                 canvas.save()
                 canvas.scale(scale, scale, cx, cy)
                 buildShield(shieldPath)

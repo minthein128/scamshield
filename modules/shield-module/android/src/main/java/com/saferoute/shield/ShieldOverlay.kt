@@ -10,7 +10,6 @@ import android.graphics.PixelFormat
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
-import android.view.Choreographer
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
@@ -110,6 +109,12 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
 
     /** Voice labels in the user's language. */
     var strings: ShieldStrings = ShieldStrings.DEFAULT
+    /** Companion avatar for the bubble while it thinks or speaks; null keeps the shield. */
+    var companionAvatar: android.graphics.Bitmap?
+        get() = bubble.avatar
+        set(value) {
+            bubble.avatar = value
+        }
     /** Level shown on the bubble ring while the companion listens or speaks. */
     var levelSource: (() -> Float)? = null
     private var companion: CompanionView? = null
@@ -120,11 +125,11 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
         pendingTap = false
         listener.onBallTap()
     }
-    private val ticker = object : Choreographer.FrameCallback {
-        override fun doFrame(frameTimeNanos: Long) {
+    private val ticker = object : Runnable {
+        override fun run() {
             if (companion == null) return
             bubble.level = levelSource?.invoke() ?: 0f
-            Choreographer.getInstance().postFrameCallback(this)
+            main.postDelayed(this, LEVEL_TICK_MS)
         }
     }
     val companionActive: Boolean get() = companion != null
@@ -175,7 +180,7 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
 
     fun remove() {
         main.removeCallbacksAndMessages(null)
-        Choreographer.getInstance().removeFrameCallback(ticker)
+        main.removeCallbacks(ticker)
         companion = null
         removePillNow()
         removeCardNow()
@@ -326,7 +331,8 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
             untuck()
             dismissCard(animated = true)
             showBubbleNow()
-            Choreographer.getInstance().postFrameCallback(ticker)
+            main.removeCallbacks(ticker)
+            main.post(ticker)
         }
         renderCompanion()
     }
@@ -335,7 +341,7 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
     fun endCompanion(notice: String? = null, opensApp: Boolean = false) {
         if (companion == null) return
         companion = null
-        Choreographer.getInstance().removeFrameCallback(ticker)
+        main.removeCallbacks(ticker)
         bubble.voice = BubbleView.Voice.NONE
         bubble.level = 0f
         removePillNow()
@@ -932,6 +938,7 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
     companion object {
         private const val AUTO_COLLAPSE_MS = 8000L
         private const val NOTICE_MS = 6000L
+        private const val LEVEL_TICK_MS = 33L
         private val VERDICT_STATES = setOf(State.SAFE, State.CAREFUL, State.DANGER)
         private const val TUCK_DELAY_MS = 1800L
         private const val SETTLE_FALLBACK_MS = 800L
