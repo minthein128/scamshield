@@ -6,6 +6,7 @@ import android.animation.PropertyValuesHolder
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.graphics.PixelFormat
 import android.os.Build
 import android.os.Handler
@@ -76,7 +77,9 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
     private val bubbleSize = dp(BubbleView.CIRCLE_DP + 2 * BubbleView.PAD_DP)
     private val edgeMargin = dp(6)
     private val tuckDepth = dp(20)
-    private val bubble = BubbleView(context, palette)
+    private val bubble = BubbleView(context, palette).apply {
+        avatar = runCatching { BitmapFactory.decodeResource(context.resources, R.drawable.companion_doll) }.getOrNull()
+    }
     private val bubbleParams = WindowManager.LayoutParams(
         bubbleSize, bubbleSize, overlayType, baseFlags, PixelFormat.TRANSLUCENT
     ).apply {
@@ -109,7 +112,7 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
 
     /** Voice labels in the user's language. */
     var strings: ShieldStrings = ShieldStrings.DEFAULT
-    /** Companion avatar for the bubble while it thinks or speaks; null keeps the shield. */
+    /** Companion avatar for the bubble during a session; null keeps the voice glyphs. */
     var companionAvatar: android.graphics.Bitmap?
         get() = bubble.avatar
         set(value) {
@@ -471,7 +474,7 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
         val voice = companion
         if (voice != null) {
             val label = CompanionPillView.labelFor(voice, strings)
-            bubble.contentDescription = "SafeRoute. $label. " + if (voice.muted || voice.paused) strings.unmuteA11y else strings.muteA11y
+            bubble.contentDescription = "${strings.name}. $label. " + if (voice.muted || voice.paused) strings.unmuteA11y else strings.muteA11y
             return
         }
         val text = when (state) {

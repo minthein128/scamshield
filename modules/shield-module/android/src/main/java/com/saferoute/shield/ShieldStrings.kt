@@ -5,6 +5,7 @@ class ShieldStrings private constructor(private val values: Map<String, String>)
 
     operator fun get(key: String): String = values[key] ?: DEFAULTS[key] ?: key
 
+    val name get() = this["name"]
     val ask get() = this["ask"]
     val askA11y get() = this["askA11y"]
     val talkA11y get() = this["talkA11y"]
@@ -41,9 +42,10 @@ class ShieldStrings private constructor(private val values: Map<String, String>)
         const val MAX_LENGTH = 160
 
         val DEFAULTS: Map<String, String> = linkedMapOf(
+            "name" to "Pyit Taing Htaung",
             "ask" to "Ask",
-            "askA11y" to "Talk to SafeRoute about this result",
-            "talkA11y" to "Talk to SafeRoute",
+            "askA11y" to "Ask Pyit Taing Htaung about this result",
+            "talkA11y" to "Talk to Pyit Taing Htaung",
             "listening" to "Listening",
             "muted" to "Muted",
             "paused" to "Paused",
@@ -55,8 +57,8 @@ class ShieldStrings private constructor(private val values: Map<String, String>)
             "connecting" to "Connecting",
             "end" to "End",
             "endA11y" to "End the conversation",
-            "captionHint" to "Ask about what is on your screen",
-            "voiceChip" to "Voice",
+            "captionHint" to "Ask Pyit Taing Htaung about your screen",
+            "voiceChip" to "Pyit Taing Htaung",
             "micDenied" to "Open SafeRoute to allow the microphone",
             "needsForeground" to "Open SafeRoute once to allow voice",
             "unavailable" to "Voice is not available right now",

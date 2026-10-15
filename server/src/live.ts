@@ -7,7 +7,7 @@ import { z } from 'zod';
 import { clientIp, type Limits } from './app.js';
 import { bearerToken, type TokenVerifier } from './auth.js';
 import type { Config } from './config.js';
-import { findCertainty, findMaleFormsAny, genderCounters } from './language-guard.js';
+import { findCertainty, findMaleFormsAny, findPromises, genderCounters, promiseCounters } from './language-guard.js';
 import {
   ACTION_SCREENS,
   type ActionScreen,
@@ -33,7 +33,7 @@ const SESSION_COST = 2;
 const MAX_CONTEXT_BYTES = 64 * 1024;
 const MAX_CONTEXTS = 10;
 
-export const liveCounters = { live_certainty_hit: 0, gender_form_hit: 0, sessions: 0 };
+export const liveCounters = { live_certainty_hit: 0, gender_form_hit: 0, promise_hit: 0, sessions: 0 };
 
 const country = z
   .string()
@@ -255,6 +255,9 @@ export function attachLive(server: Server, deps: LiveDeps) {
       const male = findMaleFormsAny(modelText).length;
       liveCounters.gender_form_hit += male;
       genderCounters.gender_form_hit += male;
+      const promises = findPromises(modelText).length;
+      liveCounters.promise_hit += promises;
+      promiseCounters.promise_hit += promises;
       turns++;
       modelText = '';
     };

@@ -32,7 +32,7 @@ internal class BubbleView(context: Context, palette: ShieldPalette) : View(conte
             invalidate()
         }
 
-    /** Companion avatar drawn instead of the shield while thinking or speaking. Null keeps the shield. */
+    /** Companion avatar (the Pyit Taing Htaung doll) drawn while listening, thinking or speaking. Null keeps the glyphs. */
     var avatar: android.graphics.Bitmap? = null
         set(value) {
             field = value
@@ -178,6 +178,11 @@ internal class BubbleView(context: Context, palette: ShieldPalette) : View(conte
         val box = 26f * d
         matrix.setScale(box, box)
         matrix.postTranslate(cx - box / 2f, cy - box / 2f)
+        val face = avatar
+        if (face != null && voice != Voice.MUTED) {
+            drawDoll(canvas, face, cx, cy, radius, box)
+            return
+        }
         when (voice) {
             Voice.LISTENING, Voice.MUTED -> {
                 val color = if (voice == Voice.MUTED) palette.textMuted else palette.accent
@@ -203,13 +208,6 @@ internal class BubbleView(context: Context, palette: ShieldPalette) : View(conte
             }
             Voice.THINKING, Voice.SPEAKING -> {
                 val scale = if (voice == Voice.SPEAKING) 1f + 0.14f * level else 1f
-                val face = avatar
-                if (face != null) {
-                    val half = 17f * d * scale
-                    arcBounds.set(cx - half, cy - half, cx + half, cy + half)
-                    canvas.drawBitmap(face, null, arcBounds, avatarPaint)
-                    return
-                }
                 canvas.save()
                 canvas.scale(scale, scale, cx, cy)
                 buildShield(shieldPath)
@@ -232,6 +230,55 @@ internal class BubbleView(context: Context, palette: ShieldPalette) : View(conte
                 canvas.restore()
             }
             Voice.NONE -> Unit
+        }
+    }
+
+    /** The doll inside the ring: it rocks with the voice like a roly-poly, dots while thinking, a mic badge while listening. */
+    private fun drawDoll(canvas: Canvas, face: android.graphics.Bitmap, cx: Float, cy: Float, radius: Float, box: Float) {
+        val inner = radius - 4.5f * d
+        canvas.save()
+        clip.reset()
+        clip.addCircle(cx, cy, inner, Path.Direction.CW)
+        canvas.clipPath(clip)
+        val speaking = voice == Voice.SPEAKING
+        val scale = if (speaking) 1f + 0.06f * level else 1f
+        val tilt = if (speaking) 7f * level * kotlin.math.sin(System.nanoTime() / 1.6e8).toFloat() else 0f
+        canvas.rotate(tilt, cx, cy + inner)
+        val half = inner * scale
+        arcBounds.set(cx - half, cy - half, cx + half, cy + half)
+        canvas.drawBitmap(face, null, arcBounds, avatarPaint)
+        canvas.restore()
+        if (voice == Voice.THINKING) {
+            for (i in 0 until 3) {
+                val t = ((thinkPhase * 3f - i) % 3f + 3f) % 3f
+                val wave = if (t < 1f) 1f - kotlin.math.abs(t - 0.5f) * 2f else 0f
+                glyph.color = (palette.accent and 0x00FFFFFF) or ((0x70 + (0x8F * wave).toInt()) shl 24)
+                canvas.drawCircle(cx + (i - 1) * 0.22f * box, cy + inner - 5f * d - 2f * d * wave, 0.07f * box, glyph)
+            }
+        } else if (voice == Voice.LISTENING) {
+            val bx = cx + inner * 0.72f
+            val by = cy + inner * 0.72f
+            val r = 7.5f * d
+            glyph.color = palette.surface
+            canvas.drawCircle(bx, by, r + 1.5f * d, glyph)
+            glyph.color = palette.accent
+            canvas.drawCircle(bx, by, r, glyph)
+            val m = 9f * d
+            matrix.setScale(m, m)
+            matrix.postTranslate(bx - m / 2f, by - m / 2f)
+            micPath.reset()
+            micPath.addRoundRect(RectF(0.34f, 0.04f, 0.66f, 0.60f), 0.16f, 0.16f, Path.Direction.CW)
+            micPath.transform(matrix)
+            glyph.color = palette.surface
+            canvas.drawPath(micPath, glyph)
+            mark.color = palette.surface
+            mark.strokeWidth = 0.12f * m
+            markPath.reset()
+            markPath.addArc(RectF(0.18f, 0.20f, 0.82f, 0.78f), 20f, 140f)
+            markPath.moveTo(0.5f, 0.78f)
+            markPath.lineTo(0.5f, 0.96f)
+            markPath.transform(matrix)
+            canvas.drawPath(markPath, mark)
         }
     }
 
