@@ -63,6 +63,8 @@ export function createApp(
 
   app.get('/healthz', (c) => c.json({ ok: true, model: cfg.model, mock: cfg.mock }));
 
+  app.get('/config.json', (c) => c.json({ apiUrl: cfg.publicApiUrl }, 200, { 'cache-control': 'no-cache' }));
+
   app.post(
     '/v1/check',
     async (c, next) => {

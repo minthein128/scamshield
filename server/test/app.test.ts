@@ -23,6 +23,13 @@ const post = (app: ReturnType<typeof make>, body: unknown, headers: Record<strin
   });
 
 describe('app', () => {
+  it('serves config.json with the public api url and no-cache', async () => {
+    const res = await make().request('/config.json');
+    expect(res.status).toBe(200);
+    expect(res.headers.get('cache-control')).toBe('no-cache');
+    expect(await res.json()).toEqual({ apiUrl: 'https://saferoute-api.akkhayar.com' });
+  });
+
   it('healthz reports mock mode', async () => {
     const res = await make().request('/healthz');
     expect(await res.json()).toEqual({ ok: true, model: 'gemini-3.5-flash-lite', mock: true });

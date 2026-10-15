@@ -23,6 +23,10 @@
       "title": "Wala kang internet",
       "message": "Suriin ang iyong koneksyon sa internet at subukan muli."
     },
+    "server_unreachable": {
+      "title": "Hindi maabot ang SafeRoute",
+      "message": "Gumagana ang internet mo, pero hindi sumasagot ang aming check service ngayon. Subukan ulit pagkatapos ng ilang sandali."
+    },
     "timeout": {
       "title": "Masyadong matagal ang pagsusuri",
       "message": "Maaaring mabagal ang iyong koneksyon. Subukan muli."

@@ -25,6 +25,15 @@
   "reportLanguage": "Bahasa laporan",
   "myCountry": "Negara asal saya",
   "destination": "Tempat saya akan bekerja atau bepergian",
+  "connection": {
+    "title": "Koneksi",
+    "host": "Server",
+    "healthy": "Server menjawab",
+    "unhealthy": "Server tidak menjawab",
+    "checking": "Memeriksa...",
+    "none": "Tidak ada alamat server",
+    "recheck": "Periksa ulang koneksi"
+  },
   "privacy": {
     "title": "Privasi",
     "share": "Bantu sesama: bagikan pola penipuan tanpa nama",
