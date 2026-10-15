@@ -26,8 +26,16 @@ export interface LiveAudio {
 
 Messages between app and server over the `/v1/live` WebSocket are JSON text frames:
 
-- Client to server, first frame: `{ "type": "start", "checkId": string, "language": "en|my|id|tl|th", "mode": "self|family", "home"?: string, "destination"?: string }`. The server looks up the report by `checkId` from its result cache, so the client never resends report text. If the id is unknown the client may include `report` (the check response JSON) instead.
-- Client to server: `{ "type": "audio", "data": base64Pcm16k }`, `{ "type": "end" }`.
-- Server to client: `{ "type": "ready" }`, `{ "type": "audio", "data": base64Pcm24k }`, `{ "type": "interrupted" }`, `{ "type": "transcript", "role": "user|model", "text": string }`, `{ "type": "action", "screen": "WARN_FAMILY|HOTLINES" }`, `{ "type": "error", "code": string, "message": string }`, `{ "type": "closed", "reason": "cap|end|error" }`.
+- Client to server, first frame: `{ "type": "start", "checkId": string, "language": "en|my|id|tl|th", "mode": "self|family", "home"?: "MM", "destination"?: "TH", "token"?: string, "report"?: {...} }`. `home` and `destination` are ISO country codes from the user profile; the server uses them to pick the verified hotlines. The server looks up the report by `checkId` in its result cache (10 minutes, per instance). The app also sends `report` (verdict, score, title, summary, scamType, flags, sources, network) so the session still works when the id is unknown to that instance. The cache wins when both exist. An unknown id with no `report` gives `error not_found`.
+- Client to server: `{ "type": "audio", "data": base64Pcm16k }` (one frame per chunk, about 100 ms, under 64 KB), `{ "type": "end" }`.
+- Server to client: `{ "type": "ready", "maxMs": number }`, `{ "type": "audio", "data": base64Pcm24k }`, `{ "type": "interrupted" }`, `{ "type": "transcript", "role": "user|model", "text": string, "final"?: true }`, `{ "type": "action", "screen": "WARN_FAMILY|HOTLINES" }`, `{ "type": "error", "code": string, "message": string }`, `{ "type": "closed", "reason": "cap|end|error" }`.
 
-Auth: the client sends the Firebase ID token as `?token=` on the WebSocket URL or in the `start` frame. Sessions are capped at 90 s and count as 2 checks against the per-uid limiter.
+Behaviour the clients rely on:
+
+- `transcript.text` is cumulative for the current line of that role. Replace the caption with it; do not append. `final: true` closes the line. The next frame of that role starts a new line.
+- `ready` arrives after the model session is open. Start capture on `ready`, not before. Audio sent earlier is dropped. `maxMs` is the session cap (default 120000, `LIVE_MAX_MS`); count down from `ready`.
+- On `interrupted` call `stopPlayback()` at once and drop queued audio. The model heard the user talk over it.
+- `error` codes: `bad_request`, `not_found`, `rate_limited`, `busy` (one live session per user), `upstream`. An `error` is always followed by `closed` with reason `error`.
+- The app plays the approved `spokenWarning` through `/v1/speak` first and opens the socket afterwards. The model never speaks first and never repeats the warning.
+- Auth: send the Firebase ID token as `token` in the `start` frame (preferred, keeps it out of URLs and logs). `?token=` and `Authorization: Bearer` also work. A missing or invalid token is treated as no token and limited per IP.
+- Limits: one session costs 2 checks in the per-uid hourly limiter and 2 in the per-IP limiter. Sessions end at the cap with `closed` reason `cap`. Nothing from the session (audio or text) is stored or logged.

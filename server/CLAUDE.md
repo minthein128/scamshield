@@ -22,6 +22,7 @@ Hono + TypeScript service implementing `docs/api-contract.md`. Pipeline: Extract
 - `src/data/hotlines.generated.ts`: generated from `../src/data` by `pnpm sync:hotlines` in the repo root. Never edit it. A test fails when it is stale.
 - `src/language-guard.ts`: curated certainty-phrase patterns (en/id/tl/my/th; Thai uses lookbehinds, not \b) that rewrite or trigger one re-ask; the pipeline reports stats via `onLanguage` and logs `certainty_rewrite`. User-facing text must speak in likelihood: add a pattern and a test when you find a new certainty phrase.
 - `src/feedback/`: `POST /v1/feedback`, check-id to signal link (7 days), tally, `npm run feedback:report` and `feedback:export` (writes the gitignored `eval/candidates.json`). Weights live in `src/intel/weights.ts`. `INTEL_COLLECTION_PREFIX=test_` sends a manual run to sandbox collections (delete them afterwards).
+- `src/live.ts`, `src/live-prompt.ts`, `src/live-mock.ts`: `/v1/live` WebSocket relay to the Gemini Live API (contract in `../docs/live-audio-contract.md`). The prompt builder redacts the report and lists verified hotlines. Never log audio or transcripts. `npm run live:smoke` drives a running server with spoken questions and judges the replies (`LIVE_SMOKE_API`, `--only=id`). Env: `LIVE_MODEL`, `LIVE_VOICE`, `LIVE_MAX_MS`, `LIVE_MAX_CONCURRENT`.
 - `src/pipeline.ts`: wires the stages. `src/app.ts`: HTTP, limits, errors. `src/mock.ts`: offline stubs.
 
 ## Rules
