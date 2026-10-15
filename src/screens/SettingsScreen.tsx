@@ -115,7 +115,6 @@ export const SettingsScreen: React.FC<RootScreenProps<'Settings'>> = ({ navigati
             <Chip key={l.code} testID={`app-language-${l.code}`} label={l.label} nativeLabel={l.nativeLabel} selected={uiLanguage === l.code} onPress={() => chooseAppLanguage(l.code)} />
           ))}
         </View>
-        {uiLanguage === 'th' ? <Text style={styles.body}>{t('common:languageNote.reportsInEnglish')}</Text> : null}
       </View>
 
       <View style={{ gap: 8 }}>

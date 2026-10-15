@@ -1,7 +1,7 @@
 import type { TimingsJson } from './timing.js';
 
 export const KINDS = ['job', 'message', 'link', 'shop', 'agency', 'screen'] as const;
-export const LANGS = ['en', 'id', 'tl', 'my'] as const;
+export const LANGS = ['en', 'id', 'tl', 'my', 'th'] as const;
 export const FAMILIES = ['too_good', 'pressure', 'payment_route', 'identity', 'link_risk', 'known_bad', 'trafficking'] as const;
 export const SCAM_TYPES = [
   'job_trafficking',

@@ -71,7 +71,28 @@ const MY: Rule[] = [
   { re: /(လိမ်စားသူ|ရာဇဝတ်ကောင်|လူကုန်ကူးသူ)\s*(?:ဖြစ်ပါသည်|ဖြစ်သည်)/g },
 ];
 
-const RULES: Record<Lang, Rule[]> = { en: EN, id: ID, tl: TL, my: MY };
+// Thai has no word boundaries: rules use lookbehinds for negation and hedge prefixes instead of \b.
+const TH_NOT = '(?<!ไม่)(?<!ไม่ได้)(?<!ยังไม่)(?<!ไม่ค่อย)';
+const TH_HEDGE = '(?<!(?:อาจ|อาจจะ|น่าจะ|คง|คงจะ|ดูเหมือน|ดูเหมือนว่า|ดูเหมือนจะ|เหมือน|คล้าย|เข้าข่าย|เสี่ยง|สงสัยว่า|ถ้า|หาก|ไม่|จะ))';
+const TH_SCAM_NOUN = '(?:การ)?(?:หลอกลวง|หลอกให้|ต้มตุ๋น|ฉ้อโกง|กลโกง|กลลวง|กับดัก|แก๊งต้มตุ๋น|การค้ามนุษย์)';
+const TH_PERSON = '(?:มิจฉาชีพ|คนร้าย|อาชญากร|คนหลอกลวง|ผู้ค้ามนุษย์|นายหน้าค้ามนุษย์|คนโกง|โจร)';
+const TH: Rule[] = [
+  { re: new RegExp(`${TH_HEDGE}(?:เป็น|คือ)${TH_PERSON}`, 'g'), sub: 'อาจเกี่ยวข้องกับรายงานการหลอกลวง' },
+  { re: new RegExp(`${TH_HEDGE}(?:เป็น|คือ)(${TH_SCAM_NOUN})`, 'g'), sub: (_m, n) => `ดูเหมือน${n}` },
+  {
+    re: new RegExp(`${TH_HEDGE}เป็น((?:ของ|ข้อความ|เว็บไซต์|เว็บ|บัญชี|เอกสาร|ข้อเสนอ|ลิงก์|แอป)?ปลอม)`, 'g'),
+    sub: (_m, n) => `ดูเหมือน${n}`,
+  },
+  { re: new RegExp(`(?<!ไม่)ปลอดภัย\\s?(?:100\\s?%|${TH_NOT}แน่นอน|ชัวร์|ร้อยเปอร์เซ็นต์)`, 'g'), sub: 'ไม่พบสัญญาณเตือนสำคัญ' },
+  { re: new RegExp(`${TH_NOT}(?:อย่างแน่นอน|แน่นอน(?!ว่า)|แน่ๆ|ชัวร์|ไม่ต้องสงสัย|ไม่ผิดแน่|เต็มร้อย|ร้อยเปอร์เซ็นต์)`, 'g'), sub: '' },
+  { re: new RegExp(`${TH_NOT}แน่นอนว่า`, 'g') },
+  { re: /(?:100|๑๐๐)\s?(?:%|เปอร์เซ็นต์)/g },
+  { re: new RegExp(`${TH_NOT}(?<!สามารถ)(?:ยืนยันแล้ว|ได้รับการยืนยัน)(?!หรือไม่|หรือยัง)`, 'g'), sub: 'มีรายงาน' },
+  { re: new RegExp(`${TH_NOT}(?<!สามารถ)พิสูจน์ได้ว่า`, 'g'), sub: 'บ่งชี้ว่า' },
+  { re: new RegExp(`${TH_NOT}(?<!สามารถ)พิสูจน์แล้ว`, 'g'), sub: 'มีรายงาน' },
+];
+
+const RULES: Record<Lang, Rule[]> = { en: EN, id: ID, tl: TL, my: MY, th: TH };
 
 export function findCertainty(text: string, lang: Lang): string[] {
   const out: string[] = [];

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { buildActions, titleFor } from '../src/explain.js';
 import { countCertainty, findCertainty, guardExtraction, guardFlags, isHeavy, rewriteCertainty } from '../src/language-guard.js';
 import type { Extraction } from '../src/types.js';
 
@@ -16,6 +17,16 @@ describe('language guard', () => {
     ['Ang alok na ito ay scam.', 'tl', 'ay mukhang scam'],
     ['Siguradong peke ito.', 'tl', 'posibleng peke'],
     ['ဤအလုပ်ကမ်းလှမ်းချက်သည် လိမ်လည်မှု ဖြစ်သည်။', 'my', 'လိမ်လည်မှု ဖြစ်နိုင်ပါသည်'],
+    ['ข้อเสนองานนี้เป็นการหลอกลวง', 'th', 'ข้อเสนองานนี้ดูเหมือนการหลอกลวง'],
+    ['ข้อความนี้เป็นกลโกงแน่นอน', 'th', 'ข้อความนี้ดูเหมือนกลโกง'],
+    ['เว็บนี้คือกับดักชัวร์ๆ', 'th', 'เว็บนี้ดูเหมือนกับดัก'],
+    ['ลิงก์นี้เป็นลิงก์ปลอม', 'th', 'ลิงก์นี้ดูเหมือนลิงก์ปลอม'],
+    ['บริษัทนี้เป็นมิจฉาชีพ', 'th', 'บริษัทนี้อาจเกี่ยวข้องกับรายงานการหลอกลวง'],
+    ['ผู้ส่งคือคนร้าย อย่าโอนเงิน', 'th', 'ผู้ส่งอาจเกี่ยวข้องกับรายงานการหลอกลวง อย่าโอนเงิน'],
+    ['ร้านนี้ปลอดภัย 100%', 'th', 'ร้านนี้ไม่พบสัญญาณเตือนสำคัญ'],
+    ['ร้านนี้ปลอดภัยแน่นอน', 'th', 'ร้านนี้ไม่พบสัญญาณเตือนสำคัญ'],
+    ['ทางการยืนยันแล้วว่าบริษัทนี้ไม่มีใบอนุญาต', 'th', 'ทางการมีรายงานว่าบริษัทนี้ไม่มีใบอนุญาต'],
+    ['ข้อมูลนี้พิสูจน์ได้ว่าบริษัทไม่มีตัวตน', 'th', 'ข้อมูลนี้บ่งชี้ว่าบริษัทไม่มีตัวตน'],
   ] as const)('rewrites %s', (input, lang, expected) => {
     const r = rewriteCertainty(input, lang);
     expect(r.hits).toBeGreaterThan(0);
@@ -30,9 +41,38 @@ describe('language guard', () => {
     ['Pastikan Anda memeriksa izin agensi. Kami tidak pasti.', 'id'],
     ['Mukhang may mga senyales ng panloloko. Posibleng scam ito.', 'tl'],
     ['ဒီအလုပ်ကမ်းလှမ်းချက်မှာ သတိပေးလက္ခဏာတချို့ တွေ့နေရပါတယ်။', 'my'],
+    ['ข้อเสนอนี้ดูเหมือนมีความเสี่ยง พบสัญญาณเตือนหลายอย่าง โปรดตรวจสอบก่อน', 'th'],
+    ['งานนี้มีสัญญาณเตือนหลายอย่างที่อาจเข้าข่ายการค้ามนุษย์ อย่าเพิ่งโอนเงิน และปรึกษาคนที่คุณไว้ใจก่อนตัดสินใจ', 'th'],
+    ['ข้อความนี้อาจเป็นกลโกง และดูเหมือนเป็นการหลอกลวง', 'th'],
+    ['ข้อความนี้น่าจะเป็นกับดัก ถ้าเป็นกลโกง ให้หยุดทันที', 'th'],
+    ['ผลยังไม่แน่นอน เราไม่สามารถยืนยันได้ และยังไม่ได้รับการยืนยันจากบริษัท', 'th'],
+    ['เราไม่สามารถพิสูจน์ได้ว่าบริษัทนี้มีอยู่จริง โปรดยืนยันกับหน่วยงานของรัฐ', 'th'],
+    ['อย่าเพิ่งบอกว่าปลอดภัย เพราะเรายังไม่แน่ใจ ไม่ชัวร์', 'th'],
+    ['เราไม่พบข้อมูลใบอนุญาตของบริษัทนี้ ลิงก์นี้ไม่ใช่เว็บทางการ', 'th'],
   ] as const)('leaves hedged text alone: %s', (input, lang) => {
     expect(findCertainty(input, lang)).toEqual([]);
     expect(rewriteCertainty(input, lang).text).toBe(input);
+  });
+
+  it('matches Thai patterns inside unspaced text', () => {
+    const t = 'พบข้อความนี้เป็นกลโกงและบริษัทคือมิจฉาชีพชัวร์ๆ';
+    expect(findCertainty(t, 'th').length).toBe(3);
+    const r = rewriteCertainty(t, 'th');
+    expect(findCertainty(r.text, 'th')).toEqual([]);
+    expect(r.text).not.toContain('ชัวร์');
+  });
+
+  it('keeps fixed Thai titles and actions free of certainty wording', () => {
+    const texts = [
+      ...(['danger', 'careful', 'safe'] as const).map((v) => titleFor(v, 'th')),
+      ...buildActions('danger', 'job_trafficking', 'th').map((a) => a.label),
+    ];
+    for (const t of texts) expect(findCertainty(t, 'th')).toEqual([]);
+  });
+
+  it('detects Thai certainty it cannot rewrite', () => {
+    expect(findCertainty('แน่นอนว่าข้อความนี้ต้องระวัง ปลอดภัยแน่ๆ 100%', 'th').length).toBeGreaterThanOrEqual(2);
+    expect(rewriteCertainty('มั่นใจ 100%', 'th').text).toBe('มั่นใจ 100%');
   });
 
   it('detects Burmese certainty it cannot rewrite', () => {

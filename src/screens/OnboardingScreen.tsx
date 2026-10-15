@@ -76,7 +76,6 @@ export const OnboardingScreen: React.FC<{ onDone: (next?: AfterOnboarding) => vo
               <Chip key={l.code} testID={`onboarding-language-${l.code}`} label={l.label} nativeLabel={l.nativeLabel} selected={uiLanguage === l.code} onPress={() => chooseLanguage(l.code)} />
             ))}
           </View>
-          {uiLanguage === 'th' ? <Text style={styles.body}>{t('common:languageNote.reportsInEnglish')}</Text> : null}
         </>
       ) : null}
 
