@@ -26,6 +26,8 @@
     "bench": "tsx ../bench/run.ts",
     "bench:labels": "tsx ../bench/labels.ts",
     "bench:report": "tsx ../bench/report.ts",
+    "config:seed-hotlines": "tsx src/admin/seed-hotlines.ts",
+    "admin:grant": "tsx src/admin/grant.ts",
     "live:smoke": "tsx eval/live-smoke.ts"
   },
   "dependencies": {
