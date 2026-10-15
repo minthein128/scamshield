@@ -187,6 +187,18 @@ A live two-way voice conversation about a finished report, relayed to the Gemini
 
 Risks are ordered by trending score. Errors: 400 `bad_request` for a bad `country` or `days`.
 
+## GET /v1/config/hotlines, /v1/config/notices, /v1/config/content (published runtime config)
+
+No auth. Per-IP limit. Every reply carries `Cache-Control: public, max-age=300` and a weak `ETag`; send `If-None-Match` to get `304`. The server keeps an in-memory copy and refreshes it every 60 seconds. When Firestore is unreachable or empty the server answers from the bundled data (`version: 0`).
+
+- `/v1/config/hotlines` returns `{ "version": 3, "items": Hotline[] }`. Retired items are left out. Each item has the `src/data/hotlines.ts` fields plus `status` and `source`.
+- `/v1/config/notices?country=TH&language=my` returns `{ "version": 1, "items": Notice[] }` with only enabled notices inside their `startsAt`/`endsAt` window. A notice with `country` or `language` set appears only for those values. Both parameters are optional.
+- `/v1/config/content?language=my` returns `{ "version": 1, "items": { "<ns>:<key>": "text" } }`. Without `language`, each value is an object of per-language texts. `language` is one of en, my, id, tl, th.
+
+The app fetches hotlines, notices and content at startup and every 6 hours, caches them, and uses the cache offline. See `docs/admin.md`.
+
+Admin errors extend the error body: codes `unauthorized` (401), `forbidden` (403) and `conflict` (409) join the existing ones. The admin API itself is under `/v1/admin` and is described in `docs/admin.md`.
+
 ## GET /healthz
 
 `{ "ok": true, "model": "...", "mock": false }`
