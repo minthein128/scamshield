@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Linking, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Linking, TouchableOpacity, PixelRatio, useWindowDimensions } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Icon, type IconName } from '../components/Icon';
 import { Screen } from '../components/Screen';
@@ -15,7 +15,8 @@ import {
   shareMessage,
   warnMessage,
 } from '../lib/report';
-import { countryLabel } from '../lib/countries';
+import { callLabel } from '../lib/callLabel';
+import { voiceRowStacks } from '../lib/voiceRow';
 import { scamTypeLabel, verdictLabel } from '../lib/labels';
 import { resolveCallTarget } from '../lib/hotlines';
 import { useRuntimeConfig } from '../lib/runtimeConfig';
@@ -59,6 +60,9 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
   const [warnOpen, setWarnOpen] = useState(false);
   const [liveOpen, setLiveOpen] = useState(false);
   const { profile } = useAppState();
+  const { width } = useWindowDimensions();
+  const narrow = width < 360;
+  const score = <Text style={[styles.score, narrow && styles.scoreNarrow]}>{result.score}<Text style={styles.scoreMax}>/100</Text></Text>;
 
   useEffect(() => {
     if (fresh && result.verdict !== 'safe') {
@@ -81,6 +85,11 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
   useRuntimeConfig();
   const callAction = result.actions.find(a => a.type === 'call');
   const hotline = resolveCallTarget(callAction?.value, profile.destinationCountry, profile.homeCountry);
+
+  const call = hotline ? callLabel(hotline, { call: number => t('call', { number }), ext: ext => t('callExt', { ext }) }) : { label: '' };
+  const listenLabel = speaking ? t('stop') : t('listen', { language: languageOption(language).label });
+  const talkLabel = t('live:button');
+  const stackVoice = voiceRowStacks(width, [listenLabel, talkLabel], PixelRatio.getFontScale());
 
   const shareResult = async () => {
     await shareText(shareMessage(result));
@@ -114,7 +123,7 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
           <Button testID="report-warn" label={t('warn')} icon="people" onPress={() => setWarnOpen(true)} />
           {result.verdict !== 'safe' ? (
             hotline?.dial ? (
-              <Button testID="report-call" icon="phone" label={t('call', { number: hotline.number ?? hotline.dial, country: countryLabel(hotline.country) })} variant="secondary" onPress={() => callNumber(hotline.dial ?? '')} />
+              <Button testID="report-call" icon="phone" label={call.label} subLabel={call.sub} variant="secondary" onPress={() => callNumber(hotline.dial ?? '')} />
             ) : (
               <Button testID="report-help" label={t('help')} variant="secondary" onPress={() => navigation.navigate('GetHelp')} />
             )
@@ -148,15 +157,16 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
       />
       <ScreenHeader title={t('title')} onBack={() => (navigation.canGoBack() ? navigation.goBack() : navigation.navigate('Tabs'))} />
 
-      <View style={[styles.banner, { backgroundColor: style.background }]} testID={`verdict-${result.verdict}`} accessible accessibilityLabel={t('a11yVerdict', { verdict: verdictLabel(result.verdict), score: result.score })}>
+      <View style={[styles.banner, narrow && styles.bannerNarrow, { backgroundColor: style.background }]} testID={`verdict-${result.verdict}`} accessible accessibilityLabel={t('a11yVerdict', { verdict: verdictLabel(result.verdict), score: result.score })}>
         <View style={styles.bannerIcon}>
           <Icon name={result.verdict === 'safe' ? 'shieldCheck' : result.verdict === 'danger' ? 'octagon' : 'alert'} size={36} color={colors.white} />
         </View>
-        <View style={{ flex: 1, gap: 4 }}>
+        {narrow ? score : null}
+        <View style={narrow ? styles.bannerTextNarrow : styles.bannerText}>
           <Text style={styles.bannerTitle}>{verdictLabel(result.verdict)}</Text>
           <Text style={[styles.bannerSub, { color: style.subtle }]}>{scamTypeLabel(result.scamType)}</Text>
         </View>
-        <Text style={styles.score}>{result.score}<Text style={styles.scoreMax}>/100</Text></Text>
+        {narrow ? null : score}
       </View>
       <View style={styles.segments}>
         {[0, 1, 2, 3].map(i => (
@@ -171,25 +181,25 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
         </View>
       ) : null}
 
-      <View style={styles.voiceRow}>
+      <View style={stackVoice ? styles.voiceStack : styles.voiceRow}>
         <Button
           testID="report-listen"
           icon={speaking ? 'stop' : 'speaker'}
-          label={speaking ? t('stop') : t('listen', { language: languageOption(language).label })}
+          label={listenLabel}
           variant="dark"
           onPress={toggleSpeech}
-          style={styles.voiceButton}
+          style={stackVoice ? styles.voiceButtonStacked : styles.voiceButton}
         />
         <Button
           testID="report-talk"
           icon="mic"
-          label={t('live:button')}
+          label={talkLabel}
           onPress={() => {
             stopSpeaking();
             setSpeaking(false);
             setLiveOpen(true);
           }}
-          style={styles.voiceButton}
+          style={stackVoice ? styles.voiceButtonStacked : styles.voiceButton}
         />
       </View>
 
@@ -267,7 +277,7 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
         <View style={{ gap: 8 }}>
           <SectionTitle>{t('actions')}</SectionTitle>
           {otherActions.map(a => (
-            <Button key={a.label} label={a.label} variant="secondary" onPress={() => run(a)} />
+            <Button key={a.label} label={a.label} maxLines={2} variant="secondary" onPress={() => run(a)} />
           ))}
         </View>
       ) : null}
@@ -279,13 +289,19 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
 
 const styles = StyleSheet.create({
   voiceRow: { flexDirection: 'row', gap: 10 },
+  voiceStack: { gap: 10 },
   voiceButton: { flex: 1, flexBasis: 0, minHeight: 64, paddingHorizontal: 10 },
+  voiceButtonStacked: { alignSelf: 'stretch', minHeight: 56 },
   banner: { flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: 24, paddingVertical: 24, paddingHorizontal: 20 },
   bannerIcon: { width: 56, height: 56, borderRadius: 28, backgroundColor: 'rgba(255,255,255,0.18)', alignItems: 'center', justifyContent: 'center' },
   bannerTitle: { fontSize: 28, lineHeight: 34, fontFamily: fonts.extraBold, letterSpacing: -0.3, color: colors.white, includeFontPadding: false },
   bannerSub: { fontSize: 14, lineHeight: 20, fontFamily: fonts.medium, includeFontPadding: false },
   score: { fontSize: 32, lineHeight: 36, fontFamily: fonts.extraBold, color: colors.white },
   scoreMax: { fontSize: 14, fontFamily: fonts.medium },
+  bannerNarrow: { flexWrap: 'wrap', paddingVertical: 20, paddingHorizontal: 16 },
+  bannerText: { flex: 1, minWidth: 0, gap: 4 },
+  bannerTextNarrow: { flexBasis: '100%', gap: 4 },
+  scoreNarrow: { marginLeft: 'auto' },
   segments: { flexDirection: 'row', gap: 4, marginTop: -8 },
   seg: { flex: 1, height: 8, borderRadius: 4 },
   thanks: { flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 16, paddingVertical: 14, paddingHorizontal: 16, backgroundColor: colors.safeBg },
