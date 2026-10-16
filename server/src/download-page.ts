@@ -1,6 +1,6 @@
 const esc = (s: string) => s.replace(/[&<>"]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[ch] as string);
 
-export function downloadPage(opts: { version?: string; bytes?: number }): string {
+export function downloadPage(opts: { version?: string; bytes?: number; href?: string }): string {
   const mb = opts.bytes ? `${(opts.bytes / 1_048_576).toFixed(1)} MB` : '';
   const meta = [opts.version ? `Version ${esc(opts.version)}` : '', mb].filter(Boolean).join(' · ');
   return `<!doctype html>
@@ -22,7 +22,7 @@ small{display:block;color:#555}
 <body>
 <h1>SafeRoute</h1>
 <p class="meta">${meta}</p>
-<a class="btn" href="/download/saferoute.apk">Download SafeRoute (APK)<small style="color:#d6f0e0">SafeRoute ကို ဒေါင်းလုဒ်လုပ်ပါ</small></a>
+<a class="btn" href="${esc(opts.href ?? '/download/saferoute.apk')}">Download SafeRoute (APK)<small style="color:#d6f0e0">SafeRoute ကို ဒေါင်းလုဒ်လုပ်ပါ</small></a>
 <ol>
 <li>Allow installs from your browser when Android asks.<small>ဖုန်းက တောင်းလာလျှင် ဘရောက်ဇာမှ ထည့်သွင်းခွင့်ပေးပါ။</small></li>
 <li>Open the downloaded file.<small>ဒေါင်းလုဒ်လုပ်ပြီးသော ဖိုင်ကို ဖွင့်ပါ။</small></li>

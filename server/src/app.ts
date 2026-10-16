@@ -1,7 +1,7 @@
 import { createReadStream } from 'node:fs';
 import { stat } from 'node:fs/promises';
 import { Readable } from 'node:stream';
-import { Hono } from 'hono';
+import { type Context, Hono } from 'hono';
 import { bodyLimit } from 'hono/body-limit';
 import { cors } from 'hono/cors';
 import { streamSSE } from 'hono/streaming';
@@ -80,12 +80,18 @@ export function createApp(
     }
   };
 
+  const versionedName = cfg.apkVersion ? `saferoute-${encodeURIComponent(cfg.apkVersion)}.apk` : undefined;
+
   app.get('/download', async (c) => {
     const st = await apkFile();
-    return c.html(downloadPage({ version: cfg.apkVersion, bytes: st?.size }), 200, { 'cache-control': 'no-cache' });
+    return c.html(
+      downloadPage({ version: cfg.apkVersion, bytes: st?.size, href: versionedName ? `/download/${versionedName}` : undefined }),
+      200,
+      { 'cache-control': 'no-cache' },
+    );
   });
 
-  app.on(['GET', 'HEAD'], '/download/saferoute.apk', async (c) => {
+  const serveApk = async (c: Context, immutable: boolean) => {
     const ip = clientIp(c.req.header('x-forwarded-for'), c.req.header('x-real-ip'));
     const decision = apkHourly.check(ip, cfg.apkPerHour);
     if (!decision.allowed) {
@@ -99,12 +105,25 @@ export function createApp(
       'content-type': 'application/vnd.android.package-archive',
       'content-disposition': 'attachment; filename="SafeRoute.apk"',
       'content-length': String(st.size),
-      'cache-control': 'no-cache',
+      'cache-control': immutable ? 'public, max-age=31536000, immutable' : 'no-cache',
       etag: `"${Math.floor(st.mtimeMs).toString(16)}-${st.size.toString(16)}"`,
     };
     if (c.req.method === 'HEAD') return new Response(null, { status: 200, headers });
     const body = Readable.toWeb(createReadStream(cfg.apkPath)) as unknown as ReadableStream;
     return new Response(body, { status: 200, headers });
+  };
+
+  app.on(['GET', 'HEAD'], '/download/saferoute.apk', async (c) => {
+    if (!versionedName || !(await apkFile())) return serveApk(c, false);
+    c.header('cache-control', 'no-store');
+    return c.redirect(`/download/${versionedName}`, 302);
+  });
+
+  app.on(['GET', 'HEAD'], '/download/:name', async (c) => {
+    if (!versionedName || c.req.param('name') !== versionedName) {
+      return c.json(errorBody('bad_request', 'APK not available'), 404 as never);
+    }
+    return await serveApk(c, true);
   });
 
   app.post(
