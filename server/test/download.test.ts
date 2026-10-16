@@ -67,7 +67,25 @@ describe('apk download', () => {
     const html = await res.text();
     expect(html).toContain('Version 1.2.3');
     expect(html).toContain('0.0 MB');
-    expect(html).toContain('href="/download/saferoute.apk"');
+    expect(html).toContain('href="/download/saferoute-1.2.3.apk"');
     expect(html).toContain('ဒေါင်းလုဒ်');
+  });
+
+  it('redirects the unversioned URL with no-store and serves the versioned one immutably', async () => {
+    const app = appOf({ APK_PATH: file, APK_VERSION: '1.2.3' });
+    const redir = await app.request('/download/saferoute.apk');
+    expect(redir.status).toBe(302);
+    expect(redir.headers.get('location')).toBe('/download/saferoute-1.2.3.apk');
+    expect(redir.headers.get('cache-control')).toBe('no-store');
+    const res = await app.request('/download/saferoute-1.2.3.apk');
+    expect(res.status).toBe(200);
+    expect(res.headers.get('cache-control')).toBe('public, max-age=31536000, immutable');
+    expect(Buffer.from(await res.arrayBuffer()).equals(bytes)).toBe(true);
+    expect((await app.request('/download/saferoute-9.9.apk')).status).toBe(404);
+  });
+
+  it('serves the unversioned URL directly when no version is set', async () => {
+    const res = await appOf({ APK_PATH: file }).request('/download/saferoute.apk');
+    expect(res.status).toBe(200);
   });
 });
