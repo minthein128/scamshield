@@ -74,7 +74,7 @@ async function timedFetch(fetchImpl: typeof fetch, url: string, timeoutMs: numbe
   const ok = kind === 'probe' ? res !== null : Boolean(res?.ok);
   const ms = Date.now() - started;
   trace.push({ kind, target: traceTarget(url), ok, ms, ...(res ? { status: res.status } : {}) });
-  if (kind !== 'probe') diag[ok ? 'info' : 'warn']('connection', kind, { host: apiHost(url), ok, ms, ...(res ? { status: res.status } : {}) });
+  if (kind === 'config') diag[ok ? 'info' : 'warn']('connection', kind, { host: apiHost(url), ok, ms, ...(res ? { status: res.status } : {}) });
   return res;
 }
 
@@ -129,11 +129,22 @@ export function fetchFirstApiUrl(
   });
 }
 
+/** Probes /health, then /healthz on a 404, and logs one line with the outcome. */
 export async function checkHealth(url: string, fetchImpl: typeof fetch = fetch, timeoutMs = HEALTH_TIMEOUT_MS): Promise<boolean> {
   const root = url.replace(/\/+$/, '');
-  const res = await timedFetch(fetchImpl, `${root}/health`, timeoutMs, 'health');
-  if (res?.status !== 404) return Boolean(res?.ok);
-  return Boolean((await timedFetch(fetchImpl, `${root}/healthz`, timeoutMs, 'health'))?.ok);
+  const started = Date.now();
+  let res = await timedFetch(fetchImpl, `${root}/health`, timeoutMs, 'health');
+  const viaHealthz = res?.status === 404;
+  if (viaHealthz) res = await timedFetch(fetchImpl, `${root}/healthz`, timeoutMs, 'health');
+  const ok = Boolean(res?.ok);
+  diag[ok ? 'info' : 'warn']('connection', 'health', {
+    host: apiHost(url),
+    ok,
+    ms: Date.now() - started,
+    ...(res ? { status: res.status } : {}),
+    ...(viaHealthz ? { via: 'healthz' } : {}),
+  });
+  return ok;
 }
 
 /** True when any reliable public endpoint answers, whatever the status. */

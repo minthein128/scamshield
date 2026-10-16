@@ -14,6 +14,7 @@ import {
   resolveApiUrl,
 } from '../config/runtime';
 import { CLOUD_RUN_API_URL, FALLBACK_API_URL, STABLE_API_URL } from '../config/env';
+import { readLog, resetDiagMemory } from '../lib/diagLog';
 import { ApiError, createRuntimeClient, type CheckClient, type CheckRequest } from '../api';
 
 const A = 'https://a.config/config.json';
@@ -194,6 +195,17 @@ describe('config sources', () => {
     expect(calls).toEqual([`${OLD}/health`, `${OLD}/healthz`]);
     expect(await checkHealth(NEW, fetchImpl)).toBe(false);
     expect(calls).not.toContain(`${NEW}/healthz`);
+  });
+
+  it('logs one health line with the outcome, not a 404 failure, when /healthz answers', async () => {
+    resetDiagMemory();
+    const { fetchImpl } = fakeFetch({ [`${OLD}/health`]: 'notfound', [`${OLD}/healthz`]: 'ok', [`${NEW}/health`]: 'down' });
+    await checkHealth(OLD, fetchImpl);
+    await checkHealth(NEW, fetchImpl);
+    const health = (await readLog()).filter(e => e.area === 'connection' && e.event === 'health');
+    expect(health).toHaveLength(2);
+    expect(health[0]).toMatchObject({ level: 'info', d: { host: 'old.example', ok: true, via: 'healthz' } });
+    expect(health[1]).toMatchObject({ level: 'warn', d: { host: 'new.example', ok: false } });
   });
 
   it('checks health and host helpers', async () => {
