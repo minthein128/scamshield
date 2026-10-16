@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Modal, Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Text } from './Text';
@@ -6,6 +6,8 @@ import { Button } from './ui';
 import { useAppState } from '../state/AppState';
 import { shareText } from '../lib/notify';
 import { textContact } from '../lib/warn';
+import { ContactsGate } from './ContactsGate';
+import { useOpenSignIn } from '../hooks/useOpenSignIn';
 import { useSheetLayout } from './useSheetLayout';
 import theme from '../theme/theme';
 
@@ -20,18 +22,34 @@ interface Props {
 
 export const WarnFamilySheet: React.FC<Props> = ({ visible, message, onClose, onAddContact }) => {
   const { t } = useTranslation(['contacts', 'common']);
-  const { contacts } = useAppState();
+  const { contacts, contactAccess } = useAppState();
+  const openSignIn = useOpenSignIn();
+  const [gateOpen, setGateOpen] = useState(false);
+  const close = () => {
+    setGateOpen(false);
+    onClose();
+  };
   const { height } = useWindowDimensions();
   const sheet = useSheetLayout();
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={close}>
       <View style={[styles.overlay, { height }, sheet.overlay]}>
-      <Pressable accessibilityLabel={t('common:actions.close')} style={styles.backdrop} onPress={onClose} />
+      <Pressable accessibilityLabel={t('common:actions.close')} style={styles.backdrop} onPress={close} />
       <View style={[styles.sheet, sheet.sheet]} testID="warn-sheet">
         <Text accessibilityRole="header" style={styles.title}>{t('warn.title')}</Text>
         <Text style={styles.body}>{t('warn.body')}</Text>
         {contacts.length === 0 ? (
-          <Button label={t('warn.addContact')} onPress={() => { onClose(); onAddContact(); }} />
+          contactAccess === 'allowed' ? (
+            <Button testID="warn-add" label={t('warn.addContact')} onPress={() => { close(); onAddContact(); }} />
+          ) : gateOpen ? (
+            <ContactsGate
+              access={contactAccess}
+              onSignIn={() => { close(); openSignIn(); }}
+              onDismiss={() => setGateOpen(false)}
+            />
+          ) : (
+            <Button testID="warn-add" label={t('warn.addContact')} onPress={() => setGateOpen(true)} />
+          )
         ) : (
           contacts.map(c => (
             <Button
@@ -40,13 +58,14 @@ export const WarnFamilySheet: React.FC<Props> = ({ visible, message, onClose, on
               label={t('warn.text', { name: c.name })}
               onPress={() => {
                 textContact(c, message).catch(() => undefined);
-                onClose();
+                close();
               }}
             />
           ))
         )}
-        <Button testID="warn-share" label={t('warn.share')} variant="secondary" onPress={() => { shareText(message).catch(() => undefined); onClose(); }} />
-        <Button label={t('common:actions.cancel')} variant="secondary" onPress={onClose} />
+        {contacts.length > 0 && contactAccess === 'signIn' ? <Text testID="warn-legacy" style={styles.body}>{t('gate.legacy')}</Text> : null}
+        <Button testID="warn-share" label={t('warn.share')} variant="secondary" onPress={() => { shareText(message).catch(() => undefined); close(); }} />
+        <Button label={t('common:actions.cancel')} variant="secondary" onPress={close} />
       </View>
       </View>
     </Modal>
