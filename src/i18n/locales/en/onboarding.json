@@ -3,7 +3,9 @@
   "skipA11y": "Skip setup",
   "language": {
     "title": "Choose your language",
-    "body": "SafeRoute shows the app and writes its reports and spoken warnings in this language. You can change it later."
+    "body": "SafeRoute shows the app and writes its reports and spoken warnings in this language. You can change it later.",
+    "tagline": "Like the Pyit Taing Htaung doll, we help you stay on your feet.",
+    "heroA11y": "SafeRoute, with the Pyit Taing Htaung doll"
   },
   "countries": {
     "fromTitle": "Where are you from?",
