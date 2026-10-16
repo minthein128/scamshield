@@ -368,7 +368,7 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
 
     // ---- voice companion ----
 
-    /** Shows or updates the companion presentation: voice glyph on the bubble and the caption pill. */
+    /** Shows or updates the companion presentation: the doll's voice state on the bubble and the status pill. */
     fun showCompanion(view: CompanionView) {
         val starting = companion == null
         companion = view
@@ -413,15 +413,15 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
 
     private fun showPill() {
         removePillNow()
-        val view = CompanionPillView(context, palette, fonts, fontScale(), strings) { listener.onEndCompanion() }
+        val view = CompanionPillView(context, palette, fonts, fontScale(), strings, onMute = { listener.onBallTap() }, onEnd = { listener.onEndCompanion() })
         val anchor = anchorFor(bubbleParams.x, bubbleParams.y)
-        val width = min(screenW() - dp(48), dp(320))
+        view.fitTo(screenW() - dp(48))
         val root = FrameLayout(context).apply {
             clipChildren = false
             clipToPadding = false
             setPadding(pad, pad, pad, pad)
         }
-        root.addView(view, FrameLayout.LayoutParams(width, FrameLayout.LayoutParams.WRAP_CONTENT))
+        root.addView(view, FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT))
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.WRAP_CONTENT,

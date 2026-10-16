@@ -59,9 +59,7 @@ class ShieldStrings private constructor(private val values: Map<String, String>)
     val warning get() = this["warning"]
     val rechecking get() = this["rechecking"]
     val connecting get() = this["connecting"]
-    val end get() = this["end"]
     val endA11y get() = this["endA11y"]
-    val captionHint get() = this["captionHint"]
     val voiceChip get() = this["voiceChip"]
     val micDenied get() = this["micDenied"]
     val needsForeground get() = this["needsForeground"]
@@ -122,9 +120,7 @@ class ShieldStrings private constructor(private val values: Map<String, String>)
             "warning" to "Warning",
             "rechecking" to "Checking again",
             "connecting" to "Connecting",
-            "end" to "End",
             "endA11y" to "End the conversation",
-            "captionHint" to "Ask Pyit Taing Htaung about your screen",
             "voiceChip" to "Pyit Taing Htaung",
             "micDenied" to "Open SafeRoute to allow the microphone",
             "needsForeground" to "Open SafeRoute once to allow voice",

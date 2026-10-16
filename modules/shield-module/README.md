@@ -21,7 +21,7 @@ Expo module for Android. It draws a floating bubble over other apps. A tap captu
 | `CompanionSession.kt` | Voice companion state machine: check, warning, `/v1/live` in companion mode, recheck, mute, focus, end |
 | `CompanionAudioEngine.kt` | Mic and speaker for a session, built on the `live-audio` engines, plus audio focus events |
 | `CompanionClients.kt` | `/v1/speak` client, WAV to 24 kHz PCM, OkHttp `/v1/live` socket |
-| `CompanionPillView.kt` | One-line companion pill: state chip, latest model line, End |
+| `CompanionPillView.kt` | Companion pill: status word, mute toggle, End (no transcript text) |
 | `ShieldStrings.kt` | Companion labels from the app (`startShield({ strings })`), English fallback |
 | `ShieldBridge.kt` | Shared state between module, service and activity |
 | `MessageGuardListener.kt` | `NotificationListenerService` for Message Guard. Drops every app outside the allowlist before reading content |
@@ -220,7 +220,7 @@ The user talks to Pyit Taing Htaung (ပစ်တိုင်းထောင်)
 | --- | --- |
 | Double tap the bubble (idle, error or a result) | Starts a session. A single tap now waits for the double-tap timeout (300 ms) before it checks the screen |
 | "Ask" chip on the result pill or sheet | Starts a session about the result on show |
-| Tap the bubble during a session | Mute or unmute. After a lost audio focus, a tap resumes |
+| Tap the bubble, or the mic on the pill, during a session | Mute or unmute. After a lost audio focus, a tap resumes |
 | End on the pill, or long press the bubble | Ends the session. The shield stays on; a second long press closes it |
 | Session cap (`LIVE_COMPANION_MAX_MS`, 300 s), the shield stops, drag to the close target, server error | Ends the session |
 | TalkBack | Custom action "Talk to Pyit Taing Htaung" on the bubble |
@@ -255,24 +255,26 @@ Barge-in: `interrupted` flushes playback at once. Audio focus: `AUDIOFOCUS_LOSS*
 
 ### What the bubble and pill show
 
+The pill shows no transcript text: only a short status word, a mute toggle (live states only) and End. It wraps its content and the status chip is capped to fit the screen width minus 48dp; Burmese status words fit at 320dp with the 1.3 font scale cap. The status chip is a polite live region, so TalkBack announces each status change. The session reads `transcript` frames only as a signal (a user line moves Listening to Thinking); the server keeps transcription on because it also feeds the certainty, gender-form and promise counters and the turn count in the session log.
+
 | State | Bubble | Pill chip | Pill text |
 | --- | --- | --- | --- |
 | Checking, rechecking | Scanning shield | Checking / Checking again | |
-| Warning | Doll rocking with the output level | Warning | The approved warning text |
+| Warning | Doll rocking with the output level | Warning | |
 | Connecting | Doll with three moving dots | Connecting | |
-| Listening | Doll with a mic badge, input-level ring | Listening | Latest model line, or "Ask Pyit Taing Htaung about your screen" |
-| Thinking | Doll with three moving dots | Thinking | Latest model line |
-| Speaking | Doll rocking and growing with the output level, level ring | Speaking | Latest model line (cumulative, replaced on update) |
+| Listening | Doll with a mic badge, input-level ring | Listening | |
+| Thinking | Doll with three moving dots | Thinking | |
+| Speaking | Doll rocking and growing with the output level, level ring | Speaking | |
 | Muted, paused | Grey mic with a slash | Muted / Paused | |
 | Ended | Verdict bubble; the result pill returns | | A notice for cap or errors |
 
-The doll is `res/drawable-nodpi/companion_doll.png` (192 px, rendered from `assets/avatar/doll.svg`), clipped to the circle inside the ring. Idle and check states keep the shield glyph. The ring keeps the verdict color of the current report. TalkBack and the pill name the companion with the `name` string. The pill text is one line, ellipsized at the start, so the newest words show.
+The doll is `res/drawable-nodpi/companion_doll.png` (192 px, rendered from `assets/avatar/doll.svg`), clipped to the circle inside the ring. The ring keeps the verdict color of the current report. TalkBack and the pill name the companion with the `name` string.
 
 ### Android 14 foreground service
 
 The service type is `specialUse|mediaProjection|microphone`. Starting a while-in-use type (microphone) needs the app to be visible: [developer.android.com, restrictions on starting a foreground service from the background](https://developer.android.com/develop/background-work/services/fgs/restrictions-bg-start). The `SYSTEM_ALERT_WINDOW` exemption on that page covers starting a service from the background, not while-in-use access; on Android 14 `startForeground` with type microphone throws `SecurityException` without it.
 
-So the service adds the microphone type while SafeRoute is visible (`startShield`, and `OnActivityEntersForeground` in the module) whenever `RECORD_AUDIO` is granted, and only calls `startForeground` again at session start if the type is missing. If that call throws, the pill shows "Open SafeRoute once to allow voice"; a tap opens the Shield screen, which re-arms the type. On Android 11 to 13 a blocked mic records silence instead of throwing: 4 s of digital silence shows the same hint in the pill. Missing `RECORD_AUDIO` shows "Open SafeRoute to allow the microphone". The app asks for it as an optional step when the shield turns on and from the "Talk to Pyit Taing Htaung from the bubble" card.
+So the service adds the microphone type while SafeRoute is visible (`startShield`, and `OnActivityEntersForeground` in the module) whenever `RECORD_AUDIO` is granted, and only calls `startForeground` again at session start if the type is missing. If that call throws, the pill shows "Open SafeRoute once to allow voice"; a tap opens the Shield screen, which re-arms the type. On Android 11 to 13 a blocked mic records silence instead of throwing: 4 s of digital silence ends the session with the same notice. Missing `RECORD_AUDIO` shows "Open SafeRoute to allow the microphone". The app asks for it as an optional step when the shield turns on and from the "Talk to Pyit Taing Htaung from the bubble" card.
 
 ### Strings
 

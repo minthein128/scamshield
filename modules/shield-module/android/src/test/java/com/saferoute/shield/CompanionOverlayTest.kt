@@ -58,7 +58,7 @@ class CompanionOverlayTest {
     fun setUp() {
         context = ApplicationProvider.getApplicationContext()
         overlay = ShieldOverlay(context, listener)
-        overlay.strings = ShieldStrings.from(mapOf("listening" to "Nar htaung nay", "end" to "Yat"))
+        overlay.strings = ShieldStrings.from(mapOf("listening" to "Nar htaung nay"))
         overlay.show()
     }
 
@@ -116,7 +116,7 @@ class CompanionOverlayTest {
     }
 
     @Test
-    fun companionShowsVoiceGlyphsAndTheCaptionPill() {
+    fun companionShowsVoiceGlyphsAndAStatusPillWithoutText() {
         overlay.setResult(result("careful"))
         advance(400)
         overlay.showCompanion(CompanionView(CompanionState.LISTENING))
@@ -124,13 +124,17 @@ class CompanionOverlayTest {
         assertTrue(overlay.hasPillWindow)
         assertEquals(BubbleView.Voice.LISTENING, overlay.bubbleVoiceForTest)
         assertEquals("Nar htaung nay", overlay.pillForTest!!.chipText)
-        assertEquals(ShieldStrings.DEFAULTS["captionHint"], overlay.pillForTest!!.captionText)
-        assertTrue(overlay.pillForTest!!.contentDescription.startsWith("Pyit Taing Htaung. Nar htaung nay"))
+        val pill = overlay.pillForTest!!
+        assertEquals("only the status chip carries text", listOf("Nar htaung nay"), texts(pill))
+        assertEquals(ShieldStrings.DEFAULTS["endA11y"], pill.endViewForTest.contentDescription)
+        assertEquals("Pyit Taing Htaung. Nar htaung nay", pill.chipViewForTest.contentDescription)
+        assertEquals("status changes are announced", View.ACCESSIBILITY_LIVE_REGION_POLITE, pill.chipViewForTest.accessibilityLiveRegion)
+        assertEquals(View.VISIBLE, pill.muteViewForTest.visibility)
         assertTrue(overlay.bubbleViewForTest.contentDescription.startsWith("Pyit Taing Htaung."))
 
-        overlay.showCompanion(CompanionView(CompanionState.SPEAKING, caption = "It looks risky."))
+        overlay.showCompanion(CompanionView(CompanionState.SPEAKING))
         assertEquals(BubbleView.Voice.SPEAKING, overlay.bubbleVoiceForTest)
-        assertEquals("It looks risky.", overlay.pillForTest!!.captionText)
+        assertEquals("Speaking", overlay.pillForTest!!.chipText)
 
         overlay.showCompanion(CompanionView(CompanionState.THINKING))
         assertEquals(BubbleView.Voice.THINKING, overlay.bubbleVoiceForTest)
@@ -138,9 +142,47 @@ class CompanionOverlayTest {
         overlay.showCompanion(CompanionView(CompanionState.LISTENING, muted = true))
         assertEquals(BubbleView.Voice.MUTED, overlay.bubbleVoiceForTest)
         assertEquals("Muted", overlay.pillForTest!!.chipText)
+        assertEquals(ShieldStrings.DEFAULTS["unmuteA11y"], overlay.pillForTest!!.muteViewForTest.contentDescription)
+        overlay.pillForTest!!.muteViewForTest.performClick()
+        assertEquals("the pill's mute control toggles like a bubble tap", 1, listener.taps)
 
-        overlay.showCompanion(CompanionView(CompanionState.LISTENING, micBlocked = true))
-        assertEquals(ShieldStrings.DEFAULTS["needsForeground"], overlay.pillForTest!!.captionText)
+        overlay.showCompanion(CompanionView(CompanionState.CONNECTING))
+        assertEquals(View.GONE, overlay.pillForTest!!.muteViewForTest.visibility)
+    }
+
+    private fun texts(v: View): List<String> = when (v) {
+        is android.widget.TextView -> listOf(v.text.toString()).filter { it.isNotEmpty() }
+        is android.view.ViewGroup -> (0 until v.childCount).flatMap { texts(v.getChildAt(it)) }
+        else -> emptyList()
+    }
+
+    @Test
+    fun burmeseStatusWordsFitAtTheNarrowestWidth() {
+        val ctx = ApplicationProvider.getApplicationContext<Context>()
+        val d = ctx.resources.displayMetrics.density
+        val root = generateSequence(java.io.File("").absoluteFile) { it.parentFile }.first { java.io.File(it, "src/i18n/locales").exists() }
+        val companion = JSONObject(java.io.File(root, "src/i18n/locales/my/live.json").readText()).getJSONObject("companion")
+        val my = ShieldStrings.from(companion.keys().asSequence().associateWith { companion.getString(it) })
+        val maxPx = ((320 - 48) * d).toInt()
+        val states = listOf(
+            CompanionView(CompanionState.LISTENING), CompanionView(CompanionState.THINKING), CompanionView(CompanionState.SPEAKING),
+            CompanionView(CompanionState.LISTENING, muted = true), CompanionView(CompanionState.LISTENING, paused = true),
+            CompanionView(CompanionState.CONNECTING), CompanionView(CompanionState.RECHECKING),
+            CompanionView(CompanionState.CHECKING), CompanionView(CompanionState.WARNING),
+        )
+        for (v in states) {
+            val pill = CompanionPillView(ctx, ShieldPalette(false), ShieldFonts(ctx), 1.3f, my, {}, {})
+            pill.fitTo(maxPx)
+            pill.render(v, ShieldOverlay.State.DANGER)
+            val spec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+            pill.measure(spec, spec)
+            pill.layout(0, 0, pill.measuredWidth, pill.measuredHeight)
+            val chip = pill.chipViewForTest
+            assertTrue("${pill.chipText} pill ${pill.measuredWidth} > $maxPx", pill.measuredWidth <= maxPx)
+            val lines = chip.layout?.lineCount ?: 1
+            for (line in 0 until lines) assertEquals("${pill.chipText} is not cut", 0, chip.layout?.getEllipsisCount(line) ?: 0)
+            assertTrue("${pill.chipText} uses at most two lines", lines <= 2)
+        }
     }
 
     @Test
