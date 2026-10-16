@@ -28,6 +28,8 @@ Expo SDK 52 / React Native, TypeScript strict. Android anti-scam app. The Expo w
 
 The resolved API URL is set: the app calls `POST {url}/v1/check` with the Firebase ID token. Unset: only in a dev build (`__DEV__`), `src/api/mock.ts` answers locally and the app shows an "Offline demo mode" banner. Release builds with no URL show an "unavailable" error. Tests never call the network.
 
+In a dev build, `EXPO_PUBLIC_OFFLINE_MOCK=1` skips URL resolution so the offline mock answers (used by `scripts/e2e-jobshield.mjs` for the Job Shield screenshots).
+
 Other env vars: `EXPO_PUBLIC_APK_URL` (download link on web), `EXPO_PUBLIC_FIREBASE_*` (web config, public identifiers; keep in gitignored `.env.local` or CI variables).
 
 ## Shield overlay (Android)
