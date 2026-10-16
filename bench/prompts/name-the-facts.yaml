@@ -1,0 +1,3 @@
+name: name-the-facts
+append: |
+  - summary: also name the specific facts the reader must act on, as written in the input: the amount of money asked for, the document asked for (passport, ID card, selfie), the chat app or handle the sender wants to move to, and the town or country they want the reader to go to.

@@ -122,8 +122,8 @@
         "caption": "A big salary, free flight and no experience needed."
       },
       "e2": {
-        "title": "Tap the shield",
-        "caption": "The shield sees the post on your screen. It asks to open the hidden text."
+        "title": "Tap the doll",
+        "caption": "The doll sees the post on your screen. It asks to open the hidden text."
       },
       "e3": {
         "title": "SafeRoute checks it",
@@ -140,7 +140,7 @@
         "caption": "Friendly words, then talk about easy profit."
       },
       "e2": {
-        "title": "Tap the shield",
+        "title": "Tap the doll",
         "caption": "SafeRoute needs the older messages to see the full story."
       },
       "e3": {
@@ -238,7 +238,7 @@
   "shieldSteps": {
     "s1": {
       "title": "Turn on the shield",
-      "caption": "A small button sits on the side of your screen."
+      "caption": "A small Pyit Taing Htaung doll sits on the side of your screen."
     },
     "s2": {
       "title": "Tap it on anything strange",

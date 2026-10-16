@@ -6,7 +6,9 @@
   "skipA11y": "Lewati penyiapan",
   "language": {
     "title": "Pilih bahasa Anda",
-    "body": "SafeRoute menampilkan aplikasi dan menuliskan laporan serta peringatan suara dalam bahasa ini. Anda bisa mengubahnya nanti."
+    "body": "SafeRoute menampilkan aplikasi dan menuliskan laporan serta peringatan suara dalam bahasa ini. Anda bisa mengubahnya nanti.",
+    "tagline": "Seperti boneka Pyit Taing Htaung, kami membantu Anda tetap tegak berdiri.",
+    "heroA11y": "SafeRoute, dengan boneka Pyit Taing Htaung"
   },
   "countries": {
     "fromTitle": "Dari mana asal Anda?",

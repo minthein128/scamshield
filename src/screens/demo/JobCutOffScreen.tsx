@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import theme from '../../theme/theme';
+import { BrandMark } from '../../components/BrandMark';
 
 interface JobCutOffScreenProps {
   onNavigate?: (route: string) => void;
@@ -31,20 +32,18 @@ export const JobCutOffScreen: React.FC<JobCutOffScreenProps> = ({ onNavigate }) 
         </View>
         <View>
           <Text style={{ color: '#0F1B2D', fontSize: 15, lineHeight: 23, fontFamily: theme.fonts.regular, includeFontPadding: false }}>{"Work in Thailand! Big salary, free flight and visa. No experience needed. Leave this week..."}</Text>
-          <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('job-expand')} style={{ backgroundColor: '#FFF1E8', borderWidth: 2, borderColor: '#C2410C', borderRadius: 8, paddingVertical: 2, paddingHorizontal: 8 }}>
-            <Text style={{ color: '#9A3412', fontSize: 15, lineHeight: 19, fontFamily: theme.fonts.extraBold, includeFontPadding: false }}>{"See more"}</Text>
+          <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('job-expand')} style={{ backgroundColor: '#FFF0F2', borderWidth: 2, borderColor: '#9F1239', borderRadius: 8, paddingVertical: 2, paddingHorizontal: 8 }}>
+            <Text style={{ color: '#881337', fontSize: 15, lineHeight: 19, fontFamily: theme.fonts.extraBold, includeFontPadding: false }}>{"See more"}</Text>
           </TouchableOpacity>
         </View>
         <View style={{ height: 250, borderRadius: 12, backgroundColor: '#E5E7EB', alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
           <Text style={{ color: '#4B5563', fontSize: 13, fontFamily: theme.fonts.semiBold, lineHeight: 18, includeFontPadding: false }}>{"[JOB AD PHOTO]"}</Text>
         </View>
       </View>
-      <View style={{ position: 'absolute', right: 16, top: 300, width: 64, height: 64, borderRadius: 32, backgroundColor: '#1D4ED8', alignItems: 'center', justifyContent: 'center', borderWidth: 3, borderColor: '#FFFFFF', flexDirection: 'row' }}>
-        <Svg width={30} height={30} viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
-          <Path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z" />
-        </Svg>
+      <View style={{ position: 'absolute', right: 16, top: 300, width: 64, height: 64, borderRadius: 32, backgroundColor: '#F2B01E', alignItems: 'center', justifyContent: 'center', borderWidth: 3, borderColor: '#FFFFFF', flexDirection: 'row' }}>
+        <BrandMark size={50} />
       </View>
-      <View style={{ position: 'absolute', right: 10, top: 294, width: 24, height: 24, borderRadius: 12, backgroundColor: '#C2410C', alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: '#FFFFFF', flexDirection: 'row' }}>
+      <View style={{ position: 'absolute', right: 10, top: 294, width: 24, height: 24, borderRadius: 12, backgroundColor: '#9F1239', alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: '#FFFFFF', flexDirection: 'row' }}>
         <Text style={{ color: '#FFFFFF', fontSize: 13, fontFamily: theme.fonts.extraBold, lineHeight: 18, includeFontPadding: false }}>{"1"}</Text>
       </View>
       <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, backgroundColor: '#0F1B2D', borderTopLeftRadius: 28, borderTopRightRadius: 28, borderBottomRightRadius: 0, borderBottomLeftRadius: 0, paddingTop: 14, paddingHorizontal: 20, paddingBottom: 26, flexDirection: 'column', gap: 14 }}>
@@ -63,14 +62,14 @@ export const JobCutOffScreen: React.FC<JobCutOffScreenProps> = ({ onNavigate }) 
         <Text style={{ color: '#FFFFFF', lineHeight: 29, fontFamily: theme.fonts.extraBold, includeFontPadding: false, fontSize: 22 }}>Part of this post is hidden</Text>
         <View style={{ flexDirection: 'column', gap: 10 }}>
           <View style={{ alignItems: 'center', gap: 12, flexDirection: 'row' }}>
-            <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: '#FFF1E8', alignItems: 'center', justifyContent: 'center', flexShrink: 0, flexDirection: 'row' }}>
-              <Text style={{ color: '#9A3412', lineHeight: 19, fontFamily: theme.fonts.extraBold, includeFontPadding: false, fontSize: 14 }}>{"1"}</Text>
+            <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: '#FFF0F2', alignItems: 'center', justifyContent: 'center', flexShrink: 0, flexDirection: 'row' }}>
+              <Text style={{ color: '#881337', lineHeight: 19, fontFamily: theme.fonts.extraBold, includeFontPadding: false, fontSize: 14 }}>{"1"}</Text>
             </View>
             <Text style={{ color: '#FFFFFF', lineHeight: 23, fontFamily: theme.fonts.semiBold, includeFontPadding: false, fontSize: 17 }}>Tap <Text style={{ fontFamily: theme.fonts.extraBold, color: '#FDBA74', lineHeight: 19, includeFontPadding: false }}>See more</Text></Text>
           </View>
           <View style={{ alignItems: 'center', gap: 12, flexDirection: 'row' }}>
-            <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: '#FFF1E8', alignItems: 'center', justifyContent: 'center', flexShrink: 0, flexDirection: 'row' }}>
-              <Text style={{ color: '#9A3412', lineHeight: 19, fontFamily: theme.fonts.extraBold, includeFontPadding: false, fontSize: 14 }}>{"2"}</Text>
+            <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: '#FFF0F2', alignItems: 'center', justifyContent: 'center', flexShrink: 0, flexDirection: 'row' }}>
+              <Text style={{ color: '#881337', lineHeight: 19, fontFamily: theme.fonts.extraBold, includeFontPadding: false, fontSize: 14 }}>{"2"}</Text>
             </View>
             <Text style={{ color: '#FFFFFF', lineHeight: 23, fontFamily: theme.fonts.semiBold, includeFontPadding: false, fontSize: 17 }}>Tap the shield again</Text>
           </View>

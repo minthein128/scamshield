@@ -1,0 +1,25 @@
+id: legit-delivery-id
+file: ../public/v2/legit-delivery-id.png
+language: id
+home: ID
+app: sms
+scam_type: none
+expected_verdict: safe
+families: []
+source_text: |
+  KilatKirim
+  Pesan teks - Hari ini 07:55
+  KilatKirim: Paket Anda dengan nomor resi KK-2210-4471 akan diantar besok antara pukul 09.00-12.00. Tidak ada biaya tambahan. Kurir kami tidak akan pernah meminta pembayaran atau kode OTP.
+must_mention:
+  - id: delivery_tomorrow
+    variants: ["besok", "diantar", "pengiriman", "paket"]
+must_advise: []
+synthetic:
+  layout: sms
+  sender: KilatKirim
+  subtitle: Pesan teks
+  messages:
+    - { from: time, text: "Pesan teks - Hari ini 07:55" }
+    - { from: them, text: "KilatKirim: Paket Anda dengan nomor resi KK-2210-4471 akan diantar besok antara pukul 09.00-12.00. Tidak ada biaya tambahan. Kurir kami tidak akan pernah meminta pembayaran atau kode OTP." }
+notes: Same fictional courier brand as parcel-id, but a plain delivery notice with no link and no fee.
+public: true

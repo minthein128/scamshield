@@ -1,0 +1,43 @@
+id: romance-en
+file: ../public/v2/romance-en.png
+language: en
+home: PH
+app: chat
+scam_type: romance_pig_butchering
+expected_verdict: danger
+score_range: [65, 100]
+families: [too_good, pressure, payment_route, identity]
+source_text: |
+  Daniel
+  last seen recently
+  Hi Maria, sorry, wrong number! But your profile photo looks so kind.
+  It's ok :)
+  2 weeks later
+  I think about you every morning. You are special to me.
+  My uncle works at a trading firm. His app BrightCoin Pro gives 8% profit every day, guaranteed. I made USD 4,000 this week.
+  Start small, just top up USD 500 here: https://brightcoin-pro.example/join The bonus ends tonight, don't tell anyone yet.
+must_mention:
+  - id: guaranteed_profit
+    variants: ["guaranteed", "8%", "8 percent"]
+  - id: top_up
+    variants: ["500", "USD 500", "top up", "top-up", "deposit"]
+  - link
+  - id: wrong_number_opening
+    variants: ["wrong number", "stranger"]
+must_advise: [dont_pay, dont_click_link, verify_trusted]
+must_not:
+  accuse: [Daniel, BrightCoin Pro]
+  advice: [you can trust him, safe to invest]
+synthetic:
+  layout: chat
+  sender: Daniel
+  subtitle: last seen recently
+  messages:
+    - { from: them, text: "Hi Maria, sorry, wrong number! But your profile photo looks so kind." }
+    - { from: me, text: "It's ok :)" }
+    - { from: time, text: "2 weeks later" }
+    - { from: them, text: "I think about you every morning. You are special to me." }
+    - { from: them, text: "My uncle works at a trading firm. His app BrightCoin Pro gives 8% profit every day, guaranteed. I made USD 4,000 this week." }
+    - { from: them, text: "Start small, just top up USD 500 here: https://brightcoin-pro.example/join The bonus ends tonight, don't tell anyone yet." }
+notes: Fictional wrong-number romance that turns into a trading-app top-up.
+public: true

@@ -7,16 +7,16 @@
     "web": "Gumagana sa SafeRoute Android app.",
     "insecure": "Gumagamit ang bersyong ito ng hindi ligtas na service address, kaya naka-off ang shield.",
     "unavailable": "Hindi available sa bersyong ito.",
-    "on": "Naka-on. I-tap ang bubble sa anumang mukhang kahina-hinala.",
+    "on": "Naka-on. Pindutin ang manika sa anumang kahina-hinala.",
     "off": "Naka-off. I-on ito para suriin kung ano ang nasa iyong screen."
   },
   "steps": {
     "overlay": "Hakbang 1 ng 4: payagan ang \"Display over other apps\", pagkatapos ay bumalik sa SafeRoute.",
     "notifications": "Hakbang 2 ng 4: payagan ang mga notification para mapanatiling gumagana ng Android ang shield.",
-    "capture": "Hakbang 3 ng 4: payagan ang SafeRoute na makita ang iyong screen kapag pinindot mo ang bubble.",
+    "capture": "Hakbang 3 ng 4: payagan ang SafeRoute na makita ang iyong screen kapag pinindot mo ang manika.",
     "starting": "Hakbang 4 ng 4: sinisimulan ang shield."
   },
-  "body": "Isang maliit na button ang lulutang sa iba pang mga app. I-tap ito sa isang alok sa trabaho, chat, o listing at susuriin ng SafeRoute ang nasa iyong screen.",
+  "body": "Isang maliit na manikang Pyit Taing Htaung ang lulutang sa ibabaw ng iba pang app. Pindutin ito sa isang post ng trabaho, chat, o listahan at susuriin ng SafeRoute ang nasa iyong screen.",
   "download": "I-download ang Android app",
   "details": "Mga detalye at pahintulot",
   "detailsA11y": "Mga detalye ng shield",

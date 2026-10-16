@@ -6,7 +6,9 @@
   "skipA11y": "Laktawan ang setup",
   "language": {
     "title": "Piliin ang iyong wika",
-    "body": "Ipapakita ng SafeRoute ang app at isusulat ang mga ulat at binibigkas na babala sa wikang ito. Maaari mo itong baguhin mamaya."
+    "body": "Ipapakita ng SafeRoute ang app at isusulat ang mga ulat at binibigkas na babala sa wikang ito. Maaari mo itong baguhin mamaya.",
+    "tagline": "Tulad ng manikang Pyit Taing Htaung, tinutulungan ka naming manatiling nakatayo.",
+    "heroA11y": "SafeRoute, kasama ang manikang Pyit Taing Htaung"
   },
   "countries": {
     "fromTitle": "Taga-saan ka?",

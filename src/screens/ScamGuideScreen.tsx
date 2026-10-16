@@ -91,7 +91,7 @@ export const ScamGuideScreen: React.FC<RootScreenProps<'ScamGuide'>> = ({ naviga
             <LinkRow
               key={a.kind}
               testID={`guide-${a.kind}`}
-              icon={a.kind === 'check' ? 'shieldCheck' : 'phone'}
+              icon={a.kind === 'check' ? 'doll' : 'phone'}
               label={a.title}
               hint={a.body}
               onPress={() => runAction(a)}

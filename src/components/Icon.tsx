@@ -3,16 +3,22 @@ import Svg, { Circle, Path, Rect } from 'react-native-svg';
 import theme from '../theme/theme';
 
 export type IconName =
-  | 'shield' | 'shieldCheck' | 'alert' | 'chevron' | 'settings' | 'link' | 'image' | 'chat' | 'speaker' | 'stop'
+  | 'doll' | 'checkCircle' | 'alert' | 'chevron' | 'settings' | 'link' | 'image' | 'chat' | 'speaker' | 'stop'
   | 'gift' | 'clock' | 'card' | 'user' | 'flag' | 'octagon' | 'radar' | 'phone' | 'people' | 'info'
   | 'thumbUp' | 'thumbDown' | 'check' | 'mic' | 'micOff';
 
 const SHAPES: Record<IconName, React.ReactNode> = {
-  shield: <Path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z" />,
-  shieldCheck: (
+  doll: (
     <>
-      <Path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z" />
-      <Path d="M9 12l2 2 4-4" />
+      <Circle cx={12} cy={3.9} r={1.5} />
+      <Path d="M12 6.6c3.9 0 6.2 3.8 6.2 7.9 0 4-2.7 6.5-6.2 6.5s-6.2-2.5-6.2-6.5c0-4.1 2.3-7.9 6.2-7.9z" />
+      <Path d="M6.2 13.6c3.8 1.4 7.8 1.4 11.6 0M10 10.6h.01M14 10.6h.01" />
+    </>
+  ),
+  checkCircle: (
+    <>
+      <Circle cx={12} cy={12} r={9} />
+      <Path d="M8 12.2l2.8 2.8 5.2-5.6" />
     </>
   ),
   alert: (

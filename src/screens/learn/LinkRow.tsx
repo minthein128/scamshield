@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 56, borderRadius: 14, paddingVertical: 8, paddingHorizontal: 12 },
   loud: { backgroundColor: colors.white, borderWidth: 1, borderColor: colors.border },
   quiet: { backgroundColor: 'transparent' },
-  icon: { width: 40, height: 40, borderRadius: 20, backgroundColor: colors.brandBlueLight, alignItems: 'center', justifyContent: 'center' },
+  icon: { width: 40, height: 40, borderRadius: 20, backgroundColor: colors.brandGoldSoft, alignItems: 'center', justifyContent: 'center' },
   iconQuiet: { backgroundColor: colors.codeBg },
   text: { flex: 1 },
   label: { color: colors.textPrimary, fontSize: 15, lineHeight: 21, fontFamily: fonts.semiBold },

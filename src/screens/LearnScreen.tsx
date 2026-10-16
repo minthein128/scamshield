@@ -59,7 +59,7 @@ export const LearnScreen: React.FC<TabScreenProps<'Learn'>> = ({ navigation }) =
 
       <LinkRow
         testID="learn-shield-howto"
-        icon="shield"
+        icon="doll"
         label={t('shieldRow.title')}
         hint={t('shieldRow.hint')}
         onPress={() => navigation.navigate('ShieldHowTo')}

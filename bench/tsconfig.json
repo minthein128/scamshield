@@ -1,5 +1,14 @@
 {
   "extends": "../server/tsconfig.json",
-  "compilerOptions": { "rootDir": "..", "noEmit": true, "typeRoots": ["../server/node_modules/@types"] },
+  "compilerOptions": {
+    "rootDir": "..",
+    "noEmit": true,
+    "typeRoots": ["../server/node_modules/@types"],
+    "paths": {
+      "vitest": ["../server/node_modules/vitest/dist/index.d.ts"],
+      "yaml": ["../server/node_modules/yaml/dist/index.d.ts"],
+      "@google/genai": ["../server/node_modules/@google/genai/dist/node/node.d.ts"]
+    }
+  },
   "include": ["."]
 }

@@ -51,7 +51,7 @@ export function blossom(cx: number, cy: number, r: number, petal: string, heart:
 }
 
 const C_COL = {
-  disc: '#DBE5FF',
+  disc: '#FCEFD2',
   body: '#B8321C',
   bodyDeep: '#8E2614',
   face: '#FFF6EA',
@@ -59,7 +59,7 @@ const C_COL = {
   gold: '#F2B01E',
   cheek: '#F6A08C',
   lips: '#B8321C',
-  shadow: '#1E3A8A',
+  shadow: '#1F1A17',
 };
 
 const EGG = 'M50 12 C69 12 80.5 32 80.5 57 C80.5 78 67.5 91 50 91 C32.5 91 19.5 78 19.5 57 C19.5 32 31 12 50 12 Z';
@@ -104,10 +104,10 @@ const doll: AvatarArt = {
 export const AVATAR_ART: Record<AvatarConcept, AvatarArt> = { C: doll };
 
 export const HALO_COLORS: Record<AvatarState, string> = {
-  idle: '#1D4ED8',
-  listening: '#F59E0B',
-  speaking: '#1D4ED8',
-  thinking: '#1D4ED8',
+  idle: '#F2B01E',
+  listening: '#B8321C',
+  speaking: '#F2B01E',
+  thinking: '#F2B01E',
 };
 
 /** Where every animated value rests for a state and level; loops add motion on top. */

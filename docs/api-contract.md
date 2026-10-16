@@ -209,3 +209,5 @@ Admin errors extend the error body: codes `unauthorized` (401), `forbidden` (403
 `/download` returns a plain HTML install page (English and Burmese, no external assets) with the version (`APK_VERSION`), the file size and a link to the APK.
 
 `/download/saferoute.apk` streams the file at `APK_PATH`. Headers: `Content-Type: application/vnd.android.package-archive`, `Content-Disposition: attachment; filename="SafeRoute.apk"`, `Content-Length`, `Cache-Control: no-cache`, `ETag` (mtime and size). When `APK_PATH` is unset or the file is missing the response is 404 with the usual error body. Limit: `APK_LIMIT_PER_HOUR` (default 20) per IP, separate from the check limits; over it the response is 429 `rate_limited`.
+
+With `APK_VERSION` set, `GET /download/saferoute.apk` answers `302` to `/download/saferoute-<APK_VERSION>.apk` with `Cache-Control: no-store`. The versioned URL serves the file with `Cache-Control: public, max-age=31536000, immutable`; any other versioned name is 404. The `/download` page links the versioned URL. Without `APK_VERSION` the unversioned URL serves the file directly.

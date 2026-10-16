@@ -44,7 +44,7 @@ Link results add flags: a Web Risk hit adds `known_bad` (high); a domain under 1
 - `GET /healthz`: `{ ok, model, mock }`.
 - `GET /config.json`: `{ apiUrl }` from `PUBLIC_API_URL` (default `https://saferoute-api.akkhayar.com`), `Cache-Control: no-cache`. The app reads it as its first config source.
 - `GET /download`: small HTML install page (English and Burmese, no external assets) for networks that block `*.web.app`.
-- `GET|HEAD /download/saferoute.apk`: streams the file at `APK_PATH` as `application/vnd.android.package-archive` with `Content-Length`, `Cache-Control: no-cache` and an mtime/size `ETag`. 404 when `APK_PATH` is unset or the file is missing. Outside the check rate limit; own limit of `APK_LIMIT_PER_HOUR` per IP.
+- `GET|HEAD /download/saferoute.apk`: streams the file at `APK_PATH` as `application/vnd.android.package-archive` with `Content-Length`, `Cache-Control: no-cache` and an mtime/size `ETag`. 404 when `APK_PATH` is unset or the file is missing. With `APK_VERSION` set it answers `302` (`no-store`) to `/download/saferoute-<APK_VERSION>.apk`, which serves the file as `immutable`. Outside the check rate limit; own limit of `APK_LIMIT_PER_HOUR` per IP.
 
 ## Environment
 
