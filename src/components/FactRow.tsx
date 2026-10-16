@@ -91,7 +91,7 @@ const Editor: React.FC<Props> = ({ source, fieldKey, fact, onValue }) => {
         <View style={styles.editorGroup}>
           <View style={styles.editorGroup}>
             <Text style={styles.editorLabel}>{t('job.facts.amount')}</Text>
-            <TextInput testID={`${id}-amount`} accessibilityLabel={t('job.facts.amount')} value={String(s.amount)} onChangeText={amount => onValue({ ...s, amount })} keyboardType="numbers-and-punctuation" placeholderTextColor={colors.textMuted} style={styles.input} />
+            <TextInput testID={`${id}-amount`} accessibilityLabel={t('job.facts.amount')} value={String(s.amount ?? '')} onChangeText={amount => onValue({ ...s, amount })} keyboardType="numbers-and-punctuation" placeholderTextColor={colors.textMuted} style={styles.input} />
           </View>
           <View style={styles.editorGroup}>
             <Text style={styles.editorLabel}>{t('job.facts.currency')}</Text>
@@ -100,6 +100,7 @@ const Editor: React.FC<Props> = ({ source, fieldKey, fact, onValue }) => {
           <Select
             testID={`${id}-period`}
             label={t('job.facts.period')}
+            placeholder={t('job.notMentioned')}
             value={s.period}
             options={SALARY_PERIODS.map(p => ({ value: p, label: periodLabel(p) }))}
             onChange={period => onValue({ ...s, period })}
@@ -168,6 +169,8 @@ export const FactRow: React.FC<Props> = props => {
         </View>
       ) : fact.edited ? (
         <Text style={styles.noQuote}>{t('job.facts.noQuote')}</Text>
+      ) : shown !== null ? (
+        <Text testID={`${id}-noquote`} style={styles.noQuote}>{t('job.facts.noMatch')}</Text>
       ) : null}
 
       {editing ? (

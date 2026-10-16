@@ -55,6 +55,7 @@ export function normalizeJobResponse(raw: JobAssessResponse): JobAssessResponse 
     attentionHeadline: raw.attentionHeadline ?? base.title,
     conflicts: Array.isArray(raw.conflicts) ? raw.conflicts : [],
     stillUnclear: Array.isArray(raw.stillUnclear) ? raw.stillUnclear.filter(x => typeof x === 'string') : [],
+    findings: Array.isArray(raw.findings) ? raw.findings.filter(f => f && typeof f.label === 'string') : [],
     adFacts: raw.adFacts ?? null,
     chatFacts: raw.chatFacts ?? null,
   };

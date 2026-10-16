@@ -135,6 +135,7 @@ export interface CheckResponse {
   attentionHeadline?: string;
   conflicts?: JobConflict[];
   stillUnclear?: string[];
+  findings?: JobFinding[];
   adFacts?: JobFacts | null;
   chatFacts?: JobFacts | null;
 }
@@ -182,8 +183,10 @@ export interface FactField<T> {
 }
 
 export interface SalaryValue {
-  amount: string | number;
+  /** The server sends a number or null. The editor holds what the user typed until it is sent. */
+  amount: string | number | null;
   currency: string;
+  /** hourly, daily, weekly, monthly, yearly or unknown */
   period: string;
 }
 
@@ -237,6 +240,8 @@ export interface JobExtractResponse {
 /** `fieldLabel` and `description` arrive in the request language. Values of enum fields are English codes. */
 export interface JobConflict {
   field: JobFactKey;
+  /** Stable rule id such as fee_vs_no_fee. */
+  code?: string;
   fieldLabel: string;
   adValue: string;
   adQuote: string;
@@ -248,6 +253,12 @@ export interface JobConflict {
 }
 
 export type AttentionTier = 'lower' | 'verify' | 'pause';
+
+/** Company search findings. Finding a company never lowers the risk, and the recruiter link stays unconfirmed. */
+export interface JobFinding {
+  code: 'company_found' | 'company_not_found' | 'company_not_checked' | 'recruiter_not_confirmed' | string;
+  label: string;
+}
 
 export interface JobAssessRequest {
   jobId?: string;
@@ -264,6 +275,9 @@ export interface JobAssessResponse extends CheckResponse {
   attentionHeadline: string;
   conflicts: JobConflict[];
   stillUnclear: string[];
+  stillUnclearFields?: JobFactKey[];
+  findings?: JobFinding[];
+  usedStoredExtraction?: boolean;
   adFacts?: JobFacts | null;
   chatFacts?: JobFacts | null;
 }

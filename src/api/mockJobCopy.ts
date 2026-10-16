@@ -14,6 +14,7 @@ export interface JobMockCopy {
   payBefore: string;
   summary: { lower: string; verify: string; pause: string };
   unclear: { workplace: string; employer: string; contract: string; workerFee: string; visaOrPermit: string };
+  findings: { notChecked: string; recruiter: string };
   fieldLabels: { workerFee: string; documentRequest: string; contract: string; visaOrPermit: string; meetingPoint: string; employer: string; salary: string; secrecyRequest: string; paymentRequest: string };
 }
 
@@ -42,6 +43,7 @@ export const JOB_MOCK_COPY: Record<LanguageCode, JobMockCopy> = {
       workerFee: 'It may be unclear whether you must pay any fee.',
       visaOrPermit: 'It may be unclear which visa or permit is used.',
     },
+    findings: { notChecked: 'We could not check whether a company with this name exists.', recruiter: 'We could not confirm that this recruiter works for that company.' },
     fieldLabels: { workerFee: 'Fee for the worker', documentRequest: 'Documents', contract: 'Contract', visaOrPermit: 'Visa or permit', meetingPoint: 'Meeting point', employer: 'Employer', salary: 'Salary', secrecyRequest: 'Secrecy', paymentRequest: 'Payment' },
   },
   my: {
@@ -68,6 +70,7 @@ export const JOB_MOCK_COPY: Record<LanguageCode, JobMockCopy> = {
       workerFee: 'ကြေးပေးရမရ မရှင်းလင်းနိုင်ပါ။',
       visaOrPermit: 'မည်သည့်ဗီဇာ သို့မဟုတ် ခွင့်ပြုချက်သုံးမည်ကို မရှင်းလင်းနိုင်ပါ။',
     },
+    findings: { notChecked: 'ဤအမည်ဖြင့် ကုမ္ပဏီရှိမရှိ ကျွန်ုပ်တို့ မစစ်ဆေးနိုင်ခဲ့ပါ။', recruiter: 'ဤအလုပ်ခေါ်သူသည် ထိုကုမ္ပဏီအတွက် အလုပ်လုပ်ကြောင်း ကျွန်ုပ်တို့ အတည်မပြုနိုင်ပါ။' },
     fieldLabels: { workerFee: 'လုပ်သားပေးရသော ကြေး', documentRequest: 'စာရွက်စာတမ်း', contract: 'စာချုပ်', visaOrPermit: 'ဗီဇာ သို့မဟုတ် ခွင့်ပြုချက်', meetingPoint: 'တွေ့ဆုံရာနေရာ', employer: 'အလုပ်ရှင်', salary: 'လစာ', secrecyRequest: 'လျှို့ဝှက်ရန်', paymentRequest: 'ငွေပေးချေမှု' },
   },
   id: {
@@ -94,6 +97,7 @@ export const JOB_MOCK_COPY: Record<LanguageCode, JobMockCopy> = {
       workerFee: 'Mungkin belum jelas apakah Anda harus membayar biaya.',
       visaOrPermit: 'Mungkin belum jelas visa atau izin apa yang dipakai.',
     },
+    findings: { notChecked: 'Kami tidak dapat memeriksa apakah ada perusahaan dengan nama ini.', recruiter: 'Kami tidak dapat memastikan bahwa perekrut ini bekerja untuk perusahaan tersebut.' },
     fieldLabels: { workerFee: 'Biaya untuk pekerja', documentRequest: 'Dokumen', contract: 'Kontrak', visaOrPermit: 'Visa atau izin', meetingPoint: 'Tempat bertemu', employer: 'Pemberi kerja', salary: 'Gaji', secrecyRequest: 'Kerahasiaan', paymentRequest: 'Pembayaran' },
   },
   tl: {
@@ -120,6 +124,7 @@ export const JOB_MOCK_COPY: Record<LanguageCode, JobMockCopy> = {
       workerFee: 'Maaaring hindi malinaw kung may babayaran kang bayarin.',
       visaOrPermit: 'Maaaring hindi malinaw kung anong visa o permit ang gagamitin.',
     },
+    findings: { notChecked: 'Hindi namin nasuri kung may kumpanyang may ganitong pangalan.', recruiter: 'Hindi namin makumpirma na nagtatrabaho ang recruiter na ito para sa kumpanyang iyon.' },
     fieldLabels: { workerFee: 'Bayad ng manggagawa', documentRequest: 'Mga dokumento', contract: 'Kontrata', visaOrPermit: 'Visa o permit', meetingPoint: 'Tagpuan', employer: 'Employer', salary: 'Sahod', secrecyRequest: 'Paglilihim', paymentRequest: 'Bayad' },
   },
   th: {
@@ -146,6 +151,7 @@ export const JOB_MOCK_COPY: Record<LanguageCode, JobMockCopy> = {
       workerFee: 'อาจยังไม่ชัดเจนว่าต้องจ่ายค่าใช้จ่ายหรือไม่',
       visaOrPermit: 'อาจยังไม่ชัดเจนว่าใช้วีซ่าหรือใบอนุญาตแบบใด',
     },
+    findings: { notChecked: 'เราไม่สามารถตรวจสอบได้ว่ามีบริษัทที่ใช้ชื่อนี้หรือไม่', recruiter: 'เราไม่สามารถยืนยันได้ว่าผู้จัดหางานคนนี้ทำงานให้บริษัทนั้น' },
     fieldLabels: { workerFee: 'ค่าใช้จ่ายของผู้ทำงาน', documentRequest: 'เอกสาร', contract: 'สัญญาจ้าง', visaOrPermit: 'วีซ่าหรือใบอนุญาต', meetingPoint: 'จุดนัดพบ', employer: 'นายจ้าง', salary: 'เงินเดือน', secrecyRequest: 'ความลับ', paymentRequest: 'การจ่ายเงิน' },
   },
 };

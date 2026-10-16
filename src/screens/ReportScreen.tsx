@@ -74,6 +74,7 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
   const style = VERDICT_STYLES[level];
   const conflicts = result.conflicts ?? [];
   const unclear = result.stillUnclear ?? [];
+  const findings = result.findings ?? [];
   const flags = groupFlags(result.flags).flatMap(g => g.flags);
   const sources = result.sources ?? [];
   const [warnOpen, setWarnOpen] = useState(false);
@@ -217,6 +218,20 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
         </View>
       ) : null}
 
+      {findings.length > 0 ? (
+        <View testID="report-findings" style={{ gap: 12 }}>
+          <SectionTitle>{t('findings.title')}</SectionTitle>
+          <View style={styles.unclearList}>
+            {findings.map((f, i) => (
+              <View key={`${f.code}-${i}`} style={styles.unclearRow}>
+                <Icon name="info" size={20} color={colors.textSecondary} />
+                <Text style={[styles.flagEvidence, styles.unclearText, readable(tablet, 14, 20)]}>{f.label}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+      ) : null}
+
       {flags.length > 0 ? (
         <View style={{ gap: 12 }}>
           <SectionTitle>{level === 'safe' ? t('flagsSafe') : t('flagsRisky')}</SectionTitle>
@@ -294,7 +309,7 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
       {!reported && canGiveFeedback(result) ? <FeedbackRow result={result} /> : null}
     </>
   );
-  const hasRight = conflicts.length > 0 || unclear.length > 0 || flags.length > 0 || sources.length > 0 || result.linkChecks.length > 0;
+  const hasRight = conflicts.length > 0 || unclear.length > 0 || findings.length > 0 || flags.length > 0 || sources.length > 0 || result.linkChecks.length > 0;
 
   return (
     <Screen

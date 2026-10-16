@@ -73,16 +73,16 @@ function salaryOf(text: string): FactField<SalaryValue> | null {
   const unit = (m[3] ?? m[0].slice(0, 3)).toLowerCase();
   const currency = /usd|\$|dollar|ဒေါ်လာ/.test(unit) ? 'USD' : /baht|thb|ဘတ်/.test(unit) ? 'THB' : /myr/.test(unit) ? 'MYR' : /sgd/.test(unit) ? 'SGD' : /ks|kyat|ကျပ်/.test(unit) ? 'MMK' : unit.toUpperCase();
   const around = hit.quote.toLowerCase();
-  const period = /day|daily|တစ်ရက်/.test(around) ? 'daily' : /hour/.test(around) ? 'hourly' : /year|annual/.test(around) ? 'yearly' : 'monthly';
-  return field({ amount: raw, currency, period }, hit, /month|day|hour|year|လ|ရက်|လစာ/.test(around) ? 0.9 : 0.6);
+  const period = /day|daily|တစ်ရက်/.test(around) ? 'daily' : /week/.test(around) ? 'weekly' : /hour/.test(around) ? 'hourly' : /year|annual/.test(around) ? 'yearly' : 'monthly';
+  return field({ amount: Number(raw), currency, period }, hit, /month|day|hour|year|လ|ရက်|လစာ/.test(around) ? 0.9 : 0.6);
 }
 
 function feeOf(text: string, source: 'ad' | 'chat'): FactField<string> | null {
   const none = find(text, /no (agency |recruitment |placement )?fees?\b|free (placement|of charge)|without (any )?fees?|ကြေးမလို|အခမဲ့/i);
-  if (none && source === 'ad') return field('none stated', none);
+  if (none && source === 'ad') return field('none', none);
   const ask = find(text, /(?:pay|send|transfer|deposit|booking fee|processing fee|registration fee)[^.!?\n]{0,60}(?:\d|fee|deposit)|(?:\d[\d,. ]*\s?(?:usd|thb|baht|ks|\$|ကျပ်|ဒေါ်လာ))[^.!?\n]{0,40}(?:fee|deposit|booking|ကြိုတင်)|ကြိုတင်ကြေး|စရံ|စရန်ငွေ/i);
   if (ask && !(none && /no |free|without/i.test(none.quote) && source === 'chat')) return field(ask.quote.slice(0, 80), ask, 0.85);
-  return none ? field('none stated', none) : null;
+  return none ? field('none', none) : null;
 }
 
 function extractOne(raw: string | undefined, source: 'ad' | 'chat'): JobFacts {
@@ -165,12 +165,13 @@ export function mockExtractJob(request: JobExtractRequest): JobExtractResponse {
 }
 
 const norm = (s: string) => s.toLowerCase().replace(/\b(co|ltd|limited|company|inc|group)\b\.?/g, '').replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
-const asNumber = (s: SalaryValue) => Number(String(s.amount).replace(/[^\d.]/g, ''));
-const perMonth = (s: SalaryValue) => asNumber(s) * ({ hourly: 160, daily: 26, monthly: 1, yearly: 1 / 12 }[s.period] ?? 1);
+const asNumber = (s: SalaryValue) => Number(s.amount ?? 0);
+const perMonth = (s: SalaryValue) => asNumber(s) * ({ hourly: 160, daily: 26, weekly: 4.3, monthly: 1, yearly: 1 / 12 }[s.period] ?? 1);
 const RANK: Record<Severity, number> = { low: 0, medium: 1, high: 2 };
 
 interface Found {
   field: JobFactKey;
+  code?: string;
   family: FlagFamily;
   severity: Severity;
   text: string;
@@ -178,24 +179,24 @@ interface Found {
   chat?: FactField<unknown>;
 }
 
-const show = (f: FactField<unknown> | undefined) => (f ? (typeof f.value === 'string' ? f.value : JSON.stringify(f.value)) : '');
+const show = (f: FactField<unknown> | undefined) => (f ? (typeof f.value === 'string' ? f.value : f.value && typeof f.value === 'object' ? `${(f.value as SalaryValue).amount ?? ''} ${(f.value as SalaryValue).currency}`.trim() : String(f.value)) : '');
 
 function conflictsOf(ad: JobFacts | null | undefined, chat: JobFacts | null | undefined, c: JobMockCopy): Found[] {
   const found: Found[] = [];
   if (!ad || !chat) return found;
-  if (ad.workerFee?.value === 'none stated' && chat.workerFee && chat.workerFee.value !== 'none stated') found.push({ field: 'workerFee', family: 'payment_route', severity: 'high', text: c.fee, ad: ad.workerFee, chat: chat.workerFee });
+  if (ad.workerFee?.value === 'none' && chat.workerFee && chat.workerFee.value !== 'none') found.push({ field: 'workerFee', code: 'fee_vs_no_fee', family: 'payment_route', severity: 'high', text: c.fee, ad: ad.workerFee, chat: chat.workerFee });
   const docs = chat.documentRequest?.value;
   if ((docs === 'passport_photo' || docs === 'passport_hold') && ad.documentRequest && (ad.documentRequest.value === 'none' || ad.documentRequest.value === 'not_mentioned'))
-    found.push({ field: 'documentRequest', family: 'trafficking', severity: 'high', text: c.documents, ad: ad.documentRequest, chat: chat.documentRequest ?? undefined });
-  if (ad.contract?.value === 'official' && chat.contract?.value === 'later') found.push({ field: 'contract', family: 'payment_route', severity: 'high', text: c.contract, ad: ad.contract, chat: chat.contract });
-  if (ad.visaOrPermit?.value === 'work_visa' && chat.visaOrPermit?.value === 'tourist') found.push({ field: 'visaOrPermit', family: 'trafficking', severity: 'high', text: c.visa, ad: ad.visaOrPermit, chat: chat.visaOrPermit });
-  if (ad.meetingPoint?.value === 'workplace' && chat.meetingPoint && ['driver_pickup', 'border', 'unnamed'].includes(chat.meetingPoint.value)) found.push({ field: 'meetingPoint', family: 'trafficking', severity: 'medium', text: c.meeting, ad: ad.meetingPoint, chat: chat.meetingPoint });
+    found.push({ field: 'documentRequest', code: docs === 'passport_hold' ? 'documents_passport_hold' : 'documents_passport_photo', family: 'trafficking', severity: 'high', text: c.documents, ad: ad.documentRequest, chat: chat.documentRequest ?? undefined });
+  if (ad.contract?.value === 'official' && chat.contract?.value === 'later') found.push({ field: 'contract', code: 'contract_later', family: 'payment_route', severity: 'high', text: c.contract, ad: ad.contract, chat: chat.contract });
+  if (ad.visaOrPermit?.value === 'work_visa' && chat.visaOrPermit?.value === 'tourist') found.push({ field: 'visaOrPermit', code: 'visa_tourist', family: 'trafficking', severity: 'high', text: c.visa, ad: ad.visaOrPermit, chat: chat.visaOrPermit });
+  if (ad.meetingPoint?.value === 'workplace' && chat.meetingPoint && ['driver_pickup', 'border', 'unnamed'].includes(chat.meetingPoint.value)) found.push({ field: 'meetingPoint', code: 'meeting_informal', family: 'trafficking', severity: 'medium', text: c.meeting, ad: ad.meetingPoint, chat: chat.meetingPoint });
   if (ad.employer && chat.employer && norm(ad.employer.value) !== norm(chat.employer.value) && !norm(ad.employer.value).includes(norm(chat.employer.value)) && !norm(chat.employer.value).includes(norm(ad.employer.value)))
-    found.push({ field: 'employer', family: 'identity', severity: 'medium', text: c.employer, ad: ad.employer, chat: chat.employer });
+    found.push({ field: 'employer', code: 'employer_different', family: 'identity', severity: 'medium', text: c.employer, ad: ad.employer, chat: chat.employer });
   if (ad.salary && chat.salary && ad.salary.value.currency === chat.salary.value.currency) {
     const a = perMonth(ad.salary.value);
     const b = perMonth(chat.salary.value);
-    if (a > 0 && b > 0 && Math.abs(a - b) / a > 0.3) found.push({ field: 'salary', family: 'too_good', severity: 'low', text: c.salary, ad: ad.salary, chat: chat.salary });
+    if (a > 0 && b > 0 && Math.abs(a - b) / a > 0.3) found.push({ field: 'salary', code: 'salary_different', family: 'too_good', severity: 'low', text: c.salary, ad: ad.salary, chat: chat.salary });
   }
   return found;
 }
@@ -236,6 +237,7 @@ export function mockAssessJob(request: JobAssessRequest): JobAssessResponse {
     .map(f => ({ family: f.family, label: f.text, severity: f.severity, evidence: (f.chat ?? f.ad)?.quote ?? '' }));
   const conflictList: JobConflict[] = conflicts.map(f => ({
     field: f.field,
+    ...(f.code ? { code: f.code } : {}),
     fieldLabel: c.fieldLabels[f.field as keyof JobMockCopy['fieldLabels']] ?? f.field,
     adValue: show(f.ad),
     adQuote: f.ad?.quote ?? '',
@@ -267,6 +269,7 @@ export function mockAssessJob(request: JobAssessRequest): JobAssessResponse {
     model: 'mock-job-v1',
     conflicts: conflictList,
     stillUnclear,
+    findings: (ad?.employer || chat?.employer ? [{ code: 'company_not_checked', label: c.findings.notChecked }, { code: 'recruiter_not_confirmed', label: c.findings.recruiter }] : []),
     adFacts: ad ?? null,
     chatFacts: chat ?? null,
   };

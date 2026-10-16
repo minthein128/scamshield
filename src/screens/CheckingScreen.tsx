@@ -25,7 +25,7 @@ const HOLD_SAFE_MS = 1500;
 const HOLD_RISK_MS = 3600;
 
 export const CheckingScreen: React.FC<RootScreenProps<'Checking'>> = ({ navigation, route }) => {
-  const { t } = useTranslation(['checking', 'common']);
+  const { t } = useTranslation(['checking', 'common', 'errors']);
   const { request, job, source, reported } = route.params;
   const language = job ? job.request.language : (request?.language ?? 'en');
   const { saveCheck } = useAppState();
@@ -72,9 +72,11 @@ export const CheckingScreen: React.FC<RootScreenProps<'Checking'>> = ({ navigati
       openReport(checked);
     } catch (e) {
       if (e instanceof ApiError && e.code === 'cancelled') return;
-      setError({ ...errorCopy(e), code: e instanceof ApiError ? e.code : undefined });
+      const code = e instanceof ApiError ? e.code : undefined;
+      const unreadable = job?.phase === 'extract' && (code === 'upstream' || code === 'invalid_response');
+      setError({ ...(unreadable ? { title: t('errors:job.unreadable.title'), message: t('errors:job.unreadable.message') } : errorCopy(e)), code });
     }
-  }, [openReport, request, job, language, navigation, saveCheck, source, reduceMotion]);
+  }, [openReport, request, job, language, navigation, saveCheck, source, reduceMotion, t]);
 
   useEffect(() => {
     run();

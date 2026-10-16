@@ -9,8 +9,8 @@ export interface FieldDef {
   options?: readonly string[];
 }
 
-export const SALARY_PERIODS = ['hourly', 'daily', 'monthly', 'yearly'] as const;
-export const NO_FEE = 'none stated';
+export const SALARY_PERIODS = ['hourly', 'daily', 'weekly', 'monthly', 'yearly'] as const;
+export const NO_FEE = 'none';
 export const FEE_MENTIONED = 'fee mentioned';
 export const LOW_CONFIDENCE = 0.7;
 
@@ -74,9 +74,19 @@ export function resetFact(draft: SourceDraft, key: JobFactKey): SourceDraft {
   return patch(draft, key, { value: draft[key].original?.value ?? null, edited: false, notMentioned: false });
 }
 
+const BURMESE_DIGITS = '၀၁၂၃၄၅၆၇၈၉';
+
+/** A typed amount such as "35,000" or "၃၅၀၀၀" as a number, or null when it is not one. */
+export function parseAmount(raw: string | number | null | undefined): number | null {
+  if (typeof raw === 'number') return Number.isFinite(raw) && raw >= 0 ? raw : null;
+  const text = String(raw ?? '').replace(/[၀-၉]/g, d => String(BURMESE_DIGITS.indexOf(d))).replace(/[\s,]/g, '');
+  if (!/^\d+(\.\d+)?$/.test(text)) return null;
+  return Number(text);
+}
+
 export function isEmptyValue(def: FieldDef, value: FactValue | null): boolean {
   if (value === null || value === undefined) return true;
-  if (def.kind === 'salary') return !String((value as SalaryValue).amount ?? '').trim();
+  if (def.kind === 'salary') return parseAmount((value as SalaryValue).amount) === null;
   if (typeof value === 'string') return !value.trim();
   return false;
 }
@@ -101,7 +111,7 @@ export function unclearCount(draft: SourceDraft): number {
 function cleanValue(def: FieldDef, value: FactValue): FactValue {
   if (def.kind === 'salary') {
     const s = value as SalaryValue;
-    return { amount: String(s.amount).trim(), currency: String(s.currency ?? '').trim().toUpperCase(), period: s.period || 'monthly' };
+    return { amount: parseAmount(s.amount), currency: String(s.currency ?? '').trim().toUpperCase(), period: s.period || 'monthly' };
   }
   return typeof value === 'string' ? value.trim() : value;
 }
@@ -131,7 +141,7 @@ export function fieldLabel(key: JobFactKey): string {
 }
 
 export function periodLabel(period: string): string {
-  return (SALARY_PERIODS as readonly string[]).includes(period) ? t(`check:job.period.${period as (typeof SALARY_PERIODS)[number]}`) : period;
+  return (SALARY_PERIODS as readonly string[]).includes(period) ? t(`check:job.period.${period as (typeof SALARY_PERIODS)[number]}`) : '';
 }
 
 export function enumLabel(key: JobFactKey, code: string): string {
@@ -146,7 +156,7 @@ export function valueLabel(key: JobFactKey, value: FactValue | null): string {
   switch (def.kind) {
     case 'salary': {
       const s = value as SalaryValue;
-      return `${s.amount} ${s.currency} ${periodLabel(s.period)}`.replace(/\s+/g, ' ').trim();
+      return [s.amount ?? '', s.currency, periodLabel(s.period)].filter(x => x !== '').join(' ').replace(/\s+/g, ' ').trim();
     }
     case 'boolean':
       return value === true ? t('check:job.values.secrecyRequest.yes') : t('check:job.values.secrecyRequest.no');
