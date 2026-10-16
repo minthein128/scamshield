@@ -52,7 +52,9 @@ export function useShieldControl(): ShieldControl {
 
   const refresh = useCallback(async () => {
     if (support !== 'ready') return;
-    setRunning(await ShieldModule.isShieldRunning());
+    const on = await ShieldModule.isShieldRunning();
+    setRunning(on);
+    if (on) setError(null);
   }, [support]);
 
   useFocusEffect(
@@ -74,8 +76,14 @@ export function useShieldControl(): ShieldControl {
         diag.info('shield', 'overlay_permission_requested');
         setStep('overlay');
         awaitingOverlay.current = true;
-        await ShieldModule.requestOverlayPermission();
-        return;
+        if (await ShieldModule.requestOverlayPermission()) return;
+        awaitingOverlay.current = false;
+        if (!(await ShieldModule.hasOverlayPermission())) {
+          diag.warn('shield', 'overlay_settings_unavailable');
+          setStep('idle');
+          showPermissionHelp('overlay');
+          return;
+        }
       }
       awaitingOverlay.current = false;
       setStep('notifications');
