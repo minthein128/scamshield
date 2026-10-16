@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { AppState, Linking, PermissionsAndroid, Platform, StyleSheet } from 'react-native';
+import { ensureMicrophone } from '../lib/permissions';
 import { useTranslation } from 'react-i18next';
 import { Text } from './Text';
 import { Button, Card } from './ui';
@@ -32,9 +33,9 @@ export const VoiceCompanionCard: React.FC = () => {
       await Linking.openSettings().catch(() => undefined);
       return;
     }
-    const r = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO).catch(() => null);
-    if (r === PermissionsAndroid.RESULTS.GRANTED) setMic('granted');
-    else if (r === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) setMic('blocked');
+    const r = await ensureMicrophone();
+    if (r === 'granted') setMic('granted');
+    else if (r !== 'declined') setMic('blocked');
   };
 
   if (Platform.OS !== 'android' || mic === 'unknown') return null;

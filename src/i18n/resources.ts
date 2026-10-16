@@ -10,6 +10,7 @@ import enHome from './locales/en/home.json';
 import enLearn from './locales/en/learn.json';
 import enLive from './locales/en/live.json';
 import enOnboarding from './locales/en/onboarding.json';
+import enPermissions from './locales/en/permissions.json';
 import enRadar from './locales/en/radar.json';
 import enReport from './locales/en/report.json';
 import enSettings from './locales/en/settings.json';
@@ -32,6 +33,7 @@ export const en = {
   learn: enLearn,
   live: enLive,
   onboarding: enOnboarding,
+  permissions: enPermissions,
   radar: enRadar,
   report: enReport,
   settings: enSettings,

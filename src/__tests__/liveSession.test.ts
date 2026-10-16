@@ -214,6 +214,15 @@ describe('live session', () => {
     expect(h.sockets).toHaveLength(0);
   });
 
+  it('stops at mic_denied when the explained request is refused', async () => {
+    const ensureMic = jest.fn(async () => 'declined' as const);
+    const h = setup({ ensureMic });
+    await h.session.start();
+    expect(ensureMic).toHaveBeenCalled();
+    expect(h.session.view).toMatchObject({ state: 'error', error: 'mic_denied' });
+    expect(h.sockets).toHaveLength(0);
+  });
+
   it('falls back to Listen when the socket cannot open', async () => {
     const h = setup();
     const p = h.session.start();
