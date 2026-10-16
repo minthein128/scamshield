@@ -18,7 +18,8 @@
     "title": "Pemeriksaan terbaru",
     "emptyTitle": "Belum ada pemeriksaan",
     "emptyBody": "Pemeriksaan Anda disimpan di perangkat ini dan akan muncul di sini.",
-    "historyOff": "Riwayat tidak aktif. Pemeriksaan tidak disimpan di ponsel ini."
+    "historyOff": "Riwayat tidak aktif. Pemeriksaan tidak disimpan di ponsel ini.",
+    "older": "Lihat pemeriksaan lama"
   },
   "radar": {
     "title": "Radar penipuan",
@@ -33,5 +34,16 @@
   },
   "notice": {
     "dismiss": "Tutup"
+  },
+  "shield": {
+    "statusOff": "Shield MATI",
+    "statusOn": "Shield AKTIF",
+    "turnOn": "Nyalakan",
+    "on": "Aktif",
+    "hintOff": "Ketuk lingkaran. Boneka akan tetap berada di atas aplikasi lain.",
+    "hintOn": "Melihat iklan lowongan atau obrolan? Ketuk boneka di layar Anda.",
+    "a11yOff": "Shield mati. Ketuk dua kali untuk menyalakan.",
+    "a11yOn": "Shield aktif. Ketuk dua kali untuk mematikan.",
+    "web": "Shield berfungsi di aplikasi Android."
   }
 }

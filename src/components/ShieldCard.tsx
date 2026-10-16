@@ -8,9 +8,9 @@ import theme from '../theme/theme';
 
 const { colors, fonts } = theme;
 
-export const ShieldCard: React.FC<{ onDetails?: () => void; style?: StyleProp<ViewStyle>; compact?: boolean }> = ({ onDetails, style, compact }) => <ShieldCardView control={useShieldControl()} onDetails={onDetails} style={style} compact={compact} />;
+export const ShieldCard: React.FC<{ onDetails?: () => void; style?: StyleProp<ViewStyle> }> = ({ onDetails, style }) => <ShieldCardView control={useShieldControl()} onDetails={onDetails} style={style} />;
 
-export const ShieldCardView: React.FC<{ control: ShieldControl; onDetails?: () => void; style?: StyleProp<ViewStyle>; compact?: boolean }> = ({ control, onDetails, style, compact }) => {
+export const ShieldCardView: React.FC<{ control: ShieldControl; onDetails?: () => void; style?: StyleProp<ViewStyle> }> = ({ control, onDetails, style }) => {
   const { t } = useTranslation('shield');
   const { support, running, step, error, setEnabled } = control;
   const apkUrl = process.env.EXPO_PUBLIC_APK_URL?.trim();
@@ -30,40 +30,6 @@ export const ShieldCardView: React.FC<{ control: ShieldControl; onDetails?: () =
       : running
         ? t('status.on')
         : t('status.off');
-
-  if (compact && unavailable) {
-    return (
-      <View testID="shield-card" style={[styles.note, style]}>
-        <BrandMark size={28} medallion={colors.textLight} />
-        <Text testID="shield-status" style={styles.noteText}>{`${t('title')}: ${status}`}</Text>
-      </View>
-    );
-  }
-
-  if (compact) {
-    return (
-      <View testID="shield-card" style={[styles.compact, style]}>
-        <TouchableOpacity accessibilityRole="button" accessibilityLabel={t('detailsA11y')} activeOpacity={0.7} onPress={onDetails} disabled={!onDetails} style={styles.compactMain}>
-          <View style={styles.compactIcon}>
-            <BrandMark size={40} medallion={running ? colors.brandGold : colors.textLight} />
-          </View>
-          <View style={styles.text}>
-            <Text style={styles.compactTitle}>{t('title')}</Text>
-            <Text testID="shield-status" numberOfLines={2} style={styles.compactStatus}>{status}</Text>
-          </View>
-        </TouchableOpacity>
-        <Switch
-          testID="shield-switch"
-          accessibilityLabel={t('title')}
-          value={running || working}
-          disabled={working}
-          onValueChange={setEnabled}
-          trackColor={{ false: colors.borderLight, true: colors.accent }}
-          thumbColor={colors.white}
-        />
-      </View>
-    );
-  }
 
   return (
     <View testID="shield-card" style={[styles.card, unavailable && styles.cardOff, style]}>
@@ -104,13 +70,6 @@ export const ShieldCardView: React.FC<{ control: ShieldControl; onDetails?: () =
 const styles = StyleSheet.create({
   card: { backgroundColor: colors.darkBackground, borderRadius: 24, padding: 20, gap: 12 },
   cardOff: {},
-  compact: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 64, paddingVertical: 10, paddingLeft: 12, paddingRight: 16, borderRadius: 16, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.border },
-  compactMain: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 48 },
-  compactIcon: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
-  compactTitle: { color: colors.textPrimary, fontSize: 16, lineHeight: 22, fontFamily: fonts.bold, includeFontPadding: false },
-  compactStatus: { color: colors.textSecondary, fontSize: 14, lineHeight: 20, fontFamily: fonts.regular, includeFontPadding: false },
-  note: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 4 },
-  noteText: { flex: 1, color: colors.textSecondary, fontSize: 14, lineHeight: 20, fontFamily: fonts.regular },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   icon: { width: 56, height: 56, alignItems: 'center', justifyContent: 'center' },
   text: { flex: 1, gap: 2 },
