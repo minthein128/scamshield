@@ -62,7 +62,7 @@ describe('big shield button', () => {
     expect(textOf('shield-download')).toBe('Download the Android app');
     expect(screen.queryByText('Turn on')).toBeNull();
     fireEvent.press(screen.getByTestId('shield-button'));
-    expect(open).toHaveBeenCalledWith(expect.stringContaining('/download'));
+    expect(open).toHaveBeenCalledWith('https://saferoute-aibc.web.app/saferoute.apk');
     expect(c.setEnabled).not.toHaveBeenCalled();
   });
 
