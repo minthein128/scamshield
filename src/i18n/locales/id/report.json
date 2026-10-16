@@ -1,0 +1,57 @@
+{
+  "_meta": {
+    "reviewed": false
+  },
+  "seen_other": "Dilaporkan {{count}} kali oleh pengguna SafeRoute lain dalam 30 hari terakhir",
+  "title": "Laporan risiko",
+  "a11yVerdict": "{{verdict}}. Skor {{score}} dari 100.",
+  "listen": "Dengarkan dalam {{language}}",
+  "stop": "Berhenti",
+  "warn": "Beri tahu keluarga saya",
+  "call": "Hubungi {{number}}",
+  "callExt": "lalu minta sambungan lokal {{ext}}",
+  "help": "Minta bantuan",
+  "share": "Bagikan peringatan ini",
+  "flagsRisky": "Tanda peringatan yang kami temukan",
+  "flagsSafe": "Hal yang kami perhatikan",
+  "sources": "Sumber yang kami periksa",
+  "linkChecks": "Pemeriksaan tautan",
+  "actions": "Hal yang dapat Anda lakukan",
+  "severity": {
+    "high": "Risiko tinggi",
+    "medium": "Risiko sedang",
+    "low": "Risiko rendah"
+  },
+  "domainAge_other": "Usia domain: {{count}} hari",
+  "domainAgeUnknown": "Usia domain tidak diketahui",
+  "webRisk": {
+    "clean": "Tidak ada ancaman yang diketahui",
+    "malware": "Peringatan malware",
+    "social_engineering": "Peringatan phishing atau penipuan",
+    "unwanted_software": "Peringatan aplikasi tak diinginkan",
+    "unknown": "Tidak diperiksa"
+  },
+  "block": {
+    "title": "Blokir pengirim",
+    "withValue": "Blokir {{value}} di aplikasi tempat Anda menemukannya.",
+    "generic": "Blokir dan laporkan pengirim di aplikasi tempat Anda menemukannya."
+  },
+  "shareMessage": "Pemeriksaan SafeRoute: {{title}}\n{{summary}}\nSkor risiko {{score}}/100.",
+  "warnMessage": "Peringatan SafeRoute ({{verdict}}): {{title}}. {{summary}} Mohon jangan kirim uang atau berkas apa pun. Hubungi saya dulu.",
+  "thanks": "Terima kasih, ini membantu melindungi orang lain",
+  "leaveQuickly": "Keluar cepat",
+  "conflictsTitle": "Ketidaksesuaian yang ditemukan",
+  "conflictsSubtitle": "Perbedaan antara janji iklan dan instruksi perekrut",
+  "adSaid": "Iklan menyebutkan:",
+  "recruiterSaid": "Perekrut meminta:",
+  "stillUnclearTitle": "Masih belum jelas",
+  "stillUnclearAdvice": "Detail penting ini tidak disebutkan dalam iklan atau obrolan. Tanyakan kepada perekrut secara tertulis sebelum membayar atau berangkat:",
+  "attention": {
+    "pause": "Berhenti sejenak",
+    "verify": "Verifikasi",
+    "lower": "Lanjutkan dengan hati-hati",
+    "pauseSub": "Permintaan berisiko tinggi terdeteksi",
+    "verifySub": "Ketentuan yang bertentangan terdeteksi",
+    "lowerSub": "Tidak ada konflik besar yang terdeteksi"
+  }
+}

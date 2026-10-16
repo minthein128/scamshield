@@ -1,0 +1,29 @@
+{
+  "_meta": {
+    "reviewed": false
+  },
+  "title": "Screen shield",
+  "status": {
+    "web": "Berfungsi di aplikasi Android SafeRoute.",
+    "insecure": "Versi ini memakai alamat layanan yang tidak aman, jadi shield dimatikan.",
+    "unavailable": "Tidak tersedia di versi ini.",
+    "on": "Aktif. Ketuk balon ini jika ada hal yang mencurigakan.",
+    "off": "Mati. Nyalakan untuk memeriksa apa yang ada di layar Anda."
+  },
+  "steps": {
+    "overlay": "Langkah 1 dari 4: izinkan \"Tampilkan di atas aplikasi lain\", lalu kembali ke SafeRoute.",
+    "notifications": "Langkah 2 dari 4: izinkan notifikasi agar Android tetap menjalankan shield.",
+    "capture": "Langkah 3 dari 4: izinkan SafeRoute melihat layar Anda saat Anda mengetuk balon.",
+    "starting": "Langkah 4 dari 4: memulai shield."
+  },
+  "body": "Tombol kecil akan melayang di atas aplikasi lain. Ketuk tombol ini pada lowongan kerja, obrolan, atau iklan, dan SafeRoute akan memeriksa layar Anda.",
+  "download": "Unduh aplikasi Android",
+  "details": "Detail dan izin",
+  "detailsA11y": "Detail shield",
+  "errors": {
+    "needsScreen": "Shield perlu melihat layar Anda untuk memeriksanya. Coba lagi dan ketuk Mulai sekarang.",
+    "notStarted": "Shield tidak berjalan. Pastikan izin \"Tampilkan di atas aplikasi lain\" aktif, lalu coba lagi.",
+    "failed": "Shield tidak berjalan. Coba lagi.",
+    "checkFailed": "Pemeriksaan tidak berjalan. Nyalakan shield dan coba lagi."
+  }
+}

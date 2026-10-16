@@ -1,0 +1,59 @@
+{
+  "_meta": {
+    "reviewed": false
+  },
+  "seen_one": "Iniulat nang {{count}} beses ng iba pang gumagamit ng SafeRoute sa nakaraang 30 araw",
+  "seen_other": "Iniulat nang {{count}} beses ng iba pang gumagamit ng SafeRoute sa nakaraang 30 araw",
+  "title": "Ulat sa panganib",
+  "a11yVerdict": "{{verdict}}. Score na {{score}} mula sa 100.",
+  "listen": "Pakinggan sa {{language}}",
+  "stop": "Ihinto",
+  "warn": "Balaan ang pamilya ko",
+  "call": "Tawagan ang {{number}}",
+  "callExt": "tapos hingin ang local {{ext}}",
+  "help": "Humingi ng tulong",
+  "share": "Ibahagi ang babalang ito",
+  "flagsRisky": "Mga babalang napansin namin",
+  "flagsSafe": "Ang aming napansin",
+  "sources": "Mga source na sinuri namin",
+  "linkChecks": "Pagsusuri sa link",
+  "actions": "Ang maaari mong gawin",
+  "severity": {
+    "high": "Mataas na panganib",
+    "medium": "Katamtamang panganib",
+    "low": "Mababang panganib"
+  },
+  "domainAge_one": "Edad ng domain: {{count}} araw",
+  "domainAge_other": "Edad ng domain: {{count}} araw",
+  "domainAgeUnknown": "Hindi alam ang edad ng domain",
+  "webRisk": {
+    "clean": "Walang nakitang banta",
+    "malware": "Babala sa malware",
+    "social_engineering": "Babala sa panlilinlang o phishing",
+    "unwanted_software": "Babala sa hindi gustong software",
+    "unknown": "Hindi nasuri"
+  },
+  "block": {
+    "title": "I-block ang nagpadala",
+    "withValue": "I-block ang {{value}} sa app kung saan mo ito nakita.",
+    "generic": "I-block at i-report ang nagpadala sa app kung saan mo ito nakita."
+  },
+  "shareMessage": "Pagsusuri ng SafeRoute: {{title}}\n{{summary}}\nRisk score na {{score}}/100.",
+  "warnMessage": "Babala mula sa SafeRoute ({{verdict}}): {{title}}. {{summary}} Huwag munang magbayad ng pera o magpadala ng mga dokumento. Tawagan muna ako.",
+  "thanks": "Salamat, nakakatulong ito na maprotektahan ang iba",
+  "leaveQuickly": "Mabilisang umalis",
+  "conflictsTitle": "Ang mga hindi tugma",
+  "conflictsSubtitle": "Pagkakaiba sa pagitan ng ipinangako sa ad at ng hiningi ng recruiter",
+  "adSaid": "Sabi sa patalastas:",
+  "recruiterSaid": "Hiningi ng recruiter:",
+  "stillUnclearTitle": "Hindi pa rin malinaw",
+  "stillUnclearAdvice": "Ang mga mahalagang detalyeng ito ay hindi nabanggit. Itanong ito sa recruiter nang nakasulat bago magbayad o bumiyahe:",
+  "attention": {
+    "pause": "Huminto muna",
+    "verify": "I-verify",
+    "lower": "Magpatuloy nang may pag-iingat",
+    "pauseSub": "May natukoy na mga kahilingang may mataas na peligro",
+    "verifySub": "May natukoy na magkasalungat na mga tuntunin",
+    "lowerSub": "Walang malalaking salungat na natukoy"
+  }
+}

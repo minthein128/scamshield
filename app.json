@@ -3,9 +3,11 @@
     "name": "SafeRoute",
     "slug": "saferoute",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "default",
     "userInterfaceStyle": "light",
     "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
       "backgroundColor": "#F4F6F8"
     },
     "ios": {
@@ -15,17 +17,23 @@
     "android": {
       "package": "com.saferoute.antifraud",
       "adaptiveIcon": {
-        "backgroundColor": "#F4F6F8"
+        "foregroundImage": "./assets/adaptive-foreground.png",
+        "backgroundImage": "./assets/adaptive-background.png",
+        "monochromeImage": "./assets/adaptive-monochrome.png",
+        "backgroundColor": "#1D4ED8"
       },
       "permissions": [
         "SYSTEM_ALERT_WINDOW",
         "FOREGROUND_SERVICE",
-        "FOREGROUND_SERVICE_MEDIA_PROJECTION"
-      ]
+        "FOREGROUND_SERVICE_MEDIA_PROJECTION",
+        "POST_NOTIFICATIONS"
+      ],
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "bundler": "metro",
-      "output": "single"
+      "output": "single",
+      "favicon": "./assets/favicon.png"
     },
     "plugins": [
       [
@@ -37,10 +45,38 @@
             "./assets/fonts/PlusJakartaSans-SemiBold.ttf",
             "./assets/fonts/PlusJakartaSans-Bold.ttf",
             "./assets/fonts/PlusJakartaSans-ExtraBold.ttf",
-            "./assets/fonts/IBMPlexMono-Medium.ttf"
+            "./assets/fonts/IBMPlexMono-Medium.ttf",
+            "./assets/fonts/A10_YoeShin-Regular.ttf",
+            "./assets/fonts/A10_YoeShin-Bold.ttf",
+            "./assets/fonts/NotoSansThai-Regular.ttf",
+            "./assets/fonts/NotoSansThai-Bold.ttf"
           ]
         }
-      ]
-    ]
+      ],
+      [
+        "expo-share-intent",
+        {
+          "disableIOS": true,
+          "androidIntentFilters": [
+            "text/*",
+            "image/*"
+          ]
+        }
+      ],
+      "@react-native-google-signin/google-signin",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "enableProguardInReleaseBuilds": true,
+            "enableShrinkResourcesInReleaseBuilds": true,
+            "useLegacyPackaging": true
+          }
+        }
+      ],
+      "./plugins/with-abi-filters"
+    ],
+    "scheme": "saferoute",
+    "icon": "./assets/icon.png"
   }
 }

@@ -1,0 +1,28 @@
+{
+  "_meta": {
+    "reviewed": false
+  },
+  "title": "Akun",
+  "signedInAs": "Masuk sebagai",
+  "unavailable": {
+    "title": "Akun tidak tersedia",
+    "body": "Versi ini tidak tersambung ke layanan akun. SafeRoute tetap berfungsi penuh tanpa akun."
+  },
+  "createTitle": "Buat akun",
+  "signInTitle": "Masuk",
+  "introSignUp": "Hasil pemeriksaan dan kontak tepercaya Anda sebelumnya akan tetap tersimpan di akun baru.",
+  "introSignIn": "Masuk untuk membuka kembali hasil pemeriksaan dan kontak tepercaya yang tersimpan.",
+  "email": "Email",
+  "password": "Kata sandi",
+  "passwordHint": "Minimal 6 karakter.",
+  "haveAccount": "Saya sudah punya akun",
+  "createNew": "Buat akun baru",
+  "forgot": "Lupa kata sandi?",
+  "google": "Lanjutkan dengan Google",
+  "facebook": "Lanjutkan dengan Facebook",
+  "errors": {
+    "missing": "Masukkan email dan kata sandi Anda.",
+    "resetNeedsEmail": "Masukkan email Anda terlebih dahulu, lalu ketuk Lupa kata sandi."
+  },
+  "resetSent": "Jika email tersebut terdaftar, tautan atur ulang kata sandi telah dikirim."
+}

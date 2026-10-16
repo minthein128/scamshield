@@ -1,0 +1,45 @@
+{
+  "_meta": {
+    "reviewed": false
+  },
+  "step": "Langkah {{current}} dari {{total}}",
+  "skipA11y": "Lewati penyiapan",
+  "language": {
+    "title": "Pilih bahasa Anda",
+    "body": "SafeRoute menampilkan aplikasi dan menuliskan laporan serta peringatan suara dalam bahasa ini. Anda bisa mengubahnya nanti."
+  },
+  "countries": {
+    "fromTitle": "Dari mana asal Anda?",
+    "fromBody": "Ini berguna agar nomor bantuan yang tepat muncul lebih dulu.",
+    "toTitle": "Ke mana Anda akan bekerja atau bepergian?",
+    "toBody": "Boleh dilewati. Lewati jika Anda belum tahu."
+  },
+  "how": {
+    "title": "Cara SafeRoute membantu",
+    "body": "Tiga hal, tidak perlu pengaturan apa pun.",
+    "check": {
+      "title": "Periksa sebelum setuju",
+      "body": "Tempel tawaran kerja, pesan, atau tautan, atau bagikan tangkapan layar. SafeRoute mencari tanda-tanda peringatan perdagangan orang dan penipuan."
+    },
+    "explain": {
+      "title": "Lihat alasannya, dalam bahasa Anda",
+      "body": "Anda mendapat hasil penilaian yang jelas, alasan di baliknya, dan peringatan suara dalam bahasa yang Anda pilih."
+    },
+    "warn": {
+      "title": "Beri tahu keluarga dan dapatkan bantuan",
+      "body": "Kirim peringatan ke orang yang Anda percayai dan temukan nomor bantuan resmi untuk negara yang penting bagi Anda."
+    }
+  },
+  "shield": {
+    "title": "Nyalakan Screen shield",
+    "body": "Boleh dilewati. Anda juga bisa menyalakannya nanti dari layar utama."
+  },
+  "account": {
+    "title": "Gunakan SafeRoute sesuai kebutuhan Anda",
+    "body": "Semua fitur bisa digunakan tanpa akun. Hasil pemeriksaan Anda tetap tersimpan di perangkat ini.",
+    "note": "Akun bersifat pilihan. Akun menyimpan riwayat dan Kontak tepercaya agar tidak hilang jika berganti ponsel, serta menambah batas periksa per jam.",
+    "anonymous": "Lanjutkan tanpa akun",
+    "signUp": "Buat akun",
+    "signIn": "Saya sudah punya akun"
+  }
+}

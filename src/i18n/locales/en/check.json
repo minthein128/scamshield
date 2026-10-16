@@ -1,0 +1,92 @@
+{
+  "title": "Check something",
+  "whatIsIt": "What is it?",
+  "kinds": {
+    "job": "Job offer",
+    "message": "Message",
+    "link": "Link",
+    "shop": "Shop",
+    "agency": "Agency"
+  },
+  "text": {
+    "title": "Text message",
+    "a11y": "Text or chat to check",
+    "placeholder": "Job post, chat messages or SMS"
+  },
+  "link": {
+    "label": "Link",
+    "a11y": "Link to check"
+  },
+  "screenshot": {
+    "label": "Screenshot",
+    "ready": "{{kb}} KB, ready to send",
+    "preparing": "Preparing picture...",
+    "upload": "Upload a screenshot",
+    "pick": "Pick a screenshot"
+  },
+  "destination": {
+    "label": "Where do you work or travel?",
+    "a11y": "Destination",
+    "placeholder": "For example Bangkok, Thailand"
+  },
+  "optional": {
+    "title": "Optional",
+    "language": "Report language"
+  },
+  "submit": "Check now",
+  "errors": {
+    "image": "We could not use that picture. Try another screenshot.",
+    "clipboardEmpty": "Your clipboard is empty."
+  },
+  "source": {
+    "screenshot": "Screenshot",
+    "screenshotAt": "Screenshot, {{place}}",
+    "fallback": "Check"
+  },
+  "job": {
+    "bannerTitle": "SafeRoute Job Shield",
+    "bannerBody": "Compare what a job ad promises with what the recruiter actually asks, before you pay, send documents, or travel.",
+    "adSectionTitle": "1. The Job Ad",
+    "adPlaceholder": "Paste job ad text or flyer description...",
+    "adTextA11y": "Job ad text",
+    "uploadFlyer": "Upload flyer image",
+    "pickFlyer": "Add flyer screenshot",
+    "chatSectionTitle": "2. What the recruiter asked you (Optional)",
+    "chatHelper": "Paste chat messages or upload screenshots from WhatsApp, Telegram, or Facebook. SafeRoute checks for hidden fees, passport demands, or route changes.",
+    "chatPlaceholder": "Paste messages from the recruiter...",
+    "chatTextA11y": "Recruiter chat text",
+    "uploadChat": "Upload chat screenshot",
+    "pickChat": "Add chat screenshot",
+    "submit": "Review facts & compare",
+    "extracting": "Extracting job facts..."
+  },
+  "jobFacts": {
+    "title": "Is this right?",
+    "reviewTitle": "Review the extracted facts",
+    "reviewBody": "SafeRoute extracted these facts from the ad and chat. Check if they are right, or tap any item to correct it.",
+    "adSection": "The Job Ad",
+    "chatSection": "What the recruiter asked",
+    "noChatProvided": "No recruiter conversation was provided. SafeRoute will verify the ad claims alone.",
+    "submit": "Looks right, check it",
+    "checking": "Checking for conflicts...",
+    "unclear": "Unclear",
+    "extracted": "Extracted",
+    "notMentioned": "Not mentioned",
+    "editA11y": "Edit {{label}}",
+    "editTitle": "Edit {{label}}",
+    "placeholder": "Enter confirmed value",
+    "saveCorrection": "Save correction",
+    "markNotMentioned": "Mark as Not Mentioned",
+    "fields": {
+      "employer": "Employer",
+      "jobTitle": "Job Title",
+      "workplace": "Workplace Address",
+      "salary": "Salary",
+      "workerFee": "Worker Fee",
+      "contract": "Contract",
+      "visaOrPermit": "Visa / Permit",
+      "documentRequest": "Passport / Documents",
+      "meetingPoint": "Meeting Point"
+    }
+  }
+}

@@ -1,0 +1,165 @@
+{
+  "kind": "screenshot-bench",
+  "date": "2026-10-14",
+  "set": "synthetic",
+  "model": "gemini-3.5-flash-lite",
+  "mode": "api",
+  "shareSignals": false,
+  "summary": {
+    "n": 6,
+    "errors": 0,
+    "accuracy": 1,
+    "exactAccuracy": 0.8333333333333334,
+    "falsePositiveRate": 0,
+    "missRate": 0,
+    "safeCases": 2,
+    "riskyCases": 4,
+    "scamTypeAccuracy": 1,
+    "p50": 4340,
+    "p95": 5945,
+    "piiLeaks": 0,
+    "piiByType": {},
+    "confusion": {
+      "safe": {
+        "safe": 2,
+        "careful": 0,
+        "danger": 0,
+        "ERROR": 0
+      },
+      "careful": {
+        "safe": 0,
+        "careful": 0,
+        "danger": 1,
+        "ERROR": 0
+      },
+      "danger": {
+        "safe": 0,
+        "careful": 0,
+        "danger": 3,
+        "ERROR": 0
+      }
+    },
+    "perApp": {
+      "chat": {
+        "n": 3,
+        "correct": 3
+      },
+      "sms": {
+        "n": 2,
+        "correct": 2
+      },
+      "social": {
+        "n": 1,
+        "correct": 1
+      }
+    },
+    "perLanguage": {
+      "en": {
+        "n": 5,
+        "correct": 5
+      },
+      "tl": {
+        "n": 1,
+        "correct": 1
+      }
+    }
+  },
+  "rows": [
+    {
+      "file": "chat-job-01.png",
+      "app": "chat",
+      "expected": "danger",
+      "scamTypeExpected": "job_trafficking",
+      "language": "en",
+      "verdict": "danger",
+      "score": 100,
+      "scamType": "job_trafficking",
+      "flagFamilies": ["too_good", "pressure", "trafficking", "identity"],
+      "flagCount": 5,
+      "seenCount": null,
+      "latencyMs": 5945,
+      "correct": true,
+      "piiHits": {}
+    },
+    {
+      "file": "chat-romance-02.png",
+      "app": "chat",
+      "expected": "danger",
+      "scamTypeExpected": "romance_pig_butchering",
+      "language": "en",
+      "verdict": "danger",
+      "score": 100,
+      "scamType": "romance_pig_butchering",
+      "flagFamilies": ["identity", "too_good", "payment_route", "link_risk", "pressure"],
+      "flagCount": 6,
+      "seenCount": null,
+      "latencyMs": 4962,
+      "correct": true,
+      "piiHits": {}
+    },
+    {
+      "file": "sms-parcel-03.png",
+      "app": "sms",
+      "expected": "danger",
+      "scamTypeExpected": "parcel_phishing",
+      "language": "en",
+      "verdict": "danger",
+      "score": 100,
+      "scamType": "parcel_phishing",
+      "flagFamilies": ["pressure", "payment_route", "link_risk", "known_bad"],
+      "flagCount": 4,
+      "seenCount": null,
+      "latencyMs": 4340,
+      "correct": true,
+      "piiHits": {}
+    },
+    {
+      "file": "sms-school-04.png",
+      "app": "sms",
+      "expected": "safe",
+      "scamTypeExpected": "none",
+      "language": "en",
+      "verdict": "safe",
+      "score": 0,
+      "scamType": "none",
+      "flagFamilies": [],
+      "flagCount": 0,
+      "seenCount": null,
+      "latencyMs": 4144,
+      "correct": true,
+      "piiHits": {}
+    },
+    {
+      "file": "social-agency-05.png",
+      "app": "social",
+      "expected": "careful",
+      "scamTypeExpected": "fake_agency",
+      "language": "en",
+      "verdict": "danger",
+      "score": 75,
+      "scamType": "fake_agency",
+      "flagFamilies": ["too_good", "payment_route", "identity"],
+      "flagCount": 3,
+      "seenCount": null,
+      "latencyMs": 5490,
+      "correct": true,
+      "piiHits": {}
+    },
+    {
+      "file": "chat-family-06.png",
+      "app": "chat",
+      "expected": "safe",
+      "scamTypeExpected": "none",
+      "language": "tl",
+      "verdict": "safe",
+      "score": 0,
+      "scamType": "none",
+      "flagFamilies": [],
+      "flagCount": 0,
+      "seenCount": null,
+      "latencyMs": 2513,
+      "correct": true,
+      "piiHits": {}
+    }
+  ]
+}

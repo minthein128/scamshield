@@ -1,0 +1,44 @@
+{
+  "row": {
+    "label": "Was this right?",
+    "thanks": "Thanks for the feedback",
+    "up": "Yes, this was right",
+    "down": "No, this was wrong",
+    "failed": "We could not send that. Try again later."
+  },
+  "sheet": {
+    "titleRisky": "What was it?",
+    "titleSafe": "What kind of scam was it?",
+    "pick": "Pick the closest match.",
+    "sendBody": "Your answer helps us warn others more accurately. Nothing you wrote is sent.",
+    "itWasSafe": "I think it was safe",
+    "different": "I think it was a different scam",
+    "optional": "Optional. Your answer helps us catch it next time.",
+    "scam": "I think it was a scam",
+    "send": "Send"
+  },
+  "choices": {
+    "job_trafficking": "Job offer abroad",
+    "romance_pig_butchering": "Romance or crypto",
+    "parcel_phishing": "Parcel or fee link",
+    "fake_agency": "Recruitment agency",
+    "marketplace_fraud": "Online shop",
+    "investment": "Investment or task",
+    "other": "Something else"
+  },
+  "reportScam": {
+    "title": "Report a scam",
+    "intro": "Tell us about a scam you saw. We remove names, numbers and links before anything is kept, and it helps warn others.",
+    "textLabel": "Paste the text or chat",
+    "textA11y": "Scam text or chat",
+    "placeholder": "The message, job post or chat",
+    "screenshotLabel": "Or a screenshot",
+    "kindLabel": "What kind of scam was it?",
+    "lostLabel": "Did you lose money? (optional)",
+    "yes": "Yes",
+    "no": "No",
+    "lostNote": "Yes or no only. We never ask how much.",
+    "submit": "Send report",
+    "source": "Reported scam"
+  }
+}

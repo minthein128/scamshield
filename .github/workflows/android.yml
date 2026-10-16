@@ -1,0 +1,121 @@
+name: Android
+
+on:
+  push:
+    branches: [main, "feat/**"]
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      force_distribute:
+        description: Upload to Firebase App Distribution from any branch
+        type: boolean
+        default: false
+
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: write
+      id-token: write
+    env:
+      DISTRIBUTE: ${{ vars.FIREBASE_ANDROID_APP_ID != '' && vars.GCP_WORKLOAD_IDENTITY_PROVIDER != '' && vars.GCP_SERVICE_ACCOUNT != '' && (github.event_name == 'workflow_dispatch' && inputs.force_distribute) }}
+      EXPO_PUBLIC_API_URL: ${{ vars.EXPO_PUBLIC_API_URL }}
+      EXPO_PUBLIC_FIREBASE_API_KEY: ${{ vars.EXPO_PUBLIC_FIREBASE_API_KEY }}
+      EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ vars.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN }}
+      EXPO_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.EXPO_PUBLIC_FIREBASE_PROJECT_ID }}
+      EXPO_PUBLIC_FIREBASE_APP_ID: ${{ vars.EXPO_PUBLIC_FIREBASE_APP_ID }}
+      EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ vars.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}
+      EXPO_PUBLIC_GOOGLE_SIGNIN: ${{ vars.EXPO_PUBLIC_GOOGLE_SIGNIN }}
+      EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID: ${{ vars.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID }}
+      EXPO_PUBLIC_FACEBOOK_APP_ID: ${{ vars.EXPO_PUBLIC_FACEBOOK_APP_ID }}
+      EXPO_NO_TELEMETRY: "1"
+      CI: "true"
+      NODE_OPTIONS: --max-old-space-size=4096
+      ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+      ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+      ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+      ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Set build version
+        run: |
+          jq --argjson code "${{ github.run_number }}" --arg ver "1.0.${{ github.run_number }}" \
+            '.expo.android.versionCode = $code | .expo.version = $ver' app.json > app.json.tmp
+          mv app.json.tmp app.json
+
+      - run: npx expo prebuild -p android --clean
+
+      - name: Assemble release
+        working-directory: android
+        run: ./gradlew assembleRelease -PreactNativeArchitectures=armeabi-v7a,arm64-v8a --no-daemon --stacktrace -Dorg.gradle.jvmargs="-Xmx3g -XX:MaxMetaspaceSize=512m"
+
+      - name: Sign APK
+        id: sign
+        run: scripts/sign-apk.sh android/app/build/outputs/apk/release dist-apk/saferoute-${{ github.run_number }}.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: saferoute-apk
+          path: dist-apk/*.apk
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publish release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist-apk/*.apk
+          generate_release_notes: true
+
+      - name: Authenticate to Google Cloud
+        if: env.DISTRIBUTE == 'true'
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+
+      - name: Distribute to Firebase App Distribution
+        if: env.DISTRIBUTE == 'true'
+        env:
+          APP_ID: ${{ vars.FIREBASE_ANDROID_APP_ID }}
+          BRANCH: ${{ github.ref_name }}
+        run: |
+          printf '%s %s: %s\n' "$BRANCH" "${GITHUB_SHA::7}" "$(git log -1 --format=%s)" > release-notes.txt
+          npx -y firebase-tools@latest appdistribution:distribute dist-apk/saferoute-${{ github.run_number }}.apk \
+            --app "$APP_ID" \
+            --project "${{ vars.GCP_PROJECT_ID }}" \
+            --groups dev-testers \
+            --release-notes-file release-notes.txt

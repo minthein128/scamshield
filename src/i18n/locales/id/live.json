@@ -1,0 +1,43 @@
+{
+  "_meta": {
+    "reviewed": false
+  },
+  "button": "Bicara dengan SafeRoute",
+  "a11yButton": "Bicara dengan SafeRoute tentang laporan ini",
+  "title": "Bicara dengan SafeRoute",
+  "privacy": "Suara Anda dikirim ke Google untuk dijawab. Tidak ada yang direkam atau disimpan.",
+  "family": "Jelaskan ke keluarga saya",
+  "mute": "Bisukan",
+  "unmute": "Bunyikan",
+  "end": "Akhiri",
+  "close": "Tutup",
+  "getHelp": "Minta bantuan",
+  "listen": "Dengarkan",
+  "retry": "Coba lagi",
+  "countdown": "Sisa {{seconds}} dtk",
+  "a11yCountdown": "Sisa {{seconds}} detik",
+  "placeholder": "Jawaban akan muncul di sini",
+  "heard": "Anda berkata: {{text}}",
+  "state": {
+    "connecting": "Menghubungkan...",
+    "warning": "Memutar peringatan dulu...",
+    "listening": "Mendengarkan. Ajukan pertanyaan Anda.",
+    "listeningMuted": "Mikrofon dibisukan.",
+    "speaking": "SafeRoute sedang berbicara..."
+  },
+  "ended": {
+    "user": "Percakapan selesai.",
+    "cap": "Waktu habis. Mulai lagi untuk bertanya lebih banyak.",
+    "server": "Percakapan selesai."
+  },
+  "errors": {
+    "mic_denied": "Mikrofon mati. Izinkan untuk berbicara, atau ketuk Dengarkan untuk mendengar peringatan.",
+    "unavailable": "Suara langsung belum tersedia sekarang. Ketuk Dengarkan untuk mendengar peringatan lagi.",
+    "rate_limited": "Anda sudah memakai banyak pemeriksaan jam ini. Coba lagi nanti.",
+    "busy": "Percakapan suara lain sedang terbuka. Tutup lalu coba lagi.",
+    "not_found": "Laporan ini tidak tersedia lagi. Jalankan pemeriksaan lagi.",
+    "upstream": "Layanan suara bermasalah. Coba lagi.",
+    "bad_request": "Layanan suara tidak dapat dimulai. Coba lagi.",
+    "audio": "Audio tidak tersedia di perangkat ini."
+  }
+}

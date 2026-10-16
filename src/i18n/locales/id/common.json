@@ -1,0 +1,79 @@
+{
+  "_meta": {
+    "reviewed": false
+  },
+  "actions": {
+    "back": "Kembali",
+    "close": "Tutup",
+    "cancel": "Batal",
+    "done": "Selesai",
+    "next": "Lanjut",
+    "continue": "Lanjutkan",
+    "skip": "Lewati",
+    "paste": "Tempel",
+    "remove": "Hapus",
+    "call": "Telepon",
+    "tryAgain": "Coba lagi"
+  },
+  "tabs": {
+    "home": "Beranda",
+    "check": "Periksa",
+    "contacts": "Kontak",
+    "contactsA11y": "Kontak tepercaya",
+    "learn": "Belajar"
+  },
+  "loading": "Memuat SafeRoute...",
+  "offlineDemo": "Mode demo offline",
+  "copied": {
+    "title": "Tersalin",
+    "message": "Peringatan sudah disalin. Tempel di obrolan apa pun untuk membagikannya."
+  },
+  "time": {
+    "justNow": "baru saja",
+    "minutesAgo": "{{count}} menit lalu",
+    "hoursAgo": "{{count}} jam lalu",
+    "yesterday": "kemarin",
+    "daysAgo_other": "{{count}} hari lalu"
+  },
+  "verdict": {
+    "safe": "Risiko rendah",
+    "careful": "Hati-hati",
+    "danger": "Risiko tinggi"
+  },
+  "families": {
+    "too_good": "Terlalu bagus untuk jadi kenyataan",
+    "pressure": "Tekanan",
+    "payment_route": "Jalur pembayaran",
+    "identity": "Identitas",
+    "link_risk": "Risiko tautan",
+    "known_bad": "Cocok dengan laporan sebelumnya",
+    "trafficking": "Tanda bahaya perdagangan orang"
+  },
+  "scamTypes": {
+    "job_trafficking": "Kemungkinan perekrutan perdagangan orang",
+    "romance_pig_butchering": "Kemungkinan penipuan asmara atau investasi",
+    "parcel_phishing": "Kemungkinan penipuan paket",
+    "fake_agency": "Agen penyalur yang tampak berisiko",
+    "marketplace_fraud": "Kemungkinan penipuan jual-beli online",
+    "investment": "Kemungkinan penipuan investasi",
+    "other": "Pesan mencurigakan",
+    "none": "Tidak ditemukan tanda penipuan"
+  },
+  "countries": {
+    "MM": "Myanmar",
+    "TH": "Thailand",
+    "KH": "Kamboja",
+    "LA": "Laos",
+    "MY": "Malaysia",
+    "ID": "Indonesia",
+    "PH": "Filipina",
+    "VN": "Vietnam"
+  },
+  "languageNames": {
+    "en": "Inggris",
+    "id": "Bahasa Indonesia",
+    "tl": "Tagalog",
+    "my": "Myanmar",
+    "th": "Thai"
+  }
+}

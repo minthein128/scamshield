@@ -1,0 +1,56 @@
+{
+  "seen_one": "Reported {{count}} time by other SafeRoute users in the last 30 days",
+  "seen_other": "Reported {{count}} times by other SafeRoute users in the last 30 days",
+  "title": "Risk report",
+  "a11yVerdict": "{{verdict}}. Score {{score}} out of 100.",
+  "listen": "Listen in {{language}}",
+  "stop": "Stop",
+  "warn": "Warn my family",
+  "call": "Call {{number}}",
+  "callExt": "then ask for local {{ext}}",
+  "help": "Get help",
+  "share": "Share this warning",
+  "flagsRisky": "Warning signs we found",
+  "flagsSafe": "What we noticed",
+  "sources": "Sources we checked",
+  "linkChecks": "Link checks",
+  "actions": "What you can do",
+  "severity": {
+    "high": "High risk",
+    "medium": "Medium risk",
+    "low": "Low risk"
+  },
+  "domainAge_one": "Domain age: {{count}} day",
+  "domainAge_other": "Domain age: {{count}} days",
+  "domainAgeUnknown": "Domain age unknown",
+  "webRisk": {
+    "clean": "No known threats",
+    "malware": "Malware warning",
+    "social_engineering": "Phishing or deception warning",
+    "unwanted_software": "Unwanted software warning",
+    "unknown": "Not checked"
+  },
+  "block": {
+    "title": "Block the sender",
+    "withValue": "Block {{value}} in the app where you found it.",
+    "generic": "Block and report the sender in the app where you found it."
+  },
+  "shareMessage": "SafeRoute check: {{title}}\n{{summary}}\nRisk score {{score}}/100.",
+  "warnMessage": "SafeRoute warning ({{verdict}}): {{title}}. {{summary}} Please do not pay money or send documents. Call me first.",
+  "thanks": "Thanks, this helps protect others",
+  "leaveQuickly": "Leave quickly",
+  "conflictsTitle": "What doesn’t match",
+  "conflictsSubtitle": "Differences between what was advertised and what the recruiter asked",
+  "adSaid": "The Job Ad said:",
+  "recruiterSaid": "The recruiter asked:",
+  "stillUnclearTitle": "Still unclear",
+  "stillUnclearAdvice": "These critical details were not mentioned in the ad or chat. Ask the recruiter in writing before paying or traveling:",
+  "attention": {
+    "pause": "Pause",
+    "verify": "Verify",
+    "lower": "Proceed with caution",
+    "pauseSub": "High-risk demands detected",
+    "verifySub": "Conflicting terms detected",
+    "lowerSub": "No major conflicts detected"
+  }
+}

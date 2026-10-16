@@ -1,0 +1,77 @@
+{
+  "actions": {
+    "back": "Go back",
+    "close": "Close",
+    "cancel": "Cancel",
+    "done": "Done",
+    "next": "Next",
+    "continue": "Continue",
+    "skip": "Skip",
+    "paste": "Paste",
+    "remove": "Remove",
+    "call": "Call",
+    "tryAgain": "Try again"
+  },
+  "tabs": {
+    "home": "Home",
+    "check": "Check",
+    "contacts": "Contacts",
+    "contactsA11y": "Trusted contacts",
+    "learn": "Learn"
+  },
+  "loading": "Loading SafeRoute...",
+  "offlineDemo": "Offline demo mode",
+  "copied": {
+    "title": "Copied",
+    "message": "The warning is copied. Paste it into any chat to share it."
+  },
+  "time": {
+    "justNow": "just now",
+    "minutesAgo": "{{count}} min ago",
+    "hoursAgo": "{{count}} h ago",
+    "yesterday": "yesterday",
+    "daysAgo_one": "{{count}} day ago",
+    "daysAgo_other": "{{count}} days ago"
+  },
+  "verdict": {
+    "safe": "Low risk",
+    "careful": "Be careful",
+    "danger": "High risk"
+  },
+  "families": {
+    "too_good": "Too good to be true",
+    "pressure": "Pressure",
+    "payment_route": "Payment route",
+    "identity": "Identity",
+    "link_risk": "Link risk",
+    "known_bad": "Matches past reports",
+    "trafficking": "Trafficking warning signs"
+  },
+  "scamTypes": {
+    "job_trafficking": "Likely trafficking recruitment",
+    "romance_pig_butchering": "Possible romance or investment scam",
+    "parcel_phishing": "Possible parcel phishing",
+    "fake_agency": "Recruitment agency that looks risky",
+    "marketplace_fraud": "Possible marketplace fraud",
+    "investment": "Possible investment scam",
+    "other": "Suspicious message",
+    "none": "No scam pattern found"
+  },
+  "countries": {
+    "MM": "Myanmar",
+    "TH": "Thailand",
+    "KH": "Cambodia",
+    "LA": "Laos",
+    "MY": "Malaysia",
+    "ID": "Indonesia",
+    "PH": "Philippines",
+    "VN": "Vietnam"
+  },
+  "languageNames": {
+    "en": "English",
+    "id": "Bahasa Indonesia",
+    "tl": "Tagalog",
+    "my": "Myanmar",
+    "th": "Thai"
+  }
+}

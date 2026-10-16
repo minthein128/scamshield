@@ -1,0 +1,3 @@
+file,app,expected,scam_type,language,notes,public
+tiktok-01.png,tiktok,danger,job_trafficking,en,example row,no
+shopee-02.png,shopee,safe,none,id,example row,no

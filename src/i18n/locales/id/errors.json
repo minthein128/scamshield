@@ -1,0 +1,79 @@
+{
+  "_meta": {
+    "reviewed": false
+  },
+  "api": {
+    "bad_request": {
+      "title": "Kami tidak dapat membaca itu",
+      "message": "Tambahkan teks, tautan, atau tangkapan layar, lalu coba lagi."
+    },
+    "too_large": {
+      "title": "Ukuran file terlalu besar",
+      "message": "Pilih tangkapan layar yang lebih kecil dan coba lagi."
+    },
+    "upstream": {
+      "title": "Layanan pemeriksaan sedang bermasalah",
+      "message": "Ada masalah di sistem kami. Coba lagi dalam beberapa menit."
+    },
+    "rate_limited": {
+      "title": "Batas pemeriksaan tercapai",
+      "message": "Tunggu sebentar lalu coba lagi. Akun gratis mendapat batas lebih tinggi."
+    },
+    "network": {
+      "title": "Anda sedang offline",
+      "message": "Periksa koneksi internet Anda dan coba lagi."
+    },
+    "server_unreachable": {
+      "title": "SafeRoute tidak dapat dijangkau",
+      "message": "Internet Anda berfungsi, tetapi layanan pemeriksaan kami tidak menjawab saat ini. Coba lagi sebentar lagi."
+    },
+    "timeout": {
+      "title": "Pemeriksaan terlalu lama",
+      "message": "Koneksi Anda mungkin lambat. Coba lagi."
+    },
+    "cancelled": {
+      "title": "Pemeriksaan dibatalkan",
+      "message": "Pemeriksaan telah dibatalkan."
+    },
+    "invalid_response": {
+      "title": "Jawaban tidak terduga",
+      "message": "Layanan pemeriksaan mengirim jawaban yang tidak dapat kami baca. Coba lagi."
+    },
+    "unavailable": {
+      "title": "Pemeriksaan tidak tersedia",
+      "message": "Versi aplikasi ini tidak terhubung ke layanan pemeriksaan. Perbarui aplikasi dan coba lagi."
+    },
+    "unknown": {
+      "title": "Terjadi kendala",
+      "message": "Silakan coba lagi."
+    },
+    "not_found": {
+      "title": "Pemeriksaan itu sudah kedaluwarsa",
+      "message": "Masukan diterima selama beberapa hari setelah pemeriksaan."
+    }
+  },
+  "rateLimitedWait": "Coba lagi dalam {{wait}}. Akun gratis mendapat batas lebih tinggi.",
+  "wait": {
+    "unknown": "beberapa saat",
+    "minute": "1 menit",
+    "minutes_other": "{{count}} menit",
+    "hours_other": "{{count}} jam"
+  },
+  "auth": {
+    "emailInUse": "Email tersebut sudah punya akun. Silakan masuk.",
+    "credentialInUse": "Akun tersebut sudah ada. Silakan masuk.",
+    "invalidEmail": "Masukkan alamat email yang benar.",
+    "weakPassword": "Gunakan kata sandi minimal 6 karakter.",
+    "missingPassword": "Masukkan kata sandi Anda.",
+    "badCredential": "Email atau kata sandi tidak cocok.",
+    "tooManyRequests": "Terlalu banyak percobaan. Tunggu beberapa menit dan coba lagi.",
+    "network": "Tidak ada koneksi. Periksa internet Anda dan coba lagi.",
+    "popupClosed": "Jendela Google ditutup sebelum proses masuk selesai.",
+    "differentMethod": "Email tersebut sudah terdaftar dengan cara masuk lain. Gunakan cara tersebut.",
+    "unauthorizedDomain": "Masuk tidak diizinkan dari alamat web ini.",
+    "popupBlocked": "Browser Anda memblokir jendela Google. Izinkan pop-up dan coba lagi.",
+    "recentLogin": "Demi keamanan Anda, masuk kembali lalu ulangi langkah ini.",
+    "notAllowed": "Cara masuk ini belum tersedia.",
+    "fallback": "Terjadi kendala. Silakan coba lagi."
+  }
+}

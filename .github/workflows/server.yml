@@ -1,0 +1,104 @@
+name: Server
+
+on:
+  push:
+    branches: [main]
+    paths: ["server/**", ".github/workflows/server.yml"]
+  pull_request:
+    paths: ["server/**", ".github/workflows/server.yml"]
+  workflow_dispatch:
+
+concurrency:
+  group: server-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: server
+    env:
+      NODE_OPTIONS: --max-old-space-size=768
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        if: hashFiles('server/pnpm-lock.yaml') != ''
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: ${{ hashFiles('server/pnpm-lock.yaml') != '' && 'pnpm' || 'npm' }}
+          cache-dependency-path: |
+            server/pnpm-lock.yaml
+            server/package-lock.json
+
+      - name: Install
+        run: |
+          if [ -f pnpm-lock.yaml ]; then pnpm install --frozen-lockfile
+          elif [ -f package-lock.json ]; then npm ci
+          else npm install
+          fi
+
+      - name: Test
+        run: |
+          if [ -f pnpm-lock.yaml ]; then pnpm test; else npm test; fi
+
+  deploy:
+    needs: test
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      HAS_WIF: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER != '' && vars.GCP_SERVICE_ACCOUNT != '' }}
+      HAS_KEY: ${{ secrets.GCP_SA_KEY != '' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check credentials
+        run: |
+          if [ "$HAS_WIF" != "true" ] && [ "$HAS_KEY" != "true" ]; then
+            echo "set GCP_WORKLOAD_IDENTITY_PROVIDER and GCP_SERVICE_ACCOUNT vars, or the GCP_SA_KEY secret" >&2
+            exit 1
+          fi
+
+      - name: Auth with Workload Identity Federation
+        if: env.HAS_WIF == 'true'
+        uses: google-github-actions/auth@v2
+        with:
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+
+      - name: Auth with service account key
+        if: env.HAS_WIF != 'true'
+        uses: google-github-actions/auth@v2
+        with:
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - id: deploy
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: saferoute-api
+          region: ${{ vars.GCP_REGION || 'asia-southeast1' }}
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+          source: server
+          env_vars: |
+            GOOGLE_GENAI_USE_VERTEXAI=true
+            GOOGLE_CLOUD_PROJECT=${{ vars.GCP_PROJECT_ID }}
+            GOOGLE_CLOUD_LOCATION=${{ vars.GOOGLE_CLOUD_LOCATION || 'global' }}
+            GEMINI_MODEL=${{ vars.GEMINI_MODEL || 'gemini-2.5-flash' }}
+          flags: --service-account=${{ vars.GCP_RUNTIME_SERVICE_ACCOUNT }} --allow-unauthenticated
+
+      - run: echo "Deployed to ${{ steps.deploy.outputs.url }}"

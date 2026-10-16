@@ -1,0 +1,252 @@
+package com.saferoute.shield
+
+import android.animation.ValueAnimator
+import android.content.Context
+import android.graphics.Canvas
+import android.graphics.LinearGradient
+import android.graphics.Matrix
+import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.RectF
+import android.graphics.Shader
+import android.provider.Settings
+import android.view.animation.OvershootInterpolator
+import android.view.View
+import android.view.animation.LinearInterpolator
+
+/** The round shield. The ring color and the glyph show the state. Size is 56dp inside a 12dp shadow margin. */
+internal class BubbleView(context: Context, palette: ShieldPalette) : View(context) {
+
+    var palette: ShieldPalette = palette
+        set(value) {
+            field = value
+            invalidate()
+        }
+
+    var shieldState: ShieldOverlay.State = ShieldOverlay.State.IDLE
+        set(value) {
+            val before = field
+            field = value
+            if (value == ShieldOverlay.State.CHECKING) startScan() else stopScan()
+            if (before == ShieldOverlay.State.CHECKING && value in VERDICTS) pop() else popScale = 1f
+            invalidate()
+        }
+
+    private val d = resources.displayMetrics.density
+    private val fill = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val ring = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.STROKE
+        strokeWidth = 3f * d
+        strokeCap = Paint.Cap.ROUND
+    }
+    private val glyph = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val mark = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.STROKE
+        strokeCap = Paint.Cap.ROUND
+        strokeJoin = Paint.Join.ROUND
+    }
+    private val arcBounds = RectF()
+    private val matrix = Matrix()
+    private val shieldPath = Path()
+    private val markPath = Path()
+    private val dotPath = Path()
+    private var phase = 0f
+    private var scanner: ValueAnimator? = null
+    private var popScale = 1f
+    private var markAlpha = 1f
+    private val scanPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val clip = Path()
+
+    init {
+        setLayerType(LAYER_TYPE_SOFTWARE, null)
+    }
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        val size = ((CIRCLE_DP + 2 * PAD_DP) * d).toInt()
+        setMeasuredDimension(size, size)
+    }
+
+    override fun onDraw(canvas: Canvas) {
+        val cx = width / 2f
+        val cy = height / 2f
+        val radius = CIRCLE_DP * d / 2f
+        val accent = palette.ring(shieldState)
+
+        fill.color = palette.surface
+        fill.setShadowLayer(8f * d, 0f, 3f * d, palette.shadow)
+        canvas.drawCircle(cx, cy, radius, fill)
+
+        val inset = ring.strokeWidth / 2f + 1.5f * d
+        arcBounds.set(cx - radius + inset, cy - radius + inset, cx + radius - inset, cy + radius - inset)
+        ring.color = if (shieldState == ShieldOverlay.State.CHECKING) (palette.accent and 0x00FFFFFF) or 0x33000000 else accent
+        canvas.drawArc(arcBounds, 0f, 360f, false, ring)
+
+        val checking = shieldState == ShieldOverlay.State.CHECKING
+        val pulse = if (checking && scanner != null) 1f + 0.05f * Math.sin(phase * 2 * Math.PI).toFloat() else 1f
+        val box = 26f * d
+        canvas.save()
+        canvas.scale(popScale * pulse, popScale * pulse, cx, cy)
+        matrix.setScale(box, box)
+        matrix.postTranslate(cx - box / 2f, cy - box / 2f)
+        buildShield(shieldPath)
+        shieldPath.transform(matrix)
+        glyph.color = palette.glyph(shieldState)
+        canvas.drawPath(shieldPath, glyph)
+        if (checking && scanner != null) drawScanLine(canvas, cx, cy, box)
+
+        val markColor = (palette.surface and 0x00FFFFFF) or ((markAlpha * 255).toInt() shl 24)
+        mark.color = markColor
+        mark.strokeWidth = 0.1f * box
+        markPath.reset()
+        dotPath.reset()
+        when (shieldState) {
+            ShieldOverlay.State.SAFE -> {
+                markPath.moveTo(0.30f, 0.50f)
+                markPath.lineTo(0.44f, 0.64f)
+                markPath.lineTo(0.70f, 0.36f)
+            }
+            ShieldOverlay.State.DANGER -> {
+                mark.strokeWidth = 0.075f * box
+                markPath.moveTo(0.5f, 0.26f)
+                markPath.lineTo(0.75f, 0.70f)
+                markPath.lineTo(0.25f, 0.70f)
+                markPath.close()
+                markPath.moveTo(0.5f, 0.40f)
+                markPath.lineTo(0.5f, 0.54f)
+                dotPath.addCircle(0.5f, 0.61f, 0.035f, Path.Direction.CW)
+            }
+            ShieldOverlay.State.CAREFUL, ShieldOverlay.State.ERROR -> {
+                markPath.moveTo(0.5f, 0.28f)
+                markPath.lineTo(0.5f, 0.56f)
+                dotPath.addCircle(0.5f, 0.70f, 0.055f, Path.Direction.CW)
+            }
+            else -> Unit
+        }
+        if (!markPath.isEmpty) {
+            markPath.transform(matrix)
+            canvas.drawPath(markPath, mark)
+        }
+        if (!dotPath.isEmpty) {
+            dotPath.transform(matrix)
+            glyph.color = markColor
+            canvas.drawPath(dotPath, glyph)
+        }
+        canvas.restore()
+    }
+
+    private fun drawScanLine(canvas: Canvas, cx: Float, cy: Float, box: Float) {
+        val top = cy - box / 2f
+        val y = top + box * (0.08f + 0.84f * phase)
+        canvas.save()
+        clip.set(shieldPath)
+        canvas.clipPath(clip)
+        val band = 0.22f * box
+        scanPaint.shader = LinearGradient(
+            0f, y - band, 0f, y,
+            palette.surface and 0x00FFFFFF, (palette.surface and 0x00FFFFFF) or 0x66000000,
+            Shader.TileMode.CLAMP
+        )
+        canvas.drawRect(cx - box / 2f, y - band, cx + box / 2f, y, scanPaint)
+        scanPaint.shader = null
+        scanPaint.color = (palette.surface and 0x00FFFFFF) or 0xCC000000.toInt()
+        scanPaint.strokeWidth = 1.5f * d
+        canvas.drawLine(cx - box / 2f, y, cx + box / 2f, y, scanPaint)
+        canvas.restore()
+    }
+
+    private fun pop() {
+        if (!animationsEnabled()) {
+            popScale = 1f
+            markAlpha = 1f
+            return
+        }
+        popScale = 0.8f
+        markAlpha = 0f
+        ValueAnimator.ofFloat(0f, 1f).apply {
+            duration = 340
+            interpolator = OvershootInterpolator(2.4f)
+            addUpdateListener {
+                val t = it.animatedValue as Float
+                popScale = 0.8f + 0.2f * t
+                markAlpha = (t * 2f).coerceIn(0f, 1f)
+                invalidate()
+            }
+            start()
+        }
+    }
+
+    private fun animationsEnabled(): Boolean =
+        Settings.Global.getFloat(context.contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f) > 0f
+
+    private fun buildShield(path: Path) {
+        path.reset()
+        path.moveTo(0.5f, 0.02f)
+        path.lineTo(0.92f, 0.18f)
+        path.lineTo(0.92f, 0.50f)
+        path.quadTo(0.92f, 0.86f, 0.5f, 0.98f)
+        path.quadTo(0.08f, 0.86f, 0.08f, 0.50f)
+        path.lineTo(0.08f, 0.18f)
+        path.close()
+    }
+
+    private fun startScan() {
+        if (scanner != null || !animationsEnabled()) return
+        scanner = ValueAnimator.ofFloat(0f, 1f).apply {
+            duration = 1400
+            repeatCount = ValueAnimator.INFINITE
+            interpolator = LinearInterpolator()
+            addUpdateListener {
+                phase = it.animatedValue as Float
+                invalidate()
+            }
+            start()
+        }
+    }
+
+    private fun stopScan() {
+        scanner?.cancel()
+        scanner = null
+    }
+
+    override fun onDetachedFromWindow() {
+        stopScan()
+        super.onDetachedFromWindow()
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        if (shieldState == ShieldOverlay.State.CHECKING) startScan()
+    }
+
+    companion object {
+        const val CIRCLE_DP = 56
+        const val PAD_DP = 12
+        private val VERDICTS = setOf(ShieldOverlay.State.SAFE, ShieldOverlay.State.CAREFUL, ShieldOverlay.State.DANGER)
+    }
+}
+
+/** The close target that shows at the bottom while the bubble is dragged. */
+internal class CloseTargetView(context: Context, private val palette: ShieldPalette) : View(context) {
+    private val d = resources.displayMetrics.density
+    private val fill = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val stroke = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.STROKE
+        strokeCap = Paint.Cap.ROUND
+        color = 0xFFFFFFFF.toInt()
+        strokeWidth = 2.5f * d
+    }
+
+    init {
+        importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
+    }
+
+    override fun onDraw(canvas: Canvas) {
+        val cx = width / 2f
+        val cy = height / 2f
+        fill.color = palette.targetFill
+        canvas.drawCircle(cx, cy, 28f * d, fill)
+        val a = 8f * d
+        canvas.drawLine(cx - a, cy - a, cx + a, cy + a, stroke)
+        canvas.drawLine(cx + a, cy - a, cx - a, cy + a, stroke)
+    }
+}

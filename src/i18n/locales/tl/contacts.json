@@ -1,0 +1,48 @@
+{
+  "_meta": {
+    "reviewed": false
+  },
+  "title": "Mga pinagkakatiwalaang contact",
+  "intro": "Mga taong pinagkakatiwalaan mo. Kapag mukhang may panganib ang pagsusuri, balaan sila sa isang pindot, o tawagan muna sila.",
+  "emptyTitle": "Wala pang pinagkakatiwalaang contact",
+  "emptyBody": "Magdagdag ng kapamilya o kaibigan sa ibaba. Kapag mukhang may panganib ang pagsusuri, balaan sila sa isang pindot, o tawagan muna sila.",
+  "emptyBodySignedOut": "Mag-sign in para magdagdag ng kapamilya o kaibigan. Kapag mukhang may panganib ang pagsusuri, maaari mo silang balaan sa isang pindot.",
+  "call": "Tawagan",
+  "remove": "Alisin",
+  "add": {
+    "title": "Magdagdag ng contact",
+    "name": "Pangalan",
+    "phone": "Numero ng telepono",
+    "phoneHint": "Isama ang country code, halimbawa +95.",
+    "submit": "Idagdag ang contact",
+    "pick": "Pumili mula sa aking contacts"
+  },
+  "authRequired": {
+    "title": "Mag-sign in para mag-save ng contacts",
+    "body": "Mag-sign in sa iyong account para magdagdag at mag-save ng mga pinagkakatiwalaang contact ng pamilya.",
+    "signIn": "Mag-sign in",
+    "createAccount": "Gumawa ng account"
+  },
+  "footnote": {
+    "synced": "Naka-sync ang iyong contacts sa iyong account.",
+    "local": "Naka-save ang iyong contacts sa device na ito. Mag-sign in para mapanatili ang mga ito kung magpalit ka ng telepono.",
+    "required": "Kailangan mong mag-sign in para mag-save ng mga contact ng pamilya."
+  },
+  "errors": {
+    "permission": "Pahintulutan ang access sa contacts para pumili ng tao, o i-type ang kanilang numero sa ibaba.",
+    "noNumber": "Walang numero ng telepono ang contact na iyon.",
+    "openFailed": "Hindi namin mabuksan ang iyong contacts. I-type na lang ang numero sa ibaba.",
+    "nameRequired": "Maglagay ng pangalan.",
+    "nameTooLong": "Masyadong mahaba ang pangalang iyon.",
+    "phoneInvalid": "Maglagay ng numero ng telepono na may 6 hanggang 15 digit.",
+    "duplicate": "Nasa listahan mo na ang numerong iyon.",
+    "signInRequired": "Kailangan mong mag-sign in para mag-save ng mga contact ng pamilya."
+  },
+  "warn": {
+    "title": "Balaan ang taong pinagkakatiwalaan mo",
+    "body": "Bubuksan nito ang text message na may babala. Ikaw ang pipili kung ipapadala ito.",
+    "addContact": "Magdagdag ng pinagkakatiwalaang contact",
+    "text": "I-text si {{name}}",
+    "share": "Ibahagi sa ibang paraan"
+  }
+}
