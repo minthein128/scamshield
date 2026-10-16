@@ -6,7 +6,7 @@ import i18n from '../i18n';
 import { BigShieldButtonView } from '../components/BigShieldButton';
 import { CheckScreen } from '../screens/CheckScreen';
 import type { ShieldControl } from '../hooks/useShieldControl';
-import { pickScreenshot, type PreparedImage } from '../lib/image';
+import { pickScreenshot, prepareImage, type PreparedImage } from '../lib/image';
 
 jest.mock('react-native-safe-area-context', () => {
   const { View } = jest.requireActual('react-native');
@@ -18,7 +18,7 @@ jest.mock('@react-navigation/native', () => ({
   useFocusEffect: (cb: () => void) => require('react').useEffect(cb, []),
 }));
 jest.mock('expo-clipboard', () => ({ hasStringAsync: jest.fn(async () => false), getStringAsync: jest.fn(async () => 'copied text') }));
-jest.mock('../lib/image', () => ({ ...jest.requireActual('../lib/image'), pickScreenshot: jest.fn() }));
+jest.mock('../lib/image', () => ({ ...jest.requireActual('../lib/image'), pickScreenshot: jest.fn(), prepareImage: jest.fn() }));
 jest.mock('../state/AppState', () => ({
   useAppState: () => ({ language: 'en', setLanguage: jest.fn(), profile: { destinationCountry: '', homeCountry: '', shareSignals: false } }),
 }));
@@ -233,6 +233,38 @@ describe('Check page v3', () => {
     await act(async () => { fireEvent.press(screen.getByTestId('check-text-clip')); });
     expect(screen.getByTestId('check-text').props.value).toBe('copied text');
     expect(screen.queryByText('Paste what you copied')).toBeNull();
+  });
+
+  it('a share replaces the whole draft: after a typed message, only the shared screenshot is sent', async () => {
+    (prepareImage as jest.Mock).mockResolvedValue(IMAGE);
+    const navigation = { navigate: jest.fn(), getParent: () => ({ navigate }) } as never;
+    const view = render(<CheckScreen navigation={navigation} route={{ params: undefined } as never} />);
+    fireEvent.changeText(screen.getByTestId('check-text'), 'Pay a deposit of 500 dollars');
+    fireEvent.press(screen.getByTestId('check-submit'));
+    expect(navigate.mock.calls[0][1].request.text).toBe('Pay a deposit of 500 dollars');
+    navigate.mockClear();
+
+    view.rerender(<CheckScreen navigation={navigation} route={{ params: { draft: { imageUri: 'file:///shot.png' }, nonce: 7 } } as never} />);
+    await waitFor(() => expect(screen.getByText('job-offer.jpg')).toBeTruthy());
+    expect(prepareImage).toHaveBeenCalledWith('file:///shot.png');
+    fireEvent.press(screen.getByTestId('check-submit'));
+    const request = navigate.mock.calls[0][1].request;
+    expect(request.imageBase64).toBe('x');
+    expect(request.text).toBeUndefined();
+    expect(request.url).toBeUndefined();
+  });
+
+  it('a Home intent clears both Job offer steps before it applies', async () => {
+    const navigation = { navigate: jest.fn(), getParent: () => ({ navigate }) } as never;
+    const view = render(<CheckScreen navigation={navigation} route={{ params: undefined } as never} />);
+    fireEvent.press(screen.getByTestId('check-mode-job'));
+    fireEvent.changeText(screen.getByTestId('job-ad-text'), 'Factory workers needed');
+    fireEvent.changeText(screen.getByTestId('job-chat-text'), 'Pay a deposit');
+    view.rerender(<CheckScreen navigation={navigation} route={{ params: { intent: 'text', nonce: 8 } } as never} />);
+    await waitFor(() => expect(screen.getByTestId('check-text').props.value).toBe(''));
+    fireEvent.press(screen.getByTestId('check-mode-job'));
+    expect(screen.getByTestId('job-ad-text').props.value).toBe('');
+    expect(screen.getByTestId('job-chat-text').props.value).toBe('');
   });
 
   it('More details unfolds the two existing fields', () => {

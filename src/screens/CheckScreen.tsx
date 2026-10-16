@@ -116,11 +116,21 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
     if (!clipHasText) setClipUsed(false);
   }, [clipHasText]);
 
+  const clearDraft = () => {
+    setText('');
+    setImage(null);
+    setChatText('');
+    setChatImage(null);
+    setClipUsed(false);
+    setNotice(null);
+  };
+
   const nonce = route.params?.nonce;
   useEffect(() => {
     const params = route.params;
     if (!params || !params.nonce) return;
     const { draft, intent } = params;
+    clearDraft();
     if (draft) {
       if (draft.kind) setMode(modeForKind(draft.kind));
       const shared = [draft.text, draft.url].filter(Boolean).join(' ');
