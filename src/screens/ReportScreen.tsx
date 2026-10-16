@@ -273,6 +273,7 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
           <SectionTitle>{t('linkChecks')}</SectionTitle>
           {result.linkChecks.map(link => {
             const clean = link.webRisk === 'clean';
+            const unchecked = link.webRisk === 'unknown';
             return (
               <View key={link.url} style={styles.sourceCard}>
                 <View style={{ flex: 1, gap: 4 }}>
@@ -284,8 +285,8 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
                 </View>
                 <Pill
                   label={t(`webRisk.${link.webRisk}`)}
-                  background={clean ? colors.safeBg : colors.dangerSoftBg}
-                  color={clean ? colors.safeText : colors.dangerSoftText}
+                  background={clean ? colors.safeBg : unchecked ? colors.borderLight : colors.dangerSoftBg}
+                  color={clean ? colors.safeText : unchecked ? colors.textSecondary : colors.dangerSoftText}
                 />
               </View>
             );

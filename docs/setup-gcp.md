@@ -76,7 +76,7 @@ gcloud iam service-accounts add-iam-policy-binding saferoute-deployer@$P.iam.gse
   --member="principalSet://iam.googleapis.com/projects/$N/locations/global/workloadIdentityPools/github/attribute.repository/$G"
 ```
 
-Web Risk has no IAM role. It needs the API enabled and billing linked; the runtime account calls it through ADC. If it returns 403, set `WEB_RISK_API_KEY` instead.
+Web Risk has no IAM role. It needs the API enabled and billing linked; the runtime account calls it through ADC. If it returns 403, set `WEB_RISK_API_KEY` instead. Without billing, enable `safebrowsing.googleapis.com`, create an API key restricted to it and set `SAFE_BROWSING_API_KEY`; the server falls back to it when Web Risk fails.
 
 ## Verify
 

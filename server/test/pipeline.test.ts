@@ -220,3 +220,17 @@ describe('pipeline byId', () => {
     expect(p.byId?.('chk_unknown')).toBeUndefined();
   });
 });
+
+describe('unchecked links', () => {
+  it('says the link is not verified when no reputation source answered', async () => {
+    const p = createPipeline({
+      extractor: createMockExtractor(),
+      correlator: { checkAll: async (urls) => urls.map((url) => ({ url, webRisk: 'unknown' as const })) },
+      grounder: createMockGrounder(),
+      model: 'm',
+    });
+    const r = await p.run({ kind: 'message', language: 'en', text: 'Hello, see https://a.example.com/page' });
+    expect(r.linkChecks[0]?.webRisk).toBe('unknown');
+    expect(r.summary).toContain('not verified');
+  });
+});
