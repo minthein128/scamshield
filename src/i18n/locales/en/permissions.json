@@ -6,15 +6,15 @@
   "explain": {
     "mic": {
       "title": "Allow the microphone",
-      "body": "To talk with Pyit Taing Htaung, SafeRoute needs your microphone. Your voice is sent to Google to answer. Nothing is recorded or saved."
+      "body": "To talk with Pyit Taing Htaung, $t(common:appName) needs your microphone. Your voice is sent to Google to answer. Nothing is recorded or saved."
     },
     "overlay": {
       "title": "Show the shield over other apps",
       "body": "The shield doll floats on top of other apps so you can tap it on anything suspicious. Android opens a settings page where you switch this on."
     },
     "screen": {
-      "title": "Let SafeRoute see your screen",
-      "body": "When you tap the doll, SafeRoute reads what is on your screen to check it. It looks only when you tap. Android asks you to confirm."
+      "title": "Let $t(common:appName) see your screen",
+      "body": "When you tap the doll, $t(common:appName) reads what is on your screen to check it. It looks only when you tap. Android asks you to confirm."
     },
     "notifications": {
       "title": "Allow notifications",
@@ -26,21 +26,21 @@
     },
     "contacts": {
       "title": "Allow contacts",
-      "body": "SafeRoute reads a contact only when you pick it, to fill in the name and number."
+      "body": "$t(common:appName) reads a contact only when you pick it, to fill in the name and number."
     }
   },
   "help": {
     "mic": {
       "title": "The microphone is off",
-      "body": "To talk to Pyit Taing Htaung, open Settings, choose Permissions, then Microphone, and allow it. The rest of SafeRoute works without it."
+      "body": "To talk to Pyit Taing Htaung, open Settings, choose Permissions, then Microphone, and allow it. The rest of $t(common:appName) works without it."
     },
     "overlay": {
       "title": "Display over other apps is off",
-      "body": "To use the shield, open Settings, find Display over other apps, and allow SafeRoute. The rest of SafeRoute works without it."
+      "body": "To use the shield, open Settings, find Display over other apps, and allow $t(common:appName). The rest of $t(common:appName) works without it."
     },
     "screen": {
       "title": "Screen access was not allowed",
-      "body": "The shield needs this to see what you want checked. Turn the shield on again and choose Start now. The rest of SafeRoute works without it."
+      "body": "The shield needs this to see what you want checked. Turn the shield on again and choose Start now. The rest of $t(common:appName) works without it."
     },
     "contacts": {
       "title": "Contacts are off",

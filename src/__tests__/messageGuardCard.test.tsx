@@ -44,7 +44,7 @@ describe('Message Guard consent', () => {
     const onConfirm = jest.fn();
     const screen = render(<MessageGuardConsent request={{ mode: 'enable' }} apps={APPS} onConfirm={onConfirm} onCancel={jest.fn()} />);
     expect(screen.getByText('What leaves your phone')).toBeTruthy();
-    expect(screen.getByText("SafeRoute's server and Google's AI check the message and send back a result.")).toBeTruthy();
+    expect(screen.getByText("Kakwe's server and Google's AI check the message and send back a result.")).toBeTruthy();
     expect(screen.getByText('Recommended')).toBeTruthy();
     expect(screen.getByTestId('message-guard-consent-app-sms').props.value).toBe(false);
     expect(screen.getByTestId('message-guard-consent-app-whatsapp').props.value).toBe(false);

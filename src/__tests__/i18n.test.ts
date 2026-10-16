@@ -34,8 +34,8 @@ describe('interpolation and plurals', () => {
   });
 
   it('picks singular and plural forms in English', () => {
-    expect(seenLine(1)).toBe('Reported 1 time by other SafeRoute users in the last 30 days');
-    expect(seenLine(19)).toBe('Reported 19 times by other SafeRoute users in the last 30 days');
+    expect(seenLine(1)).toBe('Reported 1 time by other Kakwe users in the last 30 days');
+    expect(seenLine(19)).toBe('Reported 19 times by other Kakwe users in the last 30 days');
     expect(t('common:time.daysAgo', { count: 1 })).toBe('1 day ago');
     expect(t('common:time.daysAgo', { count: 3 })).toBe('3 days ago');
   });
@@ -178,5 +178,28 @@ describe('single language setting', () => {
     expect(settings).not.toHaveProperty('appLanguage');
     expect(settings).not.toHaveProperty('reportLanguage');
     expect(check).not.toHaveProperty('reportLanguage');
+  });
+});
+
+describe('app name', () => {
+  it('reads Kakwe in every language except Burmese, which reads ကာကွယ်', () => {
+    for (const lng of ['en', 'id', 'tl', 'th']) expect(t('common:appName', { lng })).toBe('Kakwe');
+    expect(t('common:appName', { lng: 'my' })).toBe('ကာကွယ်');
+  });
+
+  it('resolves the nested name inside sentences and leaves no SafeRoute behind', () => {
+    expect(t('common:loading', { lng: 'my' })).toBe('ကာကွယ် ကို ဖွင့်နေသည်...');
+    for (const lng of ['en', 'my', 'id', 'tl', 'th'] as const) {
+      expect(t('common:loading', { lng })).not.toContain('$t(');
+      expect(t('report:shareMessage', { lng, title: 'x', summary: 'y', score: 1 })).not.toContain('SafeRoute');
+    }
+  });
+
+  it('keeps every locale file free of the old name', () => {
+    for (const lng of ['en', ...TARGETS]) {
+      for (const f of readdirSync(join(LOCALES, lng))) {
+        expect(readFileSync(join(LOCALES, lng, f), 'utf8')).not.toContain('SafeRoute');
+      }
+    }
   });
 });

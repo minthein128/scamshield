@@ -6,7 +6,7 @@
   "tagline": "Alamin ang mga babala bago ka sumagot, magbayad o bumiyahe.",
   "scamsHeading": "Mga karaniwang scam",
   "flagsHeading": "Ang 7 babala",
-  "flagsHint": "Hinahanap ng SafeRoute ang mga babalang ito. Pindutin ang isa para matuto pa.",
+  "flagsHint": "Hinahanap ng $t(common:appName) ang mga babalang ito. Pindutin ang isa para matuto pa.",
   "flagsHintA11y": "Binubuksan ang paliwanag",
   "shieldRow": {
     "title": "Paano gumagana ang Screen shield",
@@ -48,7 +48,7 @@
       "body": "Bihirang humingi agad ng pera o ng iyong pasaporte ang totoong trabaho, tindahan at bangko."
     },
     "check": {
-      "title": "I-check sa SafeRoute",
+      "title": "I-check sa $t(common:appName)",
       "body": "I-paste ang mensahe o link, o maglagay ng screenshot."
     },
     "help": {
@@ -129,12 +129,12 @@
         "caption": "Nakikita ng manika ang post sa iyong screen. Nagtatanong ito upang buksan ang nakatagong teksto."
       },
       "e3": {
-        "title": "Sinusuri ito ng SafeRoute",
+        "title": "Sinusuri ito ng $t(common:appName)",
         "caption": "Binabasa nito ang buong post at naghahanap ng mga babala."
       },
       "e4": {
         "title": "Ang resulta",
-        "caption": "Ipinapakita ng SafeRoute ang resultang mataas na panganib, kasama ang mga dahilan at kung ano ang susunod na gagawin."
+        "caption": "Ipinapakita ng $t(common:appName) ang resultang mataas na panganib, kasama ang mga dahilan at kung ano ang susunod na gagawin."
       }
     },
     "romance": {
@@ -144,7 +144,7 @@
       },
       "e2": {
         "title": "Pindutin ang manika",
-        "caption": "Kailangan ng SafeRoute ang mga naunang mensahe para makita ang buong kwento."
+        "caption": "Kailangan ng $t(common:appName) ang mga naunang mensahe para makita ang buong kwento."
       },
       "e3": {
         "title": "Mag-scroll pataas at pindutin muli",
@@ -158,7 +158,7 @@
     "parcel": {
       "e1": {
         "title": "May dumating na mensahe",
-        "caption": "Binabalaan ka ng SafeRoute bago mo buksan ang link."
+        "caption": "Binabalaan ka ng $t(common:appName) bago mo buksan ang link."
       },
       "e2": {
         "title": "Pindutin para makita kung bakit",
@@ -171,7 +171,7 @@
         "caption": "Sinasabi nitong \"opisyal\" at nagpapakita ng numero ng lisensya."
       },
       "e2": {
-        "title": "Sinusuri ito ng SafeRoute",
+        "title": "Sinusuri ito ng $t(common:appName)",
         "caption": "Hinahanap nito ang lisensya at mga ulat tungkol sa ahensya."
       }
     },
@@ -182,7 +182,7 @@
       },
       "e2": {
         "title": "Pindutin ang pangalan ng nagbebenta",
-        "caption": "Hilingin sa SafeRoute na tingnan kung sino ang nagbebenta."
+        "caption": "Hilingin sa $t(common:appName) na tingnan kung sino ang nagbebenta."
       },
       "e3": {
         "title": "Buksan ang page ng nagbebenta",
@@ -190,7 +190,7 @@
       },
       "e4": {
         "title": "Ang resulta",
-        "caption": "Ipinapakita ng SafeRoute ang mga senyales kung bakit mukhang mapanganib ang alok na ito."
+        "caption": "Ipinapakita ng $t(common:appName) ang mga senyales kung bakit mukhang mapanganib ang alok na ito."
       }
     }
   },

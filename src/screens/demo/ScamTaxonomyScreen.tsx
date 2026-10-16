@@ -13,7 +13,7 @@ export const ScamTaxonomyScreen: React.FC<ScamTaxonomyScreenProps> = ({ onNaviga
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
         <View style={styles.container}>
       <View style={{ flexDirection: 'column', gap: 8 }}>
-        <Text style={{ color: '#0F1B2D', fontSize: 40, fontFamily: theme.fonts.extraBold, letterSpacing: -0.8, lineHeight: 54, includeFontPadding: false }}>Scam types SafeRoute detects</Text>
+        <Text style={{ color: '#0F1B2D', fontSize: 40, fontFamily: theme.fonts.extraBold, letterSpacing: -0.8, lineHeight: 54, includeFontPadding: false }}>Scam types Kakwe detects</Text>
         <Text style={{ color: '#475569', fontSize: 18, lineHeight: 24, fontFamily: theme.fonts.regular, includeFontPadding: false }}>Every type maps to the red-flag families the risk score adds up. One family counts once, however many signals point to it.</Text>
       </View>
       <View style={{ flexWrap: 'wrap', gap: 10, flexDirection: 'row' }}>

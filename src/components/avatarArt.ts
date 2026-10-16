@@ -1,5 +1,5 @@
 /**
- * Vector art and pose rules for SafeRoute's voice avatar, the pyit taing htaung doll, in a 100 x 100 box.
+ * Vector art and pose rules for Kakwe's voice avatar, the pyit taing htaung doll, in a 100 x 100 box.
  * Shared by Avatar.tsx and scripts/render-avatar.mjs, so keep it free of imports.
  */
 

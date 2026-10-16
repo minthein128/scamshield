@@ -1,3 +1,4 @@
+import { appName } from '../config/brand';
 import React, { useState } from 'react';
 import { Linking, Switch, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
@@ -192,7 +193,7 @@ export const SettingsScreen: React.FC<RootScreenProps<'Settings'>> = ({ navigati
         <ConnectionCard onOpenLog={() => navigation.navigate('Diagnostics')} />
       </View>
 
-      <Text style={styles.version}>{`SafeRoute ${Constants.expoConfig?.version ?? ''}`.trim()}</Text>
+      <Text style={styles.version}>{`${appName()} ${Constants.expoConfig?.version ?? ''}`.trim()}</Text>
     </Screen>
   );
 };

@@ -2,6 +2,7 @@ import { MOCK_COPY } from './mockCopy';
 import { ApiError } from './errors';
 import type {
   CheckAction,
+  CheckStage,
   CheckClient,
   CheckRequest,
   CheckResponse,
@@ -12,6 +13,8 @@ import type {
 } from './types';
 import { hasInput } from './validate';
 import { mockAssessJob, mockExtractJob } from './mockJob';
+
+const SOURCE_STAGES: CheckStage[] = ['links', 'intel', 'ground'];
 
 export interface MockOptions {
   delayMs?: number;
@@ -144,11 +147,20 @@ export function createMockClient(options: MockOptions = {}): CheckClient {
         await wait(opts?.signal);
         return buildMockResponse(request);
       }
-      const first = Math.round(delayMs * 0.4);
-      await wait(opts?.signal, first);
+      const started = Date.now();
+      const stage = (s: CheckStage, status: 'start' | 'done') => onUpdate({ type: 'stage', stage: s, status, ms: Date.now() - started });
+      const step = (share: number) => wait(opts?.signal, Math.round(delayMs * share));
+      stage('extract', 'start');
+      await step(0.4);
+      stage('extract', 'done');
       const result = buildMockResponse(request);
       onUpdate({ type: 'verdict', response: { ...result, sources: [] } });
-      await wait(opts?.signal, delayMs - first);
+      for (const s of SOURCE_STAGES) stage(s, 'start');
+      for (const [s, share] of [['links', 0.2], ['intel', 0.15], ['ground', 0.2]] as const) {
+        await step(share);
+        stage(s, 'done');
+      }
+      await step(0.05);
       onUpdate({ type: 'final', response: result });
       return result;
     },

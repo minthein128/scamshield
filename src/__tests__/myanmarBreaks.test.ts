@@ -39,8 +39,8 @@ describe('breakMyanmar', () => {
   });
 
   it('leaves Latin text, spaces and digits alone', () => {
-    expect(breakMyanmar('SafeRoute Android')).toBe('SafeRoute Android');
-    expect(breakMyanmar('စစ်ဆေး SafeRoute')).toBe('စစ်\u200Bဆေး SafeRoute');
+    expect(breakMyanmar('Kakwe Android')).toBe('Kakwe Android');
+    expect(breakMyanmar('စစ်ဆေး Kakwe')).toBe('စစ်\u200Bဆေး Kakwe');
   });
 
   it('never leaves a lone asat, virama or vowel sign at the start of a piece', () => {

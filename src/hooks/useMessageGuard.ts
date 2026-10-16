@@ -44,6 +44,7 @@ export function useMessageGuardConfigSync(): void {
       // Native sharing stays off until the stored opt-in has loaded.
       ...(ready ? { shareSignals } : {}),
       noticeBody: t('shield:messageGuard.notice.body'),
+      noticeTitle: t('common:appName'),
       noticeOpen: t('shield:messageGuard.notice.open'),
     }).catch(e => diag.error('messageGuard', 'configure_failed', { code: errorCode(e) }));
   }, [apiUrl, language, ready, shareSignals]);

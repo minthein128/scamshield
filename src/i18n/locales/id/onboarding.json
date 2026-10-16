@@ -6,17 +6,17 @@
   "skipA11y": "Lewati penyiapan",
   "language": {
     "title": "Pilih bahasa Anda",
-    "body": "SafeRoute menampilkan aplikasi dan menuliskan laporan serta peringatan suara dalam bahasa ini. Anda bisa mengubahnya nanti.",
-    "age": "SafeRoute untuk orang berusia 18 tahun ke atas.",
+    "body": "$t(common:appName) menampilkan aplikasi dan menuliskan laporan serta peringatan suara dalam bahasa ini. Anda bisa mengubahnya nanti.",
+    "age": "$t(common:appName) untuk orang berusia 18 tahun ke atas.",
     "tagline": "Seperti boneka Pyit Taing Htaung, kami membantu Anda tetap tegak berdiri.",
-    "heroA11y": "SafeRoute, dengan boneka Pyit Taing Htaung"
+    "heroA11y": "$t(common:appName), dengan boneka Pyit Taing Htaung"
   },
   "countries": {
     "fromTitle": "Dari mana asal Anda?",
     "fromBody": "Ini berguna agar nomor bantuan yang tepat muncul lebih dulu."
   },
   "how": {
-    "title": "Yang dilakukan SafeRoute",
+    "title": "Yang dilakukan $t(common:appName)",
     "check": {
       "title": "Periksa sebelum berangkat",
       "body": "Tunjukkan iklan kerja, pesan, atau tautan."
@@ -36,7 +36,7 @@
   },
   "sharing": {
     "title": "Bantu sesama: bagikan pola penipuan tanpa nama",
-    "body": "Saat suatu pemeriksaan terlihat berisiko, SafeRoute dapat membagikan polanya agar orang lain bisa mendapat peringatan lebih awal. Ini tidak wajib.",
+    "body": "Saat suatu pemeriksaan terlihat berisiko, $t(common:appName) dapat membagikan polanya agar orang lain bisa mendapat peringatan lebih awal. Ini tidak wajib.",
     "p1": "Tanpa tangkapan layar dan tanpa teks pesan. Hanya pola singkat yang disimpan.",
     "p2": "Nama dan data pribadi lainnya dihapus terlebih dahulu.",
     "p3": "Nomor telepon dan akun hanya disimpan sebagai kode satu arah yang tidak bisa diubah kembali menjadi nomor aslinya.",

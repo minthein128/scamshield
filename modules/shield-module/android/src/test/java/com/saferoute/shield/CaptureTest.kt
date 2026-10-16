@@ -133,18 +133,27 @@ class CaptureTest {
     // ---- neutral notification ----
 
     @Test
+    fun foregroundNotificationUsesTheAppNameFromTheStrings() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val strings = ShieldStrings.from(mapOf("appName" to "ကာကွယ်"))
+        val n = ShieldNotification.build(context, "ShieldProtectionChannel", null, strings.appName)
+        assertEquals("ကာကွယ်", n.extras.getCharSequence(android.app.Notification.EXTRA_TITLE).toString())
+        assertEquals("Kakwe", ShieldStrings.DEFAULT.appName)
+    }
+
+    @Test
     fun foregroundNotificationIsNeutralAndPrivate() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         val n = ShieldNotification.build(context, "ShieldProtectionChannel", null)
         val title = n.extras.getCharSequence(android.app.Notification.EXTRA_TITLE).toString()
         val text = n.extras.getCharSequence(android.app.Notification.EXTRA_TEXT).toString()
-        assertEquals("SafeRoute", title)
+        assertEquals("Kakwe", title)
         assertEquals("Ready when you need it", text)
         assertEquals(android.app.Notification.VISIBILITY_PRIVATE, n.visibility)
         val pub = n.publicVersion
-        assertEquals("SafeRoute", pub.extras.getCharSequence(android.app.Notification.EXTRA_TITLE).toString())
+        assertEquals("Kakwe", pub.extras.getCharSequence(android.app.Notification.EXTRA_TITLE).toString())
         assertNull(pub.extras.getCharSequence(android.app.Notification.EXTRA_TEXT))
-        val all = listOf(title, text, ShieldNotification.CHANNEL_NAME, ShieldNotification.CHANNEL_DESCRIPTION).joinToString(" ")
+        val all = listOf(title, text, ShieldNotification.CHANNEL_NAME, ShieldNotification.channelDescription()).joinToString(" ")
         assertFalse(all, Regex("scam|risk|danger|fraud|careful|safe |verdict|warning|check|screen|shield", RegexOption.IGNORE_CASE).containsMatchIn(all))
     }
 
@@ -258,9 +267,9 @@ class CaptureTest {
 
     @Test
     fun talkBackNamesTheDollAndTheVerdict() {
-        assertEquals("Pyit Taing Htaung, SafeRoute shield. High risk. Double tap to show details.", bubbleDescription(ShieldOverlay.State.DANGER, ShieldStrings.DEFAULT))
+        assertEquals("Pyit Taing Htaung, Kakwe shield. High risk. Double tap to show details.", bubbleDescription(ShieldOverlay.State.DANGER, ShieldStrings.DEFAULT))
         val my = ShieldStrings.from(mapOf("name" to "ပစ်တိုင်းထောင်", "verdictSafe" to "အန္တရာယ်နည်း"))
-        assertTrue(bubbleDescription(ShieldOverlay.State.CHECKING, my).startsWith("ပစ်တိုင်းထောင်, SafeRoute shield. Checking"))
+        assertTrue(bubbleDescription(ShieldOverlay.State.CHECKING, my).startsWith("ပစ်တိုင်းထောင်, Kakwe shield. Checking"))
         assertTrue(bubbleDescription(ShieldOverlay.State.SAFE, my).contains("အန္တရာယ်နည်း"))
         overlay.setChecking()
         assertTrue(overlay.bubbleViewForTest.contentDescription.contains("Checking the screen"))

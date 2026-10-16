@@ -44,7 +44,7 @@ export const realDeps: LiveSessionDeps = {
 
 const IDLE: LiveView = { state: 'idle', caption: '', userCaption: '', remainingSec: 120, muted: false, error: null, fallback: false, warning: false, endedBy: null };
 
-/** Talk to SafeRoute: plays the approved warning, then runs a live voice session over /v1/live. */
+/** Talk to Kakwe: plays the approved warning, then runs a live voice session over /v1/live. */
 export function useLiveVoice(options: Options, deps: LiveSessionDeps = realDeps) {
   const [view, setView] = useState<LiveView>(IDLE);
   const session = useRef<ReturnType<typeof createLiveSession> | null>(null);

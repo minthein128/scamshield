@@ -3,7 +3,7 @@
     "reviewed": false
   },
   "title": "Radar penipuan",
-  "intro_other": "Laporan dari pengguna SafeRoute lain dalam 30 hari terakhir. Hanya pola yang terlihat setidaknya {{count}} kali yang ditampilkan.",
+  "intro_other": "Laporan dari pengguna $t(common:appName) lain dalam 30 hari terakhir. Hanya pola yang terlihat setidaknya {{count}} kali yang ditampilkan.",
   "global": "Global",
   "empty": {
     "title": "Belum cukup laporan",

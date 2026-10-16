@@ -11,7 +11,7 @@ import { AddedBar, CheckCard, FileCard, FoldRow, ModeChips, OrDivider, TextBox, 
 import { Button, Notice } from '../components/ui';
 import { Select } from '../components/Select';
 import { UI_LANGUAGES } from '../i18n/languages';
-import { APP_NAME } from '../config/brand';
+import { appName } from '../config/brand';
 import { countryName } from '../lib/countries';
 import { hasInput } from '../api';
 import { PreparedImage, pickScreenshot, prepareSharedImage } from '../lib/image';
@@ -186,7 +186,7 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
         <>
           {ready ? null : <Text testID="check-submit-hint" style={styles.hint}>{isJob ? t('job.submitHint') : t('submitHint')}</Text>}
           <Button testID="check-submit" label={isJob ? t('job.submit') : t('submit')} leading={<BlockIcon name="magnify" size={22} color={ready && !busy ? colors.white : colors.textSecondary} strokeWidth={2.2} />} onPress={submit} disabled={!ready || busy} mutedDisabled />
-          <Text testID="check-warn" style={styles.warn}>{t('warn', { app: APP_NAME })}</Text>
+          <Text testID="check-warn" style={styles.warn}>{t('warn', { app: appName() })}</Text>
         </>
       }
     >

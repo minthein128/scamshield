@@ -1,3 +1,4 @@
+import { appName } from './brand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useState } from 'react';
 import { diag } from '../lib/diagLog';
@@ -304,7 +305,7 @@ export async function connectionReport(info: { version: string; os: string }, fe
   const probes = trace.filter(e => e.kind === 'probe');
   const line = (e: TraceEntry) => `${e.kind} ${e.target} ${e.ok ? 'ok' : 'fail'} ${e.status ?? '-'} ${e.ms}ms`;
   return [
-    `SafeRoute ${info.version} (${info.os})`,
+    `${appName('en')} ${info.version} (${info.os})`,
     `time ${new Date().toISOString()}`,
     `chosen ${url ? apiHost(url) : 'none'}`,
     `baked ${apiHost(API_URL) || 'none'}`,

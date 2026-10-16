@@ -2,8 +2,6 @@ package com.saferoute.shield
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
-import android.animation.PropertyValuesHolder
-import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.BitmapFactory
@@ -109,7 +107,7 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
     private var snapToken = 0
     private var restX = 0
     private var restY = 0
-    private var enterAnim: ObjectAnimator? = null
+    private var enterAnim: Animator? = null
     private val machine = DragMachine(max(ViewConfiguration.get(context).scaledTouchSlop, dp(6)))
     private var lastJson: JSONObject? = null
 
@@ -342,7 +340,7 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
         main.postDelayed(tuckLater, TUCK_DELAY_MS)
     }
 
-    /** A pill with a short message about voice. A tap opens SafeRoute when [opensApp] is set, otherwise it closes. */
+    /** A pill with a short message about voice. A tap opens Kakwe when [opensApp] is set, otherwise it closes. */
     fun showNotice(message: String, opensApp: Boolean) {
         main.removeCallbacks(autoCollapse)
         untuck()
@@ -441,6 +439,15 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
         pillRoot = root
         pillView = view
         if (bubble.visibility != View.VISIBLE) root.visibility = View.INVISIBLE
+        view.alpha = 0f
+        view.addOnLayoutChangeListener(object : View.OnLayoutChangeListener {
+            override fun onLayoutChange(v: View, l: Int, t: Int, r: Int, b: Int, ol: Int, ot: Int, oldR: Int, ob: Int) {
+                v.removeOnLayoutChangeListener(this)
+                if (pillView !== view) return
+                aimPivotAtBubble(view)
+                view.enterAnimator().start()
+            }
+        })
     }
 
     private fun removePillNow() {
@@ -619,18 +626,7 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
 
     private fun playCardEnter(view: ResultCardView) {
         aimPivotAtBubble(view)
-        view.scaleX = 0.45f
-        view.scaleY = 0.45f
-        enterAnim = ObjectAnimator.ofPropertyValuesHolder(
-            view,
-            PropertyValuesHolder.ofFloat(View.ALPHA, 0f, 1f),
-            PropertyValuesHolder.ofFloat(View.SCALE_X, 0.45f, 1f),
-            PropertyValuesHolder.ofFloat(View.SCALE_Y, 0.45f, 1f)
-        ).apply {
-            duration = 200
-            interpolator = ResultCardView.EASE
-            start()
-        }
+        enterAnim = view.enterAnimator().apply { start() }
     }
 
     private fun anchorFor(x: Int, y: Int) =
@@ -675,8 +671,8 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
         view.cancelAnimations()
         aimPivotAtBubble(view)
         main.postDelayed({ if (cardRoot === root) removeCardNow() }, duration + 80)
-        view.animate().alpha(0f).scaleX(0.4f).scaleY(0.4f).setDuration(duration)
-            .setInterpolator(ResultCardView.EASE)
+        view.animate().alpha(0f).scaleX(ResultCardView.EXIT_SCALE).scaleY(ResultCardView.EXIT_SCALE).setDuration(duration)
+            .setInterpolator(ShieldMotion.EXIT)
             .setListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
                     if (cardRoot === root) removeCardNow()

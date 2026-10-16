@@ -1,4 +1,5 @@
 {
+  "appName": "Kakwe",
   "actions": {
     "back": "Go back",
     "close": "Close",
@@ -21,7 +22,7 @@
     "contactsA11y": "Trusted contacts",
     "learn": "Learn"
   },
-  "loading": "Loading SafeRoute...",
+  "loading": "Loading $t(common:appName)...",
   "offlineDemo": "Offline demo mode",
   "copied": {
     "title": "Copied",

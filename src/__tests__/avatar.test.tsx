@@ -64,7 +64,7 @@ describe('Avatar', () => {
       const view = render(<Avatar concept="C" state={state} level={0.5} size={48} />);
       const root = screen.getByTestId('avatar');
       expect(StyleSheet.flatten(root.props.style)).toMatchObject({ width: 48, height: 48 });
-      expect(root.props.accessibilityLabel).toBe('SafeRoute');
+      expect(root.props.accessibilityLabel).toBe('Kakwe');
       view.unmount();
     }
     expect(warn).not.toHaveBeenCalled();

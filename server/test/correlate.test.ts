@@ -21,7 +21,7 @@ describe('correlator', () => {
     expect(first).toContain('threatTypes=MALWARE');
     expect(first).toContain('key=k');
     const rdapCall = fetchFn.mock.calls.find((c) => String(c[0]).includes('rdap.org')) as unknown as [string, RequestInit];
-    expect((rdapCall[1].headers as Record<string, string>)['user-agent']).toContain('SafeRoute');
+    expect((rdapCall[1].headers as Record<string, string>)['user-agent']).toContain('Kakwe');
   });
 
   it('returns clean for an empty Web Risk response', async () => {

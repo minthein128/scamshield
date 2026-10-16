@@ -116,7 +116,7 @@ export function createCorrelator(cfg: Config, deps: CorrelatorDeps = {}): Correl
   async function rdapLookup(url: string): Promise<RdapInfo> {
     try {
       const res = await fetchFn(`https://rdap.org/domain/${registrableDomain(url)}`, {
-        headers: { accept: 'application/rdap+json, application/json', 'user-agent': 'SafeRoute/1.0 (scam-check)' },
+        headers: { accept: 'application/rdap+json, application/json', 'user-agent': 'Kakwe/1.0 (scam-check)' },
         redirect: 'follow',
         signal: AbortSignal.timeout(cfg.linkTimeoutMs),
       });

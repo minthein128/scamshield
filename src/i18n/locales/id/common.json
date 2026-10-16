@@ -1,4 +1,5 @@
 {
+  "appName": "Kakwe",
   "_meta": {
     "reviewed": false
   },
@@ -24,7 +25,7 @@
     "contactsA11y": "Kontak tepercaya",
     "learn": "Belajar"
   },
-  "loading": "Memuat SafeRoute...",
+  "loading": "Memuat $t(common:appName)...",
   "offlineDemo": "Mode demo offline",
   "copied": {
     "title": "Tersalin",

@@ -6,7 +6,7 @@
   "signedInAs": "Masuk sebagai",
   "unavailable": {
     "title": "Akun tidak tersedia",
-    "body": "Versi ini tidak tersambung ke layanan akun. SafeRoute tetap berfungsi penuh tanpa akun."
+    "body": "Versi ini tidak tersambung ke layanan akun. $t(common:appName) tetap berfungsi penuh tanpa akun."
   },
   "createTitle": "Buat akun",
   "signInTitle": "Masuk",

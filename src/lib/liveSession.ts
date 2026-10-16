@@ -76,7 +76,7 @@ export function reportPayload(r: CheckResponse) {
 const knownError = (code: unknown): LiveErrorCode =>
   code === 'rate_limited' || code === 'busy' || code === 'not_found' || code === 'bad_request' ? code : 'upstream';
 
-/** Owns the WebSocket, the mic and the state machine of one Talk to SafeRoute session. */
+/** Owns the WebSocket, the mic and the state machine of one Talk to Kakwe session. */
 export function createLiveSession(options: LiveSessionOptions, deps: LiveSessionDeps, onChange: (v: LiveView) => void) {
   let view: LiveView = { state: 'idle', caption: '', userCaption: '', remainingSec: Math.round(DEFAULT_CAP_MS / 1000), muted: false, error: null, fallback: false, warning: false, endedBy: null };
   let audio: LiveAudio | null = null;

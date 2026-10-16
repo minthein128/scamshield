@@ -177,7 +177,7 @@ describe('last activity line', () => {
     );
     expect(describeOutcome('skipped_otp')).toBe('a one-time code, kept on your phone');
     expect(describeOutcome('check_failed:server_503')).toBe('the check did not finish. Check your internet connection.');
-    expect(describeOutcome('result:danger')).toBe('checked, SafeRoute posted a notice');
+    expect(describeOutcome('result:danger')).toBe('checked, Kakwe posted a notice');
     expect(describeOutcome('result:careful:notice_blocked')).toContain('notifications are off');
   });
 });

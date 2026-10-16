@@ -1,11 +1,13 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/readme/cover-dark.png">
-  <img src="assets/readme/cover.png" alt="SafeRoute: spot a job scam before you pay, send documents or travel. Phone screens show a Job Shield report, a High risk verdict and the floating doll bubble over a chat app. Works in English, Burmese, Bahasa Indonesia, Tagalog and Thai. Built with Gemini and Google Cloud." width="100%">
+  <img src="assets/readme/cover.png" alt="Kakwe: spot a job scam before you pay, send documents or travel. Phone screens show a Job Shield report, a High risk verdict and the floating doll bubble over a chat app. Works in English, Burmese, Bahasa Indonesia, Tagalog and Thai. Built with Gemini and Google Cloud." width="100%">
 </picture>
 
-# SafeRoute
+# Kakwe
 
-Migrant workers from Myanmar, Thailand, Indonesia and the Philippines find jobs through social media ads and chat apps. Some of those offers lead to debt, forced scam work or trafficking, and the warning signs are easy to miss in a second language. SafeRoute is an Android app and a web demo that checks a job ad, message, link or screenshot before the person pays, sends documents or travels. It explains what it found in the user's own language and points to a verified hotline. Built for the Google Cloud AI Builder Cup 2026.
+Kakwe is called ကာကွယ် when the app language is Burmese. It was named SafeRoute before.
+
+Migrant workers from Myanmar, Thailand, Indonesia and the Philippines find jobs through social media ads and chat apps. Some of those offers lead to debt, forced scam work or trafficking, and the warning signs are easy to miss in a second language. Kakwe is an Android app and a web demo that checks a job ad, message, link or screenshot before the person pays, sends documents or travels. It explains what it found in the user's own language and points to a verified hotline. Built for the Google Cloud AI Builder Cup 2026.
 
 **[Web demo](https://saferoute-aibc.web.app)** · **[Android APK](https://saferoute-aibc.web.app/saferoute.apk)** · **[Dataset](https://huggingface.co/datasets/Rickaym/saferoute-scam-screenshots)** · **[Pitch deck](pitch/deck.pdf)**
 
@@ -23,7 +25,7 @@ Migrant workers from Myanmar, Thailand, Indonesia and the Philippines find jobs 
 | **Languages** | English, Burmese, Bahasa Indonesia, Tagalog and Thai, for the app, the reports and the spoken warnings. |
 
 <p align="center">
-  <img src="pitch/e2e/refine-02-home-phone-en.png" width="200" alt="Home screen with recent checks">
+  <img src="pitch/e2e/refine-02-home-phone-en.png" width="200" alt="Home screen with the Check button and the Kakwe shield">
   <img src="pitch/e2e/jobshield-facts-pause-en-390x844.png" width="200" alt="Job Shield asks the user to confirm the facts it read">
   <img src="pitch/e2e/verdict-report-danger-390x844-my.png" width="200" alt="High risk report in Burmese">
 </p>
@@ -63,7 +65,7 @@ Details: [docs/architecture.md](docs/architecture.md), [docs/api-contract.md](do
 
 ## Benchmarks
 
-The [Protection Score](bench/README.md) asks one question per screenshot: did SafeRoute give a frightened, low-literacy reader the right information to stay safe? It scores eight areas from 0 to 100, and critical failures (calling a dangerous message safe, inventing a phone number, accusing a named person) cap the case score.
+The [Protection Score](bench/README.md) asks one question per screenshot: did Kakwe give a frightened, low-literacy reader the right information to stay safe? It scores eight areas from 0 to 100, and critical failures (calling a dangerous message safe, inventing a phone number, accusing a named person) cap the case score.
 
 All runs use `gemini-3.5-flash-lite` and the production prompt. A public evaluation set of 28 synthetic and 51 real redacted screenshots is on [Hugging Face](https://huggingface.co/datasets/Rickaym/saferoute-scam-screenshots).
 

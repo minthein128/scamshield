@@ -73,7 +73,7 @@ class OverlayTalkBackTest {
     @Test
     fun englishFallbacksStayReadable() {
         val d = ShieldStrings.DEFAULT
-        assertEquals("Pyit Taing Htaung, SafeRoute shield. Double tap to check the screen.", bubbleDescription(ShieldOverlay.State.IDLE, d))
+        assertEquals("Pyit Taing Htaung, Kakwe shield. Double tap to check the screen.", bubbleDescription(ShieldOverlay.State.IDLE, d))
         assertEquals("No connection. Check your internet and try again.", d.errorText("No connection. Check your internet and try again."))
         assertEquals("The check failed. Try again.", d.errorText("anything else"))
     }

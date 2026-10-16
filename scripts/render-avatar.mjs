@@ -225,7 +225,7 @@ async function sheet() {
   const W = 1500, head = 110, rowH = 300;
   const T = (x, y, s, size = 16, fill = '#475569', weight = 400) => `<text x="${x}" y="${y}" font-family="${FONT}" font-size="${size}" font-weight="${weight}" fill="${fill}">${s}</text>`;
   let body = `<rect width="${W}" height="${head + rowH * 3 + 10}" fill="#F4F6F8"/>`;
-  body += T(40, 56, 'SafeRoute voice avatar concepts (C ships)', 30, INK, 700);
+  body += T(40, 56, 'Kakwe voice avatar concepts (C ships)', 30, INK, 700);
   body += T(40, 88, '160 light  |  48 light  |  160 dark  |  48 dark  |  speaking (level 0.8)  |  listening  |  blink / glow / rock frame');
   for (const [i, key] of Object.keys(CONCEPTS).entries()) {
     const c = CONCEPTS[key];

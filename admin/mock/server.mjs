@@ -27,7 +27,7 @@ const state = {
     version: 1,
     items: [
       { id: 'n-scam-jobs', country: ['TH', 'KH'], language: ['en'], title: 'Fake job offers on the rise', body: 'Offers that ask you to travel for a high-paying job may be a trap. Check the employer before you go.', severity: 'warning', startsAt: '2026-10-01', enabled: true },
-      { id: 'n-welcome', title: 'Welcome to SafeRoute', body: 'Paste any message to check it.', severity: 'info', enabled: false },
+      { id: 'n-welcome', title: 'Welcome to Kakwe', body: 'Paste any message to check it.', severity: 'info', enabled: false },
     ],
   },
   content: {
