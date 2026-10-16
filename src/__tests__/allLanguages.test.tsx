@@ -11,6 +11,7 @@ import { HomeScreen } from '../screens/HomeScreen';
 import OnboardingScreen from '../screens/OnboardingScreen';
 import { ReportScreen } from '../screens/ReportScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
+import { ShieldScreen } from '../screens/ShieldScreen';
 
 const LOCALES = ['en', 'my', 'id', 'tl', 'th'] as const;
 
@@ -57,6 +58,7 @@ jest.mock('../services/social', () => ({ googleAvailable: true, facebookAvailabl
 jest.mock('firebase/auth', () => ({}));
 jest.mock('../services/cloud', () => ({ deleteAllRemote: jest.fn() }));
 jest.mock('../hooks/useHomeShield', () => ({ useHomeShield: () => mockShield }));
+jest.mock('../hooks/useShieldControl', () => ({ ...jest.requireActual('../hooks/useShieldControl'), useShieldControl: () => mockShield }));
 jest.mock('../config/runtime', () => ({
   ...jest.requireActual('../config/runtime'),
   useApiUrl: () => 'https://api.example.com',
@@ -202,5 +204,14 @@ describe.each(LOCALES)('every main screen in %s', lng => {
     render(<SettingsScreen navigation={nav()} route={{ key: 'Settings', name: 'Settings' } as never} />);
     await settle();
     expectTranslated('settings');
+  });
+
+  it('Screen shield details', async () => {
+    render(<ShieldScreen navigation={nav()} route={{ key: 'Shield', name: 'Shield' } as never} />);
+    await settle();
+    expectTranslated('shield');
+    const shown = visibleStrings().join('').replace(/\u200B/g, '');
+    expect(shown).toContain(i18n.t('shield:needs.title'));
+    if (lng !== 'en') expect(shown).not.toContain('What the shield needs');
   });
 });

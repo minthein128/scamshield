@@ -13,6 +13,15 @@
     "capture": "Step 3 of 4: allow $t(common:appName) to see your screen when you tap the doll.",
     "starting": "Step 4 of 4: starting the shield."
   },
+  "needs": {
+    "title": "What the shield needs",
+    "overlay": "Allow \"Display over other apps\" so the doll can float over other apps.",
+    "notifications": "Allow notifications so Android keeps the shield running.",
+    "capture": "Allow screen capture. $t(common:appName) only looks at your screen when you tap the doll.",
+    "privacy": "The screenshot goes to the check service only to be checked. It is not saved."
+  },
+  "checkNow": "Check this screen now",
+  "checkingNow": "Checking your screen...",
   "body": "A small Pyit Taing Htaung doll floats over other apps. Tap it on a job post, chat or listing and $t(common:appName) checks what is on your screen.",
   "download": "Download the Android app",
   "details": "Details and permissions",
