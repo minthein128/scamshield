@@ -45,7 +45,7 @@ export function derivedFlags(linkChecks: LinkCheck[]): Flag[] {
   const out: Flag[] = [];
   for (const l of linkChecks) {
     if (l.webRisk !== 'clean' && l.webRisk !== 'unknown') {
-      out.push({ family: 'known_bad', label: 'Google Web Risk lists this link', evidence: `${l.url} (${l.webRisk})`, severity: 'high' });
+      out.push({ family: 'known_bad', label: 'Google lists this link as unsafe', evidence: `${l.url} (${l.webRisk})`, severity: 'high' });
     }
     if (l.domainAgeDays !== undefined && l.domainAgeDays < YOUNG_DOMAIN_DAYS) {
       out.push({

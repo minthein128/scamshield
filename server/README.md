@@ -56,6 +56,7 @@ Link results add flags: a Web Risk hit adds `known_bad` (high); a domain under 1
 | `GOOGLE_CLOUD_PROJECT`, `GOOGLE_CLOUD_LOCATION` | Vertex project and region | -, us-central1 |
 | `GEMINI_API_KEY` | Gemini API key mode | unset |
 | `WEB_RISK_API_KEY` | Web Risk key; if unset the service account (ADC) is used | unset |
+| `SAFE_BROWSING_API_KEY` | Safe Browsing v4 Lookup key (free, no billing). Used when Web Risk is unavailable; only the URL is sent | unset |
 | `MOCK` | `1` forces canned responses; also on when no credentials exist | unset |
 | `CORS_ORIGINS` | comma list or `*` | `*` |
 | `RATE_LIMIT_PER_MIN` | per-IP limit (in memory, per instance) | 30 |

@@ -33,6 +33,14 @@ const WEB_RISK_NOTE: Record<Lang, string> = {
   th: 'Google Web Risk ทำเครื่องหมายว่าลิงก์หนึ่งในข้อความนี้ไม่ปลอดภัย',
 };
 
+const UNCHECKED_NOTE: Record<Lang, string> = {
+  en: 'We could not check the link in this message against Google lists. It is not verified. Do not open it unless you trust the sender.',
+  id: 'Kami tidak dapat memeriksa tautan dalam pesan ini dengan daftar Google. Tautan ini belum diverifikasi. Jangan buka kecuali Anda percaya pengirimnya.',
+  tl: 'Hindi namin nasuri ang link sa mensaheng ito sa mga listahan ng Google. Hindi ito na-verify. Huwag itong buksan maliban kung pinagkakatiwalaan mo ang nagpadala.',
+  my: 'ဤစာထဲရှိ လင့်ခ်ကို Google စာရင်းများနှင့် မစစ်ဆေးနိုင်ခဲ့ပါ။ အတည်မပြုရသေးပါ။ ပို့သူကို မယုံကြည်ပါက မဖွင့်ပါနှင့်။',
+  th: 'เราตรวจสอบลิงก์ในข้อความนี้กับรายการของ Google ไม่ได้ จึงยังไม่ได้ยืนยัน อย่าเปิดหากไม่ไว้ใจผู้ส่ง',
+};
+
 const LABELS: Record<'call' | 'share' | 'block' | 'learn', Record<Lang, string>> = {
   call: { en: 'Call hotline', id: 'Hubungi hotline', tl: 'Tawagan ang hotline', my: 'ဟော့လိုင်း ခေါ်ဆိုရန်', th: 'โทรสายด่วน' },
   share: {
@@ -112,7 +120,9 @@ export function titleFor(verdict: Verdict, lang: Lang): string {
 
 export function withWebRiskNote(summary: string, links: LinkCheck[], lang: Lang): string {
   const hit = links.some((l) => l.webRisk !== 'clean' && l.webRisk !== 'unknown');
-  return hit ? `${summary} ${WEB_RISK_NOTE[lang]}`.trim() : summary;
+  if (hit) return `${summary} ${WEB_RISK_NOTE[lang]}`.trim();
+  const unchecked = links.some((l) => l.webRisk === 'unknown');
+  return unchecked ? `${summary} ${UNCHECKED_NOTE[lang]}`.trim() : summary;
 }
 
 export function buildActions(verdict: Verdict, scamType: ScamType, lang: Lang, destination?: string, home?: string): Action[] {

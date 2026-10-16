@@ -17,7 +17,7 @@ Hono + TypeScript service implementing `docs/api-contract.md`. Pipeline: Extract
 
 - `src/score.ts`: pure rules engine. Weights are constants at the top. Change them with a test in `test/score.test.ts`.
 - `src/extract.ts`, `src/prompt.ts`: Gemini call, JSON schema, system prompt. The SDK client is injected so tests mock it.
-- `src/correlate.ts`: Web Risk (API key or ADC) and RDAP. Failures return "unknown", never throw.
+- `src/correlate.ts`: Web Risk (API key or ADC), Safe Browsing v4 `threatMatches:find` fallback (`SAFE_BROWSING_API_KEY`, used when Web Risk fails; a 403 pauses Web Risk for 10 min; sends only the URL) and RDAP. Failures return "unknown" (shown as "Not checked", and the summary says the link is not verified), never throw. The `saferoute-aibc` project has no billing, so Web Risk is disabled there and the Safe Browsing key is the live source.
 - `src/ground.ts`: Search-grounded verification. `src/speak.ts`: Gemini TTS to WAV. Both degrade without throwing (speak returns 502 `upstream`).
 - `src/auth.ts`: optional Firebase ID token check (`TokenVerifier`, injected in tests). A bad token counts as no token. `src/app.ts` applies 20/h anonymous and 60/h signed-in per uid on `/v1/check`, on top of the per-IP limit. Env: `FIREBASE_PROJECT_ID`, `ANON_LIMIT_PER_HOUR`, `USER_LIMIT_PER_HOUR`. Counters are in memory per instance.
 - `src/data/hotlines.generated.ts`: generated from `../src/data` by `pnpm sync:hotlines` in the repo root. Never edit it. A test fails when it is stale.

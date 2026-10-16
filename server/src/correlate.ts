@@ -14,6 +14,9 @@ const THREAT_MAP: Record<string, WebRiskResult> = {
 };
 const THREAT_ORDER: WebRiskResult[] = ['malware', 'social_engineering', 'unwanted_software'];
 
+const SB_THREAT_TYPES = ['MALWARE', 'SOCIAL_ENGINEERING', 'UNWANTED_SOFTWARE'];
+const WEB_RISK_BACKOFF_MS = 10 * 60_000;
+
 let auth: GoogleAuth | undefined;
 async function adcToken(): Promise<string | undefined> {
   auth ??= new GoogleAuth({ scopes: ['https://www.googleapis.com/auth/cloud-platform'] });
@@ -36,9 +39,10 @@ export function createCorrelator(cfg: Config, deps: CorrelatorDeps = {}): Correl
   const getToken = deps.getToken ?? adcToken;
   const caching = cfg.cacheEnabled && cfg.linkCacheTtlMs > 0;
   const wrCache = createTtlLru<Promise<WebRiskResult>>({ max: 2000, ttlMs: cfg.linkCacheTtlMs });
+  let webRiskDownUntil = 0;
   const rdapCache = createTtlLru<Promise<RdapInfo>>({ max: 2000, ttlMs: cfg.linkCacheTtlMs });
 
-  async function webRiskLookup(url: string): Promise<WebRiskResult> {
+  async function webRiskOnly(url: string): Promise<WebRiskResult> {
     try {
       const qs = new URLSearchParams({ uri: url });
       for (const t of Object.keys(THREAT_MAP)) qs.append('threatTypes', t);
@@ -55,6 +59,7 @@ export function createCorrelator(cfg: Config, deps: CorrelatorDeps = {}): Correl
       });
       if (!res.ok) {
         log('WARNING', 'web_risk_http_error', { status: res.status });
+        if (res.status === 403 && cfg.safeBrowsingApiKey) webRiskDownUntil = Date.now() + WEB_RISK_BACKOFF_MS;
         return 'unknown';
       }
       const body = (await res.json()) as { threat?: { threatTypes?: string[] } };
@@ -66,6 +71,46 @@ export function createCorrelator(cfg: Config, deps: CorrelatorDeps = {}): Correl
       log('WARNING', 'web_risk_failed', { error: (err as Error).message });
       return 'unknown';
     }
+  }
+
+  // Only the URL leaves the server: no page text, user id or other context.
+  async function safeBrowsingLookup(url: string): Promise<WebRiskResult> {
+    try {
+      const res = await fetchFn(
+        `https://safebrowsing.googleapis.com/v4/threatMatches:find?key=${encodeURIComponent(cfg.safeBrowsingApiKey ?? '')}`,
+        {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            client: { clientId: 'saferoute', clientVersion: '1.0' },
+            threatInfo: {
+              threatTypes: SB_THREAT_TYPES,
+              platformTypes: ['ANY_PLATFORM'],
+              threatEntryTypes: ['URL'],
+              threatEntries: [{ url }],
+            },
+          }),
+          signal: AbortSignal.timeout(cfg.linkTimeoutMs),
+        },
+      );
+      if (!res.ok) {
+        log('WARNING', 'safe_browsing_http_error', { status: res.status });
+        return 'unknown';
+      }
+      const body = (await res.json()) as { matches?: Array<{ threatType?: string }> };
+      if (!body.matches?.length) return 'clean';
+      const mapped = body.matches.map((m) => THREAT_MAP[m.threatType ?? '']).filter((t): t is WebRiskResult => Boolean(t));
+      return THREAT_ORDER.find((t) => mapped.includes(t)) ?? 'unknown';
+    } catch (err) {
+      log('WARNING', 'safe_browsing_failed', { error: (err as Error).message });
+      return 'unknown';
+    }
+  }
+
+  async function webRiskLookup(url: string): Promise<WebRiskResult> {
+    const first = Date.now() < webRiskDownUntil ? 'unknown' : await webRiskOnly(url);
+    if (first !== 'unknown' || !cfg.safeBrowsingApiKey) return first;
+    return safeBrowsingLookup(url);
   }
 
   async function rdapLookup(url: string): Promise<RdapInfo> {

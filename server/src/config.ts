@@ -10,6 +10,7 @@ export interface Config {
   location: string;
   geminiApiKey?: string;
   webRiskApiKey?: string;
+  safeBrowsingApiKey?: string;
   publicApiUrl: string;
   allowedOrigins: string[];
   adminOrigins: string[];
@@ -71,6 +72,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     location: env.GOOGLE_CLOUD_LOCATION || 'us-central1',
     geminiApiKey,
     webRiskApiKey: env.WEB_RISK_API_KEY || undefined,
+    safeBrowsingApiKey: env.SAFE_BROWSING_API_KEY || undefined,
     allowedOrigins: (env.CORS_ORIGINS ?? '*')
       .split(',')
       .map((s) => s.trim())
