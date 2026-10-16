@@ -32,6 +32,7 @@
   "reportScam": {
     "title": "Mag-ulat ng scam",
     "intro": "Ibahagi sa amin ang scam na nakita mo. Inaalis namin ang mga pangalan, numero, at link bago i-save ang anuman, at nakatutulong ito na magbabala sa iba.",
+    "shareNote": "Ang pagpapadala ng ulat na ito ay nagbabahagi ng pattern nito nang hindi ka makikilala para magbabala sa iba, kahit naka-off ang pagbabahagi sa Settings.",
     "textLabel": "I-paste ang mensahe o chat",
     "textA11y": "Mensahe o chat ng scam",
     "placeholder": "Ang mensahe, job post, o chat",

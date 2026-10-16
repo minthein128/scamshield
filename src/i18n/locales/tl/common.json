@@ -13,7 +13,9 @@
     "paste": "I-paste",
     "remove": "Alisin",
     "call": "Tawagan",
-    "tryAgain": "Subukan muli"
+    "tryAgain": "Subukan muli",
+    "leave": "Umalis agad",
+    "leaveA11y": "Umalis sa screen na ito at pumunta sa Home"
   },
   "tabs": {
     "home": "Home",

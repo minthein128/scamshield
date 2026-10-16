@@ -16,7 +16,8 @@
   "recent": {
     "title": "Mga kamakailang pagsusuri",
     "emptyTitle": "Wala pang pagsusuri",
-    "emptyBody": "Naka-save ang iyong mga pagsusuri sa device na ito at makikita rito."
+    "emptyBody": "Naka-save ang iyong mga pagsusuri sa device na ito at makikita rito.",
+    "historyOff": "Naka-off ang history. Hindi naitatabi ang mga pagsusuri sa teleponong ito."
   },
   "radar": {
     "title": "Scam radar",

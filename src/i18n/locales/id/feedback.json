@@ -32,6 +32,7 @@
   "reportScam": {
     "title": "Laporkan penipuan",
     "intro": "Ceritakan penipuan yang Anda lihat. Kami menghapus nama, nomor, dan tautan sebelum disimpan, dan ini membantu memperingatkan orang lain.",
+    "shareNote": "Mengirim laporan ini akan membagikan polanya tanpa nama Anda untuk mengingatkan orang lain, meskipun fitur berbagi dimatikan di Pengaturan.",
     "textLabel": "Tempel teks atau chat",
     "textA11y": "Teks atau chat penipuan",
     "placeholder": "Pesan, lowongan kerja, atau chat",
