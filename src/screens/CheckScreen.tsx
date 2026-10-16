@@ -14,7 +14,7 @@ import { UI_LANGUAGES } from '../i18n/languages';
 import { APP_NAME } from '../config/brand';
 import { countryName } from '../lib/countries';
 import { hasInput } from '../api';
-import { PreparedImage, pickScreenshot, prepareImage } from '../lib/image';
+import { PreparedImage, pickScreenshot, prepareSharedImage } from '../lib/image';
 import { CHECK_MODES, CheckMode, buildJobRequest, buildRequest, jobSourceLabel, kindForMode, looksLikeUrl, modeForKind, sourceLabel } from '../lib/request';
 import { useClipboardHasText } from '../hooks/useClipboardText';
 import type { TabScreenProps } from '../navigation/types';
@@ -137,7 +137,7 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
       if (shared) setText(shared);
       if (draft.imageUri) {
         const uri = draft.imageUri;
-        attachImage(() => prepareImage(uri));
+        attachImage(() => prepareSharedImage(uri));
       }
     } else if (intent === 'text') {
       setMode('message');

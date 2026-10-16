@@ -3,7 +3,7 @@ import { VERDICT_STYLES, filledSegments, groupFlags, telUrl, verdictFromScore } 
 import { verdictLabel } from '../lib/labels';
 import { draftFromShare } from '../lib/share';
 import { buildRequest } from '../lib/request';
-import { base64Bytes, prepareImage } from '../lib/image';
+import { base64Bytes, prepareImage, prepareSharedImage } from '../lib/image';
 import { findVoiceLocale, pickSpeechLocale } from '../lib/speech';
 import { isCleartext, reportIdFromUrl, toCheckResponse } from '../lib/shield';
 
@@ -58,6 +58,46 @@ describe('share intent mapping', () => {
     expect(draftFromShare({ text: 'hello there' })).toMatchObject({ text: 'hello there', kind: 'message' });
     expect(draftFromShare({ files: [{ path: '/data/a.png', mimeType: 'image/png' }] })).toMatchObject({ imageUri: 'file:///data/a.png' });
     expect(draftFromShare({ text: '  ' })).toBeNull();
+  });
+  it('reads a file-manager share through its content URI, not the raw storage path', () => {
+    const shared = { files: [{ path: 'file:///storage/emulated/0/Pictures/offer.png', contentUri: 'content://com.android.externalstorage.documents/document/primary%3APictures%2Foffer.png', mimeType: 'image/png' }] };
+    expect(draftFromShare(shared)?.imageUri).toBe(shared.files[0].contentUri);
+  });
+});
+
+describe('shared image copy', () => {
+  const deps = () => {
+    const calls: string[] = [];
+    return {
+      calls,
+      copy: jest.fn(async (from: string, to: string) => void calls.push(`copy ${from} -> ${to}`)),
+      remove: jest.fn(async (uri: string) => void calls.push(`remove ${uri}`)),
+      cacheDir: 'file:///data/user/0/app/cache/',
+      prepare: jest.fn(async (uri: string) => {
+        calls.push(`prepare ${uri}`);
+        return { base64: 'x', mimeType: 'image/jpeg' as const, bytes: 1, uri: 'out' };
+      }),
+    };
+  };
+
+  it('copies a content URI into the app cache before reading, then deletes the copy', async () => {
+    const d = deps();
+    await prepareSharedImage('content://x/doc/1', d);
+    expect(d.calls).toHaveLength(3);
+    expect(d.calls[0]).toMatch(/^copy content:\/\/x\/doc\/1 -> file:\/\/\/data\/user\/0\/app\/cache\/shared-\d+$/);
+    expect(d.calls[1]).toBe(`prepare ${d.calls[0].split(' -> ')[1]}`);
+    expect(d.calls[2]).toBe(`remove ${d.calls[0].split(' -> ')[1]}`);
+  });
+
+  it('deletes the copy when reading fails, and reads app files directly', async () => {
+    const d = deps();
+    d.prepare.mockRejectedValueOnce(new Error('bad image'));
+    await expect(prepareSharedImage('content://x/doc/2', d)).rejects.toThrow('bad image');
+    expect(d.remove).toHaveBeenCalledTimes(1);
+    const e = deps();
+    await prepareSharedImage('file:///data/user/0/app/cache/IMG_1.png', e);
+    expect(e.copy).not.toHaveBeenCalled();
+    expect(e.prepare).toHaveBeenCalledWith('file:///data/user/0/app/cache/IMG_1.png');
   });
 });
 
