@@ -14,18 +14,22 @@
   "text": {
     "title": "Mensaheng text",
     "a11y": "Text o chat na susuriin",
-    "placeholder": "Post tungkol sa trabaho, mga mensahe sa chat, o SMS"
+    "placeholder": "Post tungkol sa trabaho, mga mensahe sa chat, o SMS",
+    "hint": "I-paste ang mensahe o post, o magdagdag ng larawan nito."
   },
   "link": {
     "label": "Link",
-    "a11y": "Link na susuriin"
+    "a11y": "Link na susuriin",
+    "hint": "I-paste ang link na gusto mong suriin."
   },
   "screenshot": {
     "label": "Screenshot",
     "ready": "{{kb}} KB, handa nang ipadala",
     "preparing": "Inihahanda ang larawan...",
     "upload": "Mag-upload ng screenshot",
-    "pick": "Pumili ng screenshot"
+    "pick": "Pumili ng screenshot",
+    "change": "Palitan",
+    "pickHint": "Larawan mula sa iyong telepono"
   },
   "destination": {
     "label": "Saan ka nagtatrabaho o bumibiyahe?",
@@ -54,14 +58,16 @@
       "title": "Ang job ad",
       "hint": "I-paste ang post, o magdagdag ng litrato nito.",
       "a11y": "Teksto ng job ad",
-      "placeholder": "I-paste ang job ad dito"
+      "placeholder": "I-paste ang job ad dito",
+      "pickHint": "Larawan ng ad mula sa iyong telepono"
     },
     "chat": {
       "title": "Ang sinabi o tinanong ng recruiter sa iyo",
       "optional": "Opsyonal",
       "hint": "I-paste ang mga mensahe, o magdagdag ng litrato. Makakatulong ito para mapansin ang mga bagay na posibleng hindi tugma sa ad.",
       "a11y": "Teksto ng chat sa recruiter",
-      "placeholder": "I-paste ang chat sa recruiter dito"
+      "placeholder": "I-paste ang chat sa recruiter dito",
+      "pickHint": "Larawan ng chat mula sa iyong telepono"
     },
     "submit": "Basahin ang mga tekstong ito",
     "submitHint": "Idagdag muna ang job ad o ang chat",
@@ -175,5 +181,6 @@
         "no": "Hindi sinabihang ilihim ito"
       }
     }
-  }
+  },
+  "or": "o"
 }
