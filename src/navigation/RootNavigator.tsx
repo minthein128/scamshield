@@ -75,6 +75,8 @@ const ShareIntentBridge: React.FC<{ ready: boolean }> = ({ ready }) => {
   return null;
 };
 
+const NEUTRAL_TITLE = { formatter: () => 'SafeRoute' };
+
 const openReport = (result: CheckResponse, language: LanguageCode) => navigationRef.navigate('Report', { result, language });
 
 const openScreen = (screen: 'GetHelp' | 'Shield') => navigationRef.navigate(screen);
@@ -94,10 +96,11 @@ export const RootNavigator: React.FC = () => {
     if (next) setTimeout(() => navigationRef.navigate('Account', { mode: next }), 150);
   };
   if (!loaded) return null;
+  const inApp = profile.onboarded && profile.sharingAsked;
   return (
-    <NavigationContainer ref={navigationRef} theme={navTheme} onReady={() => setReady(true)}>
+    <NavigationContainer ref={navigationRef} theme={navTheme} documentTitle={NEUTRAL_TITLE} onReady={() => setReady(true)}>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {profile.onboarded ? (
+        {inApp ? (
           <>
             <Stack.Screen name="Tabs" component={Tabs} />
             <Stack.Screen name="Checking" component={CheckingScreen} options={{ gestureEnabled: false }} />
@@ -115,8 +118,8 @@ export const RootNavigator: React.FC = () => {
           <Stack.Screen name="Onboarding">{() => <OnboardingScreen onDone={onOnboardingDone} />}</Stack.Screen>
         )}
       </Stack.Navigator>
-      <ShareIntentBridge ready={ready && profile.onboarded} />
-      <DeepLinkBridge ready={ready && profile.onboarded} />
+      <ShareIntentBridge ready={ready && inApp} />
+      <DeepLinkBridge ready={ready && inApp} />
     </NavigationContainer>
   );
 };

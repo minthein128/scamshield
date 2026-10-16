@@ -4,7 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { Icon, type IconName } from '../components/Icon';
 import { Screen } from '../components/Screen';
 import { Text } from '../components/Text';
-import { Button, Card, LinkButton, Pill, ScreenHeader, SectionTitle } from '../components/ui';
+import { Button, Card, LinkButton, Pill, SectionTitle } from '../components/ui';
+import { HeaderWithLeave } from '../components/LeaveQuickly';
 import { getApiClient } from '../api';
 import type { CheckAction } from '../api/types';
 import {
@@ -241,7 +242,7 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
   return (
     <Screen
       edges={['top']}
-      header={<ScreenHeader title={t('title')} onBack={() => (navigation.canGoBack() ? navigation.goBack() : navigation.navigate('Tabs'))} />}
+      header={<HeaderWithLeave title={t('title')} onBack={() => (navigation.canGoBack() ? navigation.goBack() : navigation.navigate('Tabs'))} />}
       wide={layout.isExpanded}
       footerRow={tablet}
       footer={

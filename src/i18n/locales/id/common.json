@@ -13,7 +13,9 @@
     "paste": "Tempel",
     "remove": "Hapus",
     "call": "Telepon",
-    "tryAgain": "Coba lagi"
+    "tryAgain": "Coba lagi",
+    "leave": "Keluar cepat",
+    "leaveA11y": "Keluar dari layar ini dan kembali ke Beranda"
   },
   "tabs": {
     "home": "Beranda",

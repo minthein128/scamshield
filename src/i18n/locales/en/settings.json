@@ -35,8 +35,10 @@
   "privacy": {
     "title": "Privacy",
     "share": "Help others: share anonymous scam patterns",
-    "shareBody": "No screenshots and no raw text are shared. Personal details are removed first, and phone numbers, accounts and links are stored only as one-way hashes. Patterns appear on the Scam radar once several people report them.",
-    "p1": "Your checks are saved on this device. Signed-in accounts also sync the report text, trusted contacts and settings. Screenshots are never saved or synced.",
+    "shareBody": "Off unless you turn it on. No screenshots and no message text are shared. Names and personal details are removed first, phone numbers and accounts are kept only as one-way codes, and website names may be kept. Shared patterns are deleted after 90 days. Report a scam always shares, because you choose to send it.",
+    "history": "Keep check history on this phone",
+    "historyBody": "When this is off, SafeRoute keeps only the check you are looking at and deletes saved checks. Signed-in accounts also stop syncing checks.",
+    "p1": "Your checks are saved on this phone while history is on. Signed-in accounts also sync a short record of each check (verdict, scam type and SafeRoute's summary), trusted contacts and settings. Your messages, screenshots and links are never synced.",
     "p2": "To check something, SafeRoute sends the text, link or screenshot to our check service, which uses Google AI models and Google Safe Browsing to assess it. We do not log the content.",
     "p3": "Each install gets an anonymous ID. We use it only to limit how many checks one person can run per hour.",
     "p4": "You can delete the data on this device at any time. Account holders can also delete their account and everything synced.",
@@ -60,6 +62,12 @@
       "title": "Delete your account?",
       "message": "This permanently deletes your account and everything synced to it. Data on this device is cleared too.",
       "action": "Delete account"
+    },
+    "historyOff": {
+      "title": "Delete saved checks?",
+      "message": "Turning this off deletes the checks saved on this phone.",
+      "messageSynced": "Turning this off deletes the checks saved on this phone and in your account.",
+      "action": "Turn off"
     }
   },
   "deleted": {

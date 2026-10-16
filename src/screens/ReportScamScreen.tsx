@@ -66,6 +66,7 @@ export const ReportScamScreen: React.FC<RootScreenProps<'ReportScam'>> = ({ navi
   return (
     <Screen footer={<Button testID="report-scam-submit" label={t('reportScam.submit')} onPress={submit} disabled={!ready || busy} />} header={<ScreenHeader title={t('reportScam.title')} onBack={() => (navigation.canGoBack() ? navigation.goBack() : navigation.navigate('Tabs'))} />}>
       <Text style={styles.body}>{t('reportScam.intro')}</Text>
+      <Text testID="report-scam-share-note" style={styles.body}>{t('reportScam.shareNote')}</Text>
 
       <View style={{ gap: 6 }}>
         <View style={styles.labelRow}>

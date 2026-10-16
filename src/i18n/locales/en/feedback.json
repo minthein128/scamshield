@@ -29,6 +29,7 @@
   "reportScam": {
     "title": "Report a scam",
     "intro": "Tell us about a scam you saw. We remove names, numbers and links before anything is kept, and it helps warn others.",
+    "shareNote": "Sending this report shares its anonymous pattern to warn others, even when sharing is off in Settings.",
     "textLabel": "Paste the text or chat",
     "textA11y": "Scam text or chat",
     "placeholder": "The message, job post or chat",

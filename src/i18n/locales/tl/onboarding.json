@@ -7,6 +7,7 @@
   "language": {
     "title": "Piliin ang iyong wika",
     "body": "Ipapakita ng SafeRoute ang app at isusulat ang mga ulat at binibigkas na babala sa wikang ito. Maaari mo itong baguhin mamaya.",
+    "age": "Ang SafeRoute ay para sa mga taong may edad na 18 pataas.",
     "tagline": "Tulad ng manikang Pyit Taing Htaung, tinutulungan ka naming manatiling nakatayo.",
     "heroA11y": "SafeRoute, kasama ang manikang Pyit Taing Htaung"
   },
@@ -35,6 +36,17 @@
   "shield": {
     "title": "I-on ang Screen shield",
     "body": "Opsyonal. Maaari mo rin itong gawin mamaya mula sa home screen."
+  },
+  "sharing": {
+    "title": "Tumulong sa iba: magbahagi ng anonymous na mga pattern ng scam",
+    "body": "Kapag mukhang mapanganib ang pagsusuri, maaaring ibahagi ng SafeRoute ang pattern nito para mas maagang mabalaan ang ibang tao. Hindi ito sapilitan.",
+    "p1": "Walang screenshot at walang text ng mensahe. Maikling pattern lamang ang itatago.",
+    "p2": "Tinatanggal muna ang mga pangalan at iba pang personal na detalye.",
+    "p3": "Ang mga numero ng telepono at account ay itinatago lamang bilang mga one-way code na hindi na maibabalik sa dating numero.",
+    "p4": "Binubura ang mga ibinahaging pattern pagkalipas ng 90 araw.",
+    "note": "Maaari mo itong baguhin anumang oras sa Settings.",
+    "yes": "Oo, ibahagi",
+    "no": "Huwag na, salamat"
   },
   "account": {
     "title": "Gamitin ang SafeRoute sa paraang gusto mo",

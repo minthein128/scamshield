@@ -38,8 +38,10 @@
   "privacy": {
     "title": "Privacy",
     "share": "Tumulong sa iba: magbahagi ng mga pattern ng scam nang hindi nagpapakilala",
-    "shareBody": "Walang ibinabahaging screenshot o orihinal na text. Inaalis muna ang personal na impormasyon, at ang mga numero ng telepono, account, at link ay itinatago lamang bilang one-way code. Lalabas ang mga pattern sa Scam radar kapag naiulat na ito ng ilang tao.",
-    "p1": "Naka-save ang iyong mga pagsusuri sa teleponong ito. Para sa mga naka-sign in, sini-sync din ang text ng ulat, mga pinagkakatiwalaang contact, at mga setting. Hinding-hindi sine-save o sini-sync ang mga screenshot.",
+    "shareBody": "Naka-off ito maliban kung i-on mo. Walang screenshot at walang text ng mensahe na ibinabahagi. Tinatanggal muna ang mga pangalan at personal na detalye, itinatago lang ang mga numero ng telepono at account bilang one-way code, at maaaring itabi ang mga pangalan ng website. Binubura ang mga ibinahaging pattern pagkalipas ng 90 araw. Palaging nagbabahagi ang Mag-ulat ng scam, dahil pinili mo itong ipadala.",
+    "history": "I-save ang history ng pagsusuri sa teleponong ito",
+    "historyBody": "Kapag naka-off ito, itinatago lang ng SafeRoute ang pagsusuring tinitingnan mo at binubura ang mga naka-save na pagsusuri. Hihinto rin sa pag-sync ng mga pagsusuri ang mga naka-sign in na account.",
+    "p1": "Naka-save sa teleponong ito ang iyong mga pagsusuri habang naka-on ang history. Sini-sync din ng mga naka-sign in na account ang maikling tala ng bawat pagsusuri (resulta, posibleng uri ng scam, at buod ng SafeRoute), mga pinagkakatiwalaang contact, at mga setting. Hinding-hindi sini-sync ang iyong mga mensahe, screenshot, at link.",
     "p2": "Para suriin ang isang bagay, ipinapadala ng SafeRoute ang text, link, o screenshot sa aming serbisyo ng pagsusuri, na gumagamit ng Google AI models at Google Safe Browsing para suriin ito. Hindi namin itinatala ang nilalaman nito.",
     "p3": "Bawat pag-install ay binibigyan ng anonymous ID. Ginagamit lang namin ito para limitahan kung ilang pagsusuri ang puwedeng gawin ng isang tao bawat oras.",
     "p4": "Maaari mong burahin ang data sa teleponong ito anumang oras. Puwede ring burahin ng mga may account ang kanilang account at ang lahat ng naka-sync.",
@@ -63,6 +65,12 @@
       "title": "Burahin ang iyong account?",
       "message": "Permanenteng buburahin nito ang iyong account at ang lahat ng naka-sync dito. Mabubura rin ang data sa teleponong ito.",
       "action": "Burahin ang account"
+    },
+    "historyOff": {
+      "title": "Burahin ang mga naka-save na pagsusuri?",
+      "message": "Kapag ini-off ito, mabubura ang mga pagsusuring naka-save sa teleponong ito.",
+      "messageSynced": "Kapag ini-off ito, mabubura ang mga pagsusuring naka-save sa teleponong ito at sa iyong account.",
+      "action": "I-off"
     }
   },
   "deleted": {

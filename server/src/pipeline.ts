@@ -64,6 +64,11 @@ const unknownLinks = (urls: string[]): LinkCheck[] => urls.map((url) => ({ url, 
 const sha = (s: string) => createHash('sha256').update(s).digest('hex');
 const newId = () => `chk_${randomUUID().replaceAll('-', '').slice(0, 20)}`;
 
+/** Sharing is opt-in. A report-a-scam tap counts as consent unless the request says false. */
+export function sharesSignals(req: Pick<CheckRequest, 'shareSignals' | 'reported'>): boolean {
+  return req.shareSignals === true || (req.reported === true && req.shareSignals !== false);
+}
+
 export function cacheKey(req: CheckRequest): string {
   return sha(
     JSON.stringify([
@@ -75,7 +80,7 @@ export function cacheKey(req: CheckRequest): string {
       req.context?.destination ?? '',
       req.context?.route ?? '',
       req.context?.home ?? '',
-      req.shareSignals !== false,
+      sharesSignals(req),
       req.reported === true,
     ]),
   );
@@ -289,7 +294,7 @@ export function createPipeline(deps: PipelineDeps): Pipeline {
       tm.meta.scoreExplainMs = Math.round((performance.now() - scoreStart) * 100) / 100;
 
       const intel = deps.intel;
-      if (intel && prepared && req.shareSignals !== false) {
+      if (intel && prepared && sharesSignals(req)) {
         const own = network.flags.length ? ownScore(ownFlags, linkChecks) : scored;
         const reported = req.reported === true;
         const ownType = own.flags.length === 0 ? 'none' : extraction.scamType;

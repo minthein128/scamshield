@@ -31,7 +31,7 @@ export const PRIVACY_POINTS = ['privacy.p1', 'privacy.p2', 'privacy.p3', 'privac
 export const SettingsScreen: React.FC<RootScreenProps<'Settings'>> = ({ navigation }) => {
   const { t } = useTranslation(['settings', 'common']);
   const { status, signOut, deleteAccount } = useAuth();
-  const { profile, language, setLanguage, updateProfile, syncState, clearSyncedCopies, deleteLocalData } = useAppState();
+  const { profile, language, setLanguage, updateProfile, setKeepHistory, syncState, clearSyncedCopies, deleteLocalData } = useAppState();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -61,6 +61,15 @@ export const SettingsScreen: React.FC<RootScreenProps<'Settings'>> = ({ navigati
       if (!(await confirmAction(t('confirm.deleteLocal.title'), message, t('confirm.deleteLocal.action')))) return;
       if (synced) await signOut();
       await deleteLocalData();
+    });
+
+  const onKeepHistory = (keep: boolean) =>
+    guarded(async () => {
+      if (!keep) {
+        const message = status.kind === 'account' ? t('confirm.historyOff.messageSynced') : t('confirm.historyOff.message');
+        if (!(await confirmAction(t('confirm.historyOff.title'), message, t('confirm.historyOff.action')))) return;
+      }
+      await setKeepHistory(keep);
     });
 
   const onDeleteAccount = () =>
@@ -146,13 +155,27 @@ export const SettingsScreen: React.FC<RootScreenProps<'Settings'>> = ({ navigati
               testID="settings-share-signals"
               accessibilityLabel={t('privacy.share')}
               value={profile.shareSignals}
-              onValueChange={v => updateProfile({ shareSignals: v })}
+              onValueChange={v => updateProfile({ shareSignals: v, sharingAsked: true })}
               trackColor={{ false: colors.borderLight, true: colors.accent }}
               thumbColor={colors.white}
               {...({ activeThumbColor: colors.white } as object)}
             />
           </View>
           <Text style={styles.body}>{t('privacy.shareBody')}</Text>
+          <View style={styles.switchRow}>
+            <Text style={[styles.strong, { flex: 1 }]}>{t('privacy.history')}</Text>
+            <Switch
+              testID="settings-keep-history"
+              accessibilityLabel={t('privacy.history')}
+              value={profile.keepHistory}
+              onValueChange={onKeepHistory}
+              disabled={busy}
+              trackColor={{ false: colors.borderLight, true: colors.accent }}
+              thumbColor={colors.white}
+              {...({ activeThumbColor: colors.white } as object)}
+            />
+          </View>
+          <Text style={styles.body}>{t('privacy.historyBody')}</Text>
           {PRIVACY_POINTS.map(p => (
             <Text key={p} style={styles.body}>{t(p)}</Text>
           ))}

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { loadConfig } from '../src/config.js';
-import { buildGroundingPrompt, createGrounder, needsGrounding, parseFindings } from '../src/ground.js';
+import { buildGroundingRequest, createGrounder, groundingQuery, needsGrounding, parseFindings } from '../src/ground.js';
 import type { Extraction } from '../src/types.js';
 
 const cfg = loadConfig({ GEMINI_API_KEY: 'g' });
@@ -80,10 +80,51 @@ describe('grounding', () => {
     expect(parseFindings('{"findings":[{"family":"trafficking","label":"a","evidence":"b"}]}')).toEqual([]);
   });
 
-  it('prompt names the entities and the language', () => {
-    const p = buildGroundingPrompt(base, 'my');
+  it('prompt names the companies, country and language, not the salary or role', () => {
+    const r = buildGroundingRequest(base, 'my');
+    const p = `${r.system}\n${r.question}`;
+    expect(r.question).toContain('Acme Recruit');
+    expect(r.question).not.toContain('JSON');
     expect(p).toContain('Acme Recruit');
-    expect(p).toContain('USD 3000');
+    expect(p).toContain('Thailand');
     expect(p).toContain('Burmese');
+    expect(p).not.toContain('USD 3000');
+    expect(p).not.toContain('cook');
+  });
+
+  it('sends no phone number, chat handle, account number or person name to search', async () => {
+    const identifiers = [
+      '+66 81 234 5678',
+      '0812345678',
+      '@fastjob_th',
+      'line:agentmay',
+      '1234567890123',
+      'Mr. Somchai Jaidee',
+      'somchai@example.com',
+    ];
+    const report: Extraction = {
+      ...base,
+      entities: {
+        companies: ['Acme Recruit', 'Mr. Somchai Jaidee', '@fastjob_th', 'Acct 1234567890123', '+66 81 234 5678', 'somchai@example.com'],
+        phones: ['+66 81 234 5678', '0812345678', '@fastjob_th', 'line:agentmay'],
+        domains: ['https://acme-jobs.example/apply?ref=0812345678&u=agentmay', 'wa.me/66812345678'],
+        role: 'cook',
+        country: 'Thailand',
+        salaryClaim: 'USD 3000',
+      },
+      sender: { phones: ['0812345678'], handles: ['@fastjob_th', 'line:agentmay'], accounts: ['1234567890123'] },
+    };
+    expect(groundingQuery(report)).toEqual({ companies: ['Acme Recruit'], domains: ['acme-jobs.example', 'wa.me'], country: 'Thailand' });
+    const generateContent = vi.fn(async () => reply('{"findings":[]}'));
+    await createGrounder(cfg, { models: { generateContent } } as never).ground(req, report, 5000);
+    const sent = JSON.stringify(generateContent.mock.calls[0]);
+    expect(sent).toContain('Acme Recruit');
+    for (const id of identifiers) expect(sent).not.toContain(id);
+    expect(sent).not.toMatch(/\d{6,}/);
+    expect(sent).not.toMatch(/Somchai|agentmay|fastjob/i);
+  });
+
+  it('does not ground on phone numbers alone', () => {
+    expect(needsGrounding({ ...base, entities: { companies: [], phones: ['+66 81 234 5678'], domains: [] } })).toBe(false);
   });
 });

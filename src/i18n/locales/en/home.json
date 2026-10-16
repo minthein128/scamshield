@@ -13,7 +13,8 @@
   "recent": {
     "title": "Recent checks",
     "emptyTitle": "No checks yet",
-    "emptyBody": "Your checks are saved on this device and show up here."
+    "emptyBody": "Your checks are saved on this device and show up here.",
+    "historyOff": "History is off. Checks are not saved on this phone."
   },
   "radar": {
     "title": "Scam radar",

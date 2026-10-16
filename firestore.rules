@@ -13,6 +13,26 @@ service cloud.firestore {
     function shortId(id) {
       return id.size() <= 100;
     }
+    function slimHistory(d) {
+      return d.keys().hasOnly(['createdAt', 'language', 'kind', 'verdict', 'scoreBucket', 'scamType', 'title', 'summary'])
+        && d.keys().hasAll(['createdAt', 'language', 'kind', 'verdict', 'scoreBucket', 'scamType', 'title', 'summary'])
+        && text(d.createdAt, 40)
+        && text(d.language, 8)
+        && d.kind in ['job', 'message', 'link', 'shop', 'agency', 'screen']
+        && d.verdict in ['safe', 'careful', 'danger']
+        && d.scoreBucket in [0, 20, 40, 60, 80]
+        && text(d.scamType, 40)
+        && text(d.title, 300)
+        && text(d.summary, 2000);
+    }
+    function legacyHistory(d) {
+      return d.keys().hasOnly(['createdAt', 'language', 'source', 'report'])
+        && d.keys().hasAll(['createdAt', 'language', 'report'])
+        && text(d.createdAt, 40)
+        && text(d.language, 8)
+        && text(d.report, 60000)
+        && (!('source' in d) || text(d.source, 200));
+    }
 
     match /users/{uid} {
       allow read, delete: if owns(uid);
@@ -26,13 +46,7 @@ service cloud.firestore {
 
       match /history/{id} {
         allow read, delete: if owns(uid);
-        allow create, update: if owns(uid) && shortId(id)
-          && request.resource.data.keys().hasOnly(['createdAt', 'language', 'source', 'report'])
-          && request.resource.data.keys().hasAll(['createdAt', 'language', 'report'])
-          && text(request.resource.data.createdAt, 40)
-          && text(request.resource.data.language, 8)
-          && text(request.resource.data.report, 60000)
-          && (!('source' in request.resource.data) || text(request.resource.data.source, 200));
+        allow create, update: if owns(uid) && shortId(id) && (slimHistory(request.resource.data) || legacyHistory(request.resource.data));
       }
 
       match /contacts/{id} {

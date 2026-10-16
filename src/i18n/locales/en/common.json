@@ -10,7 +10,9 @@
     "paste": "Paste",
     "remove": "Remove",
     "call": "Call",
-    "tryAgain": "Try again"
+    "tryAgain": "Try again",
+    "leave": "Leave quickly",
+    "leaveA11y": "Leave this screen and go to Home"
   },
   "tabs": {
     "home": "Home",

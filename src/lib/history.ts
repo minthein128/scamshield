@@ -36,3 +36,14 @@ export async function clearHistory(): Promise<void> {
 export async function saveHistory(list: HistoryEntry[]): Promise<void> {
   await AsyncStorage.setItem(HISTORY_KEY, JSON.stringify(list.slice(0, MAX_HISTORY)));
 }
+
+const SLIMMED_KEY = 'saferoute.historySlim.v1';
+
+/** True once this device rewrote the account's old full-report history docs. */
+export async function historySlimmed(uid: string): Promise<boolean> {
+  return (await AsyncStorage.getItem(`${SLIMMED_KEY}.${uid}`).catch(() => null)) === '1';
+}
+
+export async function markHistorySlimmed(uid: string): Promise<void> {
+  await AsyncStorage.setItem(`${SLIMMED_KEY}.${uid}`, '1');
+}

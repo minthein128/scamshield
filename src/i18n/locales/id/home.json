@@ -16,7 +16,8 @@
   "recent": {
     "title": "Pemeriksaan terbaru",
     "emptyTitle": "Belum ada pemeriksaan",
-    "emptyBody": "Pemeriksaan Anda disimpan di perangkat ini dan akan muncul di sini."
+    "emptyBody": "Pemeriksaan Anda disimpan di perangkat ini dan akan muncul di sini.",
+    "historyOff": "Riwayat tidak aktif. Pemeriksaan tidak disimpan di ponsel ini."
   },
   "radar": {
     "title": "Radar penipuan",
