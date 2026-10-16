@@ -40,6 +40,8 @@ describe('voice companion strings', () => {
       expect(strings[key]).toMatch(/[\u1000-\u109F]/);
     }
     expect(strings.verdictSafe).toBe(t('common:verdict.safe', { lng: 'my' }));
+    const spoken = ['a11yCheckScreen', 'a11yChecking', 'a11yShowDetails', 'a11yExpanded', 'errNoConnection', 'errTooMany', 'errBusy', 'errTooLarge', 'errCapture', 'errCaptureDenied', 'errFailed'] as const;
+    for (const key of spoken) expect(strings[key]).toMatch(/[\u1000-\u109F]/);
   });
 
   it('keeps hedged wording', () => {

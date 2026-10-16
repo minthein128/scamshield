@@ -137,7 +137,6 @@ class CompanionSessionTest {
         host.checks[0](report("danger"), null)
         assertEquals(CompanionState.WARNING, session.view.state)
         assertEquals(listOf("Please do not pay yet."), host.warnings)
-        assertEquals("Please do not pay yet.", session.view.caption)
         assertTrue(audio.played > 0)
         assertNull(host.socket)
 
@@ -168,7 +167,6 @@ class CompanionSessionTest {
         assertEquals(CompanionState.SPEAKING, session.view.state)
         frame("""{"type":"transcript","role":"model","text":"It looks risky."}""")
         frame("""{"type":"transcript","role":"model","text":"It looks risky. Please wait."}""")
-        assertEquals("It looks risky. Please wait.", session.view.caption)
         advance(600)
         assertEquals(CompanionState.LISTENING, session.view.state)
 
@@ -360,7 +358,8 @@ class CompanionSessionTest {
         val silence = Base64.encodeToString(ByteArray(3200), Base64.NO_WRAP)
         repeat(CompanionSession.SILENT_CHUNKS) { audio.onChunk!!(silence) }
         advance(10)
-        assertTrue(session.view.micBlocked)
+        assertEquals(CompanionState.ENDED, session.view.state)
+        assertEquals("needs_foreground", session.view.error)
     }
 
     @Test
@@ -370,7 +369,7 @@ class CompanionSessionTest {
         val silence = Base64.encodeToString(ByteArray(3200), Base64.NO_WRAP)
         repeat(CompanionSession.SILENT_CHUNKS + 5) { audio.onChunk!!(silence) }
         advance(10)
-        assertFalse(session.view.micBlocked)
+        assertEquals(CompanionState.LISTENING, session.view.state)
     }
 
     @Test

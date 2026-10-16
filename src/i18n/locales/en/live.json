@@ -54,9 +54,7 @@
     "warning": "Warning",
     "rechecking": "Checking again",
     "connecting": "Connecting",
-    "end": "End",
     "endA11y": "End the conversation",
-    "captionHint": "Ask Pyit Taing Htaung about your screen",
     "voiceChip": "Pyit Taing Htaung",
     "micDenied": "Open SafeRoute to allow the microphone",
     "needsForeground": "Open SafeRoute once to allow voice",
@@ -80,6 +78,18 @@
     "tapToRetry": "Tap to retry",
     "fullReport": "Full report",
     "showDetails": "Show details",
-    "closeShield": "Close shield"
+    "closeShield": "Close shield",
+    "a11yShield": "SafeRoute shield",
+    "a11yCheckScreen": "Double tap to check the screen.",
+    "a11yChecking": "Checking the screen.",
+    "a11yShowDetails": "Double tap to show details.",
+    "a11yExpanded": "Expanded.",
+    "errNoConnection": "No connection. Check your internet and try again.",
+    "errTooMany": "Too many checks. Wait a minute and try again.",
+    "errBusy": "The check service is busy. Try again soon.",
+    "errTooLarge": "The screenshot is too large to check.",
+    "errCapture": "Could not read the screen. Tap the shield to try again.",
+    "errCaptureDenied": "Screen capture was not allowed. Tap the shield to try again.",
+    "errFailed": "The check failed. Try again."
   }
 }

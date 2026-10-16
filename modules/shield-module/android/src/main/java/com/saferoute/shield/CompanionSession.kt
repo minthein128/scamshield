@@ -16,13 +16,9 @@ data class CompanionView(
     val muted: Boolean = false,
     /** Another app or a call took audio focus. */
     val paused: Boolean = false,
-    /** Latest model line (cumulative), or the warning text while it plays. */
-    val caption: String = "",
     val endedBy: EndReason? = null,
     /** Error code: a /v1/live code, or mic_denied, needs_foreground, audio, check_failed. */
     val error: String? = null,
-    /** Set when the mic gives pure silence, which is what Android does when voice is blocked in the background. */
-    val micBlocked: Boolean = false,
 ) {
     val live: Boolean get() = state == CompanionState.LISTENING || state == CompanionState.THINKING || state == CompanionState.SPEAKING
 }
@@ -80,7 +76,7 @@ class CompanionSession(
             if (hasSignal(b64)) {
                 heardSound = true
             } else if (++silentChunks == SILENT_CHUNKS) {
-                main.post { if (!heardSound && isActive) set(view.copy(micBlocked = true)) }
+                main.post { if (!heardSound && isActive) end(EndReason.ERROR, "needs_foreground") }
             }
         }
     }
@@ -152,7 +148,7 @@ class CompanionSession(
 
     private fun playWarning(result: JSONObject, then: () -> Unit) {
         val text = result.optString("spokenWarning").ifBlank { result.optString("summary") }
-        set(view.copy(state = CompanionState.WARNING, caption = text))
+        set(view.copy(state = CompanionState.WARNING))
         if (text.isBlank()) {
             then()
             return
@@ -171,7 +167,7 @@ class CompanionSession(
     }
 
     private fun openLive() {
-        set(view.copy(state = CompanionState.CONNECTING, caption = ""))
+        set(view.copy(state = CompanionState.CONNECTING))
         main.postDelayed(connectTimer, CONNECT_TIMEOUT_MS)
         socket = try {
             host.openSocket(this)
@@ -219,10 +215,8 @@ class CompanionSession(
                 if (view.state == CompanionState.SPEAKING) set(view.copy(state = CompanionState.LISTENING))
             }
             "transcript" -> {
-                val line = f.optString("text")
-                if (f.optString("role") == "model") {
-                    if (line.isNotBlank() && view.state != CompanionState.WARNING) set(view.copy(caption = line))
-                } else if (view.state == CompanionState.LISTENING && line.isNotBlank()) {
+                // Only a state signal: no transcript text reaches the overlay.
+                if (f.optString("role") == "user" && view.state == CompanionState.LISTENING && f.optString("text").isNotBlank()) {
                     set(view.copy(state = CompanionState.THINKING))
                     main.removeCallbacks(thinkTimer)
                     main.postDelayed(thinkTimer, THINK_TIMEOUT_MS)
@@ -260,7 +254,7 @@ class CompanionSession(
         if (!view.live) return
         main.removeCallbacks(settleTimer)
         main.removeCallbacks(thinkTimer)
-        set(view.copy(state = CompanionState.RECHECKING, caption = ""))
+        set(view.copy(state = CompanionState.RECHECKING))
         syncMic()
         host.runCheck { json, _ ->
             if (!isActive) return@runCheck
@@ -280,7 +274,7 @@ class CompanionSession(
     }
 
     private fun resumeAfterRecheck() {
-        set(view.copy(state = CompanionState.THINKING, caption = ""))
+        set(view.copy(state = CompanionState.THINKING))
         main.removeCallbacks(thinkTimer)
         main.postDelayed(thinkTimer, THINK_TIMEOUT_MS)
         syncMic()

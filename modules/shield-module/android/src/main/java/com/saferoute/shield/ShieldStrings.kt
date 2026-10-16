@@ -21,6 +21,17 @@ class ShieldStrings private constructor(private val values: Map<String, String>)
         else -> this["chipNotChecked"]
     }
 
+    /** The sentence TalkBack reads for a failed check, in the user's language. Unknown failures read as "The check failed". */
+    fun errorText(message: String?): String = when (ShieldPalette.errorKind(message.orEmpty())) {
+        "offline" -> this["errNoConnection"]
+        "rate" -> this["errTooMany"]
+        "busy" -> this["errBusy"]
+        "large" -> this["errTooLarge"]
+        "denied" -> this["errCaptureDenied"]
+        "capture" -> this["errCapture"]
+        else -> this["errFailed"]
+    }
+
     /** Short chip for a failed check. */
     fun errorChip(message: String): String = when (ShieldPalette.errorKind(message)) {
         "offline" -> this["chipOffline"]
@@ -48,9 +59,7 @@ class ShieldStrings private constructor(private val values: Map<String, String>)
     val warning get() = this["warning"]
     val rechecking get() = this["rechecking"]
     val connecting get() = this["connecting"]
-    val end get() = this["end"]
     val endA11y get() = this["endA11y"]
-    val captionHint get() = this["captionHint"]
     val voiceChip get() = this["voiceChip"]
     val micDenied get() = this["micDenied"]
     val needsForeground get() = this["needsForeground"]
@@ -82,6 +91,18 @@ class ShieldStrings private constructor(private val values: Map<String, String>)
             "chipBusy" to "Service busy",
             "chipNotChecked" to "Not checked",
             "tapToRetry" to "Tap to retry",
+            "a11yShield" to "SafeRoute shield",
+            "a11yCheckScreen" to "Double tap to check the screen.",
+            "a11yChecking" to "Checking the screen.",
+            "a11yShowDetails" to "Double tap to show details.",
+            "a11yExpanded" to "Expanded.",
+            "errNoConnection" to "No connection. Check your internet and try again.",
+            "errTooMany" to "Too many checks. Wait a minute and try again.",
+            "errBusy" to "The check service is busy. Try again soon.",
+            "errTooLarge" to "The screenshot is too large to check.",
+            "errCapture" to "Could not read the screen. Tap the shield to try again.",
+            "errCaptureDenied" to "Screen capture was not allowed. Tap the shield to try again.",
+            "errFailed" to "The check failed. Try again.",
             "dismiss" to "Dismiss",
             "fullReport" to "Full report",
             "showDetails" to "Show details",
@@ -99,9 +120,7 @@ class ShieldStrings private constructor(private val values: Map<String, String>)
             "warning" to "Warning",
             "rechecking" to "Checking again",
             "connecting" to "Connecting",
-            "end" to "End",
             "endA11y" to "End the conversation",
-            "captionHint" to "Ask Pyit Taing Htaung about your screen",
             "voiceChip" to "Pyit Taing Htaung",
             "micDenied" to "Open SafeRoute to allow the microphone",
             "needsForeground" to "Open SafeRoute once to allow voice",

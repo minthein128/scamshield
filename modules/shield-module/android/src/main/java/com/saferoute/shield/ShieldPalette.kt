@@ -65,12 +65,16 @@ internal class ShieldPalette(val dark: Boolean) {
         }
 
         /** Kind of failure behind an error message from CheckClient or the service: offline, rate, busy or other. */
+        /** Kind of failure behind an English error message from CheckClient or the service. */
         fun errorKind(message: String): String {
             val m = message.lowercase()
             return when {
                 "no connection" in m || "internet" in m -> "offline"
                 "too many" in m -> "rate"
                 "busy" in m -> "busy"
+                "too large" in m -> "large"
+                "not allowed" in m || "permission" in m -> "denied"
+                "screen capture" in m || "read the screen" in m -> "capture"
                 else -> "other"
             }
         }

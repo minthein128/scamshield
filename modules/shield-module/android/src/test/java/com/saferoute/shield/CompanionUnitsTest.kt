@@ -20,16 +20,16 @@ class CompanionUnitsTest {
         val s = ShieldStrings.from(
             mapOf(
                 "listening" to "  Nar   htaung nay ",
-                "end" to "",
+                "muted" to "",
                 "speaking" to 42,
                 "unknown" to "x",
-                "captionHint" to "y".repeat(400),
+                "endA11y" to "y".repeat(400),
             )
         )
         assertEquals("Nar htaung nay", s.listening)
-        assertEquals("End", s.end)
+        assertEquals("blank falls back to English", "Muted", s.muted)
         assertEquals("Speaking", s.speaking)
-        assertEquals(ShieldStrings.MAX_LENGTH, s.captionHint.length)
+        assertEquals(ShieldStrings.MAX_LENGTH, s.endA11y.length)
         assertEquals("unknown", s["unknown"])
         assertEquals("Pyit Taing Htaung", ShieldStrings.DEFAULT.name)
         assertEquals("ပစ်တိုင်းထောင်", ShieldStrings.from(mapOf("name" to "ပစ်တိုင်းထောင်")).name)

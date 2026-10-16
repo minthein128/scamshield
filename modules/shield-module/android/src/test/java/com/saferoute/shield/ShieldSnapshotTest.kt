@@ -119,7 +119,7 @@ class ShieldSnapshotTest {
 
     private fun render(dark: Boolean, s: ShieldStrings, name: String) {
         val palette = ShieldPalette(dark)
-        val bitmap = Bitmap.createBitmap((380 * d).toInt(), (830 * d).toInt(), Bitmap.Config.ARGB_8888)
+        val bitmap = Bitmap.createBitmap((380 * d).toInt(), (1080 * d).toInt(), Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
         canvas.drawColor(if (dark) 0xFF15110F.toInt() else 0xFFF7F3EE.toInt())
 
@@ -145,6 +145,19 @@ class ShieldSnapshotTest {
                 draw(canvas, bubble, 8 * d + i * 60 * d, y)
             }
         y += 84 * d
+
+        listOf(
+            CompanionView(CompanionState.LISTENING), CompanionView(CompanionState.THINKING),
+            CompanionView(CompanionState.SPEAKING), CompanionView(CompanionState.LISTENING, muted = true),
+        ).forEachIndexed { i, v ->
+            val pill = CompanionPillView(context, palette, ShieldFonts(context), 1f, s, {}, {})
+            pill.fitTo((360 * d).toInt() - (48 * d).toInt())
+            pill.render(v, ShieldOverlay.State.DANGER)
+            val h = draw(canvas, pill, 20 * d, y)
+            assertTrue("companion pill is at least 48dp tall", h >= 48 * d - 1)
+            y += h + 10 * d
+        }
+        y += 4 * d
 
         val rows = listOf(
             card(palette, model(ShieldOverlay.State.SAFE, s), false, s),

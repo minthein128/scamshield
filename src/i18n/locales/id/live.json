@@ -57,9 +57,7 @@
     "warning": "Peringatan",
     "rechecking": "Memeriksa lagi",
     "connecting": "Menghubungkan",
-    "end": "Akhiri",
     "endA11y": "Akhiri percakapan",
-    "captionHint": "Tanya Pyit Taing Htaung tentang layar Anda",
     "voiceChip": "Pyit Taing Htaung",
     "micDenied": "Buka SafeRoute untuk izinkan mikrofon",
     "needsForeground": "Buka SafeRoute sekali untuk menyalakan suara",
@@ -83,6 +81,18 @@
     "tapToRetry": "Ketuk untuk coba lagi",
     "fullReport": "Laporan lengkap",
     "showDetails": "Lihat rincian",
-    "closeShield": "Tutup shield"
+    "closeShield": "Tutup shield",
+    "a11yShield": "Perisai SafeRoute",
+    "a11yCheckScreen": "Ketuk dua kali untuk memeriksa layar.",
+    "a11yChecking": "Sedang memeriksa layar.",
+    "a11yShowDetails": "Ketuk dua kali untuk melihat rincian.",
+    "a11yExpanded": "Terbuka.",
+    "errNoConnection": "Tidak ada koneksi. Periksa internet Anda dan coba lagi.",
+    "errTooMany": "Terlalu banyak pemeriksaan. Tunggu sebentar dan coba lagi.",
+    "errBusy": "Layanan pemeriksaan sedang sibuk. Coba lagi nanti.",
+    "errTooLarge": "Tangkapan layar terlalu besar untuk diperiksa.",
+    "errCapture": "Layar tidak bisa dibaca. Ketuk perisai untuk coba lagi.",
+    "errCaptureDenied": "Tangkapan layar tidak diizinkan. Ketuk perisai untuk coba lagi.",
+    "errFailed": "Pemeriksaan gagal. Coba lagi."
   }
 }

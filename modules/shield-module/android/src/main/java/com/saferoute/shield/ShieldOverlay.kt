@@ -306,7 +306,7 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
             State.CAREFUL -> ShieldHaptics.careful(context)
             else -> {
                 ShieldHaptics.danger(context)
-                bubble.announceForAccessibility("High risk. $title. $summary")
+                bubble.announceForAccessibility("$chip. $title. $summary")
             }
         }
     }
@@ -324,8 +324,9 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
         untuck()
         showBubbleNow()
         val chip = strings.errorChip(message)
+        val text = strings.errorText(message)
         presentCard(
-            CardModel(State.ERROR, chip, strings.tapToRetry, message, emptyList(), false, "$chip. ${strings.tapToRetry}.")
+            CardModel(State.ERROR, chip, strings.tapToRetry, text, emptyList(), false, "$chip. $text ${strings.tapToRetry}.")
         )
     }
 
@@ -367,7 +368,7 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
 
     // ---- voice companion ----
 
-    /** Shows or updates the companion presentation: voice glyph on the bubble and the caption pill. */
+    /** Shows or updates the companion presentation: the doll's voice state on the bubble and the status pill. */
     fun showCompanion(view: CompanionView) {
         val starting = companion == null
         companion = view
@@ -412,15 +413,15 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
 
     private fun showPill() {
         removePillNow()
-        val view = CompanionPillView(context, palette, fonts, fontScale(), strings) { listener.onEndCompanion() }
+        val view = CompanionPillView(context, palette, fonts, fontScale(), strings, onMute = { listener.onBallTap() }, onEnd = { listener.onEndCompanion() })
         val anchor = anchorFor(bubbleParams.x, bubbleParams.y)
-        val width = min(screenW() - dp(48), dp(320))
+        view.fitTo(screenW() - dp(48))
         val root = FrameLayout(context).apply {
             clipChildren = false
             clipToPadding = false
             setPadding(pad, pad, pad, pad)
         }
-        root.addView(view, FrameLayout.LayoutParams(width, FrameLayout.LayoutParams.WRAP_CONTENT))
+        root.addView(view, FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT))
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.WRAP_CONTENT,
@@ -1134,12 +1135,12 @@ internal data class ResumeCard(val model: CardModel, val expanded: Boolean)
 
 /** TalkBack text for the bubble outside a voice session. The doll is the shield, so the name leads. */
 internal fun bubbleDescription(state: ShieldOverlay.State, strings: ShieldStrings): String {
-    val name = strings.name
+    val lead = "${strings.name}, ${strings["a11yShield"]}."
     return when (state) {
-        ShieldOverlay.State.IDLE -> "$name, SafeRoute shield. Double tap to check the screen."
-        ShieldOverlay.State.CHECKING -> "$name, SafeRoute shield. Checking the screen."
+        ShieldOverlay.State.IDLE -> "$lead ${strings["a11yCheckScreen"]}"
+        ShieldOverlay.State.CHECKING -> "$lead ${strings["a11yChecking"]}"
         ShieldOverlay.State.SAFE, ShieldOverlay.State.CAREFUL, ShieldOverlay.State.DANGER ->
-            "$name, SafeRoute shield. ${strings.chip(state)}. Double tap to show details."
-        ShieldOverlay.State.ERROR -> "$name, SafeRoute shield. ${strings.chip(state)}. ${strings.tapToRetry}."
+            "$lead ${strings.chip(state)}. ${strings["a11yShowDetails"]}"
+        ShieldOverlay.State.ERROR -> "$lead ${strings.chip(state)}. ${strings.tapToRetry}."
     }
 }
