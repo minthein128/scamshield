@@ -1,16 +1,65 @@
 package com.saferoute.shield
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.os.PowerManager
+import android.provider.Settings
+import androidx.core.app.NotificationManagerCompat
 
 /** Message Guard calls behind the Expo module functions. Keeps consent rules out of ShieldModule. */
 internal object MessageGuardBridge {
 
     fun status(context: Context): Map<String, Any?> {
         val store = MessageGuardStore(context)
+        val access = hasAccess(context)
+        if (store.enabled && access && !MessageGuardListener.connected) MessageGuardListener.rebind(context)
         return mapOf(
             "enabled" to store.enabled,
             "consent" to store.hasConsent,
             "pausedReason" to store.pausedReason,
+            "listenerConnected" to MessageGuardListener.connected,
+            "notificationsEnabled" to MessageGuardNotifier.canNotify(context),
+            "batteryOptimized" to isBatteryOptimized(context),
+            "missingApps" to MessageApps.missingApps(context, store.enabledApps),
+            "last" to store.activity.last()?.let { it.toMap(MessageApps.labelForId(context, it.app)) },
+        )
+    }
+
+    fun hasAccess(context: Context): Boolean =
+        NotificationManagerCompat.getEnabledListenerPackages(context).contains(context.packageName)
+
+    /** True when Android may stop SafeRoute in the background to save battery. */
+    fun isBatteryOptimized(context: Context): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return false
+        val power = context.getSystemService(Context.POWER_SERVICE) as? PowerManager ?: return false
+        return !power.isIgnoringBatteryOptimizations(context.packageName)
+    }
+
+    /** Opens the battery optimisation list, or SafeRoute's App info when a phone hides that list. */
+    fun openBatterySettings(context: Context): Boolean {
+        val intents = listOfNotNull(
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS) else null,
+            Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + context.packageName)),
+        )
+        for (intent in intents) {
+            try {
+                context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                return true
+            } catch (_: Exception) {
+                continue
+            }
+        }
+        return false
+    }
+
+    /** Decision events after [afterSeq], oldest first, plus counts per outcome. Codes only, no content. */
+    fun activity(context: Context, afterSeq: Long): Map<String, Any?> {
+        val store = MessageGuardStore(context)
+        return mapOf(
+            "events" to store.activity.events(afterSeq).map { it.toMap(MessageApps.labelForId(context, it.app)) },
+            "counts" to store.activity.counts().mapValues { it.value.toDouble() },
         )
     }
 

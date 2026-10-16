@@ -284,6 +284,106 @@ class MessageGuardTest {
     }
 
     @Test
+    fun extractor_reads_the_newest_inbox_line_over_a_count() {
+        val n = Notification()
+        n.extras = Bundle().apply {
+            putCharSequence(Notification.EXTRA_TITLE, "+95 9 4455 1122")
+            putCharSequence(Notification.EXTRA_TEXT, "3 new messages")
+            putCharSequenceArray(Notification.EXTRA_TEXT_LINES, arrayOf("hello", "", "Your parcel is held, pay the fee at http://post-mm.top/pay"))
+        }
+        assertEquals("Your parcel is held, pay the fee at http://post-mm.top/pay", MessageGuardExtractor.extract(n)!!.text)
+    }
+
+    @Test
+    fun extractor_skips_the_users_own_reply() {
+        val noSender = Notification()
+        noSender.extras = Bundle().apply {
+            putCharSequence(Notification.EXTRA_TITLE, "Ko Zaw")
+            putParcelableArray(
+                Notification.EXTRA_MESSAGES,
+                arrayOf(
+                    Bundle().apply { putCharSequence("text", "Pay the fee now at http://pay-x.top"); putCharSequence("sender", "Ko Zaw") },
+                    Bundle().apply { putCharSequence("text", "no thanks, I will not pay") },
+                ),
+            )
+        }
+        assertEquals(MessageGuardActivity.SKIPPED_SELF, (MessageGuardExtractor.read(noSender) as MessageGuardExtractor.Read.Skip).outcome)
+
+        val named = Notification()
+        named.extras = Bundle().apply {
+            putCharSequence(Notification.EXTRA_SELF_DISPLAY_NAME, "Me")
+            putParcelableArray(
+                Notification.EXTRA_MESSAGES,
+                arrayOf(Bundle().apply { putCharSequence("text", "on my way"); putCharSequence("sender", "Me") }),
+            )
+        }
+        assertEquals(MessageGuardActivity.SKIPPED_SELF, (MessageGuardExtractor.read(named) as MessageGuardExtractor.Read.Skip).outcome)
+    }
+
+    @Test
+    fun extractor_names_hidden_previews_and_missing_text() {
+        for (text in listOf("New message", "2 new messages", "Ko Zaw sent you a message", "Pesan baru", "ข้อความใหม่", "Sensitive notification content hidden")) {
+            val n = Notification()
+            n.extras = Bundle().apply {
+                putCharSequence(Notification.EXTRA_TITLE, "Ko Zaw")
+                putCharSequence(Notification.EXTRA_TEXT, text)
+            }
+            assertEquals(text, MessageGuardActivity.SKIPPED_HIDDEN_PREVIEW, (MessageGuardExtractor.read(n) as MessageGuardExtractor.Read.Skip).outcome)
+        }
+        val empty = Notification()
+        empty.extras = Bundle().apply { putCharSequence(Notification.EXTRA_TITLE, "Ko Zaw") }
+        assertEquals(MessageGuardActivity.SKIPPED_NO_TEXT, (MessageGuardExtractor.read(empty) as MessageGuardExtractor.Read.Skip).outcome)
+        assertFalse(MessageGuardExtractor.isPlaceholder("New message from your bank: verify your account at bit.ly/x"))
+    }
+
+    @Test
+    fun sms_covers_phone_makers_sms_apps_and_the_default() {
+        for (default in listOf(null, "com.google.android.apps.messaging", "com.samsung.android.messaging", "com.example.sms")) {
+            val watched = MessageApps.watchedPackages(default, setOf("sms"))
+            assertTrue("$default", watched.containsAll(listOf("com.samsung.android.messaging", "com.android.mms")))
+            assertFalse("$default", "com.google.android.apps.messaging" in watched)
+        }
+        assertTrue("com.example.sms" in MessageApps.watchedPackages("com.example.sms", setOf("sms")))
+        assertFalse("com.android.mms" in MessageApps.watchedPackages(null, setOf("whatsapp")))
+        assertEquals("sms", MessageApps.idFor("com.android.mms", null))
+        assertEquals("viber", MessageApps.idFor("com.viber.voip", null))
+        assertEquals("telegram", MessageApps.idFor("org.thunderdog.challegram", null))
+        assertNull(MessageApps.idFor("com.android.chrome", null))
+    }
+
+    @Test
+    fun manifest_can_see_every_watched_app() {
+        val manifest = listOf("src/main/AndroidManifest.xml", "android/src/main/AndroidManifest.xml").map(::java.io.File).first { it.exists() }.readText()
+        for (pkg in MessageApps.catalog.flatMap { it.packages } + MessageApps.oemSms) {
+            assertTrue(pkg, manifest.contains("<package android:name=\"$pkg\" />"))
+        }
+    }
+
+    @Test
+    fun engine_counts_a_repeated_ordinary_message_once() {
+        val engine = engine()
+        val first = engine.prepare("Hey are we still on for dinner tonight at 7?", "Mom") as MessageGuardEngine.Decision.Skip
+        assertEquals(MessagePrefilter.SKIP_LOW, first.reason)
+        val again = engine.prepare("Hey are we still on for dinner tonight at 7?", "Mom") as MessageGuardEngine.Decision.Skip
+        assertEquals(MessageGuardEngine.SKIP_DUPLICATE, again.reason)
+    }
+
+    @Test
+    fun network_failures_have_a_kind() {
+        assertEquals("timeout", MessageCheckClient.failureKind(java.net.SocketTimeoutException()))
+        assertEquals("no_connection", MessageCheckClient.failureKind(java.net.UnknownHostException()))
+        assertEquals("no_connection", MessageCheckClient.failureKind(java.net.ConnectException()))
+        assertEquals("network", MessageCheckClient.failureKind(java.io.IOException()))
+        val e = try {
+            MessageCheckClient.check("", "en", "x", false, "")
+            null
+        } catch (c: CheckException) {
+            c
+        }
+        assertEquals("no_server", e!!.kind)
+    }
+
+    @Test
     fun request_body_is_a_redacted_message_check() {
         val body = JSONObject(String(MessageCheckClient.body("hello [PHONE]", "my", false), Charsets.UTF_8))
         assertEquals("message", body.getString("kind"))

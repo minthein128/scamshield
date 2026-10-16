@@ -14,6 +14,9 @@ internal class MessageGuardEngine(
 
     /** The sender is used only to score the message on the device; it is never part of the sent text. */
     fun prepare(text: String, sender: String?, names: Collection<String> = listOfNotNull(sender)): Decision {
+        val seenKey = "raw:" + MessageGuardLimiter.keyFor(MessagePrefilter.normalize(text))
+        if (limiter.isDuplicate(seenKey)) return Decision.Skip(SKIP_DUPLICATE)
+        limiter.remember(seenKey)
         val verdict = prefilter.evaluate(text, sender)
         if (!verdict.send) return Decision.Skip(verdict.skip ?: MessagePrefilter.SKIP_LOW)
         val redacted = MessageRedactor.redact(text, prefilter.links, keywords.maxSendLength, names)
