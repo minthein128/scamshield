@@ -28,16 +28,29 @@ interface Hit {
   match: RegExpExecArray;
 }
 
+const BOUNDARY = /(?<!\b(?:Co|Ltd|Inc|Mr|Ms|St|No))[.!?။](?=\s|$)|\n/g;
+
+function sentenceAround(text: string, index: number): string {
+  let start = 0;
+  let end = text.length;
+  for (const m of text.matchAll(BOUNDARY)) {
+    const at = (m.index ?? 0) + m[0].length;
+    if (at <= index) start = at;
+    else {
+      end = at;
+      break;
+    }
+  }
+  return text.slice(start, end).trim();
+}
+
 /** First match of `pattern` with the sentence it sits in, taken word for word from the text. */
 function find(text: string, pattern: RegExp): Hit | null {
   const flat = asciiDigits(text);
   const match = new RegExp(pattern.source, pattern.flags.replace('g', '')).exec(flat);
   if (!match) return null;
-  const start = Math.max(flat.slice(0, match.index).search(/[^.!?။\n]*$/), 0);
-  const tail = flat.slice(match.index).search(/[.!?။\n]/);
-  const end = tail < 0 ? text.length : match.index + tail + 1;
-  const quote = text.slice(start, end).trim();
-  return { quote: quote.length > 160 ? text.slice(Math.max(match.index - 60, start), match.index + 100).trim() : quote, match };
+  const quote = sentenceAround(text, match.index);
+  return { quote: quote.length > 160 ? text.slice(Math.max(match.index - 60, 0), match.index + 100).trim() : quote, match };
 }
 
 const field = <T>(value: T, hit: Hit, confidence = 0.9, extra: Partial<FactField<T>> = {}): FactField<T> => ({ value, quote: hit.quote, confidence, ...extra });
@@ -57,7 +70,6 @@ const TITLES: [RegExp, string][] = [
   [/customer service|ဖောက်သည်ဝန်ဆောင်/i, 'Customer service'],
   [/online (chat|marketing)|အွန်လိုင်း/i, 'Online chat or marketing'],
   [/factory|စက်ရုံ/i, 'Factory worker'],
-  [/driver|ယာဉ်မောင်း/i, 'Driver'],
   [/cook|chef|restaurant|waiter|စားဖိုမှူး/i, 'Restaurant staff'],
   [/housekeep|cleaner|maid/i, 'Housekeeping'],
   [/construction|builder/i, 'Construction'],
@@ -67,7 +79,7 @@ const TITLES: [RegExp, string][] = [
 
 function salaryOf(text: string): FactField<SalaryValue> | null {
   const hit = find(text, /(?:(?:usd|thb|myr|sgd)\s?|\$\s?)(\d[\d,. ]*\d|\d)|(\d[\d,. ]*\d|\d)\s?(usd|thb|baht|myr|sgd|dollars?|\$|ks|kyat|ကျပ်|ဒေါ်လာ|ဘတ်)/i);
-  if (!hit) return null;
+  if (!hit || /deposit|fee|booking|ကြိုတင်|စရံ|စရန်/i.test(hit.quote)) return null;
   const m = hit.match;
   const raw = (m[1] ?? m[2]).replace(/[ ,]/g, '');
   const unit = (m[3] ?? m[0].slice(0, 3)).toLowerCase();
@@ -81,7 +93,10 @@ function feeOf(text: string, source: 'ad' | 'chat'): FactField<string> | null {
   const none = find(text, /no (agency |recruitment |placement )?fees?\b|free (placement|of charge)|without (any )?fees?|ကြေးမလို|အခမဲ့/i);
   if (none && source === 'ad') return field('none', none);
   const ask = find(text, /(?:pay|send|transfer|deposit|booking fee|processing fee|registration fee)[^.!?\n]{0,60}(?:\d|fee|deposit)|(?:\d[\d,. ]*\s?(?:usd|thb|baht|ks|\$|ကျပ်|ဒေါ်လာ))[^.!?\n]{0,40}(?:fee|deposit|booking|ကြိုတင်)|ကြိုတင်ကြေး|စရံ|စရန်ငွေ/i);
-  if (ask && !(none && /no |free|without/i.test(none.quote) && source === 'chat')) return field(ask.quote.slice(0, 80), ask, 0.85);
+  if (ask && !(none && /no |free|without/i.test(none.quote) && source === 'chat')) {
+    const sum = /(\d[\d,. ]*\d|\d)\s?(usd|thb|baht|myr|sgd|\$|ks|ကျပ်|ဒေါ်လာ)/i.exec(asciiDigits(ask.quote));
+    return field(sum ? `${sum[1].replace(/\s/g, '')} ${sum[2].toUpperCase()}` : ask.quote.slice(0, 60), ask, 0.85);
+  }
   return none ? field('none', none) : null;
 }
 

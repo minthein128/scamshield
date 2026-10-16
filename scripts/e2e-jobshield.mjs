@@ -47,17 +47,24 @@ async function click(page, id) {
   await page.evaluate(s => document.querySelector(s).click(), sel(id));
 }
 
-async function scrollAll(page, y) {
-  await page.evaluate(top => {
-    for (const el of document.querySelectorAll('*')) {
-      const cs = getComputedStyle(el);
-      if ((cs.overflowY === 'auto' || cs.overflowY === 'scroll') && el.scrollHeight > el.clientHeight + 50) el.scrollTo(0, top < 0 ? el.scrollHeight : top);
-    }
-  }, y);
-  await sleep(400);
+async function wheel(page, [w, h], dy) {
+  await page.mouse.move(w / 2, h / 2);
+  await page.mouse.wheel({ deltaY: dy });
+  await sleep(500);
 }
 
-async function run(lang, [w, h], scenario) {
+async function scrollTop(page, size) {
+  await wheel(page, size, -20000);
+}
+
+async function reveal(page, size, id) {
+  await page.waitForSelector(sel(id), { timeout: 30000 });
+  const top = await page.evaluate(s => document.querySelector(s).getBoundingClientRect().top, sel(id));
+  await wheel(page, size, top - size[1] * 0.3);
+}
+
+async function run(lang, size, scenario) {
+  const [w, h] = size;
   const page = await browser.newPage();
   await page.setViewport({ width: w, height: h, deviceScaleFactor: 1 });
   await page.evaluateOnNewDocument((l) => {
@@ -67,24 +74,25 @@ async function run(lang, [w, h], scenario) {
   page.on('pageerror', e => console.log('pageerror', e.message.slice(0, 160)));
   const name = (step) => `${OUT}/jobshield-${step}-${scenario}-${lang}-${w}x${h}.png`;
   await page.goto(URL_, { waitUntil: 'networkidle2', timeout: 180000 });
-  await page.waitForFunction(label => [...document.querySelectorAll('[role=tab],[role=button],a,div')].some(e => e.textContent?.trim() === label), { timeout: 120000 }, tab(lang));
+  await page.waitForFunction(label => [...document.querySelectorAll('[role=tab],[role=button],a,div')].some(e => e.textContent?.replace(/[\u200B\s]/g, '') === label.replace(/\s/g, '')), { timeout: 120000 }, tab(lang));
   await page.evaluate(label => {
-    const els = [...document.querySelectorAll('[role=tab],[role=button],a')].filter(e => e.textContent?.trim() === label);
+    const els = [...document.querySelectorAll('[role=tab],[role=button],a')].filter(e => e.textContent?.replace(/[\u200B\s]/g, '') === label.replace(/\s/g, ''));
     els[els.length - 1].click();
   }, tab(lang));
   await fill(page, 'job-ad-text', scenario === 'pause' ? AD[lang] : AD_CLEAN[lang]);
   if (scenario === 'pause') await fill(page, 'job-chat-text', CHAT[lang]);
   await sleep(500);
   await page.screenshot({ path: name('input') });
-  await scrollAll(page, -1);
+  await wheel(page, size, 20000);
   await page.screenshot({ path: name('input-bottom') });
   await click(page, 'check-submit');
   await page.waitForSelector(sel('facts-submit'), { timeout: 60000 });
   await sleep(800);
   await page.screenshot({ path: name('facts') });
-  await scrollAll(page, 700);
+  await wheel(page, size, h * 0.8);
   await page.screenshot({ path: name('facts-scrolled') });
   if (scenario === 'pause') {
+    await reveal(page, size, 'fact-chat-contract');
     await click(page, 'fact-chat-contract-edit');
     await sleep(500);
     await page.screenshot({ path: name('facts-editing') });
@@ -93,15 +101,31 @@ async function run(lang, [w, h], scenario) {
     await page.screenshot({ path: name('facts-select') });
     await click(page, 'fact-chat-contract-select-later');
     await sleep(300);
+    await reveal(page, size, 'fact-chat-salary');
+    await click(page, 'fact-chat-salary-edit');
+    await sleep(400);
+    await reveal(page, size, 'fact-chat-salary-amount');
+    await page.screenshot({ path: name('facts-salary') });
+    await click(page, 'fact-chat-salary-edit');
+    await reveal(page, size, 'fact-chat-workplace');
+    await page.screenshot({ path: name('facts-unclear') });
+  } else {
+    await reveal(page, size, 'fact-ad-employer');
+    await page.screenshot({ path: name('facts-unclear') });
   }
+  await scrollTop(page, size);
   await click(page, 'facts-submit');
   await page.waitForSelector('[data-testid^="verdict-"]', { timeout: 90000 }).catch(() => undefined);
   await page.waitForSelector(sel('report-warn'), { timeout: 90000 });
   await sleep(1200);
   await page.screenshot({ path: name('result') });
-  await scrollAll(page, 650);
+  if (scenario === 'pause') {
+    await reveal(page, size, 'report-conflicts');
+    await page.screenshot({ path: name('result-conflicts') });
+  }
+  await wheel(page, size, h * 0.7);
   await page.screenshot({ path: name('result-scrolled') });
-  await scrollAll(page, -1);
+  await wheel(page, size, 20000);
   await page.screenshot({ path: name('result-bottom') });
   await page.close();
 }

@@ -5,6 +5,7 @@ import { Icon, type IconName } from './Icon';
 import { Text } from './Text';
 import { Pill } from './ui';
 import type { JobConflict } from '../api/types';
+import { plainValueLabel } from '../lib/jobFacts';
 import theme, { readable } from '../theme/theme';
 
 const { colors, fonts } = theme;
@@ -43,11 +44,11 @@ export const ConflictCard: React.FC<{ conflict: JobConflict; tablet?: boolean }>
       <Text style={[styles.description, readable(tablet, 14, 20)]}>{conflict.description}</Text>
       <View style={styles.quoteBox}>
         <Text style={styles.quoteLabel}>{t('conflicts.adSays')}</Text>
-        <Text testID={`conflict-${conflict.field}-ad`} style={[styles.quoteText, readable(tablet, 14, 20)]}>{conflict.adQuote || conflict.adValue}</Text>
+        <Text testID={`conflict-${conflict.field}-ad`} style={[styles.quoteText, readable(tablet, 14, 20)]}>{conflict.adQuote || plainValueLabel(conflict.field, conflict.adValue)}</Text>
       </View>
       <View style={styles.quoteBox}>
         <Text style={styles.quoteLabel}>{t('conflicts.chatSays')}</Text>
-        <Text testID={`conflict-${conflict.field}-chat`} style={[styles.quoteText, readable(tablet, 14, 20)]}>{conflict.chatQuote || conflict.chatValue}</Text>
+        <Text testID={`conflict-${conflict.field}-chat`} style={[styles.quoteText, readable(tablet, 14, 20)]}>{conflict.chatQuote || plainValueLabel(conflict.field, conflict.chatValue)}</Text>
       </View>
     </View>
   );

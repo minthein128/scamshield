@@ -156,7 +156,7 @@ export function valueLabel(key: JobFactKey, value: FactValue | null): string {
   switch (def.kind) {
     case 'salary': {
       const s = value as SalaryValue;
-      return [s.amount ?? '', s.currency, periodLabel(s.period)].filter(x => x !== '').join(' ').replace(/\s+/g, ' ').trim();
+      return [typeof s.amount === 'number' ? s.amount.toLocaleString('en-US') : (s.amount ?? ''), s.currency, periodLabel(s.period)].filter(x => x !== '').join(' ').replace(/\s+/g, ' ').trim();
     }
     case 'boolean':
       return value === true ? t('check:job.values.secrecyRequest.yes') : t('check:job.values.secrecyRequest.no');
@@ -171,4 +171,13 @@ export function valueLabel(key: JobFactKey, value: FactValue | null): string {
 
 export function enumOptions(key: JobFactKey): { value: string; label: string }[] {
   return (defOf(key).options ?? []).map(code => ({ value: code, label: enumLabel(key, code) }));
+}
+
+/** A conflict value as the server sends it: an English code or raw text. Codes read in the app language. */
+export function plainValueLabel(key: JobFactKey, raw: string): string {
+  const def = defOf(key);
+  if (!raw) return '';
+  if (def.kind === 'enum') return enumLabel(key, raw);
+  if (def.kind === 'fee') return valueLabel(key, raw);
+  return raw;
 }

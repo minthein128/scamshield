@@ -132,4 +132,13 @@ describe('conflict list', () => {
     expect(textOf('conflict-contract-chat')).toContain('signed on arrival');
     expect(screen.getAllByText('The ad says').length).toBe(result.conflicts.length);
   });
+
+  it('shows a translated value when a fact the user added has no quote', () => {
+    render(
+      <ConflictCard
+        conflict={{ field: 'contract', fieldLabel: 'Contract', adValue: 'official', adQuote: 'Official contract', chatValue: 'later', chatQuote: '', description: 'x', family: 'payment_route', severity: 'high' }}
+      />,
+    );
+    expect(textOf('conflict-contract-chat')).toBe('A contract later');
+  });
 });

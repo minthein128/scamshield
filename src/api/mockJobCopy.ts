@@ -32,9 +32,9 @@ export const JOB_MOCK_COPY: Record<LanguageCode, JobMockCopy> = {
     secrecy: 'The chat may ask you to keep this secret.',
     payBefore: 'The chat may ask for money before a contract.',
     summary: {
-      lower: 'We found few warning signs between the ad and the chat. Some important details may still be missing, so please check them before you go.',
-      verify: 'Some details in the ad and the chat may not match. Please check them with the recruiter and an official source before you go.',
-      pause: 'Several details may not match, and some requests could put you at risk. Please pause before you pay, send documents or travel.',
+      lower: 'We found few warning signs between the ad and the chat. Some important details may still be missing.',
+      verify: 'Some details in the ad and the chat may not match. Please check them with the recruiter and an official source.',
+      pause: 'Several details may not match, and some requests could put you at risk.',
     },
     unclear: {
       workplace: 'No workplace address may have been given.',
@@ -59,9 +59,9 @@ export const JOB_MOCK_COPY: Record<LanguageCode, JobMockCopy> = {
     secrecy: 'ဤအကြောင်းကို လျှို့ဝှက်ထားရန် ချက်တင်တွင် ပြောနေနိုင်ပါသည်။',
     payBefore: 'စာချုပ်မချုပ်မီ ငွေတောင်းနေနိုင်ပါသည်။',
     summary: {
-      lower: 'ကြော်ငြာနှင့် ချက်တင်ကြား သတိပေးချက် အနည်းငယ်သာ တွေ့ပါသည်။ အရေးကြီးသော အချက်အချို့ ကျန်နေနိုင်သဖြင့် မသွားမီ စစ်ဆေးပေးပါ။',
-      verify: 'ကြော်ငြာနှင့် ချက်တင်ထဲက အချက်အချို့ မကိုက်ညီနိုင်ပါ။ မသွားမီ အလုပ်ခေါ်သူနှင့် တရားဝင်ရင်းမြစ်ဖြင့် စစ်ဆေးပေးပါ။',
-      pause: 'အချက်အများအပြား မကိုက်ညီနိုင်ပြီး တောင်းဆိုချက်အချို့ သင့်ကို အန္တရာယ်ရှိစေနိုင်ပါသည်။ ငွေမပေးမီ၊ စာရွက်မပို့မီ၊ ခရီးမထွက်မီ ခဏရပ်ပါ။',
+      lower: 'ကြော်ငြာနှင့် ချက်တင်ကြား သတိပေးချက် အနည်းငယ်သာ တွေ့ပါသည်။ အရေးကြီးသော အချက်အချို့ ကျန်နေနိုင်ပါသည်။',
+      verify: 'ကြော်ငြာနှင့် ချက်တင်ထဲက အချက်အချို့ မကိုက်ညီနိုင်ပါ။ အလုပ်ခေါ်သူနှင့် တရားဝင်ရင်းမြစ်ဖြင့် စစ်ဆေးပေးပါ။',
+      pause: 'အချက်အများအပြား မကိုက်ညီနိုင်ပြီး တောင်းဆိုချက်အချို့ သင့်ကို အန္တရာယ်ရှိစေနိုင်ပါသည်။',
     },
     unclear: {
       workplace: 'အလုပ်ခွင်လိပ်စာ မပေးထားနိုင်ပါ။',
@@ -86,9 +86,9 @@ export const JOB_MOCK_COPY: Record<LanguageCode, JobMockCopy> = {
     secrecy: 'Chat mungkin meminta Anda merahasiakan hal ini.',
     payBefore: 'Chat mungkin meminta uang sebelum ada kontrak.',
     summary: {
-      lower: 'Kami menemukan sedikit tanda peringatan antara iklan dan chat. Beberapa hal penting mungkin masih belum jelas, jadi mohon periksa sebelum berangkat.',
-      verify: 'Beberapa hal di iklan dan chat mungkin tidak cocok. Mohon periksa dengan perekrut dan sumber resmi sebelum berangkat.',
-      pause: 'Beberapa hal mungkin tidak cocok, dan sebagian permintaan bisa membahayakan Anda. Mohon berhenti dulu sebelum membayar, mengirim dokumen, atau berangkat.',
+      lower: 'Kami menemukan sedikit tanda peringatan antara iklan dan chat. Beberapa hal penting mungkin masih belum jelas.',
+      verify: 'Beberapa hal di iklan dan chat mungkin tidak cocok. Mohon periksa dengan perekrut dan sumber resmi.',
+      pause: 'Beberapa hal mungkin tidak cocok, dan sebagian permintaan bisa membahayakan Anda.',
     },
     unclear: {
       workplace: 'Alamat tempat kerja mungkin belum diberikan.',
@@ -113,9 +113,9 @@ export const JOB_MOCK_COPY: Record<LanguageCode, JobMockCopy> = {
     secrecy: 'Maaaring hinihiling ng chat na ilihim mo ito.',
     payBefore: 'Maaaring humihingi ng pera ang chat bago ang kontrata.',
     summary: {
-      lower: 'Kaunti lang ang nakita naming babala sa pagitan ng ad at ng chat. Maaaring may mahahalagang detalye pang kulang, kaya pakisuri bago ka umalis.',
-      verify: 'Maaaring hindi magkatugma ang ilang detalye sa ad at sa chat. Pakisuri sa recruiter at sa opisyal na source bago ka umalis.',
-      pause: 'Maaaring hindi magkatugma ang ilang detalye, at ang ilang hiling ay maaaring maglagay sa iyo sa panganib. Huminto muna bago magbayad, magpadala ng dokumento, o bumiyahe.',
+      lower: 'Kaunti lang ang nakita naming babala sa pagitan ng ad at ng chat. Maaaring may mahahalagang detalye pang kulang.',
+      verify: 'Maaaring hindi magkatugma ang ilang detalye sa ad at sa chat. Pakisuri sa recruiter at sa opisyal na source.',
+      pause: 'Maaaring hindi magkatugma ang ilang detalye, at ang ilang hiling ay maaaring maglagay sa iyo sa panganib.',
     },
     unclear: {
       workplace: 'Maaaring walang ibinigay na address ng trabaho.',
@@ -140,9 +140,9 @@ export const JOB_MOCK_COPY: Record<LanguageCode, JobMockCopy> = {
     secrecy: 'แชตอาจขอให้คุณเก็บเรื่องนี้เป็นความลับ',
     payBefore: 'แชตอาจขอเงินก่อนทำสัญญา',
     summary: {
-      lower: 'เราพบสัญญาณเตือนไม่มากระหว่างโฆษณากับแชต อาจยังขาดรายละเอียดสำคัญบางอย่าง โปรดตรวจสอบก่อนเดินทาง',
-      verify: 'รายละเอียดบางอย่างในโฆษณากับแชตอาจไม่ตรงกัน โปรดตรวจสอบกับผู้จัดหางานและแหล่งข้อมูลทางการก่อนเดินทาง',
-      pause: 'รายละเอียดหลายอย่างอาจไม่ตรงกัน และบางคำขออาจทำให้คุณเสี่ยง โปรดหยุดก่อนจ่ายเงิน ส่งเอกสาร หรือเดินทาง',
+      lower: 'เราพบสัญญาณเตือนไม่มากระหว่างโฆษณากับแชต อาจยังขาดรายละเอียดสำคัญบางอย่าง',
+      verify: 'รายละเอียดบางอย่างในโฆษณากับแชตอาจไม่ตรงกัน โปรดตรวจสอบกับผู้จัดหางานและแหล่งข้อมูลทางการ',
+      pause: 'รายละเอียดหลายอย่างอาจไม่ตรงกัน และบางคำขออาจทำให้คุณเสี่ยง',
     },
     unclear: {
       workplace: 'อาจยังไม่มีที่อยู่สถานที่ทำงาน',

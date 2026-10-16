@@ -56,7 +56,7 @@ describe('fact editing', () => {
   it('edits salary as amount, currency and period', () => {
     const next = setValue(draftFromFacts(facts), 'salary', { amount: ' 1,200 ', currency: 'usd', period: 'daily' });
     expect(toFacts(next).salary).toMatchObject({ value: { amount: 1200, currency: 'USD', period: 'daily' }, quote: '35,000 THB / month', edited: true });
-    expect(valueLabel('salary', { amount: 1200, currency: 'USD', period: 'daily' })).toBe('1200 USD per day');
+    expect(valueLabel('salary', { amount: 1200, currency: 'USD', period: 'daily' })).toBe('1,200 USD per day');
     expect(parseAmount('၃၅,၀၀၀')).toBe(35000);
     expect(parseAmount('abc')).toBeNull();
   });
@@ -119,6 +119,13 @@ describe('offline job mock', () => {
     const none = await client.extractJob({ ad: { text: 'Hello, are you free tomorrow?' }, language: 'en' });
     expect(Object.values(none.ad ?? {}).every(v => v === null)).toBe(true);
     expect(none.chat).toBeNull();
+  });
+
+  it('does not read a deposit as a salary or a driver as the job title', async () => {
+    const out = await client.extractJob({ chat: { text: 'Pay a 300 USD deposit to reserve your seat. A driver will pick you up.' }, language: 'en' });
+    expect(out.chat?.salary).toBeNull();
+    expect(out.chat?.jobTitle).toBeNull();
+    expect(out.chat?.workerFee).toMatchObject({ value: '300 USD' });
   });
 
   it('rejects an empty request', async () => {
