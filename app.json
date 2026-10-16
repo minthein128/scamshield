@@ -74,7 +74,8 @@
           }
         }
       ],
-      "./plugins/with-abi-filters"
+      "./plugins/with-abi-filters",
+      "./plugins/with-minimal-permissions"
     ],
     "scheme": "saferoute",
     "icon": "./assets/icon.png"

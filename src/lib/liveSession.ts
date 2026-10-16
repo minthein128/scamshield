@@ -48,6 +48,8 @@ export interface LiveSessionDeps {
   /** Plays the approved spoken warning and resolves when it ends. */
   playWarning: (text: string, language: LanguageCode) => Promise<void>;
   stopWarning: () => void;
+  /** Explains and requests the microphone. Resolves 'granted' when it is on. */
+  ensureMic?: () => Promise<'granted' | 'declined' | 'denied' | 'blocked'>;
 }
 
 export const DEFAULT_CAP_MS = 120_000;
@@ -247,6 +249,7 @@ export function createLiveSession(options: LiveSessionOptions, deps: LiveSession
       } catch {
         return fail('audio');
       }
+      if (deps.ensureMic && (await deps.ensureMic().catch(() => 'denied' as const)) !== 'granted') return fail('mic_denied');
       if (!(await audio.requestPermission().catch(() => false))) return fail('mic_denied');
       if (cancelled || finished) return;
       if (!opts.skipWarning) {

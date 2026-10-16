@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Svg, { Circle, G, Path, Rect } from 'react-native-svg';
-import * as ShieldModule from 'shield-module';
+import { useShieldControl } from '../../hooks/useShieldControl';
 import theme from '../../theme/theme';
 import { MarkShapes } from '../../components/BrandMark';
 import { MARK_VIEW, markShapes } from '../../components/dollMark';
@@ -11,13 +11,10 @@ interface ShieldIntroScreenProps {
 }
 
 export const ShieldIntroScreen: React.FC<ShieldIntroScreenProps> = ({ onNavigate }) => {
+  const { setEnabled } = useShieldControl();
   const handleTurnOnShield = async () => {
     try {
-      const hasPerm = await ShieldModule.hasOverlayPermission();
-      if (!hasPerm) {
-        await ShieldModule.requestOverlayPermission();
-      }
-      await ShieldModule.startShield();
+      await setEnabled(true);
     } catch (e) {
       console.warn('Shield activation:', e);
     }
