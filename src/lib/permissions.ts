@@ -43,7 +43,7 @@ async function explainedKinds(): Promise<string[]> {
   }
 }
 
-/** Explains once per install, for optional permissions. Later calls resolve false without asking. */
+/** Explains once per install, for optional permissions. Later calls resolve false. */
 export async function explainOnceEver(kind: PermissionKind): Promise<boolean> {
   const list = await explainedKinds();
   if (list.includes(kind)) return false;

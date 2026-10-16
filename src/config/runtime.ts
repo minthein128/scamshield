@@ -196,7 +196,7 @@ async function resolveUrlInner(deps: ResolveDeps): Promise<string> {
   const remember = (u: string) => AsyncStorage.setItem(API_URL_CACHE_KEY, u).catch(() => undefined);
   known.forEach(healthy);
 
-  // config.json still names the legacy host for old installs, so a healthy stable URL wins.
+  // A healthy stable URL wins over config.json, which may still name an older host.
   if (stable && (await healthy(stable))) {
     if (cached !== stable) await remember(stable);
     return stable;
