@@ -77,6 +77,19 @@ describe('job assessment', () => {
     expect(out.findings[0]?.code).toBe('company_not_checked');
   });
 
+  it('replaces search labels with localized job labels', async () => {
+    const g = fakeGrounder(false, [
+      { family: 'identity', label: 'လိုင်စင်မှတ်တမ်းหรือข้อมูล', evidence: 'No record in the registry', severity: 'low' },
+    ]);
+    const res = await assessJobOffer({ facts: { ad: legitAd }, language: 'my' }, { grounder: g });
+    expect(res.flags).toContainEqual({
+      family: 'identity',
+      label: 'ဤကုမ္ပဏီ၏ လိုင်စင် သို့မဟုတ် မှတ်ပုံတင်ခြင်းကို ကျွန်ုပ်တို့ အတည်မပြုနိုင်ပါ',
+      evidence: 'No record in the registry',
+      severity: 'low',
+    });
+  });
+
   it('guards wording that comes back from search', async () => {
     const g = fakeGrounder(true, [
       { family: 'identity', label: 'This agency is safe and verified job offers', evidence: 'No risk detected', severity: 'low' },

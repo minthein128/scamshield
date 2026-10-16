@@ -6,7 +6,7 @@ import { log } from '../log.js';
 import { ApiError, type Flag, type Lang, type Source } from '../types.js';
 import { normalizeEmployer } from './parse.js';
 import { attentionFor, collectFlags, detectConflicts, headlineFor, scoreJob, stated, stillUnclear } from './rules.js';
-import { FINDING_TEXT, TIER_SPOKEN, TIER_SUMMARY } from './text.js';
+import { FINDING_TEXT, GROUND_LABEL, TIER_SPOKEN, TIER_SUMMARY } from './text.js';
 import type {
   FactField,
   FactKey,
@@ -121,7 +121,8 @@ export async function assessJobOffer(req: JobAssessRequest, deps: AssessDeps = {
   const grounded = await groundCompany(deps, lang, names, ad, chat);
   const sources: Source[] = grounded?.sources ?? [];
   if (grounded) {
-    flags.push(...grounded.flags.map((f) => ({ ...f, evidence: guardJobText(f.evidence, lang).text })));
+    const label = (f: Flag) => (f.family in GROUND_LABEL ? GROUND_LABEL[f.family as keyof typeof GROUND_LABEL][lang] : f.label);
+    flags.push(...grounded.flags.map((f) => ({ ...f, label: label(f), evidence: guardJobText(f.evidence, lang).text })));
   }
 
   const scored = scoreJob(flags);

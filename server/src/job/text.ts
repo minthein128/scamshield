@@ -390,6 +390,31 @@ export const FINDING_TEXT: Record<FindingCode, L> = {
   },
 };
 
+/** Job labels for search findings, so model wording never reaches the job report. */
+export const GROUND_LABEL: Record<'identity' | 'known_bad' | 'too_good', L> = {
+  identity: {
+    en: "We could not confirm this company's licence or registration",
+    id: 'Kami tidak dapat memastikan izin atau pendaftaran perusahaan ini',
+    tl: 'Hindi namin makumpirma ang lisensya o rehistro ng kumpanyang ito',
+    my: 'ဤကုမ္ပဏီ၏ လိုင်စင် သို့မဟုတ် မှတ်ပုံတင်ခြင်းကို ကျွန်ုပ်တို့ အတည်မပြုနိုင်ပါ',
+    th: 'เรายืนยันใบอนุญาตหรือการจดทะเบียนของบริษัทนี้ไม่ได้',
+  },
+  known_bad: {
+    en: 'Reports online mention this company or website in scam warnings',
+    id: 'Ada laporan online yang menyebut perusahaan atau situs ini dalam peringatan penipuan',
+    tl: 'May mga ulat online na bumabanggit sa kumpanya o website na ito sa mga babala sa scam',
+    my: 'အွန်လိုင်းပေါ်ရှိ လိမ်လည်မှုသတိပေးချက်များတွင် ဤကုမ္ပဏီ သို့မဟုတ် ဝက်ဘ်ဆိုက်ကို ဖော်ပြထားသည်',
+    th: 'มีรายงานออนไลน์ที่กล่าวถึงบริษัทหรือเว็บไซต์นี้ในคำเตือนเรื่องการหลอกลวง',
+  },
+  too_good: {
+    en: 'Search suggests the pay is far above the usual pay for this work',
+    id: 'Hasil pencarian menunjukkan gajinya jauh di atas gaji biasa untuk pekerjaan ini',
+    tl: 'Ayon sa paghahanap, mas mataas nang husto ang sahod kaysa karaniwan para sa trabahong ito',
+    my: 'ရှာဖွေမှုအရ ဤအလုပ်အတွက် လစာသည် ပုံမှန်ထက် အများကြီး မြင့်နေပုံရသည်',
+    th: 'ผลการค้นหาบ่งชี้ว่าค่าจ้างสูงกว่าปกติมากสำหรับงานนี้',
+  },
+};
+
 export const SOURCE_NAME: Record<'ad' | 'chat', L> = {
   ad: { en: 'Ad', id: 'Iklan', tl: 'Ad', my: 'ကြော်ငြာ', th: 'ประกาศ' },
   chat: { en: 'Chat', id: 'Chat', tl: 'Chat', my: 'စကားပြော', th: 'แชท' },
@@ -405,5 +430,6 @@ export const ALL_TABLES: Array<Record<string, L | undefined>> = [
   SIGNAL_LABEL,
   UNCLEAR_TEXT,
   FINDING_TEXT,
+  GROUND_LABEL,
   SOURCE_NAME,
 ];
