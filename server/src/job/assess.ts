@@ -1,201 +1,174 @@
 import { randomUUID } from 'node:crypto';
 import { buildActions } from '../explain.js';
-import type { Grounder } from '../ground.js';
-import { rewriteCertainty } from '../language-guard.js';
-import { score } from '../score.js';
-import type { Flag, Lang, Source, Verdict } from '../types.js';
-import {
-  applyBorderProtection,
-  detectConflicts,
-  extractSingleSourceFlags,
-  getStillUnclear,
-  mapToAttentionTier,
-} from './rules.js';
-import type { JobAssessRequest, JobAssessResponse, JobConflict, JobFacts } from './types.js';
+import type { Grounder, GroundResult } from '../ground.js';
+import { guardJobText } from '../language-guard.js';
+import { log } from '../log.js';
+import { ApiError, type Flag, type Lang, type Source } from '../types.js';
+import { normalizeEmployer } from './parse.js';
+import { attentionFor, collectFlags, detectConflicts, headlineFor, scoreJob, stated, stillUnclear } from './rules.js';
+import { FINDING_TEXT, TIER_SPOKEN, TIER_SUMMARY } from './text.js';
+import type {
+  FactField,
+  FactKey,
+  FindingCode,
+  JobAssessRequest,
+  JobAssessResponse,
+  JobExtraction,
+  JobFacts,
+  JobFinding,
+  PartialFacts,
+} from './types.js';
+import { FACT_KEYS } from './types.js';
+import { completeFacts } from './validate.js';
 
-const SUMMARY_TEMPLATES: Record<
-  'pause' | 'verify' | 'lower',
-  Record<Lang, (conflictsCount: number, unclearCount: number) => string>
-> = {
-  pause: {
-    en: (c, u) =>
-      `Significant discrepancies and coercive instructions detected between the advertised job and recruiter demands (${c} conflict${c === 1 ? '' : 's'}). Pause before making payments, sending documents, or traveling.`,
-    id: (c, u) =>
-      `Ditemukan perbedaan mencolok dan instruksi berisiko antara iklan pekerjaan dan permintaan perekrut (${c} konflik). Tunda sebelum melakukan pembayaran, mengirim dokumen, atau bepergian.`,
-    tl: (c, u) =>
-      `May nakitang malaking pagkakaiba at mga mapanganib na tagubilin sa pagitan ng ad ng trabaho at mga hinihingi ng recruiter (${c} salungatan). Huminto muna bago magbayad, magpadala ng dokumento, o bumiyahe.`,
-    my: (c, u) =>
-      `ကြော်ငြာထားသောအလုပ်နှင့် အလုပ်ခေါ်သူ၏ တောင်းဆိုချက်များအကြား သိသာထင်ရှားသော ကွဲလွဲချက်များနှင့် သတိပေးချက်များ တွေ့ရှိရပါသည် (${c} ချက် မကိုက်ညီပါ)။ ငွေလွှဲခြင်း၊ စာရွက်စာတမ်းပို့ခြင်း သို့မဟုတ် ခရီးထွက်ခြင်း မပြုမီ ရပ်တန့်စဉ်းစားပါ။`,
-    th: (c, u) =>
-      `พบข้อขัดแย้งที่สำคัญและคำสั่งที่น่าสงสัยระหว่างโฆษณางานและข้อเรียกร้องของผู้รับสมัคร (${c} จุดไม่ตรงกัน) โปรดหยุดคิดก่อนโอนเงิน ส่งเอกสาร หรือออกเดินทาง`,
-  },
-  verify: {
-    en: (c, u) =>
-      `Some details do not match or remain unconfirmed between the job ad and chat messages. Verify the recruitment agency's official licence before proceeding.`,
-    id: (c, u) =>
-      `Beberapa rincian tidak cocok atau belum terkonfirmasi antara iklan pekerjaan dan percakapan. Periksa izin resmi agensi perekrutan sebelum melanjutkan.`,
-    tl: (c, u) =>
-      `Ilang detalye ay hindi tugma o hindi pa nakumpirma sa pagitan ng job ad at chat. I-verify ang opisyal na lisensya ng ahensya bago magpatuloy.`,
-    my: (c, u) =>
-      `အလုပ်ကြော်ငြာနှင့် စကားပြောဆိုချက်များအကြား အချို့သောအချက်အလက်များ မကိုက်ညီခြင်း သို့မဟုတ် ရှင်းလင်းမှုမရှိခြင်း တွေ့ရပါသည်။ ဆက်လက်မလုပ်ဆောင်မီ တရားဝင်အေဂျင်စီလိုင်စင်ကို အတည်ပြုစစ်ဆေးပါ။`,
-    th: (c, u) =>
-      `รายละเอียดบางอย่างไม่ตรงกันหรือไม่ได้รับการยืนยันระหว่างโฆษณางานและการสนทนา โปรดตรวจสอบใบอนุญาตอย่างเป็นทางการของหน่วยงานก่อนดำเนินการต่อ`,
-  },
-  lower: {
-    en: (c, u) =>
-      `Few warning signs found between the ad and chat, though critical details may still need independent verification.`,
-    id: (c, u) =>
-      `Sedikit tanda peringatan ditemukan antara iklan dan percakapan, meskipun rincian penting mungkin masih memerlukan verifikasi mandiri.`,
-    tl: (c, u) =>
-      `Kakaunting babala ang natukoy sa pagitan ng ad at chat, ngunit maaaring kailangan pa rin ng independiyenteng beripikasyon ang ilang mahalagang detalye.`,
-    my: (c, u) =>
-      `ကြော်ငြာနှင့် စကားပြောဆိုချက်များအကြား သတိပေးချက် အနည်းငယ်သာ တွေ့ရှိရသော်လည်း အရေးကြီးသောအချက်များကို သီးခြားစစ်ဆေးရန် လိုအပ်နိုင်ပါသည်။`,
-    th: (c, u) =>
-      `พบสัญญาณเตือนน้อยระหว่างโฆษณาและการสนทนา แม้ว่ารายละเอียดสำคัญอาจยังต้องได้รับการตรวจสอบเพิ่มเติม`,
-  },
-};
+export interface AssessDeps {
+  grounder?: Grounder;
+  getStored?: (jobId: string) => JobExtraction | undefined;
+  groundTimeoutMs?: number;
+}
 
-const SPOKEN_WARNINGS: Record<'pause' | 'verify' | 'lower', Record<Lang, string>> = {
-  pause: {
-    en: 'Warning signs detected between the ad and recruiter instructions. Do not pay fees, surrender your passport, or travel without verified official contracts.',
-    id: 'Tanda bahaya terdeteksi antara iklan dan instruksi perekrut. Jangan membayar biaya, menyerahkan paspor, atau bepergian tanpa kontrak resmi.',
-    tl: 'May mga babalang natukoy sa pagitan ng ad at tagubilin ng recruiter. Huwag magbayad, huwag ibigay ang pasaporte, o bumiyahe nang walang opisyal na kontrata.',
-    my: 'ကြော်ငြာနှင့် အလုပ်ခေါ်သူ၏ညွှန်ကြားချက်များအကြား သတိပေးလက္ခဏာများ တွေ့ရှိရပါသည်။ ငွေကြေးမပေးပါနှင့်၊ ပတ်စပို့မပေးအပ်ပါနှင့်၊ တရားဝင်စာချုပ်မရှိဘဲ ခရီးမထွက်ပါနှင့်။',
-    th: 'พบสัญญาณเตือนระหว่างโฆษณาและคำแนะนำของผู้รับสมัคร โปรดอย่าจ่ายเงิน อย่ายื่นพาสปอร์ต หรือเดินทางโดยไม่มีสัญญาที่เป็นทางการ',
-  },
-  verify: {
-    en: 'Some details in this offer conflict or are missing. Please verify the employer and recruiter with trusted labour authorities before agreeing.',
-    id: 'Beberapa rincian tawaran ini bertentangan atau belum lengkap. Harap verifikasi pemberi kerja kepada pihak berwenang sebelum menyetujui.',
-    tl: 'May mga detalyeng sumasalungat o kulang sa alok na ito. Mangyaring i-verify ang employer sa mga awtoridad bago sumang-ayon.',
-    my: 'ဤကမ်းလှမ်းချက်ရှိ အချို့သောအချက်များ ကွဲလွဲနေပါသည် သို့မဟုတ် လိုအပ်နေပါသည်။ သဘောမတူမီ အလုပ်ရှင်နှင့် အေဂျင်စီကို တရားဝင် အတည်ပြုစစ်ဆေးပါ။',
-    th: 'รายละเอียดบางอย่างในข้อเสนอนี้ขัดแย้งกันหรือยังขาดหายไป โปรดตรวจสอบนายจ้างกับหน่วยงานแรงงานที่เชื่อถือได้ก่อนตกลง',
-  },
-  lower: {
-    en: 'Few warning signs detected. Remember never to travel on a tourist visa for work or surrender your passport to any agency.',
-    id: 'Sedikit tanda peringatan terdeteksi. Ingat untuk tidak pernah bepergian dengan visa turis untuk bekerja atau menyerahkan paspor Anda.',
-    tl: 'Kakaunting babala ang natukoy. Tandaan na huwag maglakbay gamit ang tourist visa para magtrabaho o ibigay ang iyong pasaporte.',
-    my: 'သတိပေးချက် အနည်းငယ်သာ တွေ့ရှိရပါသည်။ အလုပ်လုပ်ရန်အတွက် ဗီဇာမရှိဘဲ ခရီးမထွက်ရန်နှင့် မည်သူ့ကိုမျှ ပတ်စပို့မပေးအပ်ရန် သတိပြုပါ။',
-    th: 'พบสัญญาณเตือนน้อย โปรดจำไว้ว่าอย่าเดินทางด้วยวีซ่าท่องเที่ยวเพื่อทำงาน หรือมอบพาสปอร์ตให้ใคร',
-  },
-};
+type AnyFact = FactField<unknown>;
 
-export async function assessJobOffer(
-  req: JobAssessRequest,
-  grounder?: Grounder,
-  timeoutMs = 5000,
-): Promise<JobAssessResponse> {
-  const ad = req.facts.ad ?? null;
-  const chat = req.facts.chat ?? null;
-  const lang = req.language || 'en';
-
-  // 1. Detect conflicts between ad and chat
-  const conflicts = detectConflicts(ad, chat);
-
-  // 2. Turn conflicts into flags
-  const flags: Flag[] = conflicts.map((c) => ({
-    family: c.family,
-    label: c.description,
-    evidence: `Ad: "${c.adQuote}" vs Chat: "${c.chatQuote}"`,
-    severity: c.severity,
-  }));
-
-  // 3. Extract single-source flags
-  if (ad) {
-    flags.push(...extractSingleSourceFlags(ad, 'ad'));
+/**
+ * Stored extraction plus the user's changes. Edited values replace stored ones but the stored quote
+ * stays; null or not_mentioned removes a fact; a key the request leaves out keeps the stored fact.
+ */
+export function mergeFacts(stored: JobFacts | null, sent: PartialFacts | null | undefined): JobFacts | null {
+  if (sent === undefined) return stored;
+  if (sent === null) return null;
+  if (!stored) return completeFacts(sent);
+  const out = {} as Record<FactKey, AnyFact | null>;
+  const sentMap = sent as Record<FactKey, AnyFact | null | undefined>;
+  const storedMap = stored as unknown as Record<FactKey, AnyFact | null>;
+  for (const k of FACT_KEYS) {
+    const base = storedMap[k];
+    const s = sentMap[k];
+    if (s === undefined) out[k] = base;
+    else if (s === null || s.value === 'not_mentioned') out[k] = null;
+    else if (s.edited) out[k] = { value: s.value, quote: base?.quote ?? '', confidence: base?.confidence ?? s.confidence, edited: true };
+    else out[k] = base ?? s;
   }
-  if (chat) {
-    flags.push(...extractSingleSourceFlags(chat, 'chat'));
+  return out as unknown as JobFacts;
+}
+
+const FREE_MAIL = /^(?:gmail|googlemail|yahoo|ymail|hotmail|outlook|live|icloud|me|aol|proton|protonmail|mail|gmx|yandex|qq|163)\./i;
+
+function hostsFrom(f: AnyFact | null): string[] {
+  if (!stated(f) || (f.value !== 'company_channel' && f.value !== 'email')) return [];
+  const text = `${f.quote}`;
+  const hosts = [...text.matchAll(/@([a-z0-9-]+(?:\.[a-z0-9-]+)+)/gi), ...text.matchAll(/https?:\/\/([a-z0-9.-]+\.[a-z]{2,})/gi)].map((m) =>
+    (m[1] ?? '').toLowerCase().replace(/^www\./, ''),
+  );
+  return [...new Set(hosts)].filter((h) => h && !FREE_MAIL.test(h));
+}
+
+function employers(ad: JobFacts | null, chat: JobFacts | null): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const f of [ad?.employer, chat?.employer]) {
+    if (!stated(f)) continue;
+    const key = normalizeEmployer(f.value);
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    out.push(f.value.trim());
   }
+  return out;
+}
 
-  // 4. Grounding (if employer exists)
-  const sources: Source[] = [];
-  const employerName = ad?.employer?.value || chat?.employer?.value;
-  if (employerName && grounder) {
-    try {
-      const entities = {
-        companies: [employerName],
-        phones: (chat?.contactChannel?.value === 'phone' && chat.contactChannel.quote ? [chat.contactChannel.quote] : []),
-        domains: [],
-        role: ad?.jobTitle?.value || chat?.jobTitle?.value || undefined,
-        country: ad?.destinationCountry?.value || chat?.destinationCountry?.value || undefined,
-      };
-      const groundRes = await grounder.ground(
-        { kind: 'job', language: lang, context: req.context },
-        { entities } as never,
-        timeoutMs,
-      );
-      flags.push(...groundRes.flags);
-      sources.push(...groundRes.sources);
+async function groundCompany(
+  deps: AssessDeps,
+  lang: Lang,
+  names: string[],
+  ad: JobFacts | null,
+  chat: JobFacts | null,
+): Promise<GroundResult | undefined> {
+  if (!deps.grounder || names.length === 0) return undefined;
+  const country = [ad?.destinationCountry, chat?.destinationCountry].find((f) => stated(f))?.value;
+  const domains = [...hostsFrom(ad?.contactChannel ?? null), ...hostsFrom(chat?.contactChannel ?? null)];
+  try {
+    return await deps.grounder.ground(
+      { language: lang },
+      { entities: { companies: names, phones: [], domains, ...(country ? { country } : {}) } },
+      deps.groundTimeoutMs ?? 6000,
+      { companyCheck: true },
+    );
+  } catch (err) {
+    log('WARNING', 'job_ground_failed', { error: (err as Error).message });
+    return undefined;
+  }
+}
 
-      // Section 3.1 Item 3:
-      // "In grounding for job checks, report two separate findings:
-      // 'We found a company with this name' and 'We could not confirm this recruiter works for that company'
-      // Never let 'company found' lower the risk on its own."
-      const contactChannel = chat?.contactChannel?.value;
-      if (contactChannel === 'personal_chat_app') {
-        flags.push({
-          family: 'identity',
-          label: 'Recruiter contacted via personal chat app without verified company domain linkage',
-          evidence: chat?.contactChannel?.quote || 'Personal chat app',
-          severity: 'medium',
-        });
-      }
-    } catch {
-      // Grounding degrades gracefully
-    }
+function findingsFor(names: string[], grounded: GroundResult | undefined, lang: Lang): JobFinding[] {
+  if (names.length === 0) return [];
+  const company: FindingCode =
+    grounded?.companyFound === true ? 'company_found' : grounded?.companyFound === false ? 'company_not_found' : 'company_not_checked';
+  return [company, 'recruiter_not_confirmed' as const].map((code) => ({ code, label: FINDING_TEXT[code][lang] }));
+}
+
+export async function assessJobOffer(req: JobAssessRequest, deps: AssessDeps = {}): Promise<JobAssessResponse> {
+  const lang = req.language;
+  const stored = req.jobId ? deps.getStored?.(req.jobId) : undefined;
+  if (!stored && !req.facts) {
+    throw new ApiError(400, 'bad_request', 'This job check has expired. Send facts with the request.');
+  }
+  const ad = stored ? mergeFacts(stored.ad, req.facts?.ad) : completeFacts(req.facts?.ad);
+  const chat = stored ? mergeFacts(stored.chat, req.facts?.chat) : completeFacts(req.facts?.chat);
+
+  const conflicts = detectConflicts(ad, chat, lang);
+  const flags: Array<Flag & { geographic?: boolean }> = collectFlags(ad, chat, conflicts, lang);
+
+  const names = employers(ad, chat);
+  const grounded = await groundCompany(deps, lang, names, ad, chat);
+  const sources: Source[] = grounded?.sources ?? [];
+  if (grounded) {
+    flags.push(...grounded.flags.map((f) => ({ ...f, evidence: guardJobText(f.evidence, lang).text })));
   }
 
-  // 5. Score using standard rules engine
-  const scored = score({
-    flags,
-    linkChecks: [],
-    unsolicited: false,
-    scamType: 'job_trafficking',
-  });
+  const scored = scoreJob(flags);
+  const attention = attentionFor(scored.verdict);
+  const unclear = stillUnclear(ad, chat, lang);
 
-  // 6. Apply border town protection rule (Section 3.1 Item 4)
-  const protectedResult = applyBorderProtection(scored.flags, scored.score);
-  const finalScore = protectedResult.score;
-  const finalVerdict: Verdict = finalScore >= 70 ? 'danger' : finalScore >= 35 ? 'careful' : 'safe';
-
-  // 7. Map attention tier
-  const { tier, headline } = mapToAttentionTier(finalVerdict);
-
-  // 8. Find still unclear fields
-  const stillUnclear = getStillUnclear(ad, chat);
-
-  // 9. Build summary and spoken warning
-  const rawSummary = SUMMARY_TEMPLATES[tier][lang](conflicts.length, stillUnclear.length);
-  const rawSpoken = SPOKEN_WARNINGS[tier][lang];
-
-  // Pass through language guard
-  const { text: cleanSummary } = rewriteCertainty(rawSummary, lang);
-  const { text: cleanSpoken } = rewriteCertainty(rawSpoken, lang);
-
-  const actions = buildActions(finalVerdict, 'job_trafficking', lang, req.context?.destination);
-
-  const id = req.jobId || `chk_${randomUUID().replaceAll('-', '').slice(0, 20)}`;
-
-  return {
-    id,
+  let certaintyHits = 0;
+  const guard = (t: string) => {
+    const r = guardJobText(t, lang);
+    certaintyHits += r.hits;
+    return r.text;
+  };
+  const headline = guard(headlineFor(attention, lang));
+  const response: JobAssessResponse = {
+    id: req.jobId ?? `job_${randomUUID().replaceAll('-', '').slice(0, 16)}`,
     createdAt: new Date().toISOString(),
     kind: 'job',
-    verdict: finalVerdict,
-    score: finalScore,
-    attention: tier,
-    attentionHeadline: headline,
+    verdict: scored.verdict,
+    score: scored.score,
     title: headline,
-    summary: cleanSummary,
-    spokenWarning: cleanSpoken,
-    scamType: 'job_trafficking',
-    flags: protectedResult.flags,
+    summary: guard(TIER_SUMMARY[attention][lang]),
+    spokenWarning: guard(TIER_SPOKEN[attention][lang]),
+    scamType: scored.flags.length > 0 ? 'job_trafficking' : 'none',
+    flags: scored.flags.map((f) => ({ ...f, label: guard(f.label) })),
     linkChecks: [],
     sources,
-    actions,
-    model: 'job-shield-v1',
-    conflicts,
-    stillUnclear,
+    actions: buildActions(scored.verdict, 'job_trafficking', lang, req.context?.destination, req.context?.home),
+    model: 'job-shield-v2',
+    attention,
+    attentionHeadline: headline,
+    conflicts: conflicts.map((c) => ({ ...c, fieldLabel: guard(c.fieldLabel), description: guard(c.description) })),
+    stillUnclear: unclear.text.map(guard),
+    stillUnclearFields: unclear.fields,
+    findings: findingsFor(names, grounded, lang).map((f) => ({ ...f, label: guard(f.label) })),
+    usedStoredExtraction: Boolean(stored),
     adFacts: ad,
     chatFacts: chat,
   };
+  log('INFO', 'job_assess_scored', {
+    attention,
+    score: scored.score,
+    conflicts: conflicts.length,
+    flags: response.flags.length,
+    overrides: scored.overrides,
+    stored: Boolean(stored),
+    grounded: grounded !== undefined,
+    certaintyHits,
+  });
+  return response;
 }

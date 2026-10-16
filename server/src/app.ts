@@ -12,7 +12,11 @@ import type { Config } from './config.js';
 import { downloadPage } from './download-page.js';
 import type { Feedback } from './feedback/service.js';
 import { parseFeedback } from './feedback/validate.js';
+import type { Grounder } from './ground.js';
 import { type Intel, isCountry } from './intel/service.js';
+import { assessJobOffer } from './job/assess.js';
+import { createJobExtractor, type JobExtractor } from './job/extract.js';
+import { parseJobAssessRequest, parseJobExtractRequest } from './job/validate.js';
 import { log } from './log.js';
 import type { Pipeline } from './pipeline.js';
 import { createRateLimiter } from './ratelimit.js';
@@ -20,10 +24,6 @@ import type { Speaker } from './speak.js';
 import { Timings, timingStore } from './timing.js';
 import { ApiError, type CheckResponse } from './types.js';
 import { parseRequest, parseSpeakRequest } from './validate.js';
-import type { Grounder } from './ground.js';
-import { assessJobOffer } from './job/assess.js';
-import { createJobExtractor } from './job/extract.js';
-import { parseJobAssessRequest, parseJobExtractRequest } from './job/validate.js';
 
 export const clientIp = (forwarded?: string, real?: string) => forwarded?.split(',')[0]?.trim() || real || 'local';
 
@@ -50,8 +50,8 @@ export function createApp(
   limits: Limits = createLimits(cfg),
   admin?: AdminDeps,
   published?: PublishedCache,
-  jobExtractor: ReturnType<typeof createJobExtractor> = createJobExtractor(cfg),
-  grounder?: Grounder,
+  jobExtractor: JobExtractor = createJobExtractor(cfg, undefined),
+  jobGrounder?: Grounder,
 ) {
   const app = new Hono();
   const limiter = limits.ip;
@@ -278,66 +278,57 @@ export function createApp(
     return c.json(out);
   });
 
-  app.post(
-    '/v1/job/extract',
-    async (c, next) => {
-      if (!limiter.allow(clientIp(c.req.header('x-forwarded-for'), c.req.header('x-real-ip')))) {
-        return c.json(errorBody('rate_limited', 'Too many requests, retry in a minute'), 429, { 'retry-after': '60' });
-      }
-      await next();
-    },
-    bodyLimit({
-      maxSize: cfg.maxBodyBytes,
-      onError: (c) => c.json(errorBody('too_large', `Body exceeds ${cfg.maxBodyBytes} bytes`), 413),
-    }),
-    async (c) => {
-      const started = Date.now();
-      let body: unknown;
-      try {
-        body = await c.req.json();
-      } catch {
-        throw new ApiError(400, 'bad_request', 'Body must be valid JSON');
-      }
-      const req = parseJobExtractRequest(body);
-      const res = await jobExtractor.extract(req);
-      log('INFO', 'job_extract_done', { jobId: res.jobId, language: req.language, ms: Date.now() - started });
-      return c.json(res);
-    },
-  );
+  const jobBody = bodyLimit({
+    maxSize: cfg.maxBodyBytes,
+    onError: (c) => c.json(errorBody('too_large', `Body exceeds ${cfg.maxBodyBytes} bytes`), 413),
+  });
+  const jobLimit = async (c: Context, next: () => Promise<void>) => {
+    if (!limiter.allow(clientIp(c.req.header('x-forwarded-for'), c.req.header('x-real-ip')))) {
+      return c.json(errorBody('rate_limited', 'Too many requests, retry in a minute'), 429, { 'retry-after': '60' });
+    }
+    await next();
+  };
+  const jsonBody = async (c: Context) => {
+    try {
+      return (await c.req.json()) as unknown;
+    } catch {
+      throw new ApiError(400, 'bad_request', 'Body must be valid JSON');
+    }
+  };
 
-  app.post(
-    '/v1/job/assess',
-    async (c, next) => {
-      if (!limiter.allow(clientIp(c.req.header('x-forwarded-for'), c.req.header('x-real-ip')))) {
-        return c.json(errorBody('rate_limited', 'Too many requests, retry in a minute'), 429, { 'retry-after': '60' });
-      }
-      await next();
-    },
-    bodyLimit({
-      maxSize: cfg.maxBodyBytes,
-      onError: (c) => c.json(errorBody('too_large', `Body exceeds ${cfg.maxBodyBytes} bytes`), 413),
-    }),
-    async (c) => {
-      const started = Date.now();
-      let body: unknown;
-      try {
-        body = await c.req.json();
-      } catch {
-        throw new ApiError(400, 'bad_request', 'Body must be valid JSON');
-      }
-      const req = parseJobAssessRequest(body);
-      const res = await assessJobOffer(req, grounder);
-      log('INFO', 'job_assess_done', {
-        id: res.id,
-        verdict: res.verdict,
-        attention: res.attention,
-        conflicts: res.conflicts.length,
-        score: res.score,
-        ms: Date.now() - started,
-      });
-      return c.json(res);
-    },
-  );
+  app.post('/v1/job/extract', jobLimit, jobBody, async (c) => {
+    const started = Date.now();
+    const req = parseJobExtractRequest(await jsonBody(c));
+    const res = await jobExtractor.extract(req);
+    log('INFO', 'job_extract_done', {
+      language: req.language,
+      ad: res.ad !== null,
+      chat: res.chat !== null,
+      hasImage: Boolean(req.ad?.imageBase64 || req.chat?.imageBase64),
+      latencyMs: Date.now() - started,
+    });
+    return c.json(res);
+  });
+
+  app.post('/v1/job/assess', jobLimit, jobBody, async (c) => {
+    const started = Date.now();
+    const req = parseJobAssessRequest(await jsonBody(c));
+    const res = await assessJobOffer(req, {
+      ...(jobGrounder ? { grounder: jobGrounder } : {}),
+      getStored: (id) => jobExtractor.getStored(id),
+    });
+    log('INFO', 'job_assess_done', {
+      verdict: res.verdict,
+      attention: res.attention,
+      score: res.score,
+      conflicts: res.conflicts.length,
+      flagCount: res.flags.length,
+      sourceCount: res.sources.length,
+      language: req.language,
+      latencyMs: Date.now() - started,
+    });
+    return c.json(res);
+  });
 
   app.post(
     '/v1/speak',
