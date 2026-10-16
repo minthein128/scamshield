@@ -114,7 +114,7 @@ class MessageGuardListener : NotificationListenerService() {
             val json = result.toString()
             store.saveResult(id, json)
             ShieldBridge.publishResult(id, json)
-            val shown = MessageGuardNotifier.post(applicationContext, result, store.noticeBody, store.noticeOpen)
+            val shown = MessageGuardNotifier.post(applicationContext, result, store.noticeBody, store.noticeOpen, store.noticeTitle)
             store.activity.update(seq, MessageGuardActivity.result(verdict, shown))
         } catch (e: Exception) {
             store.log.setVerdict(logId, MessageGuardLog.FAILED)

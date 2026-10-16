@@ -6,7 +6,7 @@ import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
 /**
- * Removes SafeRoute's own overlay windows from a captured frame, so the bubble can stay on screen
+ * Removes Kakwe's own overlay windows from a captured frame, so the bubble can stay on screen
  * during a check. Each window rect is filled with the average colour of a thin ring around it.
  * When the ring is busy (text, photos), filling would erase content, so the caller hides instead.
  */

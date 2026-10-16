@@ -102,6 +102,10 @@ internal class MessageGuardStore(context: Context, now: () -> Long = System::cur
         get() = prefs.getString("noticeBody", null)
         set(v) = prefs.edit().putString("noticeBody", v).apply()
 
+    var noticeTitle: String?
+        get() = prefs.getString("noticeTitle", null)
+        set(v) = prefs.edit().putString("noticeTitle", v).apply()
+
     var noticeOpen: String?
         get() = prefs.getString("noticeOpen", null)
         set(v) = prefs.edit().putString("noticeOpen", v).apply()

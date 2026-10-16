@@ -305,7 +305,7 @@ class ShieldService : Service(), ShieldOverlay.Listener {
     private fun hasMic(): Boolean =
         ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
 
-    /** Adds the microphone type while SafeRoute is visible, so a later session from the bubble is allowed. */
+    /** Adds the microphone type while Kakwe is visible, so a later session from the bubble is allowed. */
     fun armVoice() {
         main.post {
             if (!started || micTyped || !hasMic() || Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return@post
@@ -435,10 +435,10 @@ class ShieldService : Service(), ShieldOverlay.Listener {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                ShieldNotification.CHANNEL_NAME,
+                ShieldBridge.strings.appName,
                 NotificationManager.IMPORTANCE_LOW
             ).apply {
-                description = ShieldNotification.CHANNEL_DESCRIPTION
+                description = ShieldNotification.channelDescription(ShieldBridge.strings.appName)
                 lockscreenVisibility = Notification.VISIBILITY_PRIVATE
             }
             val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -450,7 +450,7 @@ class ShieldService : Service(), ShieldOverlay.Listener {
         val launch = packageManager.getLaunchIntentForPackage(packageName)?.let {
             PendingIntent.getActivity(this, 0, it, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
         }
-        return ShieldNotification.build(this, CHANNEL_ID, launch)
+        return ShieldNotification.build(this, CHANNEL_ID, launch, ShieldBridge.strings.appName)
     }
 
     override fun onDestroy() {

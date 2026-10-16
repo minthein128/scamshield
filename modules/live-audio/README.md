@@ -1,6 +1,6 @@
 # live-audio
 
-Expo module (Android only) for SafeRoute live voice. It captures the microphone and plays the model's voice. The TypeScript interface is `LiveAudio` in `docs/live-audio-contract.md`. `index.ts` exports `createLiveAudio()`. On web and iOS the returned object throws a clear error on every call; the web build uses `src/lib/liveAudio.web.ts` instead.
+Expo module (Android only) for Kakwe live voice. It captures the microphone and plays the model's voice. The TypeScript interface is `LiveAudio` in `docs/live-audio-contract.md`. `index.ts` exports `createLiveAudio()`. On web and iOS the returned object throws a clear error on every call; the web build uses `src/lib/liveAudio.web.ts` instead.
 
 ## Audio format
 

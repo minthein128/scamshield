@@ -7,21 +7,22 @@ import androidx.core.app.NotificationCompat
 
 /**
  * The shield's foreground-service notification. It is neutral on purpose: someone who sees the lock
- * screen or the shade learns only that SafeRoute is installed, never what was checked.
+ * screen or the shade learns only that Kakwe is installed, never what was checked.
  */
 internal object ShieldNotification {
-    const val TITLE = "SafeRoute"
+    const val TITLE = "Kakwe"
     const val TEXT = "Ready when you need it"
-    const val CHANNEL_NAME = "SafeRoute"
-    const val CHANNEL_DESCRIPTION = "Keeps SafeRoute ready"
+    const val CHANNEL_NAME = TITLE
 
-    fun build(context: Context, channelId: String, contentIntent: PendingIntent?): Notification {
+    fun channelDescription(name: String = TITLE) = "Keeps $name ready"
+
+    fun build(context: Context, channelId: String, contentIntent: PendingIntent?, title: String = TITLE): Notification {
         val public = NotificationCompat.Builder(context, channelId)
-            .setContentTitle(TITLE)
+            .setContentTitle(title)
             .setSmallIcon(android.R.drawable.ic_dialog_info)
             .build()
         return NotificationCompat.Builder(context, channelId)
-            .setContentTitle(TITLE)
+            .setContentTitle(title)
             .setContentText(TEXT)
             .setSmallIcon(android.R.drawable.ic_dialog_info)
             .setOngoing(true)
