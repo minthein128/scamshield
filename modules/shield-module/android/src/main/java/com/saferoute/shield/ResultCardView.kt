@@ -70,7 +70,8 @@ internal class ResultCardView(
     private val fonts: ShieldFonts,
     private val fontScale: Float,
     val model: CardModel,
-    private val callbacks: CardCallbacks
+    private val callbacks: CardCallbacks,
+    private val strings: ShieldStrings = ShieldStrings.DEFAULT,
 ) : LinearLayout(context) {
 
     private val d = resources.displayMetrics.density
@@ -110,7 +111,7 @@ internal class ResultCardView(
             addView(details, LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0))
             details.visibility = GONE
         }
-        ViewCompat.addAccessibilityAction(this, "Dismiss") { _, _ ->
+        ViewCompat.addAccessibilityAction(this, strings.dismiss) { _, _ ->
             callbacks.onSwipedAway()
             true
         }
@@ -127,7 +128,7 @@ internal class ResultCardView(
         ViewCompat.replaceAccessibilityAction(
             header,
             AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_CLICK,
-            if (model.canExpand) "Show details" else "Retry",
+            if (model.canExpand) strings.showDetails else strings.tapToRetry,
             null
         )
 
@@ -172,7 +173,7 @@ internal class ResultCardView(
                 orientation = HORIZONTAL
                 gravity = Gravity.TOP
                 isFocusable = true
-                contentDescription = "${severityWord(flag.severity)} flag: ${flag.text}"
+                contentDescription = "${strings.severity(flag.severity)}: ${flag.text}"
             }
             row.addView(FlagIconView(context, palette.severity(flag.severity), palette.surface, flag.severity), LayoutParams(dp(18), dp(18)).apply {
                 topMargin = dp(1)
@@ -187,9 +188,9 @@ internal class ResultCardView(
         }
         model.preview?.let { details.addView(previewRow(it), LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply { topMargin = dp(12) }) }
         val actions = LinearLayout(context).apply { orientation = HORIZONTAL; gravity = Gravity.END }
-        actions.addView(textButton("Dismiss", palette.textMuted, fonts.semiBold) { callbacks.onDismissClicked() })
+        actions.addView(textButton(strings.dismiss, palette.textMuted, fonts.semiBold) { callbacks.onDismissClicked() })
         if (model.canOpenReport) {
-            actions.addView(textButton("Full report", palette.accent, fonts.bold) { callbacks.onFullReport() })
+            actions.addView(textButton(strings.fullReport, palette.accent, fonts.bold) { callbacks.onFullReport() })
         }
         details.addView(actions, LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
             topMargin = dp(6)
@@ -261,11 +262,6 @@ internal class ResultCardView(
         marginEnd = dp(4)
     }
 
-    private fun severityWord(severity: String) = when (severity) {
-        "high" -> "High risk"
-        "medium" -> "Medium risk"
-        else -> "Low risk"
-    }
 
     /** Fix the collapsed and expanded sizes. Call once before the card is added to a window. */
     fun prepare(maxExpandedWidth: Int) {

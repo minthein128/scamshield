@@ -64,21 +64,14 @@ internal class ShieldPalette(val dark: Boolean) {
             return ShieldPalette(night == Configuration.UI_MODE_NIGHT_YES)
         }
 
-        fun chipLabel(state: ShieldOverlay.State): String = when (state) {
-            ShieldOverlay.State.SAFE -> "Safe"
-            ShieldOverlay.State.CAREFUL -> "Be careful"
-            ShieldOverlay.State.DANGER -> "High risk"
-            else -> "Not checked"
-        }
-
-        /** Short chip text for an error message from CheckClient or the service. */
-        fun errorLabel(message: String): String {
+        /** Kind of failure behind an error message from CheckClient or the service: offline, rate, busy or other. */
+        fun errorKind(message: String): String {
             val m = message.lowercase()
             return when {
-                "no connection" in m || "internet" in m -> "Offline"
-                "too many" in m -> "Rate limited"
-                "busy" in m -> "Service busy"
-                else -> "Not checked"
+                "no connection" in m || "internet" in m -> "offline"
+                "too many" in m -> "rate"
+                "busy" in m -> "busy"
+                else -> "other"
             }
         }
     }

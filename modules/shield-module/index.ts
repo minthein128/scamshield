@@ -27,9 +27,21 @@ export interface ShieldCheckResult {
   model?: string;
 }
 
-/** Labels the voice companion shows on the bubble pill. Missing keys fall back to English. */
+/** Labels the overlay shows: verdict and error chips, card buttons and the voice companion. Missing keys fall back to English. */
 export const COMPANION_STRING_KEYS = [
   'name',
+  'verdictSafe',
+  'verdictCareful',
+  'verdictDanger',
+  'chipOffline',
+  'chipRateLimited',
+  'chipBusy',
+  'chipNotChecked',
+  'tapToRetry',
+  'dismiss',
+  'fullReport',
+  'showDetails',
+  'closeShield',
   'ask',
   'whatWeChecked',
   'previewClose',
