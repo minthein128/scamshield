@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import { AppState, PermissionsAndroid, Platform } from 'react-native';
+import { AppState, Platform } from 'react-native';
 import * as ShieldModule from 'shield-module';
 import { t } from '../i18n';
 import { useApiUrl } from '../config/runtime';
 import { companionStrings } from '../lib/companionStrings';
 import { diag, errorCode } from '../lib/diagLog';
+import { ensureNotifications, explainOnce, explainPermission, showPermissionHelp } from '../lib/permissions';
 import { isCleartext } from '../lib/shield';
 import { getAuthToken } from '../services/token';
 import { useAppState } from '../state/AppState';
@@ -21,11 +22,11 @@ export function shieldSupport(platform: string = Platform.OS, apiUrl: string | n
   return 'ready';
 }
 
-export type ShieldStep = 'idle' | 'overlay' | 'notifications' | 'capture' | 'microphone' | 'starting';
+export type ShieldStep = 'idle' | 'overlay' | 'notifications' | 'capture' | 'starting';
 
 export function stepText(step: ShieldStep): string {
   if (step === 'idle') return '';
-  return step === 'microphone' ? t('live:companion.permissionStep') : t(`shield:steps.${step}`);
+  return t(`shield:steps.${step}`);
 }
 
 export interface ShieldControl {
@@ -66,6 +67,10 @@ export function useShieldControl(): ShieldControl {
     setError(null);
     try {
       if (!(await ShieldModule.hasOverlayPermission())) {
+        if (!(await explainPermission('overlay'))) {
+          diag.info('shield', 'overlay_declined');
+          return;
+        }
         diag.info('shield', 'overlay_permission_requested');
         setStep('overlay');
         awaitingOverlay.current = true;
@@ -73,20 +78,21 @@ export function useShieldControl(): ShieldControl {
         return;
       }
       awaitingOverlay.current = false;
-      if (Number(Platform.Version) >= 33) {
-        setStep('notifications');
-        await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
-      }
+      setStep('notifications');
+      const notified = await ensureNotifications('notifications');
+      if (notified !== 'granted') diag.info('shield', 'notifications_not_granted', { result: notified });
       setStep('capture');
-      if (!(await ShieldModule.requestScreenCapturePermission())) {
-        diag.warn('shield', 'capture_denied');
-        setError(t('shield:errors.needsScreen'));
+      if (!(await explainOnce('screen'))) {
+        diag.info('shield', 'capture_declined');
         setStep('idle');
         return;
       }
-      if (!(await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO))) {
-        setStep('microphone');
-        await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO).catch(() => undefined);
+      if (!(await ShieldModule.requestScreenCapturePermission())) {
+        diag.warn('shield', 'capture_denied');
+        setError(t('shield:errors.needsScreen'));
+        showPermissionHelp('screen');
+        setStep('idle');
+        return;
       }
       setStep('starting');
       const token = await getAuthToken();
@@ -121,7 +127,10 @@ export function useShieldControl(): ShieldControl {
       if (awaitingOverlay.current) {
         ShieldModule.hasOverlayPermission().then(ok => {
           if (ok) turnOn().catch(() => undefined);
-          else setStep('idle');
+          else {
+            setStep('idle');
+            showPermissionHelp('overlay');
+          }
         });
         awaitingOverlay.current = false;
       }

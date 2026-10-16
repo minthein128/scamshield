@@ -24,6 +24,7 @@ import GetHelpScreen from '../screens/GetHelpScreen';
 import RadarScreen from '../screens/RadarScreen';
 import { navigationRef } from './ref';
 import { useAppState } from '../state/AppState';
+import { PermissionHost } from '../components/PermissionHost';
 import { useMessageGuardConfigSync } from '../hooks/useMessageGuard';
 import { useShieldTokenSync } from '../hooks/useShieldTokenSync';
 import LearnScreen from '../screens/LearnScreen';
@@ -124,6 +125,7 @@ export const RootNavigator: React.FC = () => {
       </Stack.Navigator>
       <ShareIntentBridge ready={ready && inApp} />
       <DeepLinkBridge ready={ready && inApp} />
+      <PermissionHost />
     </NavigationContainer>
   );
 };
