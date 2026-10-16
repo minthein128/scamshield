@@ -108,6 +108,7 @@ describe('live session', () => {
   it('builds the socket url from the api base', () => {
     expect(liveWsUrl('https://x.trycloudflare.com/')).toBe('wss://x.trycloudflare.com/v1/live');
     expect(liveWsUrl('http://localhost:8080')).toBe('ws://localhost:8080/v1/live');
+    expect(liveWsUrl('https://sg-dev-808112092414.asia-southeast1.run.app')).toBe('wss://sg-dev-808112092414.asia-southeast1.run.app/v1/live');
   });
 
   it('sends mic chunks, drops them when muted', async () => {

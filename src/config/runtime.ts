@@ -1,9 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useState } from 'react';
 import { diag } from '../lib/diagLog';
-import { API_URL, OFFLINE_MOCK, STABLE_API_URL } from './env';
+import { API_URL, FALLBACK_API_URL, OFFLINE_MOCK, STABLE_API_URL } from './env';
 
-const DEFAULT_CONFIG_URLS = [`${STABLE_API_URL}/config.json`, 'https://saferoute-aibc.web.app/config.json', 'https://saferoute-aibc.firebaseapp.com/config.json'];
+const DEFAULT_CONFIG_URLS = ['https://saferoute-aibc.web.app/config.json', 'https://saferoute-aibc.firebaseapp.com/config.json'];
 
 export function parseConfigUrls(raw: string | undefined): string[] {
   const urls = (raw ?? '')
@@ -129,8 +129,10 @@ export function fetchFirstApiUrl(
 }
 
 export async function checkHealth(url: string, fetchImpl: typeof fetch = fetch, timeoutMs = HEALTH_TIMEOUT_MS): Promise<boolean> {
-  const res = await timedFetch(fetchImpl, `${url.replace(/\/+$/, '')}/healthz`, timeoutMs, 'health');
-  return Boolean(res?.ok);
+  const root = url.replace(/\/+$/, '');
+  const res = await timedFetch(fetchImpl, `${root}/health`, timeoutMs, 'health');
+  if (res?.status !== 404) return Boolean(res?.ok);
+  return Boolean((await timedFetch(fetchImpl, `${root}/healthz`, timeoutMs, 'health'))?.ok);
 }
 
 /** True when any reliable public endpoint answers, whatever the status. */
@@ -147,6 +149,7 @@ export interface ResolveDeps {
   configUrls?: string[];
   staggerMs?: number;
   stableUrl?: string;
+  fallbackUrl?: string;
   graceMs?: number;
 }
 
@@ -165,7 +168,8 @@ async function resolveUrlInner(deps: ResolveDeps): Promise<string> {
   const cached = validApiUrl(await AsyncStorage.getItem(API_URL_CACHE_KEY).catch(() => null));
   const baked = validApiUrl(deps.envUrl ?? API_URL);
   const stable = validApiUrl(deps.stableUrl ?? STABLE_API_URL);
-  const known = [stable, cached, baked].filter((u, i, a): u is string => Boolean(u) && a.indexOf(u) === i);
+  const fallback = validApiUrl(deps.fallbackUrl ?? FALLBACK_API_URL);
+  const known = [stable, fallback, cached, baked].filter((u, i, a): u is string => Boolean(u) && a.indexOf(u) === i);
 
   const memo = new Map<string, Promise<boolean>>();
   const healthy = (u: string) => {

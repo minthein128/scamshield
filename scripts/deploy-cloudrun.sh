@@ -11,6 +11,7 @@ DATA_PROJECT="${DATA_PROJECT:-saferoute-aibc}"
 DATA_GCLOUD_CONFIG="${DATA_GCLOUD_CONFIG:-}"
 SECRETS_DIR="${SECRETS_DIR:-$HOME/work/scamshield-secrets}"
 GEMINI_MODEL="${GEMINI_MODEL:-gemini-3.5-flash-lite}"
+PUBLIC_API_URL="${PUBLIC_API_URL:-https://sg-dev-808112092414.asia-southeast1.run.app}"
 MIN_INSTANCES="${MIN_INSTANCES:-1}"
 MAX_INSTANCES="${MAX_INSTANCES:-2}"
 CONCURRENCY="${CONCURRENCY:-80}"
@@ -63,7 +64,7 @@ gc run deploy "$SERVICE" --source server --image "$IMAGE" --region "$REGION" \
   --memory 1Gi --cpu 1 --cpu-boost --concurrency "$CONCURRENCY" --timeout 3600 \
   --min-instances "$MIN_INSTANCES" --max-instances "$MAX_INSTANCES" \
   --set-secrets "GEMINI_API_KEY=${SECRET_PREFIX}gemini-api-key:latest,INTEL_PEPPER=${SECRET_PREFIX}intel-pepper:latest,SAFE_BROWSING_API_KEY=${SECRET_PREFIX}safe-browsing-api-key:latest" \
-  --set-env-vars "^|^GEMINI_MODEL=${GEMINI_MODEL}|FIREBASE_PROJECT_ID=${DATA_PROJECT}|INTEL_PROJECT=${DATA_PROJECT}|NODE_OPTIONS=--max-old-space-size=768"
+  --set-env-vars "^|^GEMINI_MODEL=${GEMINI_MODEL}|FIREBASE_PROJECT_ID=${DATA_PROJECT}|INTEL_PROJECT=${DATA_PROJECT}|PUBLIC_API_URL=${PUBLIC_API_URL}|NODE_OPTIONS=--max-old-space-size=768"
 
 URL="$(gc run services describe "$SERVICE" --region "$REGION" --format 'value(status.url)')"
 echo "Cloud Run URL: $URL"
