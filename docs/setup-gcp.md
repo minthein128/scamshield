@@ -1,14 +1,13 @@
 # GCP setup
 
-TLDR: Firebase (Auth, Firestore, Hosting) stays in `saferoute-aibc` (no billing). The API runs on Cloud Run as service `sg-dev` in project `crtest-511817` (billing on), region `asia-southeast1`, and reads Firestore in `saferoute-aibc` across projects. `scripts/deploy-cloudrun.sh` sets it all up and deploys. `saferoute-api.akkhayar.com` still points at the tunnel backend until the release switch.
+TLDR: Firebase (Auth, Firestore, Hosting) stays in `saferoute-aibc` (no billing). The API runs on Cloud Run as service `sg-dev` in project `crtest-511817` (billing on), region `asia-southeast1`, and reads Firestore in `saferoute-aibc` across projects. `scripts/deploy-cloudrun.sh` sets it all up and deploys. The app calls `https://sg-dev-808112092414.asia-southeast1.run.app` directly; the APK downloads from `https://saferoute-aibc.web.app/saferoute.apk`.
 
 ## State
 
 | Piece | Project | State |
 |---|---|---|
 | Firebase Auth, Firestore `(default)`, Hosting `saferoute-aibc.web.app` | `saferoute-aibc` | live, Spark plan |
-| `saferoute-api.akkhayar.com` | Cloudflare | tunnel to the dev-host backend (port 18080) |
-| Cloud Run service `sg-dev` | `crtest-511817` | deployed, not live; `https://sg-dev-808112092414.asia-southeast1.run.app` |
+| Cloud Run service `sg-dev` | `crtest-511817` | live; `https://sg-dev-808112092414.asia-southeast1.run.app` |
 | Artifact Registry repo `sg-dev` (docker, `asia-southeast1`) | `crtest-511817` | holds the `sg-dev` image |
 | Runtime service account `sg-dev@crtest-511817.iam.gserviceaccount.com` | `crtest-511817` | `secretAccessor` on the three secrets; `roles/datastore.user` on `saferoute-aibc` |
 | Secrets `sg-dev-gemini-api-key`, `sg-dev-intel-pepper`, `sg-dev-safe-browsing-api-key` | `crtest-511817` | mounted as `GEMINI_API_KEY`, `INTEL_PEPPER`, `SAFE_BROWSING_API_KEY` |
@@ -19,7 +18,7 @@ TLDR: Firebase (Auth, Firestore, Hosting) stays in `saferoute-aibc` (no billing)
 
 | Setting | Value | Why |
 |---|---|---|
-| Gemini | `GEMINI_API_KEY` from Secret Manager | same mode as the tunnel backend |
+| Gemini | `GEMINI_API_KEY` from Secret Manager | AI Studio key mode, no Vertex billing on `saferoute-aibc` |
 | Firestore | `FIREBASE_PROJECT_ID=saferoute-aibc`, `INTEL_PROJECT=saferoute-aibc` | config, admin, intel and feedback stores and token checks use the Firebase project |
 | Web Risk | ADC as `sg-dev`, billed to `crtest-511817` | Web Risk rejects API keys; Safe Browsing stays as the fallback |
 | `APK_PATH` | unset | `/download` and `/download/saferoute.apk` answer 302 to `https://saferoute-aibc.web.app/saferoute.apk` |
@@ -31,7 +30,7 @@ TLDR: Firebase (Auth, Firestore, Hosting) stays in `saferoute-aibc` (no billing)
 
 Cloud Run reserves `/healthz` on `run.app` URLs (Google answers 404 before the request reaches the container). The server also answers `/health`; probe that on `run.app`. The app probes `/health` and retries `/healthz` only on a 404, so servers older than `/health` still pass.
 
-The app does not need a Cloudflare hop. Builds 1.0.172 to 1.0.198 keep using `saferoute-api.akkhayar.com` and probe `/healthz` only, so keep that host and the web.app `config.json` pointing at it until those installs update.
+The app needs no Cloudflare hop. Its primary URL is the run.app URL (`src/config/env.ts`); it falls back to the web.app `config.json` only when that URL is unhealthy.
 
 ## Deploy
 
@@ -53,23 +52,6 @@ The script is idempotent and holds no secrets. It:
 Variables: `PROJECT`, `REGION`, `SERVICE`, `REPO`, `SA_NAME`, `SECRET_PREFIX`, `DATA_PROJECT`, `DATA_GCLOUD_CONFIG`, `SECRETS_DIR`, `GEMINI_MODEL`, `MIN_INSTANCES`, `MAX_INSTANCES`, `CONCURRENCY`. The script does not touch DNS, GitHub variables, the web demo or the APK.
 
 `server.yml` deploys on push to `main` with Vertex AI into the `GCP_PROJECT_ID` variable (`saferoute-aibc`, no billing). Point it at `crtest-511817` and `sg-dev`, or disable it, before `main` gets a server change.
-
-## Switch `saferoute-api.akkhayar.com` to Cloud Run
-
-Use a Cloudflare Worker on the route `saferoute-api.akkhayar.com/*`. It keeps the hostname and the Cloudflare certificate, passes WebSockets, and needs no Google domain verification. Shipped APKs probe `/healthz`, which Cloud Run reserves, so the Worker rewrites it to `/health`:
-
-```js
-export default {
-  fetch(req) {
-    const url = new URL(req.url);
-    url.hostname = 'sg-dev-808112092414.asia-southeast1.run.app';
-    if (url.pathname === '/healthz') url.pathname = '/health';
-    return fetch(new Request(url, req));
-  },
-};
-```
-
-Deploy the Worker and add the route. The proxied DNS record of the named tunnel stays; the Worker answers before the tunnel origin is reached. Roll back by deleting the route. Retire the tunnel backend after a quiet period.
 
 ## Verify
 
@@ -119,20 +101,6 @@ gcloud iam service-accounts add-iam-policy-binding saferoute-deployer@$P.iam.gse
 ```
 
 Web Risk has no IAM role. It needs the API enabled and billing on the caller's project; `sg-dev` calls it through ADC and `crtest-511817` pays. The Safe Browsing key (`SAFE_BROWSING_API_KEY`) is the fallback when Web Risk fails.
-
-## Temporary backend
-
-Until the Cloud Run API is live, a quick Cloudflare tunnel serves the backend from a dev host. The files live outside the repo in `~/work/scamshield-run`.
-
-| Piece | Role |
-|---|---|
-| `start.sh` | Starts the server on port 18080 and a `cloudflared` quick tunnel, writes the URL to `tunnel-url.txt`, then calls `publish-config.sh` |
-| `publish-config.sh` | Writes `{ "apiUrl": "<tunnel>" }` to `dist/config.json` and runs `firebase deploy --only hosting` when the URL differs from the live file |
-| `watchdog.sh` | Checks `/healthz` locally and through the tunnel; reruns `start.sh` on failure |
-| `scamshield-backend.service` | `systemd --user` oneshot unit that runs `start.sh` at boot (user linger enabled) |
-| `scamshield-watchdog.timer` | Runs `watchdog.sh` every minute |
-
-A quick tunnel gets a new URL on every start. The app is to read `https://saferoute-aibc.web.app/config.json` (served with `Cache-Control: no-cache`, see `firebase.json`) so builds need no baked URL. The GitHub variable `EXPO_PUBLIC_API_URL` must match the current tunnel for builds that still bake it.
 
 ## Firebase App Distribution
 

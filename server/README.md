@@ -42,7 +42,7 @@ Link results add flags: a Web Risk hit adds `known_bad` (high); a domain under 1
 - `POST /v1/check`: see the contract. 400 `bad_request`, 413 `too_large` (body over 6 MB, image over ~4 MB), 429 `rate_limited`, 502 `upstream`.
 - `POST /v1/speak`: `{text, language}` returns a base64 WAV from Gemini TTS (`TTS_MODEL`, default `gemini-3.8-flash-tts`; unverified, see CLAUDE.md).
 - `GET /health`, `GET /healthz`: `{ ok, model, mock }`. Cloud Run reserves `/healthz` on `run.app`, so use `/health` there.
-- `GET /config.json`: `{ apiUrl }` from `PUBLIC_API_URL` (default `https://saferoute-api.akkhayar.com`; `scripts/deploy-cloudrun.sh` sets the run.app URL), `Cache-Control: no-cache`. Installed builds before the run.app switch read it as their first config source.
+- `GET /config.json`: `{ apiUrl }` from `PUBLIC_API_URL` (default `https://sg-dev-808112092414.asia-southeast1.run.app`), `Cache-Control: no-cache`. Installed builds before the run.app switch read it as their first config source.
 - `GET /download`: small HTML install page (English and Burmese, no external assets) for networks that block `*.web.app`.
 - `GET|HEAD /download/saferoute.apk`: streams the file at `APK_PATH` as `application/vnd.android.package-archive` with `Content-Length`, `Cache-Control: no-cache` and an mtime/size `ETag`. 404 when `APK_PATH` is unset or the file is missing. With `APK_VERSION` set it answers `302` (`no-store`) to `/download/saferoute-<APK_VERSION>.apk`, which serves the file as `immutable`. Outside the check rate limit; own limit of `APK_LIMIT_PER_HOUR` per IP.
 
