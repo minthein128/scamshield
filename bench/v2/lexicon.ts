@@ -104,7 +104,7 @@ export const ADVICE_LIBRARY: Record<AdviceId, Phrase[]> = {
     /jangan (?:\S+ ){0,3}(?:paspor|dokumen|ktp|swafoto|selfie)/,
     /(?:huwag|wag) (?:\S+ ){0,4}(?:pasaporte|dokumento|id|selfie)/,
     /(?:ပတ်စ်?ပို့|ပါ့စပို့|နိုင်ငံကူးလက်မှတ်|စာရွက်စာတမ်း|မှတ်ပုံတင်).{0,40}မ(?:ပေး|ပို့|အပ်)/,
-    /(?:อย่า|ไม่ควร)(?:เพิ่ง)?(?:ส่ง|ให้|มอบ).{0,24}(?:พาสปอร์ต|หนังสือเดินทาง|เอกสาร|บัตรประชาชน|รูป)/,
+    /(?:อย่า|ไม่ควร).{0,12}(?:ส่ง|ให้|มอบ).{0,24}(?:พาสปอร์ต|หนังสือเดินทาง|เอกสาร|บัตรประชาชน|รูป)/,
   ],
   dont_travel: [
     new RegExp(`${NEG_EN} (?:\\S+ ){0,5}(?:travel|go|leave|cross|get in|board|accept the ride|meet)\\b`),
@@ -158,7 +158,7 @@ export const ADVICE_LIBRARY: Record<AdviceId, Phrase[]> = {
   call_hotline: ['hotline', 'helpline', 'call the police', 'saluran bantuan', 'polisi', 'pulis', 'ဟော့လိုင်း', 'ရဲ', 'สายด่วน', 'ตำรวจ'],
   dont_click_link: [
     new RegExp(`${NEG_EN} (?:\\S+ ){0,5}(?:click|tap|open|press|visit)\\b`),
-    /jangan (?:\S+ ){0,2}(?:klik|buka|membuka|tekan)/,
+    /jangan (?:\S+ ){0,2}(?:klik|buka|membuka|tekan|tap|ketuk)/,
     /(?:huwag|wag) (?:\S+ ){0,2}(?:i click|pindutin|buksan|i tap)/,
     'မနှိပ်',
     'မဖွင့်',
@@ -182,7 +182,29 @@ export const ADVICE_LIBRARY: Record<AdviceId, Phrase[]> = {
     'รายงาน',
     'แจ้ง',
   ],
-  verify_official: ['official', 'directly', 'resmi', 'langsung', 'opisyal', 'direkta', 'တရားဝင်', 'တိုက်ရိုက်', 'ทางการ', 'โดยตรง', 'ช่องทาง'],
+  verify_official: [
+    'official',
+    'directly',
+    'already know',
+    'sudah anda ketahui',
+    'yang anda kenal',
+    'alam mo na',
+    'kilala mo',
+    'ที่รู้จัก',
+    'ที่คุณรู้จัก',
+    'ที่มีอยู่แล้ว',
+    'သိပြီးသား',
+    'သိထားတဲ့',
+    'resmi',
+    'langsung',
+    'opisyal',
+    'direkta',
+    'တရားဝင်',
+    'တိုက်ရိုက်',
+    'ทางการ',
+    'โดยตรง',
+    'ช่องทาง',
+  ],
 };
 
 /** Words that call a person or company a criminal, or a thing a scam, by language. */

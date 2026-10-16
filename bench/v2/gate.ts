@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { relative, resolve } from 'node:path';
 import { parseArgs } from '../lib.js';
 import { BASELINE, type BenchResultV2, COMMON_HELP, optionsFromFlags, printSummary, runBench } from './bench.js';
+import { allCritical, allInvented } from './metrics.js';
 
 export interface GateVerdict {
   pass: boolean;
@@ -11,11 +12,15 @@ export interface GateVerdict {
   lines: string[];
 }
 
-/** Fails on a score drop above maxDrop, a new critical failure, or a missing case. */
+/** Fails on a score drop above maxDrop, a new critical failure or wrong number, or a lost case. */
 export function gate(baseline: BenchResultV2, current: BenchResultV2, maxDrop: number): GateVerdict {
   const drop = (baseline.summary.composite ?? 0) - (current.summary.composite ?? 0);
-  const had = new Set(baseline.cases.flatMap((c) => c.critical.map((k) => `${c.id}:${k}`)));
-  const newCritical = current.cases.flatMap((c) => c.critical.map((k) => `${c.id}:${k}`)).filter((k) => !had.has(k));
+  const had = new Set(
+    baseline.cases.flatMap((c) => [...allCritical(c), ...allInvented(c).map((n) => `wrong_number ${n}`)].map((k) => `${c.id}:${k}`)),
+  );
+  const newCritical = current.cases
+    .flatMap((c) => [...allCritical(c), ...allInvented(c).map((n) => `wrong_number ${n}`)].map((k) => `${c.id}:${k}`))
+    .filter((k) => !had.has(k));
   const missing = baseline.cases.map((c) => c.id).filter((id) => !current.cases.some((c) => c.id === id));
   const lines = [
     `baseline ${baseline.date} ${baseline.model} prompt ${baseline.prompt.name} (${baseline.prompt.hash}): ${baseline.summary.composite?.toFixed(1)}`,
@@ -29,7 +34,9 @@ export function gate(baseline: BenchResultV2, current: BenchResultV2, maxDrop: n
   }
   for (const k of newCritical) lines.push(`  NEW CRITICAL ${k}`);
   for (const m of missing) lines.push(`  MISSING CASE ${m}`);
-  return { pass: drop <= maxDrop && newCritical.length === 0 && missing.length === 0, drop, newCritical, missing, lines };
+  const newErrors = current.summary.errors > baseline.summary.errors;
+  if (newErrors) lines.push(`  RUN ERRORS ${current.summary.errors} (baseline ${baseline.summary.errors})`);
+  return { pass: drop <= maxDrop && newCritical.length === 0 && missing.length === 0 && !newErrors, drop, newCritical, missing, lines };
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {

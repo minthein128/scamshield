@@ -79,7 +79,7 @@ export function stitchedFrom(needle: string, hay: string, maxPieces = 3): boolea
   return true;
 }
 
-/** Is a quote present in the source? Each sentence or ellipsis-separated part must be found. */
+/** Is a quote in the source? Each sentence or part must be found and every number must match exactly. */
 export function groundEvidence(evidence: string, sources: string[], threshold = 0.8): EvidenceMatch {
   const parts = evidence
     .split(/\.{3}|…|(?<=[.!?\u104b])\s+|\n+/u)
@@ -103,8 +103,10 @@ export function groundEvidence(evidence: string, sources: string[], threshold = 
     total += len;
     weighted += s * len;
   }
+  const known = new Set(sources.flatMap(numbersIn).map((n) => String(Number(n))));
+  const wrongNumber = numbersIn(evidence).some((n) => !known.has(String(Number(n))));
   const score = total ? weighted / total : 0;
-  const grounded = score >= threshold;
+  const grounded = score >= threshold && !wrongNumber;
   return { grounded, score: Math.round(score * 1000) / 1000, how: grounded ? how : 'none' };
 }
 

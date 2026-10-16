@@ -85,6 +85,9 @@ export interface CaseScore {
   uncapped: number;
   composite: number;
   judge?: { score: number; reason: string; model: string };
+  /** The base run and each repeat scored on its own, for paired comparisons across runs. */
+  runs?: { verdict: string; score: number | null; composite: number; critical: string[]; invented: string[] }[];
+  meanComposite?: number;
   output?: {
     title: string;
     summary: string;

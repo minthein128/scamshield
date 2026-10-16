@@ -113,13 +113,17 @@ export async function runBench(opts: BenchOptions): Promise<BenchResultV2> {
     const recs = byCase.get(c.id);
     if (!recs) continue;
     const base = recs.find((r) => r.kind === 'base') as RunRecord;
-    scores.push(
-      scoreCase(
-        c,
-        base,
-        recs.filter((r) => r.kind !== 'base'),
-      ),
+    const s = scoreCase(
+      c,
+      base,
+      recs.filter((r) => r.kind !== 'base'),
     );
+    s.runs = [base, ...recs.filter((r) => r.kind === 'repeat')].map((r) => {
+      const x = scoreCase(c, { ...r, kind: 'base' }, []);
+      return { verdict: x.verdict, score: x.score, composite: x.composite, critical: x.critical, invented: x.facts.invented };
+    });
+    s.meanComposite = Math.round((10 * s.runs.reduce((a, r) => a + r.composite, 0)) / s.runs.length) / 10;
+    scores.push(s);
   }
 
   const judgeModel = opts.judge === false || opts.judge === undefined ? null : opts.judge || JUDGE_MODEL;

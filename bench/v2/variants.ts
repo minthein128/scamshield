@@ -115,7 +115,7 @@ export interface VariantPlan {
 }
 
 export function parsePlan(spec: string | undefined, repeats: number): VariantPlan {
-  if (spec === 'none') return { images: [], languages: false, repeats: 1 };
+  if (spec === 'none') return { images: [], languages: false, repeats };
   const all = !spec || spec === 'all';
   const want = new Set(all ? [...IMAGE_VARIANTS, 'lang'] : spec.split(','));
   for (const w of want) if (w !== 'lang' && !(IMAGE_VARIANTS as readonly string[]).includes(w)) throw new Error(`unknown variant ${w}`);
