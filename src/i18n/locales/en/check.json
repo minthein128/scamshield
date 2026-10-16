@@ -1,6 +1,6 @@
 {
   "title": "Check something",
-  "whatIsIt": "What is it?",
+  "whatIsIt": "What do you want to check?",
   "kinds": {
     "job": "Job offer",
     "message": "Message",
