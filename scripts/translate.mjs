@@ -21,7 +21,7 @@ const LANG_NAMES = {
 
 // Product terms. null means keep the English text exactly as written.
 const GLOSSARY = {
-  SafeRoute: { all: null },
+  Kakwe: { my: 'ကာကွယ်', id: 'Kakwe', tl: 'Kakwe', th: 'Kakwe' },
   'Screen shield': { all: null },
   'Message Guard': { all: null },
   'Pyit Taing Htaung (the voice companion)': { my: 'ပစ်တိုင်းထောင်', id: 'Pyit Taing Htaung', tl: 'Pyit Taing Htaung', th: 'Pyit Taing Htaung' },
@@ -99,7 +99,7 @@ async function callGemini(apiKey, lang, entries, retries = 3) {
   const glossary = Object.entries(GLOSSARY)
     .map(([term, tr]) => `- "${term}" => ${tr.all === null ? 'keep in English' : `"${tr[lang]}"`}`)
     .join('\n');
-  const system = `You translate UI strings of SafeRoute, an anti-scam app for migrant workers, from English into ${LANG_NAMES[lang]}.
+  const system = `You translate UI strings of Kakwe, an anti-scam app for migrant workers, from English into ${LANG_NAMES[lang]}.
 Glossary (use exactly these):
 ${glossary}
 Rules:${STYLE_RULES}

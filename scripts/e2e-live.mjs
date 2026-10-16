@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Drives the exported web app in headless Chrome with a fake microphone and checks Talk to SafeRoute.
+// Drives the exported web app in headless Chrome with a fake microphone and checks Talk to Kakwe.
 // Usage: node scripts/e2e-live.mjs --web=/tmp/web --api=http://127.0.0.1:8791 --wav=/tmp/q-my.wav --lang=my --out=pitch/e2e --cap-ms=120000
 // Needs puppeteer-core (npm i --no-save puppeteer-core) and a Chrome binary in CHROME_PATH (default /tmp/chrome-ns.sh).
 import { createServer } from 'node:http';
@@ -92,7 +92,7 @@ await page.type(sel('check-text'), JOB, { delay: 0 });
 await shot('02-check');
 await page.click(sel('check-submit'));
 const gotReport = await waitFor(async () => (await page.$(sel('report-talk'))) !== null, 90000, 'report');
-ok('check finished and the report shows Talk to SafeRoute', gotReport);
+ok('check finished and the report shows Talk to Kakwe', gotReport);
 await sleep(800);
 await shot('03-report');
 
