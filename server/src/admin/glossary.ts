@@ -8,7 +8,7 @@ export const LANG_NAMES = {
 
 /** Product terms. null means keep the English text exactly as written. Mirrors scripts/translate.mjs; a test keeps them in step. */
 export const GLOSSARY: Record<string, Record<string, string | null>> = {
-  SafeRoute: { all: null },
+  Kakwe: { my: 'ကာကွယ်', id: 'Kakwe', tl: 'Kakwe', th: 'Kakwe' },
   'Screen shield': { all: null },
   'Message Guard': { all: null },
   'Low risk (the safe verdict; never "Safe", it must read as a likelihood)': {

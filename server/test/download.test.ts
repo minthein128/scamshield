@@ -46,7 +46,7 @@ describe('apk download', () => {
     const res = await appOf({ APK_PATH: file }).request('/download/saferoute.apk');
     expect(res.status).toBe(200);
     expect(res.headers.get('content-type')).toBe('application/vnd.android.package-archive');
-    expect(res.headers.get('content-disposition')).toBe('attachment; filename="SafeRoute.apk"');
+    expect(res.headers.get('content-disposition')).toBe('attachment; filename="Kakwe.apk"');
     expect(res.headers.get('content-length')).toBe('5000');
     expect(res.headers.get('cache-control')).toBe('no-cache');
     expect(res.headers.get('etag')).toMatch(/^"[0-9a-f]+-1388"$/);

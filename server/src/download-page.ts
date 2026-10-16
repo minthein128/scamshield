@@ -8,7 +8,7 @@ export function downloadPage(opts: { version?: string; bytes?: number; href?: st
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SafeRoute for Android</title>
+<title>Kakwe for Android</title>
 <style>
 body{font:18px/1.5 system-ui,sans-serif;max-width:32rem;margin:0 auto;padding:1.5rem;color:#1a1a1a}
 h1{margin:0 0 .25rem}
@@ -20,9 +20,9 @@ small{display:block;color:#555}
 </style>
 </head>
 <body>
-<h1>SafeRoute</h1>
+<h1>Kakwe</h1>
 <p class="meta">${meta}</p>
-<a class="btn" href="${esc(opts.href ?? '/download/saferoute.apk')}">Download SafeRoute (APK)<small style="color:#d6f0e0">SafeRoute ကို ဒေါင်းလုဒ်လုပ်ပါ</small></a>
+<a class="btn" href="${esc(opts.href ?? '/download/saferoute.apk')}">Download Kakwe (APK)<small style="color:#d6f0e0">ကာကွယ် ကို ဒေါင်းလုဒ်လုပ်ပါ</small></a>
 <ol>
 <li>Allow installs from your browser when Android asks.<small>ဖုန်းက တောင်းလာလျှင် ဘရောက်ဇာမှ ထည့်သွင်းခွင့်ပေးပါ။</small></li>
 <li>Open the downloaded file.<small>ဒေါင်းလုဒ်လုပ်ပြီးသော ဖိုင်ကို ဖွင့်ပါ။</small></li>

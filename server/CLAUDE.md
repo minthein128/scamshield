@@ -1,4 +1,4 @@
-# SafeRoute server (agent guide)
+# Kakwe server (agent guide)
 
 Hono + TypeScript service implementing `docs/api-contract.md`. Pipeline: Extract (Gemini) -> Correlate (Web Risk + RDAP) -> Score (rules) -> Explain.
 

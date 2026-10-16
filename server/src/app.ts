@@ -119,7 +119,7 @@ export function createApp(
     if (!st || !cfg.apkPath) return c.json(errorBody('bad_request', 'APK not available'), 404 as never);
     const headers = {
       'content-type': 'application/vnd.android.package-archive',
-      'content-disposition': 'attachment; filename="SafeRoute.apk"',
+      'content-disposition': 'attachment; filename="Kakwe.apk"',
       'content-length': String(st.size),
       'cache-control': immutable ? 'public, max-age=31536000, immutable' : 'no-cache',
       etag: `"${Math.floor(st.mtimeMs).toString(16)}-${st.size.toString(16)}"`,

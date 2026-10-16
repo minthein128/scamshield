@@ -218,7 +218,7 @@ export function countCertainty(res: Pick<CheckResponse, 'title' | 'summary' | 's
   return userFacingText(res).reduce((n, t) => n + findCertainty(t, lang).length, 0);
 }
 
-// SafeRoute speaks with a female voice. These are male speaker forms; ผม also means "hair", so this is detect only.
+// Kakwe speaks with a female voice. These are male speaker forms; ผม also means "hair", so this is detect only.
 const MALE_FORMS: Partial<Record<Lang, RegExp>> = {
   my: /ကျွန်တော်|ခင်ဗျာ|ခင်ဗျ/g,
   th: /ครับ|ผม/g,
@@ -226,7 +226,7 @@ const MALE_FORMS: Partial<Record<Lang, RegExp>> = {
 
 export const genderCounters = { gender_form_hit: 0 };
 
-// Promises of actions SafeRoute cannot take (send, call, contact, report, follow up). Detect only.
+// Promises of actions Kakwe cannot take (send, call, contact, report, follow up). Detect only.
 const PROMISES: Record<Lang, RegExp> = {
   en: /\b(?:we|i)(?:'ll| will| are going to| am going to) (?:send|call|contact|message|text|report|follow up|notify|get back|reach out)/gi,
   id: /\b(?:kami|saya) akan (?:mengirim|kirim|menelepon|menghubungi|melaporkan|mengabari)/gi,
@@ -237,7 +237,7 @@ const PROMISES: Record<Lang, RegExp> = {
 
 export const promiseCounters = { promise_hit: 0 };
 
-/** Promises of actions SafeRoute cannot take, in any language. Detect only, never rewritten. */
+/** Promises of actions Kakwe cannot take, in any language. Detect only, never rewritten. */
 export function findPromises(text: string): string[] {
   return (Object.values(PROMISES) as RegExp[]).flatMap((re) => [...text.matchAll(new RegExp(re.source, re.flags))].map((m) => m[0]));
 }

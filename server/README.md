@@ -1,6 +1,6 @@
-# SafeRoute server
+# Kakwe server
 
-Backend for the SafeRoute Android app. Implements `docs/api-contract.md` on Node 22, Hono and `@google/genai`. Runs on Cloud Run.
+Backend for the Kakwe Android app. Implements `docs/api-contract.md` on Node 22, Hono and `@google/genai`. Runs on Cloud Run.
 
 Default model: `gemini-3.5-flash-lite` (set `GEMINI_MODEL` to change it, for example `gemini-3.8-flash`, which was about 2x slower with no accuracy gain in our eval).
 
