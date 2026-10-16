@@ -4,9 +4,11 @@ import android.content.Context
 import android.os.Build
 import android.provider.Telephony
 
-/** The only apps whose notifications Message Guard may read. */
+/** The only apps whose notifications Message Guard may read. Chat and SMS apps only, never email or banking. */
 internal object MessageApps {
     class App(val id: String, val label: String, val packages: Set<String>)
+
+    class Row(val id: String, val label: String, val enabled: Boolean, val recommended: Boolean)
 
     const val SMS_ID = "sms"
 
@@ -21,14 +23,15 @@ internal object MessageApps {
         App("signal", "Signal", setOf("org.thoughtcrime.securesms")),
     )
 
+    val knownIds: Set<String> = catalog.map { it.id }.toSet() + SMS_ID
+
     private fun ownerOf(pkg: String?): App? = catalog.firstOrNull { pkg in it.packages }
 
-    /** Package names to watch. A null enabled set means every app. */
-    fun watchedPackages(defaultSms: String?, enabledIds: Set<String>?): Set<String> {
+    /** Package names to watch. Only apps the user turned on; an empty set watches nothing. */
+    fun watchedPackages(defaultSms: String?, enabledIds: Set<String>): Set<String> {
         val out = HashSet<String>()
-        for (app in catalog) if (enabledIds == null || app.id in enabledIds) out.addAll(app.packages)
-        val smsOn = enabledIds == null || SMS_ID in enabledIds
-        if (smsOn && defaultSms != null && ownerOf(defaultSms) == null) out.add(defaultSms)
+        for (app in catalog) if (app.id in enabledIds) out.addAll(app.packages)
+        if (SMS_ID in enabledIds && defaultSms != null && ownerOf(defaultSms) == null) out.add(defaultSms)
         return out
     }
 
@@ -43,22 +46,33 @@ internal object MessageApps {
             null
         }
 
-    fun isWatched(context: Context, pkg: String, enabledIds: Set<String>?): Boolean =
+    fun isWatched(context: Context, pkg: String, enabledIds: Set<String>): Boolean =
         pkg in watchedPackages(defaultSmsPackage(context), enabledIds)
 
-    /** Rows for the settings list. The SMS row appears only when the default SMS app is not in the catalog. */
-    fun rows(context: Context, enabledIds: Set<String>?): List<Triple<String, String, Boolean>> {
-        val rows = ArrayList<Triple<String, String, Boolean>>()
+    /** Name shown in the transparency log for a watched package. */
+    fun labelFor(context: Context, pkg: String): String =
+        ownerOf(pkg)?.label ?: appLabel(context, pkg) ?: "SMS"
+
+    private fun appLabel(context: Context, pkg: String): String? = try {
+        context.packageManager.getApplicationLabel(context.packageManager.getApplicationInfo(pkg, 0)).toString()
+    } catch (_: Exception) {
+        null
+    }
+
+    fun rows(context: Context, enabledIds: Set<String>): List<Row> {
         val sms = defaultSmsPackage(context)
-        if (sms != null && ownerOf(sms) == null) {
-            val label = try {
-                context.packageManager.getApplicationLabel(context.packageManager.getApplicationInfo(sms, 0)).toString()
-            } catch (_: Exception) {
-                "Default SMS app"
-            }
-            rows.add(Triple(SMS_ID, "$label (SMS)", enabledIds == null || SMS_ID in enabledIds))
+        return rows(sms, sms?.let { appLabel(context, it) }, enabledIds)
+    }
+
+    /** Settings rows. The SMS app comes first and is marked recommended; nothing is on unless the user chose it. */
+    fun rows(defaultSms: String?, smsLabel: String?, enabledIds: Set<String>): List<Row> {
+        val out = ArrayList<Row>()
+        val owner = ownerOf(defaultSms)
+        if (defaultSms != null && owner == null) {
+            out.add(Row(SMS_ID, "${smsLabel ?: "SMS"} (SMS)", SMS_ID in enabledIds, true))
         }
-        for (app in catalog) rows.add(Triple(app.id, app.label, enabledIds == null || app.id in enabledIds))
-        return rows
+        if (owner != null) out.add(Row(owner.id, owner.label, owner.id in enabledIds, true))
+        for (app in catalog) if (app !== owner) out.add(Row(app.id, app.label, app.id in enabledIds, false))
+        return out
     }
 }

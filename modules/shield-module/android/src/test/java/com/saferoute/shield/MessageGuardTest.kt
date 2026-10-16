@@ -139,8 +139,9 @@ class MessageGuardTest {
 
     @Test
     fun redacts_long_digit_runs() {
-        assertEquals("Account [NUMBER] is on hold", redact("Account 123456789012 is on hold"))
-        assertEquals("Card [NUMBER] charged", redact("Card 4111 1111 1111 1111 charged"))
+        assertEquals("Account [ACCOUNT] is on hold", redact("Account 123456789012 is on hold"))
+        assertEquals("Ref [NUMBER] is on hold", redact("Ref 123456789012 is on hold"))
+        assertEquals("Card [ACCOUNT] charged", redact("Card 4111 1111 1111 1111 charged"))
     }
 
     @Test
@@ -157,18 +158,21 @@ class MessageGuardTest {
     }
 
     @Test
-    fun trims_links_but_keeps_host_and_path() {
+    fun links_keep_only_scheme_and_host() {
         assertEquals(
-            "Pay at https://dhl-redeliver.top/pay now",
+            "Pay at https://dhl-redeliver.top/[PATH] now",
             redact("Pay at https://dhl-redeliver.top/pay?id=998877&mail=a@b.com#x now"),
         )
-        assertEquals("Open bit.ly/[NUMBER]", redact("Open bit.ly/99887766"))
+        assertEquals("Open bit.ly/[PATH]", redact("Open bit.ly/99887766"))
+        assertEquals("Visit www.deals-mm.com today", redact("Visit www.deals-mm.com today"))
+        assertEquals("Login http://bank-th.top/[PATH]", redact("Login http://user:pw@bank-th.top/login"))
     }
 
     @Test
-    fun output_is_capped() {
-        val out = MessageRedactor.redact("word ".repeat(500), prefilter.links, 1000)
-        assertTrue(out.length <= 1000)
+    fun output_is_capped_at_600() {
+        assertEquals(600, keywords.maxSendLength)
+        assertTrue(MessageRedactor.redact("word ".repeat(500), prefilter.links, 1000).length <= 600)
+        assertTrue(MessageRedactor.redact("word ".repeat(500), prefilter.links).length <= 600)
     }
 
     @Test
@@ -181,7 +185,8 @@ class MessageGuardTest {
         assertFalse(decision.text.contains("@"))
         assertTrue(decision.text.contains("[PHONE]"))
         assertTrue(decision.text.contains("[EMAIL]"))
-        assertTrue(decision.text.contains("tinyurl.com/x9"))
+        assertTrue(decision.text.contains("tinyurl.com/[PATH]"))
+        assertFalse(decision.text.contains("Anna"))
     }
 
     @Test
@@ -219,7 +224,7 @@ class MessageGuardTest {
 
     @Test
     fun only_allowlisted_apps_are_watched() {
-        val watched = MessageApps.watchedPackages("com.samsung.android.messaging", null)
+        val watched = MessageApps.watchedPackages("com.samsung.android.messaging", MessageApps.knownIds)
         assertTrue(watched.containsAll(listOf(
             "com.google.android.apps.messaging", "com.whatsapp", "com.viber.voip", "org.telegram.messenger",
             "jp.naver.line.android", "com.facebook.orca", "com.zing.zalo", "org.thoughtcrime.securesms",
@@ -284,7 +289,9 @@ class MessageGuardTest {
         assertEquals("message", body.getString("kind"))
         assertEquals("hello [PHONE]", body.getString("text"))
         assertEquals("my", body.getString("language"))
-        assertFalse(body.getBoolean("shareSignals"))
+        assertFalse(body.has("shareSignals"))
+        val shared = JSONObject(String(MessageCheckClient.body("hello", "en", true), Charsets.UTF_8))
+        assertTrue(shared.getBoolean("shareSignals"))
         assertFalse(body.has("imageBase64"))
         assertFalse(body.has("sender"))
     }
@@ -294,8 +301,6 @@ class MessageGuardTest {
         assertEquals(ShieldOverlay.State.DANGER, MessageGuardNotifier.stateFor("danger"))
         assertEquals(ShieldOverlay.State.CAREFUL, MessageGuardNotifier.stateFor("careful"))
         assertNull(MessageGuardNotifier.stateFor("safe"))
-        assertEquals("Looks risky", MessageGuardNotifier.chipFor(ShieldOverlay.State.DANGER))
-        assertEquals("Shows warning signs", MessageGuardNotifier.chipFor(ShieldOverlay.State.CAREFUL))
         assertEquals("saferoute://report/chk_1", MessageGuardNotifier.reportUri("chk_1").toString())
     }
 

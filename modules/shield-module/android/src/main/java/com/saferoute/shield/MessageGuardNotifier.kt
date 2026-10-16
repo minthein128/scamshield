@@ -1,5 +1,6 @@
 package com.saferoute.shield
 
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -11,11 +12,18 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import org.json.JSONObject
 
-/** Posts the SafeRoute warning notification for a careful or high-risk message. */
+/**
+ * Posts a discreet notice for a careful or high-risk message. The notice never names the verdict
+ * or quotes the message, so a person who sees the phone learns only that SafeRoute has a note.
+ */
 internal object MessageGuardNotifier {
-    const val CHANNEL_DANGER = "saferoute_warnings"
-    const val CHANNEL_CAREFUL = "saferoute_warnings_careful"
+    const val CHANNEL = "saferoute_notices"
+    private val OLD_CHANNELS = listOf("saferoute_warnings", "saferoute_warnings_careful")
     private const val TAG = "saferoute_message"
+
+    const val TITLE = "SafeRoute"
+    const val BODY = "A message may need a second look. Open to see why."
+    const val OPEN = "Open"
 
     fun stateFor(verdict: String): ShieldOverlay.State? = when (verdict) {
         "danger" -> ShieldOverlay.State.DANGER
@@ -23,23 +31,13 @@ internal object MessageGuardNotifier {
         else -> null
     }
 
-    fun chipFor(state: ShieldOverlay.State): String =
-        if (state == ShieldOverlay.State.DANGER) "Looks risky" else "Shows warning signs"
-
     fun reportUri(id: String): Uri = Uri.parse("saferoute://report/" + Uri.encode(id))
 
-    fun post(context: Context, result: JSONObject) {
-        val state = stateFor(result.optString("verdict")) ?: return
-        val id = result.optString("id").ifBlank { return }
-        val manager = NotificationManagerCompat.from(context)
-        if (!manager.areNotificationsEnabled()) return
-        createChannels(context)
-
-        val palette = ShieldPalette.forContext(context)
-        val chip = chipFor(state)
-        val title = result.optString("title").ifBlank { "This message needs a second look" }.take(80)
-        val summary = result.optString("summary").take(160)
-        val open = PendingIntent.getActivity(
+    fun build(context: Context, result: JSONObject, body: String? = null, open: String? = null): Notification? {
+        stateFor(result.optString("verdict")) ?: return null
+        val id = result.optString("id").ifBlank { return null }
+        val text = body?.takeIf { it.isNotBlank() } ?: BODY
+        val intent = PendingIntent.getActivity(
             context,
             id.hashCode(),
             Intent(Intent.ACTION_VIEW, reportUri(id))
@@ -48,38 +46,44 @@ internal object MessageGuardNotifier {
                 .putExtra(ShieldBridge.EXTRA_RESULT_JSON, result.toString()),
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
-        val danger = state == ShieldOverlay.State.DANGER
-        val builder = NotificationCompat.Builder(context, if (danger) CHANNEL_DANGER else CHANNEL_CAREFUL)
-            .setSmallIcon(android.R.drawable.ic_dialog_alert)
-            .setContentTitle("$chip: $title")
-            .setContentText(summary)
-            .setStyle(NotificationCompat.BigTextStyle().bigText(summary))
-            .setSubText("SafeRoute Message Guard")
-            .setColor(palette.ring(state))
-            .setCategory(NotificationCompat.CATEGORY_MESSAGE)
-            .setPriority(if (danger) NotificationCompat.PRIORITY_HIGH else NotificationCompat.PRIORITY_DEFAULT)
+        val public = NotificationCompat.Builder(context, CHANNEL)
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setContentTitle(TITLE)
+            .build()
+        return NotificationCompat.Builder(context, CHANNEL)
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setContentTitle(TITLE)
+            .setContentText(text)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(text))
+            .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+            .setPublicVersion(public)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setAutoCancel(true)
-            .setContentIntent(open)
-            .addAction(0, "Open report", open)
+            .setContentIntent(intent)
+            .addAction(0, open?.takeIf { it.isNotBlank() } ?: OPEN, intent)
+            .build()
+    }
+
+    fun post(context: Context, result: JSONObject, body: String? = null, open: String? = null) {
+        val manager = NotificationManagerCompat.from(context)
+        if (!manager.areNotificationsEnabled()) return
+        createChannel(context)
+        val notification = build(context, result, body, open) ?: return
         try {
-            manager.notify(TAG, id.hashCode(), builder.build())
+            manager.notify(TAG, result.optString("id").hashCode(), notification)
         } catch (_: SecurityException) {
             return
         }
-        if (danger) ShieldHaptics.danger(context) else ShieldHaptics.careful(context)
+        ShieldHaptics.careful(context)
     }
 
-    private fun createChannels(context: Context) {
+    private fun createChannel(context: Context) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        OLD_CHANNELS.forEach { manager.deleteNotificationChannel(it) }
         manager.createNotificationChannel(
-            NotificationChannel(CHANNEL_DANGER, "SafeRoute warnings", NotificationManager.IMPORTANCE_HIGH).apply {
-                description = "Warns you when a message looks like a scam"
-            }
-        )
-        manager.createNotificationChannel(
-            NotificationChannel(CHANNEL_CAREFUL, "SafeRoute cautions", NotificationManager.IMPORTANCE_DEFAULT).apply {
-                description = "Tells you when a message needs a second look"
+            NotificationChannel(CHANNEL, TITLE, NotificationManager.IMPORTANCE_DEFAULT).apply {
+                lockscreenVisibility = Notification.VISIBILITY_PRIVATE
             }
         )
     }

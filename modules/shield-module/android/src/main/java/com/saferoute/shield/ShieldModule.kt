@@ -146,9 +146,7 @@ class ShieldModule : Module() {
 
         AsyncFunction("setMessageGuardEnabled") { enabled: Boolean ->
             val context = appContext.reactContext ?: return@AsyncFunction false
-            MessageGuardStore(context).enabled = enabled
-            if (enabled) MessageGuardListener.rebind(context)
-            true
+            MessageGuardBridge.setEnabled(context, enabled)
         }
 
         AsyncFunction("isMessageGuardEnabled") {
@@ -156,27 +154,39 @@ class ShieldModule : Module() {
             MessageGuardStore(context).enabled
         }
 
+        AsyncFunction("getMessageGuardStatus") {
+            val context = appContext.reactContext ?: return@AsyncFunction null
+            MessageGuardBridge.status(context)
+        }
+
+        AsyncFunction("grantMessageGuardConsent") { ids: List<String> ->
+            val context = appContext.reactContext ?: return@AsyncFunction false
+            MessageGuardBridge.grantConsent(context, ids)
+        }
+
         AsyncFunction("setMessageGuardApps") { ids: List<String> ->
             val context = appContext.reactContext ?: return@AsyncFunction false
-            val known = MessageApps.catalog.map { it.id } + MessageApps.SMS_ID
-            MessageGuardStore(context).enabledApps = ids.filter { it in known }.toSet()
-            true
+            MessageGuardBridge.keepApps(context, ids)
         }
 
         AsyncFunction("getMessageGuardApps") {
             val context = appContext.reactContext ?: return@AsyncFunction emptyList<Map<String, Any>>()
-            MessageApps.rows(context, MessageGuardStore(context).enabledApps).map { (id, label, enabled) ->
-                mapOf("id" to id, "label" to label, "enabled" to enabled)
-            }
+            MessageGuardBridge.apps(context)
         }
 
         AsyncFunction("configureMessageGuard") { options: Map<String, Any?> ->
             val context = appContext.reactContext ?: return@AsyncFunction false
-            val store = MessageGuardStore(context)
-            (options["apiUrl"] as? String)?.let { store.apiUrl = it }
-            (options["language"] as? String)?.let { if (it.isNotBlank()) store.language = it }
-            (options["shareSignals"] as? Boolean)?.let { store.shareSignals = it }
-            true
+            MessageGuardBridge.configure(context, options)
+        }
+
+        AsyncFunction("getMessageGuardLog") {
+            val context = appContext.reactContext ?: return@AsyncFunction emptyList<Map<String, Any>>()
+            MessageGuardBridge.log(context)
+        }
+
+        AsyncFunction("clearMessageGuardLog") {
+            val context = appContext.reactContext ?: return@AsyncFunction false
+            MessageGuardBridge.clearLog(context)
         }
     }
 }

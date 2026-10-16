@@ -72,17 +72,42 @@ export interface ShieldStartOptions {
   strings?: Partial<Record<CompanionStringKey, string>>;
 }
 
-/** One messaging app Message Guard can watch. */
+/** One messaging app Message Guard can watch. Nothing is on until the user picks it. */
 export interface MessageGuardApp {
   id: string;
   label: string;
   enabled: boolean;
+  /** The phone's SMS app. Listed first. */
+  recommended?: boolean;
 }
 
 export interface MessageGuardConfig {
   apiUrl?: string;
   language?: 'en' | 'id' | 'tl' | 'my' | 'th';
   shareSignals?: boolean;
+  /** Neutral notification body in the user's language. */
+  noticeBody?: string;
+  /** Notification button label in the user's language. */
+  noticeOpen?: string;
+}
+
+export interface MessageGuardStatus {
+  enabled: boolean;
+  /** The user agreed to the current consent text for the chosen apps. */
+  consent: boolean;
+  /** Set when Message Guard paused itself, for example 'daily_limit'. */
+  pausedReason: string | null;
+}
+
+/** One check Message Guard sent, kept on the phone only. */
+export interface MessageGuardLogEntry {
+  id: string;
+  /** Epoch milliseconds. */
+  at: number;
+  app: string;
+  /** The exact redacted text that left the phone. */
+  text: string;
+  verdict: 'pending' | 'failed' | 'safe' | 'careful' | 'danger' | string;
 }
 
 export interface ShieldSubscription {
@@ -107,6 +132,10 @@ interface ShieldModuleType {
   setMessageGuardApps(ids: string[]): Promise<boolean>;
   getMessageGuardApps(): Promise<MessageGuardApp[]>;
   configureMessageGuard(config: MessageGuardConfig): Promise<boolean>;
+  getMessageGuardStatus(): Promise<MessageGuardStatus | null>;
+  grantMessageGuardConsent(ids: string[]): Promise<boolean>;
+  getMessageGuardLog(): Promise<MessageGuardLogEntry[]>;
+  clearMessageGuardLog(): Promise<boolean>;
   addListener(
     event: 'onShieldResult',
     listener: (e: { id: string; json: string }) => void
@@ -146,17 +175,19 @@ let mockOverlayGranted = false;
 let mockCaptureGranted = false;
 let mockNotificationAccess = false;
 let mockGuardEnabled = false;
+let mockGuardConsent: string[] = [];
 const MOCK_GUARD_APPS: MessageGuardApp[] = [
-  { id: 'messages', label: 'Google Messages', enabled: true },
-  { id: 'whatsapp', label: 'WhatsApp', enabled: true },
-  { id: 'viber', label: 'Viber', enabled: true },
-  { id: 'telegram', label: 'Telegram', enabled: true },
-  { id: 'line', label: 'LINE', enabled: true },
-  { id: 'messenger', label: 'Messenger', enabled: true },
-  { id: 'zalo', label: 'Zalo', enabled: true },
-  { id: 'signal', label: 'Signal', enabled: true },
+  { id: 'messages', label: 'Google Messages', enabled: false, recommended: true },
+  { id: 'whatsapp', label: 'WhatsApp', enabled: false },
+  { id: 'viber', label: 'Viber', enabled: false },
+  { id: 'telegram', label: 'Telegram', enabled: false },
+  { id: 'line', label: 'LINE', enabled: false },
+  { id: 'messenger', label: 'Messenger', enabled: false },
+  { id: 'zalo', label: 'Zalo', enabled: false },
+  { id: 'signal', label: 'Signal', enabled: false },
 ];
 let mockGuardApps: MessageGuardApp[] = MOCK_GUARD_APPS.map(a => ({ ...a }));
+let mockGuardLog: MessageGuardLogEntry[] = [];
 const mockListeners = new Set<(r: ShieldCheckResult) => void>();
 
 export async function hasOverlayPermission(): Promise<boolean> {
@@ -321,7 +352,10 @@ export async function openNotificationAccessSettings(): Promise<boolean> {
   return true;
 }
 
-/** Turns Message Guard on or off. It reads nothing while off. Needs notification access to do anything. */
+/**
+ * Turns Message Guard on or off. Turning on needs consent from grantMessageGuardConsent() first and
+ * returns false without it. Turning off withdraws consent. It reads nothing while off.
+ */
 export async function setMessageGuardEnabled(enabled: boolean): Promise<boolean> {
   if (nativeShieldModule) {
     try {
@@ -330,7 +364,64 @@ export async function setMessageGuardEnabled(enabled: boolean): Promise<boolean>
       return false;
     }
   }
+  if (enabled && mockGuardConsent.length === 0) return false;
   mockGuardEnabled = enabled;
+  if (!enabled) {
+    mockGuardConsent = [];
+    mockGuardApps = mockGuardApps.map(a => ({ ...a, enabled: false }));
+  }
+  return true;
+}
+
+/** Records the user's consent for exactly these apps. Adding an app later needs a new call. */
+export async function grantMessageGuardConsent(ids: string[]): Promise<boolean> {
+  if (nativeShieldModule) {
+    try {
+      return await nativeShieldModule.grantMessageGuardConsent(ids);
+    } catch {
+      return false;
+    }
+  }
+  const known = ids.filter(id => mockGuardApps.some(a => a.id === id));
+  if (known.length === 0) return false;
+  mockGuardConsent = known;
+  mockGuardApps = mockGuardApps.map(a => ({ ...a, enabled: known.includes(a.id) }));
+  return true;
+}
+
+export async function getMessageGuardStatus(): Promise<MessageGuardStatus> {
+  const off: MessageGuardStatus = { enabled: false, consent: false, pausedReason: null };
+  if (nativeShieldModule) {
+    try {
+      return (await nativeShieldModule.getMessageGuardStatus()) ?? off;
+    } catch {
+      return off;
+    }
+  }
+  return { enabled: mockGuardEnabled, consent: mockGuardConsent.length > 0, pausedReason: null };
+}
+
+/** What Message Guard sent in the last seven days, newest first. Stored on the phone only. */
+export async function getMessageGuardLog(): Promise<MessageGuardLogEntry[]> {
+  if (nativeShieldModule) {
+    try {
+      return await nativeShieldModule.getMessageGuardLog();
+    } catch {
+      return [];
+    }
+  }
+  return mockGuardLog.map(e => ({ ...e }));
+}
+
+export async function clearMessageGuardLog(): Promise<boolean> {
+  if (nativeShieldModule) {
+    try {
+      return await nativeShieldModule.clearMessageGuardLog();
+    } catch {
+      return false;
+    }
+  }
+  mockGuardLog = [];
   return true;
 }
 
@@ -345,7 +436,7 @@ export async function isMessageGuardEnabled(): Promise<boolean> {
   return mockGuardEnabled;
 }
 
-/** Sets which apps are watched, by id from getMessageGuardApps(). Apps not listed are ignored. */
+/** Narrows the watched apps. An app outside the current consent is ignored; add it with grantMessageGuardConsent(). */
 export async function setMessageGuardApps(ids: string[]): Promise<boolean> {
   if (nativeShieldModule) {
     try {
@@ -354,7 +445,8 @@ export async function setMessageGuardApps(ids: string[]): Promise<boolean> {
       return false;
     }
   }
-  mockGuardApps = mockGuardApps.map(a => ({ ...a, enabled: ids.includes(a.id) }));
+  mockGuardConsent = mockGuardConsent.filter(id => ids.includes(id));
+  mockGuardApps = mockGuardApps.map(a => ({ ...a, enabled: mockGuardConsent.includes(a.id) }));
   return true;
 }
 
@@ -398,4 +490,8 @@ export default {
   setMessageGuardApps,
   getMessageGuardApps,
   configureMessageGuard,
+  getMessageGuardStatus,
+  grantMessageGuardConsent,
+  getMessageGuardLog,
+  clearMessageGuardLog,
 };

@@ -8,8 +8,8 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 /**
- * Reads notifications only from the allowlisted messaging apps, and only while Message Guard is on.
- * Notifications from every other app are dropped before any content is read.
+ * Reads notifications only from the messaging apps the user chose, and only while Message Guard is on
+ * with consent. Notifications from every other app are dropped before any content is read.
  */
 class MessageGuardListener : NotificationListenerService() {
 
@@ -28,30 +28,39 @@ class MessageGuardListener : NotificationListenerService() {
 
     override fun onNotificationPosted(sbn: StatusBarNotification?) {
         if (sbn == null || !store.enabled) return
-        if (!MessageApps.isWatched(applicationContext, sbn.packageName, store.enabledApps)) return
+        val pkg = sbn.packageName ?: return
+        if (!MessageApps.isWatched(applicationContext, pkg, store.enabledApps)) return
         val notification = sbn.notification ?: return
         val skip = Notification.FLAG_GROUP_SUMMARY or Notification.FLAG_ONGOING_EVENT
         if (notification.flags and skip != 0) return
         val extracted = MessageGuardExtractor.extract(notification) ?: return
-        worker.execute { process(extracted) }
+        worker.execute { process(pkg, extracted) }
     }
 
-    private fun process(message: MessageGuardExtractor.Extracted) {
+    private fun process(pkg: String, message: MessageGuardExtractor.Extracted) {
+        if (!store.enabled) return
+        val decision = engine.prepare(message.text, message.sender, message.names)
+        if (decision is MessageGuardEngine.Decision.Skip) {
+            if (decision.reason == MessageGuardEngine.SKIP_DAILY) store.pause(MessageGuardStore.PAUSE_DAILY)
+            return
+        }
+        val send = decision as MessageGuardEngine.Decision.Send
+        val logId = store.log.add(MessageApps.labelFor(applicationContext, pkg), send.text)
         try {
-            val decision = engine.prepare(message.text, message.sender)
-            if (decision !is MessageGuardEngine.Decision.Send) return
             val result = MessageCheckClient.check(
-                store.apiUrl, store.language, decision.text, store.shareSignals, ShieldBridge.authToken,
+                store.apiUrl, store.language, send.text, store.shareSignals, ShieldBridge.authToken,
             )
+            val verdict = result.optString("verdict")
+            store.log.setVerdict(logId, verdict.ifBlank { MessageGuardLog.FAILED })
             val id = result.optString("id").ifBlank { "chk_msg_${System.currentTimeMillis()}" }
             result.put("id", id)
-            if (MessageGuardNotifier.stateFor(result.optString("verdict")) == null) return
+            if (MessageGuardNotifier.stateFor(verdict) == null) return
             val json = result.toString()
             store.saveResult(id, json)
             ShieldBridge.publishResult(id, json)
-            MessageGuardNotifier.post(applicationContext, result)
+            MessageGuardNotifier.post(applicationContext, result, store.noticeBody, store.noticeOpen)
         } catch (_: Exception) {
-            // A failed check shows nothing.
+            store.log.setVerdict(logId, MessageGuardLog.FAILED)
         }
     }
 
