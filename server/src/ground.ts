@@ -72,27 +72,32 @@ export function needsGrounding(x: Pick<Extraction, 'entities'>): boolean {
   return q.companies.length + q.domains.length > 0;
 }
 
-export function buildGroundingPrompt(x: Pick<Extraction, 'entities'>, lang: Lang): string {
+export interface GroundingRequest {
+  /** Format and wording rules. A JSON-only reply rule, or rules in the user turn, make the model skip the search. */
+  system: string;
+  /** A plain question that names only organisations, website hosts and the country. */
+  question: string;
+}
+
+export function buildGroundingRequest(x: Pick<Extraction, 'entities'>, lang: Lang): GroundingRequest {
   const q = groundingQuery(x);
-  const lines = ['Check these organisations and websites named in a message a user wants checked for scams. Use Google Search.'];
-  if (q.companies.length) lines.push(`Companies or agencies: ${q.companies.join('; ')}`);
-  if (q.domains.length) lines.push(`Websites: ${q.domains.join('; ')}`);
-  if (q.country) lines.push(`Country: ${q.country}`);
-  lines.push(
-    '',
-    'Answer these questions:',
-    '1. Does each named company or recruitment agency exist, and does it hold a licence from the labour authority of the relevant country?',
-    '2. Are there scam reports about each company or website?',
-    '',
-    `Reply with ONLY a JSON object: {"findings":[{"family":"known_bad|identity","label":"...","evidence":"..."}]}`,
+  const where = q.country ? ` in ${q.country}` : '';
+  const names = [...q.companies, ...q.domains];
+  const question =
+    names.length === 1
+      ? `Is ${names[0]}${where} a licensed, legitimate business? Are there scam reports about it?`
+      : `Are ${names.join(', ')}${where} licensed, legitimate businesses? Are there scam reports about any of them?`;
+  const system = [
+    'You check companies, agencies and websites named in a message that a user wants checked for scams. Search Google before you answer.',
+    `First search, then write a short answer, and end it with a JSON object: {"findings":[{"family":"known_bad|identity","label":"...","evidence":"..."}]}`,
     '- known_bad: you found scam or blacklist reports that name this exact company or website as the scammer. Reports that scammers impersonate a well-known brand (a courier, bank or marketplace) are NOT evidence against a message from that brand: do not report them.',
     '- General advisories that scammers use a brand name (Tokopedia, Shopee, DHL, a bank) say nothing about the message you are checking. Never report them in any family. A well-known brand with a normal, specific listing or notice needs no finding.',
     '- identity: the entity cannot be found, has no licence, or the claimed identity does not match.',
     '- Add a finding only when search results support it. If everything checks out, return {"findings":[]}.',
     '- Use likelihood language. Say "We could not find a licence record for X", never "X is unlicensed" or "X is a scammer". Say "Reports online describe similar messages as scams", never "X is a scam". Never call a named company or website a criminal. Never use "definitely", "confirmed" or "100%". In Thai, write "เราไม่พบข้อมูลใบอนุญาตของ X" or "มีรายงานออนไลน์ว่าข้อความคล้ายกันถูกใช้หลอกลวง", never "เป็นการหลอกลวง", "เป็นมิจฉาชีพ", "แน่นอน", "ชัวร์" or "ยืนยันแล้ว".',
     `- Write label in ${LANG_NAMES[lang]}. Keep evidence to one short sentence naming the source.`,
-  );
-  return lines.join('\n');
+  ].join('\n');
+  return { system, question };
 }
 
 export function parseFindings(text: string | undefined): Flag[] {
@@ -129,11 +134,13 @@ export function createGrounder(cfg: Config, client: Pick<GoogleGenAI, 'models'>)
   return {
     async ground(req, extraction, timeoutMs) {
       if (!cfg.grounding || !needsGrounding(extraction) || timeoutMs < 1000) return { flags: [], sources: [] };
+      const request = buildGroundingRequest(extraction, req.language);
       try {
         const res = await client.models.generateContent({
           model: cfg.model,
-          contents: [{ role: 'user', parts: [{ text: buildGroundingPrompt(extraction, req.language) }] }],
+          contents: [{ role: 'user', parts: [{ text: request.question }] }],
           config: {
+            systemInstruction: request.system,
             tools: [{ googleSearch: {} }],
             temperature: 0.1,
             ...thinkingOf(cfg),

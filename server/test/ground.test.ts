@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { loadConfig } from '../src/config.js';
-import { buildGroundingPrompt, createGrounder, groundingQuery, needsGrounding, parseFindings } from '../src/ground.js';
+import { buildGroundingRequest, createGrounder, groundingQuery, needsGrounding, parseFindings } from '../src/ground.js';
 import type { Extraction } from '../src/types.js';
 
 const cfg = loadConfig({ GEMINI_API_KEY: 'g' });
@@ -81,7 +81,10 @@ describe('grounding', () => {
   });
 
   it('prompt names the companies, country and language, not the salary or role', () => {
-    const p = buildGroundingPrompt(base, 'my');
+    const r = buildGroundingRequest(base, 'my');
+    const p = `${r.system}\n${r.question}`;
+    expect(r.question).toContain('Acme Recruit');
+    expect(r.question).not.toContain('JSON');
     expect(p).toContain('Acme Recruit');
     expect(p).toContain('Thailand');
     expect(p).toContain('Burmese');

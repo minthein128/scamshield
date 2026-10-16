@@ -37,3 +37,4 @@ Hono + TypeScript service implementing `docs/api-contract.md`. Pipeline: Extract
 - Default model is `gemini-3.5-flash-lite` (measured: see README). `THINKING_LEVEL` defaults to LOW; set it empty to use the model default.
 - Grounding must not report brand-impersonation advisories as `known_bad`; the eval case `legit-sms-en` guards this.
 - Grounding cannot share a call with `responseSchema`, so `ground.ts` asks for JSON in plain text and parses leniently.
+- Grounding searches only when the user turn is a plain question. A "reply with ONLY JSON" rule, or the rules in the user turn, make `gemini-3.5-flash-lite` answer from memory with no search and no sources. Keep the rules in `systemInstruction` and let the model write a short answer before the JSON.
