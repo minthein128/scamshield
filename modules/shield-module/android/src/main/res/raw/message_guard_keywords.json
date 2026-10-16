@@ -2,7 +2,7 @@
   "version": 1,
   "threshold": 3,
   "minLength": 15,
-  "maxSendLength": 1000,
+  "maxSendLength": 600,
   "otpMaxLength": 240,
   "weights": {
     "link": 2,
