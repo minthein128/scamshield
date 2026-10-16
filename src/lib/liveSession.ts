@@ -2,7 +2,8 @@ import type { CheckResponse, LanguageCode } from '../api/types';
 import { diag } from './diagLog';
 import type { LiveAudio } from './liveAudio.types';
 
-export type LiveState = 'idle' | 'connecting' | 'listening' | 'speaking' | 'ended' | 'error';
+/** 'declined' means the user tapped Not now on the microphone reason; Try again asks again. */
+export type LiveState = 'idle' | 'connecting' | 'listening' | 'speaking' | 'ended' | 'error' | 'declined';
 export type LiveAction = 'WARN_FAMILY' | 'HOTLINES';
 export type LiveErrorCode = 'mic_denied' | 'unavailable' | 'rate_limited' | 'busy' | 'not_found' | 'upstream' | 'bad_request' | 'audio';
 
@@ -125,6 +126,7 @@ export function createLiveSession(options: LiveSessionOptions, deps: LiveSession
     if (finished) return;
     finished = true;
     if (next.state === 'error') diag.error('live', 'error', { code: next.error ?? 'unknown', fallback: Boolean(next.fallback), ms: Date.now() - openedAt });
+    else if (next.state === 'declined') diag.info('live', 'mic_declined', { ms: Date.now() - openedAt });
     else diag.info('live', 'end', { by: next.endedBy ?? 'unknown', ms: Date.now() - openedAt });
     teardown();
     set(next);
@@ -249,7 +251,9 @@ export function createLiveSession(options: LiveSessionOptions, deps: LiveSession
       } catch {
         return fail('audio');
       }
-      if (deps.ensureMic && (await deps.ensureMic().catch(() => 'denied' as const)) !== 'granted') return fail('mic_denied');
+      const mic = deps.ensureMic ? await deps.ensureMic().catch(() => 'denied' as const) : 'granted';
+      if (mic === 'declined') return finish({ state: 'declined' });
+      if (mic !== 'granted') return fail('mic_denied');
       if (!(await audio.requestPermission().catch(() => false))) return fail('mic_denied');
       if (cancelled || finished) return;
       if (!opts.skipWarning) {

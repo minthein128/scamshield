@@ -15,6 +15,7 @@
   "close": "Isara",
   "getHelp": "Humingi ng tulong",
   "retry": "Subukan ulit",
+  "declined": "Pinili mong hindi gamitin ang mikropono. I-tap ang Subukan ulit kapag gusto mong makipag-usap, o isara ito at basahin ang ulat.",
   "countdown": "{{seconds}} s na lang",
   "a11yCountdown": "{{seconds}} segundo na lang",
   "placeholder": "Dito lalabas ang sagot",
@@ -33,6 +34,7 @@
   },
   "errors": {
     "mic_denied": "Naka-off ang mikropono. Payagan ito sa settings ng phone para makipag-usap, o isara ito at basahin ang ulat.",
+    "mic_denied_web": "Naka-block ang mikropono. Payagan ito para sa site na ito sa settings ng browser, o isara ito at basahin ang ulat.",
     "unavailable": "Hindi available ngayon ang live na boses. Subukan ulit mamaya, o isara ito at basahin ang ulat.",
     "rate_limited": "Marami ka nang nagamit na pagsusuri ngayong oras. Subukan ulit mamaya.",
     "busy": "May isa pang usapang boses na bukas. Isara ito at subukan ulit.",

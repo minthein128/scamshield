@@ -71,7 +71,7 @@ export function useLiveVoice(options: Options, deps: LiveSessionDeps = realDeps)
   const changeMode = useCallback(
     (mode: Options['mode']) => {
       const s = session.current;
-      if (s && s.view.state !== 'idle' && !s.view.warning && s.view.state !== 'connecting' && s.view.state !== 'ended' && s.view.state !== 'error') launch(mode, true);
+      if (s && s.view.state !== 'idle' && !s.view.warning && s.view.state !== 'connecting' && s.view.state !== 'ended' && s.view.state !== 'error' && s.view.state !== 'declined') launch(mode, true);
       else s?.setMode(mode);
     },
     [launch],
