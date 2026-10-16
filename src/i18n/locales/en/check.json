@@ -94,7 +94,8 @@
       "textPlaceholder": "Type what the text says",
       "empty": "We could not find clear details in these texts. You can add them yourself, or go back and check the text.",
       "submit": "Looks right, check it",
-      "submitHint": "You can still change details after you see the result."
+      "submitHint": "You can still change details after you see the result.",
+      "noMatch": "We could not match this to the text, so please check it."
     },
     "fields": {
       "employer": "Employer",
@@ -117,6 +118,7 @@
     "period": {
       "hourly": "per hour",
       "daily": "per day",
+      "weekly": "per week",
       "monthly": "per month",
       "yearly": "per year"
     },

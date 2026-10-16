@@ -97,7 +97,8 @@
       "textPlaceholder": "Tuliskan isi teks tersebut",
       "empty": "Kami belum menemukan rincian yang jelas dari teks ini. Anda bisa menambahkannya sendiri, atau kembali dan memeriksa teksnya.",
       "submit": "Sudah pas, periksa sekarang",
-      "submitHint": "Anda masih bisa mengubah rincian setelah melihat hasilnya."
+      "submitHint": "Anda masih bisa mengubah rincian setelah melihat hasilnya.",
+      "noMatch": "Kami tidak dapat mencocokkan ini dengan teks, jadi harap periksa kembali."
     },
     "fields": {
       "employer": "Pemberi kerja",
@@ -120,6 +121,7 @@
     "period": {
       "hourly": "per jam",
       "daily": "per hari",
+      "weekly": "per minggu",
       "monthly": "per bulan",
       "yearly": "per tahun"
     },

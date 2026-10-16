@@ -59,5 +59,8 @@
   },
   "unclear": {
     "title": "Still unclear"
+  },
+  "findings": {
+    "title": "What we could and could not confirm"
   }
 }

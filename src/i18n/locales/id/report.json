@@ -60,5 +60,8 @@
   },
   "unclear": {
     "title": "Masih belum jelas"
+  },
+  "findings": {
+    "title": "Apa yang bisa dan tidak bisa kami pastikan"
   }
 }

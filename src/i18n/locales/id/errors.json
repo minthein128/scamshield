@@ -75,5 +75,11 @@
     "recentLogin": "Demi keamanan Anda, masuk kembali lalu ulangi langkah ini.",
     "notAllowed": "Cara masuk ini belum tersedia.",
     "fallback": "Terjadi kendala. Silakan coba lagi."
+  },
+  "job": {
+    "unreadable": {
+      "title": "Kami tidak bisa membaca rincian lowongan ini",
+      "message": "Teks atau gambar mungkin sulit dibaca. Silakan coba lagi, atau tempel teksnya."
+    }
   }
 }

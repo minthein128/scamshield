@@ -74,5 +74,11 @@
     "recentLogin": "For your safety, sign in again and then repeat this step.",
     "notAllowed": "This sign-in method is not available yet.",
     "fallback": "Something went wrong. Please try again."
+  },
+  "job": {
+    "unreadable": {
+      "title": "We could not read the job details",
+      "message": "The text or picture may be hard to read. Please try again, or paste the text."
+    }
   }
 }

@@ -97,7 +97,8 @@
       "textPlaceholder": "I-type ang sinasabi sa teksto",
       "empty": "Wala kaming nakitang malinaw na detalye sa mga tekstong ito. Maaari mo itong idagdag mismo, o bumalik at suriin ang teksto.",
       "submit": "Mukhang tama, suriin ito",
-      "submitHint": "Maaari mo pa ring baguhin ang mga detalye pagkatapos mong makita ang resulta."
+      "submitHint": "Maaari mo pa ring baguhin ang mga detalye pagkatapos mong makita ang resulta.",
+      "noMatch": "Hindi namin ito maitugma sa teksto, kaya pakitingnan ito."
     },
     "fields": {
       "employer": "Employer",
@@ -120,6 +121,7 @@
     "period": {
       "hourly": "bawat oras",
       "daily": "bawat araw",
+      "weekly": "bawat linggo",
       "monthly": "bawat buwan",
       "yearly": "bawat taon"
     },
