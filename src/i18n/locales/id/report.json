@@ -36,5 +36,29 @@
   },
   "shareMessage": "Pemeriksaan SafeRoute: {{title}}\n{{summary}}\nSkor risiko {{score}}/100.",
   "warnMessage": "Peringatan SafeRoute ({{verdict}}): {{title}}. {{summary}} Mohon jangan kirim uang atau berkas apa pun. Hubungi saya dulu.",
-  "thanks": "Terima kasih, ini membantu melindungi orang lain"
+  "thanks": "Terima kasih, ini membantu melindungi orang lain",
+  "attention": {
+    "word": {
+      "lower": "Tanda lebih sedikit",
+      "verify": "Periksa dulu",
+      "pause": "Tunggu dulu"
+    },
+    "headline": {
+      "lower": "Sedikit tanda bahaya ditemukan, tetapi rincian penting mungkin belum lengkap",
+      "verify": "Ada rincian yang tidak cocok, periksa dulu sebelum Anda pergi",
+      "pause": "Tunggu dulu sebelum Anda membayar, mengirim dokumen, atau berangkat"
+    },
+    "note": {
+      "lower": "Hasil seperti ini tidak membuktikan bahwa tawaran ini asli. Harap tetap periksa rinciannya sebelum Anda membayar, mengirim dokumen, atau berangkat.",
+      "verify": "Harap minta perekrut menjelaskan hal-hal di bawah ini secara tertulis sebelum Anda melanjutkan."
+    }
+  },
+  "conflicts": {
+    "title": "Yang tidak cocok",
+    "adSays": "Di iklan tertulis",
+    "chatSays": "Di obrolan tertulis"
+  },
+  "unclear": {
+    "title": "Masih belum jelas"
+  }
 }

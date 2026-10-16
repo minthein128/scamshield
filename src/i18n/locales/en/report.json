@@ -35,5 +35,29 @@
   },
   "shareMessage": "SafeRoute check: {{title}}\n{{summary}}\nRisk score {{score}}/100.",
   "warnMessage": "SafeRoute warning ({{verdict}}): {{title}}. {{summary}} Please do not pay money or send documents. Call me first.",
-  "thanks": "Thanks, this helps protect others"
+  "thanks": "Thanks, this helps protect others",
+  "attention": {
+    "word": {
+      "lower": "Fewer signs",
+      "verify": "Check first",
+      "pause": "Pause"
+    },
+    "headline": {
+      "lower": "Few warning signs found, but important details may still be missing",
+      "verify": "Some details do not add up, check them before you go",
+      "pause": "Pause before you pay, send documents or travel"
+    },
+    "note": {
+      "lower": "A result like this cannot show that an offer is real. Please still check the details before you pay, send documents or travel.",
+      "verify": "Please ask the recruiter to clear up the points below, in writing, before you go on."
+    }
+  },
+  "conflicts": {
+    "title": "What doesn't match",
+    "adSays": "The ad says",
+    "chatSays": "The chat says"
+  },
+  "unclear": {
+    "title": "Still unclear"
+  }
 }
