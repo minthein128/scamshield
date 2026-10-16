@@ -32,7 +32,7 @@ internal class BubbleView(context: Context, palette: ShieldPalette) : View(conte
             invalidate()
         }
 
-    /** Companion avatar (the Pyit Taing Htaung doll) drawn while listening, thinking or speaking. Null keeps the glyphs. */
+    /** The Pyit Taing Htaung doll, drawn in every state. Null keeps the shield glyph. */
     var avatar: android.graphics.Bitmap? = null
         set(value) {
             field = value
@@ -82,6 +82,11 @@ internal class BubbleView(context: Context, palette: ShieldPalette) : View(conte
     private val scanPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val levelRing = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE }
     private val avatarPaint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
+    private val badgePath = Path()
+    private val badgeOutline = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.STROKE
+        strokeJoin = Paint.Join.ROUND
+    }
     private val micPath = Path()
     private var thinker: ValueAnimator? = null
     private var thinkPhase = 0f
@@ -113,6 +118,11 @@ internal class BubbleView(context: Context, palette: ShieldPalette) : View(conte
 
         if (voice != Voice.NONE) {
             drawVoice(canvas, cx, cy, radius, accent)
+            return
+        }
+
+        avatar?.let {
+            drawDollState(canvas, it, cx, cy, radius)
             return
         }
 
@@ -171,7 +181,8 @@ internal class BubbleView(context: Context, palette: ShieldPalette) : View(conte
 
     private fun drawVoice(canvas: Canvas, cx: Float, cy: Float, radius: Float, accent: Int) {
         if ((voice == Voice.LISTENING || voice == Voice.SPEAKING) && level > 0.02f) {
-            levelRing.color = (accent and 0x00FFFFFF) or ((0x30 + (0x70 * level).toInt()) shl 24)
+            val halo = if (voice == Voice.LISTENING) palette.brandRed else palette.brandGold
+            levelRing.color = (halo and 0x00FFFFFF) or ((0x40 + (0x80 * level).toInt()) shl 24)
             levelRing.strokeWidth = (2f + 3f * level) * d
             canvas.drawCircle(cx, cy, radius + (1.5f + 7f * level) * d, levelRing)
         }
@@ -233,27 +244,132 @@ internal class BubbleView(context: Context, palette: ShieldPalette) : View(conte
         }
     }
 
-    /** The doll inside the ring: it rocks with the voice like a roly-poly, dots while thinking, a mic badge while listening. */
-    private fun drawDoll(canvas: Canvas, face: android.graphics.Bitmap, cx: Float, cy: Float, radius: Float, box: Float) {
-        val inner = radius - 4.5f * d
+    /** The doll clipped to the circle inside the ring, rocking about its round base like a roly-poly. */
+    private fun drawDollFace(canvas: Canvas, face: android.graphics.Bitmap, cx: Float, cy: Float, inner: Float, scale: Float, tilt: Float) {
         canvas.save()
         clip.reset()
         clip.addCircle(cx, cy, inner, Path.Direction.CW)
         canvas.clipPath(clip)
-        val speaking = voice == Voice.SPEAKING
-        val scale = if (speaking) 1f + 0.06f * level else 1f
-        val tilt = if (speaking) 7f * level * kotlin.math.sin(System.nanoTime() / 1.6e8).toFloat() else 0f
         canvas.rotate(tilt, cx, cy + inner)
         val half = inner * scale
         arcBounds.set(cx - half, cy - half, cx + half, cy + half)
         canvas.drawBitmap(face, null, arcBounds, avatarPaint)
         canvas.restore()
+    }
+
+    /** Idle, checking and result states with the doll: rocking scan while checking, a verdict badge after. */
+    private fun drawDollState(canvas: Canvas, face: android.graphics.Bitmap, cx: Float, cy: Float, radius: Float) {
+        val inner = radius - 4.5f * d
+        val checking = shieldState == ShieldOverlay.State.CHECKING && scanner != null
+        val tilt = if (checking) 9f * kotlin.math.sin(phase * 2 * Math.PI).toFloat() else 0f
+        drawDollFace(canvas, face, cx, cy, inner, popScale, tilt)
+        if (checking) {
+            canvas.save()
+            clip.reset()
+            clip.addCircle(cx, cy, inner, Path.Direction.CW)
+            canvas.clipPath(clip)
+            val top = cy - inner
+            val y = top + 2f * inner * phase
+            val band = 0.35f * inner
+            scanPaint.shader = LinearGradient(
+                0f, y - band, 0f, y,
+                palette.accent and 0x00FFFFFF, (palette.accent and 0x00FFFFFF) or 0x55000000,
+                Shader.TileMode.CLAMP
+            )
+            canvas.drawRect(cx - inner, y - band, cx + inner, y, scanPaint)
+            scanPaint.shader = null
+            scanPaint.color = palette.accent
+            scanPaint.strokeWidth = 2f * d
+            canvas.drawLine(cx - inner, y, cx + inner, y, scanPaint)
+            canvas.restore()
+        }
+        drawVerdictBadge(canvas, cx + inner * 0.72f, cy + inner * 0.72f)
+    }
+
+    /** Verdict badge on the doll, shaped like the app's marks: check in a circle (safe), "!" in a triangle (careful), "!" in an octagon (danger), grey "!" circle (error). */
+    private fun drawVerdictBadge(canvas: Canvas, bx: Float, by: Float) {
+        val state = shieldState
+        if (state == ShieldOverlay.State.IDLE || state == ShieldOverlay.State.CHECKING) return
+        val r = 9f * d
+        val m = 2f * r
+        matrix.setScale(m, m)
+        matrix.postTranslate(bx - r, by - r)
+        badgePath.reset()
+        when (state) {
+            ShieldOverlay.State.CAREFUL -> {
+                badgePath.moveTo(0.5f, 0.02f)
+                badgePath.lineTo(1.0f, 0.92f)
+                badgePath.lineTo(0.0f, 0.92f)
+                badgePath.close()
+            }
+            ShieldOverlay.State.DANGER -> {
+                val a = 0.29f
+                badgePath.moveTo(a, 0f)
+                badgePath.lineTo(1f - a, 0f)
+                badgePath.lineTo(1f, a)
+                badgePath.lineTo(1f, 1f - a)
+                badgePath.lineTo(1f - a, 1f)
+                badgePath.lineTo(a, 1f)
+                badgePath.lineTo(0f, 1f - a)
+                badgePath.lineTo(0f, a)
+                badgePath.close()
+            }
+            else -> badgePath.addCircle(0.5f, 0.5f, 0.5f, Path.Direction.CW)
+        }
+        badgePath.transform(matrix)
+        badgeOutline.color = palette.surface
+        badgeOutline.strokeWidth = 3f * d
+        canvas.drawPath(badgePath, badgeOutline)
+        glyph.color = palette.ring(state)
+        canvas.drawPath(badgePath, glyph)
+        val white = 0x00FFFFFF or ((markAlpha * 255).toInt() shl 24)
+        mark.color = white
+        mark.strokeWidth = 0.12f * m
+        markPath.reset()
+        dotPath.reset()
+        when (state) {
+            ShieldOverlay.State.SAFE -> {
+                markPath.moveTo(0.28f, 0.52f)
+                markPath.lineTo(0.44f, 0.67f)
+                markPath.lineTo(0.72f, 0.36f)
+            }
+            ShieldOverlay.State.CAREFUL -> {
+                markPath.moveTo(0.5f, 0.36f)
+                markPath.lineTo(0.5f, 0.62f)
+                dotPath.addCircle(0.5f, 0.78f, 0.065f, Path.Direction.CW)
+            }
+            else -> {
+                markPath.moveTo(0.5f, 0.24f)
+                markPath.lineTo(0.5f, 0.56f)
+                dotPath.addCircle(0.5f, 0.74f, 0.065f, Path.Direction.CW)
+            }
+        }
+        markPath.transform(matrix)
+        canvas.drawPath(markPath, mark)
+        if (!dotPath.isEmpty) {
+            dotPath.transform(matrix)
+            glyph.color = white
+            canvas.drawPath(dotPath, glyph)
+        }
+    }
+
+    /** The doll inside the ring: it rocks with the voice like a roly-poly, dots while thinking, a mic badge while listening. */
+    private fun drawDoll(canvas: Canvas, face: android.graphics.Bitmap, cx: Float, cy: Float, radius: Float, box: Float) {
+        val inner = radius - 4.5f * d
+        val speaking = voice == Voice.SPEAKING
+        val scale = if (speaking) 1f + 0.06f * level else 1f
+        val tilt = if (speaking) 7f * level * kotlin.math.sin(System.nanoTime() / 1.6e8).toFloat() else 0f
+        drawDollFace(canvas, face, cx, cy, inner, scale, tilt)
         if (voice == Voice.THINKING) {
             for (i in 0 until 3) {
                 val t = ((thinkPhase * 3f - i) % 3f + 3f) % 3f
                 val wave = if (t < 1f) 1f - kotlin.math.abs(t - 0.5f) * 2f else 0f
-                glyph.color = (palette.accent and 0x00FFFFFF) or ((0x70 + (0x8F * wave).toInt()) shl 24)
-                canvas.drawCircle(cx + (i - 1) * 0.22f * box, cy + inner - 5f * d - 2f * d * wave, 0.07f * box, glyph)
+                val dx = cx + (i - 1) * 0.22f * box
+                val dy = cy + inner - 5f * d - 2f * d * wave
+                glyph.color = palette.accent
+                canvas.drawCircle(dx, dy, 0.07f * box + 1.2f * d, glyph)
+                glyph.color = (0x00FFFFFF) or ((0x90 + (0x6F * wave).toInt()) shl 24)
+                canvas.drawCircle(dx, dy, 0.07f * box, glyph)
             }
         } else if (voice == Voice.LISTENING) {
             val bx = cx + inner * 0.72f
@@ -261,7 +377,7 @@ internal class BubbleView(context: Context, palette: ShieldPalette) : View(conte
             val r = 7.5f * d
             glyph.color = palette.surface
             canvas.drawCircle(bx, by, r + 1.5f * d, glyph)
-            glyph.color = palette.accent
+            glyph.color = palette.brandRed
             canvas.drawCircle(bx, by, r, glyph)
             val m = 9f * d
             matrix.setScale(m, m)

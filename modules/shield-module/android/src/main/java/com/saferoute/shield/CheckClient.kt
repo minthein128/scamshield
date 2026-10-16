@@ -12,15 +12,17 @@ object CheckClient {
     private const val CONNECT_TIMEOUT_MS = 10_000
     private const val READ_TIMEOUT_MS = 60_000
 
-    fun checkScreen(apiUrl: String, language: String, jpeg: ByteArray, authToken: String = ""): JSONObject {
+    /** The /v1/check body. Scam-pattern sharing is opt-in, so shareSignals is always sent and false unless chosen. */
+    fun requestBody(language: String, jpeg: ByteArray, shareSignals: Boolean = false): JSONObject = JSONObject()
+        .put("kind", "screen")
+        .put("imageBase64", Base64.encodeToString(jpeg, Base64.NO_WRAP))
+        .put("imageMimeType", "image/jpeg")
+        .put("language", language)
+        .put("shareSignals", shareSignals)
+
+    fun checkScreen(apiUrl: String, language: String, jpeg: ByteArray, authToken: String = "", shareSignals: Boolean = false): JSONObject {
         if (apiUrl.isBlank()) throw CheckException("Shield has no server address.")
-        val body = JSONObject()
-            .put("kind", "screen")
-            .put("imageBase64", Base64.encodeToString(jpeg, Base64.NO_WRAP))
-            .put("imageMimeType", "image/jpeg")
-            .put("language", language)
-            .toString()
-            .toByteArray(Charsets.UTF_8)
+        val body = requestBody(language, jpeg, shareSignals).toString().toByteArray(Charsets.UTF_8)
 
         val connection = try {
             URL(apiUrl.trim().trimEnd('/') + "/v1/check").openConnection() as HttpURLConnection

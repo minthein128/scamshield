@@ -31,6 +31,8 @@ export interface ShieldCheckResult {
 export const COMPANION_STRING_KEYS = [
   'name',
   'ask',
+  'whatWeChecked',
+  'previewClose',
   'askA11y',
   'talkA11y',
   'listening',
@@ -68,6 +70,8 @@ export interface ShieldStartOptions {
   /** ISO country codes from the profile; the voice companion uses them to pick verified hotlines. */
   home?: string;
   destination?: string;
+  /** The user's opt-in to share scam patterns from screen checks. Native treats a missing value as false. */
+  shareSignals?: boolean;
   /** Voice companion labels in the user's language. */
   strings?: Partial<Record<CompanionStringKey, string>>;
 }
@@ -95,6 +99,7 @@ interface ShieldModuleType {
   requestScreenCapturePermission(): Promise<boolean>;
   startShield(options?: ShieldStartOptions): Promise<boolean>;
   setAuthToken(token: string | null): Promise<boolean>;
+  setShareSignals(enabled: boolean): Promise<boolean>;
   stopShield(): Promise<boolean>;
   isShieldRunning(): Promise<boolean>;
   checkScreenNow(): Promise<void>;
@@ -207,6 +212,16 @@ export async function startShield(options?: ShieldStartOptions): Promise<boolean
   }
   mockRunning = true;
   return true;
+}
+
+/** Updates the running shield's scam-pattern sharing choice. Off unless the user opted in. */
+export async function setShieldShareSignals(enabled: boolean): Promise<boolean> {
+  if (!nativeShieldModule) return true;
+  try {
+    return await nativeShieldModule.setShareSignals(enabled);
+  } catch {
+    return false;
+  }
 }
 
 /** Replaces the token used by the running shield. Call it when the ID token refreshes. */
@@ -385,6 +400,7 @@ export default {
   requestScreenCapturePermission,
   startShield,
   setShieldAuthToken,
+  setShieldShareSignals,
   stopShield,
   isShieldRunning,
   checkScreenNow,

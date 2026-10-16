@@ -7,6 +7,8 @@ class ShieldStrings private constructor(private val values: Map<String, String>)
 
     val name get() = this["name"]
     val ask get() = this["ask"]
+    val whatWeChecked get() = this["whatWeChecked"]
+    val previewClose get() = this["previewClose"]
     val askA11y get() = this["askA11y"]
     val talkA11y get() = this["talkA11y"]
     val listening get() = this["listening"]
@@ -44,6 +46,8 @@ class ShieldStrings private constructor(private val values: Map<String, String>)
         val DEFAULTS: Map<String, String> = linkedMapOf(
             "name" to "Pyit Taing Htaung",
             "ask" to "Ask",
+            "whatWeChecked" to "This is what we checked",
+            "previewClose" to "Tap to close. This picture is not saved.",
             "askA11y" to "Ask Pyit Taing Htaung about this result",
             "talkA11y" to "Talk to Pyit Taing Htaung",
             "listening" to "Listening",

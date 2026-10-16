@@ -43,6 +43,8 @@
   "companion": {
     "name": "Pyit Taing Htaung",
     "ask": "ถาม",
+    "whatWeChecked": "นี่คือสิ่งที่เราตรวจสอบ",
+    "previewClose": "แตะเพื่อปิด รูปนี้ไม่ได้บันทึกไว้",
     "askA11y": "ถาม Pyit Taing Htaung เกี่ยวกับผลนี้ค่ะ",
     "talkA11y": "คุยกับ Pyit Taing Htaung ค่ะ",
     "listening": "กำลังฟัง",

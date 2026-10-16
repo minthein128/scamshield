@@ -40,6 +40,9 @@ internal data class CardModel(
     val canAsk: Boolean = false,
     val askLabel: String = "Ask",
     val askDescription: String = "Ask Pyit Taing Htaung about this result",
+    /** In-memory copy of the screenshot that was sent. Never written to disk. */
+    val preview: android.graphics.Bitmap? = null,
+    val previewLabel: String = "This is what we checked",
     /** A voice notice rather than a check result. Dismissing it keeps the result. */
     val notice: Boolean = false,
     /** Notice pill: a tap opens SafeRoute. */
@@ -50,6 +53,7 @@ internal data class CardModel(
 
 internal interface CardCallbacks {
     fun onAsk() {}
+    fun onPreview() {}
     fun onRetry()
     fun onFullReport()
     fun onDismissClicked()
@@ -142,7 +146,13 @@ internal class ResultCardView(
             ellipsize = TextUtils.TruncateAt.END
         }
         header.addView(titleView, titleParams())
-        if (model.canAsk) header.addView(askChip(), LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(36)).apply { marginEnd = dp(2) })
+        if (model.canAsk) {
+            header.addView(askChip(), LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(48)).apply {
+                marginEnd = dp(2)
+                topMargin = -dp(4)
+                bottomMargin = -dp(4)
+            })
+        }
         if (model.canExpand) {
             header.addView(chevron, LayoutParams(dp(36), dp(36)))
         }
@@ -164,7 +174,7 @@ internal class ResultCardView(
                 isFocusable = true
                 contentDescription = "${severityWord(flag.severity)} flag: ${flag.text}"
             }
-            row.addView(FlagIconView(context, palette.severity(flag.severity), palette.surface), LayoutParams(dp(18), dp(18)).apply {
+            row.addView(FlagIconView(context, palette.severity(flag.severity), palette.surface, flag.severity), LayoutParams(dp(18), dp(18)).apply {
                 topMargin = dp(1)
             })
             row.addView(
@@ -175,6 +185,7 @@ internal class ResultCardView(
                 topMargin = dp(10)
             })
         }
+        model.preview?.let { details.addView(previewRow(it), LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply { topMargin = dp(12) }) }
         val actions = LinearLayout(context).apply { orientation = HORIZONTAL; gravity = Gravity.END }
         actions.addView(textButton("Dismiss", palette.textMuted, fonts.semiBold) { callbacks.onDismissClicked() })
         if (model.canOpenReport) {
@@ -186,28 +197,63 @@ internal class ResultCardView(
     }
 
     private fun askChip(): View {
+        val radius = dp(18).toFloat()
+        fun pill(color: Int) = GradientDrawable().apply { cornerRadius = radius; setColor(color) }
+        val states = android.graphics.drawable.StateListDrawable().apply {
+            addState(intArrayOf(android.R.attr.state_pressed), pill(palette.askPressed))
+            addState(intArrayOf(), pill(palette.askFill))
+        }
+        val inset = android.graphics.drawable.InsetDrawable(states, 0, dp(6), 0, dp(6))
+        val mask = android.graphics.drawable.InsetDrawable(pill(0xFFFFFFFF.toInt()), 0, dp(6), 0, dp(6))
         val chip = LinearLayout(context).apply {
             orientation = HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
-            setPadding(dp(8), 0, dp(12), 0)
+            setPadding(dp(10), 0, dp(14), 0)
             minimumWidth = dp(48)
+            minimumHeight = dp(48)
             isClickable = true
             isFocusable = true
             contentDescription = model.askDescription
-            val shapeBg = GradientDrawable().apply {
-                cornerRadius = dp(18).toFloat()
-                setColor((palette.accent and 0x00FFFFFF) or 0x1F000000)
-            }
-            val mask = GradientDrawable().apply { cornerRadius = dp(18).toFloat(); setColor(0xFFFFFFFF.toInt()) }
-            background = RippleDrawable(ColorStateList.valueOf((palette.accent and 0x00FFFFFF) or 0x33000000), shapeBg, mask)
+            background = RippleDrawable(ColorStateList.valueOf((palette.askText and 0x00FFFFFF) or 0x33000000), inset, mask)
             setOnClickListener { callbacks.onAsk() }
         }
-        chip.addView(MicIconView(context, palette.accent), LayoutParams(dp(18), dp(18)))
+        chip.addView(MicIconView(context, palette.askText), LayoutParams(dp(16), dp(16)))
         chip.addView(
-            text(model.askLabel, 13f, palette.accent, fonts.bold).apply { maxLines = 1 },
-            LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply { marginStart = dp(4) }
+            text(model.askLabel, 13f, palette.askText, fonts.bold).apply { maxLines = 1 },
+            LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply { marginStart = dp(5) }
         )
         return chip
+    }
+
+    /** "This is what we checked": a small thumbnail of the sent screenshot. Tap to enlarge. */
+    private fun previewRow(bitmap: android.graphics.Bitmap): View {
+        val row = LinearLayout(context).apply {
+            orientation = HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            minimumHeight = dp(48)
+            isClickable = true
+            isFocusable = true
+            contentDescription = model.previewLabel
+            setOnClickListener { callbacks.onPreview() }
+        }
+        val h = dp(PREVIEW_DP)
+        val w = maxOf(dp(24), h * bitmap.width / maxOf(1, bitmap.height))
+        val image = android.widget.ImageView(context).apply {
+            setImageBitmap(bitmap)
+            scaleType = android.widget.ImageView.ScaleType.CENTER_CROP
+            importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
+            background = GradientDrawable().apply {
+                cornerRadius = dp(6).toFloat()
+                setStroke(maxOf(1, d.toInt()), palette.border)
+            }
+            clipToOutline = true
+        }
+        row.addView(image, LayoutParams(w, h))
+        row.addView(
+            text(model.previewLabel, 13f, palette.textSecondary, fonts.semiBold).apply { maxLines = 2 },
+            LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f).apply { marginStart = dp(12) }
+        )
+        return row
     }
 
     private fun titleParams() = LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f).apply {
@@ -403,12 +449,14 @@ internal class ResultCardView(
         }
     }
 
-    internal class MicIconView(context: Context, private val color: Int) : View(context) {
+    internal class MicIconView(context: Context, private val tint: Int) : View(context) {
         private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            this.color = color
+            color = tint
             strokeCap = Paint.Cap.ROUND
         }
         private val oval = android.graphics.RectF()
+
+        val paintColorForTest: Int get() = paint.color
 
         init {
             importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
@@ -428,8 +476,10 @@ internal class ResultCardView(
         }
     }
 
-    private class FlagIconView(context: Context, private val color: Int, private val glyph: Int) : View(context) {
+    /** Severity mark shaped like the app's: octagon (high), triangle (medium), circle (low). */
+    private class FlagIconView(context: Context, private val color: Int, private val glyph: Int, private val severity: String) : View(context) {
         private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+        private val shape = android.graphics.Path()
 
         init {
             importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
@@ -441,7 +491,31 @@ internal class ResultCardView(
             val cy = height / 2f
             paint.style = Paint.Style.FILL
             paint.color = color
-            canvas.drawCircle(cx, cy, 9f * d, paint)
+            val r = 9f * d
+            shape.reset()
+            when (severity) {
+                "high" -> {
+                    val a = 0.41f * r
+                    shape.moveTo(cx - a, cy - r)
+                    shape.lineTo(cx + a, cy - r)
+                    shape.lineTo(cx + r, cy - a)
+                    shape.lineTo(cx + r, cy + a)
+                    shape.lineTo(cx + a, cy + r)
+                    shape.lineTo(cx - a, cy + r)
+                    shape.lineTo(cx - r, cy + a)
+                    shape.lineTo(cx - r, cy - a)
+                    shape.close()
+                }
+                "medium" -> {
+                    shape.moveTo(cx, cy - r * 1.05f)
+                    shape.lineTo(cx + r * 1.1f, cy + r * 0.9f)
+                    shape.lineTo(cx - r * 1.1f, cy + r * 0.9f)
+                    shape.close()
+                }
+                else -> shape.addCircle(cx, cy, r, android.graphics.Path.Direction.CW)
+            }
+            canvas.drawPath(shape, paint)
+            if (severity == "medium") canvas.translate(0f, 1.5f * d)
             paint.color = glyph
             paint.style = Paint.Style.STROKE
             paint.strokeCap = Paint.Cap.ROUND
@@ -454,6 +528,7 @@ internal class ResultCardView(
 
     companion object {
         const val PILL_RADIUS_DP = 24f
+        const val PREVIEW_DP = 72
         const val SHEET_RADIUS_DP = 20f
         val EASE = PathInterpolator(0.2f, 0f, 0f, 1f)
     }

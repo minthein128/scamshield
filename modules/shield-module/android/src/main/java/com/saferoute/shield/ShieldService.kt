@@ -19,7 +19,7 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.os.SystemClock
-import androidx.core.app.NotificationCompat
+import android.util.Log
 import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
 import org.json.JSONObject
@@ -141,16 +141,31 @@ class ShieldService : Service(), ShieldOverlay.Listener {
     private fun startCheck() {
         val currentCapturer = capturer ?: return
         if (!busy.compareAndSet(false, true)) return
-        val hiddenAt = SystemClock.elapsedRealtime()
-        overlay?.hideForCapture()
+        val tapAt = SystemClock.elapsedRealtime()
+        overlay?.setChecking()
+        val masks = overlay?.captureRects().orEmpty()
         worker.execute {
             try {
-                Thread.sleep(HIDE_SETTLE_MS)
-                val jpeg = currentCapturer.captureJpeg(hiddenAt + FRAME_AFTER_HIDE_MS, FRAME_WAIT_MS)
+                var shot = currentCapturer.capture(tapAt + FRESH_FRAME_MS, FRAME_WAIT_MS, masks)
+                var path = "mask"
+                if (shot is ScreenCapturer.Capture.Busy) {
+                    path = "fade"
+                    val fadedBy = onMain { overlay?.fadeForCapture() } ?: SystemClock.elapsedRealtime()
+                    shot = currentCapturer.capture(fadedBy + FRAME_AFTER_FADE_MS, FADE_FRAME_WAIT_MS, emptyList()) {
+                        main.post { overlay?.afterCapture() }
+                    }
+                } else {
+                    main.post { overlay?.afterCapture() }
+                }
+                val jpeg = (shot as? ScreenCapturer.Capture.Jpeg)
                     ?: throw CheckException("Could not read the screen. Tap the shield to try again.")
-                main.post { overlay?.setChecking() }
-                val result = CheckClient.checkScreen(apiUrl, language, jpeg, ShieldBridge.authToken)
-                main.post { onResult(result) }
+                Log.i(
+                    TAG,
+                    "capture path=$path tap_to_jpeg_ms=${SystemClock.elapsedRealtime() - tapAt} crop=${jpeg.crop.toShortString()} " +
+                        "frame_wait_ms=${jpeg.frameWaitMs} encode_ms=${jpeg.encodeMs}" + if (path == "mask") " bubble hidden_ms=0" else ""
+                )
+                val result = CheckClient.checkScreen(apiUrl, language, jpeg.bytes, ShieldBridge.authToken, ShieldBridge.shareSignals)
+                main.post { onResult(result, jpeg.thumb) }
             } catch (e: CheckException) {
                 main.post { onFailure(e.message ?: "The check failed.") }
             } catch (e: InterruptedException) {
@@ -161,13 +176,25 @@ class ShieldService : Service(), ShieldOverlay.Listener {
         }
     }
 
-    private fun onResult(result: JSONObject) {
+    /** Runs [block] on the main thread and waits up to 500 ms for its value. */
+    private fun <T> onMain(block: () -> T?): T? {
+        val latch = java.util.concurrent.CountDownLatch(1)
+        var value: T? = null
+        main.post {
+            value = block()
+            latch.countDown()
+        }
+        latch.await(500, java.util.concurrent.TimeUnit.MILLISECONDS)
+        return value
+    }
+
+    private fun onResult(result: JSONObject, preview: android.graphics.Bitmap? = null) {
         val id = result.optString("id").ifBlank { "chk_local_${System.currentTimeMillis()}" }
         val json = result.toString()
         lastId = id
         lastJson = json
         busy.set(false)
-        overlay?.setResult(result)
+        overlay?.setResult(result, preview)
         ShieldBridge.publishResult(id, json)
         pendingCheck?.let {
             pendingCheck = null
@@ -408,26 +435,22 @@ class ShieldService : Service(), ShieldOverlay.Listener {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                "SafeRoute Shield",
+                ShieldNotification.CHANNEL_NAME,
                 NotificationManager.IMPORTANCE_LOW
-            ).apply { description = "Shows while the SafeRoute shield button is on" }
+            ).apply {
+                description = ShieldNotification.CHANNEL_DESCRIPTION
+                lockscreenVisibility = Notification.VISIBILITY_PRIVATE
+            }
             val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             manager.createNotificationChannel(channel)
         }
     }
 
     private fun buildNotification(): Notification {
-        val builder = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("SafeRoute Shield is on")
-            .setContentText("Tap the floating shield to check what is on your screen.")
-            .setSmallIcon(android.R.drawable.ic_dialog_info)
-            .setOngoing(true)
-        packageManager.getLaunchIntentForPackage(packageName)?.let { launch ->
-            builder.setContentIntent(
-                PendingIntent.getActivity(this, 0, launch, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
-            )
+        val launch = packageManager.getLaunchIntentForPackage(packageName)?.let {
+            PendingIntent.getActivity(this, 0, it, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
         }
-        return builder.build()
+        return ShieldNotification.build(this, CHANNEL_ID, launch)
     }
 
     override fun onDestroy() {
@@ -452,9 +475,12 @@ class ShieldService : Service(), ShieldOverlay.Listener {
         const val ACTION_STOP = "com.saferoute.shield.STOP"
         const val EXTRA_API_URL = "apiUrl"
         const val EXTRA_LANGUAGE = "language"
-        private const val HIDE_SETTLE_MS = 250L
-        private const val FRAME_AFTER_HIDE_MS = 100L
-        private const val FRAME_WAIT_MS = 600L
+        private const val TAG = "ShieldCapture"
+        /** A frame two vsyncs after the tap no longer shows the dismissed result card. */
+        private const val FRESH_FRAME_MS = 34L
+        private const val FRAME_WAIT_MS = 200L
+        private const val FRAME_AFTER_FADE_MS = 17L
+        private const val FADE_FRAME_WAIT_MS = 150L
         private val RESULT_STATES = setOf(ShieldOverlay.State.SAFE, ShieldOverlay.State.CAREFUL, ShieldOverlay.State.DANGER)
 
         @Volatile var instance: ShieldService? = null

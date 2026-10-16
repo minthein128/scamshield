@@ -29,17 +29,31 @@ class ShieldSnapshotTest {
         for (dark in listOf(false, true)) render(dark)
     }
 
+    /** A stand-in for the sent screenshot: a chat-like page with message bubbles. */
+    private fun fakeShot(): Bitmap {
+        val bmp = Bitmap.createBitmap(240, 480, Bitmap.Config.ARGB_8888)
+        val c = android.graphics.Canvas(bmp)
+        c.drawColor(0xFFECE5DD.toInt())
+        val p = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG)
+        for (i in 0 until 6) {
+            p.color = if (i % 2 == 0) 0xFFFFFFFF.toInt() else 0xFFDCF8C6.toInt()
+            val left = if (i % 2 == 0) 12f else 80f
+            c.drawRoundRect(left, 24f + i * 74f, left + 148f, 80f + i * 74f, 12f, 12f, p)
+        }
+        return bmp
+    }
+
     private fun model(state: ShieldOverlay.State): CardModel {
         val chip = ShieldPalette.chipLabel(state)
         return when (state) {
             ShieldOverlay.State.SAFE -> CardModel(
                 state, chip, "Looks like a normal chat", "No signs of a scam were found on this screen.",
-                emptyList(), true, "$chip. Looks like a normal chat"
+                emptyList(), true, "$chip. Looks like a normal chat", canAsk = true, askLabel = "Ask"
             )
             ShieldOverlay.State.CAREFUL -> CardModel(
                 state, chip, "Unknown sender asks for a code", "The sender is not in your contacts and wants a login code.",
                 listOf(FlagRow("Asks for a one-time code", "medium"), FlagRow("Unknown number", "low")),
-                true, "$chip. Unknown sender asks for a code"
+                true, "$chip. Unknown sender asks for a code", canAsk = true, askLabel = "Ask"
             )
             ShieldOverlay.State.ERROR -> CardModel(
                 state, "Offline", "Tap to retry", "No connection. Check your internet and try again.",
@@ -53,7 +67,7 @@ class ShieldSnapshotTest {
                     FlagRow("Link does not match the bank domain: secure-bnk.example", "high"),
                     FlagRow("Asks you to keep this secret", "medium")
                 ),
-                true, "High risk. Fake bank asks you to transfer money"
+                true, "High risk. Fake bank asks you to transfer money", canAsk = true, askLabel = "Ask", preview = fakeShot()
             )
         }
     }
@@ -89,18 +103,21 @@ class ShieldSnapshotTest {
 
     private fun render(dark: Boolean) {
         val palette = ShieldPalette(dark)
-        val bitmap = Bitmap.createBitmap((380 * d).toInt(), (750 * d).toInt(), Bitmap.Config.ARGB_8888)
+        val bitmap = Bitmap.createBitmap((380 * d).toInt(), (830 * d).toInt(), Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
         canvas.drawColor(if (dark) 0xFF0F1B2D.toInt() else 0xFFF4F6F8.toInt())
 
         var y = 8 * d
+        val doll = android.graphics.BitmapFactory.decodeResource(context.resources, R.drawable.companion_doll)
         states.forEachIndexed { i, s ->
-            val bubble = BubbleView(context, palette).also { it.shieldState = s }
+            val bubble = BubbleView(context, palette).also {
+                it.avatar = doll
+                it.shieldState = s
+            }
             draw(canvas, bubble, 8 * d + i * 60 * d, y)
         }
         y += 84 * d
 
-        val doll = android.graphics.BitmapFactory.decodeResource(context.resources, R.drawable.companion_doll)
         listOf(BubbleView.Voice.LISTENING, BubbleView.Voice.THINKING, BubbleView.Voice.SPEAKING, BubbleView.Voice.MUTED)
             .forEachIndexed { i, v ->
                 val bubble = BubbleView(context, palette).also {

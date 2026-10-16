@@ -51,7 +51,7 @@ cd android
 The compile check does not exercise runtime behavior. Verify these on a real device:
 
 1. Overlay permission, then `requestScreenCapturePermission()`, then `startShield({ apiUrl, language })`.
-2. Tap the bubble in another app. The bubble disappears for about 0.3 s, fades back with a progress ring, then shows the verdict ring and a result pill.
+2. Tap the bubble in another app. The bubble stays on screen and the doll starts rocking under the scan sweep at once (after the 300 ms double-tap window), then shows the verdict ring, a verdict badge and a result pill. `adb logcat -s ShieldCapture` prints the capture path and timings.
 3. "Full report" opens `saferoute://report/<id>`. The app must declare the `saferoute` scheme and read the result with `getShieldResult(id)`.
 4. Android 14 and up: the consent dialog must appear again after the user stops sharing from the status bar chip.
 
@@ -71,16 +71,26 @@ Three windows exist. All use `TYPE_APPLICATION_OVERLAY` with `NOT_FOCUSABLE | NO
 
 | State | Ring (light / dark) | Glyph | Notes |
 | --- | --- | --- | --- |
-| Idle | `#CBD5E1` / `#475569` | Brand blue shield | Half-tucked at the edge: 20dp of the circle sits off screen, 48dp stay visible |
-| Checking | Faint static blue track | Blue shield that pulses (scale 1.0 to 1.05) while a scan line sweeps down it, 1.4 s per pass | Bubble is hidden during capture, then fades and scales in from 70%. With animator scale 0 the shield is static |
-| Safe | `#1D4ED8` / `#8FB0FF` (theme safe is blue) | Shield with check | Pill auto-collapses after 8 s, bubble returns to idle |
-| Careful | `#B45309` / `#FBBF24` | Shield with "!" | Pill stays until dismissed |
-| Danger | `#C2410C` / `#FB923C` | Shield with alert triangle | Pill stays until dismissed |
-| Error | `#64748B` / `#94A3B8` | Shield with "!" | Neutral pill with "Tap to retry" |
+| Idle | `#D7CDC0` / `#6B635C` | Pyit Taing Htaung doll on its gold disc | Half-tucked at the edge: 20dp of the circle sits off screen, 48dp stay visible |
+| Checking | Faint lacquer-black track | Doll rocking (about 9 degrees) under an ink scan sweep, 1.4 s per pass | The bubble stays visible; see "Capture without hiding". With animator scale 0 the doll is static |
+| Safe | `#1D4ED8` / `#8FB0FF` (blue is used only for Low risk) | Doll with a check in a circle | Pill auto-collapses after 8 s, bubble returns to idle |
+| Careful | `#B45309` / `#FBBF24` | Doll with "!" in a triangle | Pill stays until dismissed |
+| Danger | `#9F1239` / `#E11D48` (deep crimson, never the doll's red) | Doll with "!" in an octagon | Pill stays until dismissed |
+| Error | `#6B635C` / `#A89E94` | Doll with a grey "!" circle | Neutral pill with "Tap to retry" |
+
+The badge (18dp) sits at the doll's lower right in the ring color with a white mark; its shape repeats the app's verdict marks, so the verdict never rests on color alone. Colors follow `src/theme/theme.ts` and `docs/brand.md`; `BrandPaletteTest` fails when they drift. The doll is `res/drawable-nodpi/companion_doll.png`; without it the old shield glyph is drawn. Every state, light and dark, is in `pitch/e2e/bubble-doll-states.png` (from `ShieldSnapshotTest`).
+
+### Capture without hiding
+
+A tap starts the loader at once and the bubble stays put (it untucks only after the frame is taken). The capturer grabs the first frame at least 34 ms after the tap, so a dismissed result card is gone, then paints over every overlay window rect (bubble window with its 12dp shadow margin, companion pill) with the average color of a ring around it before JPEG encoding (`CaptureMask`).
+
+Before encoding, the frame is also cropped to drop the status bar with the notification shade area and display cutout (top inset) and the navigation bar (bottom, or side in landscape), using the current window insets; no inset may remove more than 20% of a side. A 480 px copy of exactly what was sent stays in memory for the expanded sheet ("This is what we checked", tap to enlarge full screen, tap to close). It is never written to disk and is dropped when the card closes.
+
+When the ring is busy (luminance spread over 20 of 255, for example text or a photo next to the bubble), filling would erase content, so the capture falls back: the windows fade to alpha 0 in 60 ms, the first frame 17 ms later is taken (150 ms cap), and they fade back in 120 ms with the loader still running.
 
 On a verdict the shield pops (scale 80% to 100% with overshoot, 340 ms) while its mark fades in, in the verdict color. Shapes and colors come from `src/theme/theme.ts`.
 
-Circle fill is the theme surface (`#FFFFFF`, dark `#1E293B`). Ring width is 3dp. The shadow is a 8dp blur, 3dp offset.
+Circle fill is the theme surface (`#FFFFFF`, dark `#2E2723`). Ring width is 3dp. The shadow is a 8dp blur, 3dp offset.
 
 Gestures:
 
@@ -94,6 +104,9 @@ Gestures:
 - Position: the card window is anchored, not tied to the bubble every frame. It is placed once per rest position by `AnchorMath`. It is below the bubble when the bubble is in the upper half of the screen, above it otherwise. It is anchored to the bubble's side edge with a 12dp margin.
 - Enter: alpha 0 to 1 and scale 45% to 100% about the bubble center, 200 ms, `cubic-bezier(0.2, 0, 0, 1)`. Exit is 170 ms.
 - Collapsed: a pill at least 48dp tall with radius 24dp. It holds a verdict chip (12sp bold, 14dp radius), a one-line title (14sp semibold, ellipsized) and a chevron.
+- Ask chip (results only): the app's primary button, lacquer black `#1F1A17` with white text and a white mic (17:1), pressed `#3D3631`; on dark it inverts to cream `#F7F3EE` with ink text. The visible chip is 36dp tall inside a 48dp touch target. Blue stays reserved for Low risk and red and gold for the doll.
+- Voice halo: the doll's red `#B8321C` while listening (also the mic badge), gold `#F2B01E` while thinking or speaking, as in `src/components/avatarArt.ts`. The End control is lacquer black, not crimson.
+- Flag icons: "!" in an octagon (high), triangle (medium) or circle (low).
 - Expanded (tap, 220 ms): width grows to min(344dp, screen - 48dp), radius goes to 20dp, a detail area opens. It holds a summary (14sp, up to 4 lines), up to 3 flag rows (18dp severity icon, 13sp, up to 2 lines) and two text buttons, "Dismiss" and "Full report" (48dp tall, at least 48dp wide).
 - Surface: theme surface color, 1dp border, 10dp elevation. Font is Plus Jakarta Sans (Regular, SemiBold, Bold) from `assets/fonts` in the APK, system sans if the load fails.
 - Swipe left or right to dismiss. Past 40% of the width, or a fast fling, it flies off. Otherwise it springs back.
@@ -103,8 +116,8 @@ Gestures:
 | --- | --- | --- |
 | Safe | `#DBE5FF` / `#1E3A8A` | `#1E3A8A` / `#DBE5FF` |
 | Be careful | `#FEF3C7` / `#854D0E` | `#78350F` / `#FDE68A` |
-| High risk | `#C2410C` / `#FFFFFF` | `#9A3412` / `#FFFFFF` |
-| Error | `#EEF2F6` / `#334155` | `#334155` / `#E2E8F0` |
+| High risk | `#9F1239` / `#FFFFFF` | `#9F1239` / `#FFFFFF` |
+| Error | `#F1EBE3` / `#3D3631` | `#4A403A` / `#EFE8DF` |
 
 Dark mode follows the system setting. The service re-reads it in `onConfigurationChanged`.
 
@@ -122,8 +135,8 @@ Safe: one 18 ms tick. Careful: one 35 ms pulse. Danger: three strong pulses (45,
 ### State diagram
 
 ```
-            tap                    hide 250 ms, capture, upload
-  IDLE ───────────────► (hidden) ───────────────────────────► CHECKING
+            tap (bubble stays, loader starts)   capture with masks, upload
+  IDLE ─────────────────────────────────► CHECKING ─────────────────────
    ▲  ▲                                                        │
    │  │ Dismiss, swipe, 8 s (safe only)        verdict         ▼
    │  └──────────────── SAFE / CAREFUL / DANGER ◄───────────────┤
@@ -155,6 +168,10 @@ Bubble gesture, with a result card showing:
 ### Preview
 
 `./gradlew :shield-module:testDebugUnitTest` also runs `ShieldDragTest` (anchor maths for left, right, top, bottom and nav-bar positions, the drag state machine, and drag, close and configuration change against a real overlay). It renders every state, light and dark, to `android/build/shield-snapshots/*.png` with Robolectric native graphics. Elevation shadows and the Plus Jakarta Sans fonts are not part of that render (the test has no APK assets), so check those on a device.
+
+## Notifications
+
+The foreground-service notification is neutral: title "SafeRoute", text "Ready when you need it", channel "SafeRoute", `VISIBILITY_PRIVATE` with a public version that shows only "SafeRoute" (`ShieldNotification.kt`). It never names a check, a verdict or a scam. Message Guard warnings are separate (`MessageGuardNotifier.kt`).
 
 ## Message Guard
 
@@ -259,6 +276,10 @@ So the service adds the microphone type while SafeRoute is visible (`startShield
 - [ ] End on the pill and a long press both end the session and keep the shield; drag to the close target closes both.
 - [ ] Android 14: kill SafeRoute from recents, start the shield from the Home switch, leave the app, double tap: voice works; if not, the pill says "Open SafeRoute once to allow voice".
 - [ ] "Ask me for the hotline" opens SafeRoute on Get help; TalkBack offers "Talk to Pyit Taing Htaung".
+
+## Signal sharing
+
+Scam-pattern sharing is opt-in. `startShield({ shareSignals })` and `setShieldShareSignals(enabled)` set it; native starts at false and every screen check sends `shareSignals` explicitly, `true` only after the user opted in. The app keeps it in step with the profile setting (`useShieldShareSync`).
 
 ## Auth token
 
