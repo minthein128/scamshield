@@ -26,6 +26,8 @@ const RECENT = {
   my: [['မြဝတီ အနီး အရေးပေါ် အလုပ်ခေါ်စာ', 'danger', 60], ['agency-jobs.example/apply', 'careful', 300], ['ဈေးဝယ် ရှိပိုး အလုပ်', 'safe', 1800], ['ဗီဇာအတွက် 300 USD ပို့ပါ', 'danger', 2880], ['ဘန်ကောက် စက်ရုံ အလုပ်', 'careful', 4320], ['Facebook မှ ဖုန်းရောင်းသည့် ဆိုင်', 'safe', 10080], ['ဖူးကက် ဟိုတယ် အလုပ်', 'safe', 14400]],
 };
 
+const homeTab = lang => JSON.parse(readFileSync(`src/i18n/locales/${lang}/common.json`, 'utf8')).tabs.home;
+const homeLink = lang => JSON.parse(readFileSync(`src/i18n/locales/${lang}/home.json`, 'utf8')).quick.link;
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const tab = lang => JSON.parse(readFileSync(`src/i18n/locales/${lang}/common.json`, 'utf8')).tabs.check;
 const sel = id => `[data-testid="${id}"]`;
@@ -109,16 +111,16 @@ for (const lang of LANGS) {
   await shot(clip, `clip-${lang}`);
   await clip.close();
 }
-{
-  const page = await open('en', 390, 1000, '?shieldStub=off');
-  await gotoCheck(page, 'en');
-  await shot(page, 'entry-tab-en');
-  await page.evaluate(label => [...document.querySelectorAll('[role=tab],[role=button],a')].filter(e => e.textContent?.trim() === label).pop().click(), 'Home');
+for (const lang of LANGS) {
+  const page = await open(lang, 390, 1000, '?shieldStub=off');
+  await gotoCheck(page, lang);
+  await shot(page, `entry-tab-${lang}`);
+  await page.evaluate(label => [...document.querySelectorAll('[role=tab],[role=button],a')].filter(e => e.textContent?.replace(/[\u200B\s]/g, '') === label.replace(/\s/g, '')).pop().click(), homeTab(lang));
   await sleep(800);
-  await page.evaluate(() => [...document.querySelectorAll('[role=button]')].find(e => e.getAttribute('aria-label') === 'Link').click());
+  await page.evaluate(label => [...document.querySelectorAll('[role=button]')].find(e => e.getAttribute('aria-label') === label).click(), homeLink(lang));
   await page.waitForSelector(sel('check-mode-message'), { timeout: 30000 });
   await sleep(800);
-  await shot(page, 'entry-home-link-en');
+  await shot(page, `entry-home-link-${lang}`);
   await page.close();
 }
 await browser.close();
