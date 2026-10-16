@@ -10,6 +10,7 @@ import puppeteer from 'puppeteer-core';
 const arg = (name, def) => process.argv.find(a => a.startsWith(`--${name}=`))?.slice(name.length + 3) ?? def;
 const URL_ = arg('url', 'http://localhost:8099');
 const OUT = arg('out', 'pitch/e2e');
+const NOBANNER = process.argv.includes('--no-banner');
 mkdirSync(OUT, { recursive: true });
 
 const STEPS = ['language', 'account', 'countries', 'how', 'sharing'];
@@ -31,6 +32,7 @@ async function run(lang, [w, h], only) {
   await page.goto(URL_, { waitUntil: 'networkidle2', timeout: 240000 });
   await page.waitForSelector(sel('onboarding-hero'), { timeout: 120000 });
   await sleep(1200);
+  if (NOBANNER) await page.evaluate(() => { for (const e of document.querySelectorAll('div')) { const r = e.getBoundingClientRect(); if (r.top < 2 && r.height > 15 && r.height < 40 && r.width > 300 && getComputedStyle(e).backgroundColor !== 'rgba(0, 0, 0, 0)') e.style.display = 'none'; } });
   const suffix = only ? `-${w}x${h}` : '';
   const shot = async i => {
     if (!only || only === STEPS[i]) await page.screenshot({ path: `${OUT}/onb2-${i + 1}-${STEPS[i]}-${lang}${suffix}.png` });

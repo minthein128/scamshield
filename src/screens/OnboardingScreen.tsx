@@ -107,7 +107,7 @@ export const OnboardingScreen: React.FC = () => {
   return (
     <Screen
       footer={
-        step === 'account' ? accountFooter : step === 'sharing' ? (
+        step === 'account' ? null : step === 'sharing' ? (
           <View style={styles.choiceRow}>
             <Button testID="onboarding-share-yes" label={t('sharing.yes')} variant="secondary" style={styles.choice} onPress={() => finish(true)} />
             <Button testID="onboarding-share-no" label={t('sharing.no')} variant="secondary" style={styles.choice} onPress={() => finish(false)} />
@@ -194,6 +194,7 @@ export const OnboardingScreen: React.FC = () => {
             </View>
           )}
           {error ? <Notice testID="onboarding-error" message={error} /> : null}
+          <View style={styles.inlineFooter}>{accountFooter}</View>
         </>
       ) : null}
 
@@ -281,7 +282,7 @@ const styles = StyleSheet.create({
   tileOn: { backgroundColor: colors.accent, borderColor: colors.accent },
   tileText: { color: colors.textPrimary, fontSize: 18, lineHeight: 24, fontFamily: fonts.bold },
   wrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  group: { borderRadius: 20, paddingHorizontal: 14, paddingTop: 14, paddingBottom: 16, gap: 8 },
+  group: { borderRadius: 20, paddingHorizontal: 14, paddingTop: 12, paddingBottom: 12, gap: 6 },
   groupPlain: { backgroundColor: '#FBF9F6', borderWidth: 1, borderColor: colors.border },
   groupGold: { backgroundColor: '#FFF6E6', borderWidth: 1.5, borderColor: colors.brandGold },
   groupHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
@@ -289,7 +290,8 @@ const styles = StyleSheet.create({
   groupTitle: { color: colors.textPrimary, fontSize: 16, lineHeight: 22, fontFamily: fonts.extraBold },
   badge: { flexShrink: 0, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 13, backgroundColor: colors.brandGoldSoft },
   badgeText: { color: '#7A4B00', fontSize: 12, lineHeight: 18, fontFamily: fonts.bold },
-  list: { gap: 6 },
+  list: { gap: 4 },
+  inlineFooter: { gap: 8, marginTop: 4 },
   perk: { flexDirection: 'row', gap: 10, alignItems: 'flex-start' },
   perkIcon: { width: 26, height: 26, borderRadius: 13, backgroundColor: colors.brandGoldSoft, alignItems: 'center', justifyContent: 'center' },
   perkIconWhite: { backgroundColor: colors.white },
