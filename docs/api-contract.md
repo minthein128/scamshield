@@ -198,78 +198,118 @@ No auth. Per-IP limit. Every reply carries `Cache-Control: public, max-age=300` 
 
 The app fetches hotlines, notices and content at startup and every 6 hours, caches them, and uses the cache offline. See `docs/admin.md`.
 
-## Job Shield endpoints
+Admin errors extend the error body: codes `unauthorized` (401), `forbidden` (403) and `conflict` (409) join the existing ones. The admin API itself is under `/v1/admin` and is described in `docs/admin.md`.
 
-SafeRoute Job Shield compares advertised terms with recruiter demands before a migrant worker pays, sends documents or travels.
+## Job Shield: POST /v1/job/extract and POST /v1/job/assess
+
+Job Shield compares what a job ad promises with what the recruiter asks in chat. It is a two-step flow: extract the facts, let the user confirm or correct them, then assess. Both routes share the per-IP limit of `/v1/check`. Nothing from either route is stored in Firestore or logged; extractions live in memory for 10 minutes.
 
 ### POST /v1/job/extract
 
-Extracts structured job facts from an ad (flyer, post) and/or a recruiter chat.
-
 Request:
+
 ```json
 {
-  "ad": { "text": "...", "imageBase64": "...", "imageMimeType": "image/jpeg" },
-  "chat": { "text": "...", "imageBase64": "...", "imageMimeType": "image/jpeg" },
+  "ad":   { "text": "optional", "imageBase64": "optional", "imageMimeType": "image/jpeg" | "image/png" | "image/webp" },
+  "chat": { "text": "optional", "imageBase64": "optional", "imageMimeType": "image/jpeg" },
   "language": "en" | "id" | "tl" | "my" | "th",
-  "context": { "home": "Myanmar", "destination": "Thailand" }
+  "context": { "home": "optional", "destination": "optional", "route": "optional" }
 }
 ```
 
-At least one of `ad` or `chat` is required.
+At least one of `ad` and `chat` is required, and each source needs `text` or `imageBase64`. Both sources go to the model in one call.
 
 Response 200:
+
 ```json
 {
-  "jobId": "job_...",
-  "ad": {
-    "employer": { "value": "Bangkok Logistics", "quote": "Bangkok Logistics Ltd", "confidence": 0.9 },
-    "jobTitle": { "value": "Customer Service", "quote": "Customer Service", "confidence": 0.95 },
-    "workplace": { "value": "Bangkok", "quote": "Silom Road", "confidence": 0.9 },
-    "destinationCountry": { "value": "Thailand", "quote": "Thailand", "confidence": 0.9 },
-    "salary": { "value": { "amount": "35000", "currency": "THB", "period": "monthly" }, "quote": "35,000 THB", "confidence": 0.9 },
-    "workerFee": { "value": "none stated", "quote": "No fees", "confidence": 0.9 },
-    "contract": { "value": "official", "quote": "Official contract", "confidence": 0.9 },
-    "visaOrPermit": { "value": "work_visa", "quote": "Non-B visa sponsored", "confidence": 0.9 },
-    "travelArrangedBy": null,
-    "route": null,
-    "meetingPoint": { "value": "workplace", "quote": "Office at Silom", "confidence": 0.9 },
-    "documentRequest": null,
-    "paymentRequest": null,
-    "urgency": null,
-    "contactChannel": { "value": "company_channel", "quote": "hr@bangkoklogistics.example.com", "confidence": 0.9 },
-    "secrecyRequest": null
-  },
-  "chat": null
+  "jobId": "job_3f9c0a1b2c3d4e5f",
+  "ad": JobFacts | null,
+  "chat": JobFacts | null
 }
 ```
 
-Every field is either `null` (not mentioned) or an object with `{ value, quote, confidence }`. Extractions are cached in memory for 10 minutes by `jobId`.
+A source that was not sent is `null`. `JobFacts` has these 16 keys. Each key is `null` (the source does not mention it) or a `Fact`:
+
+```json
+{ "value": <see table>, "quote": "exact text from the source", "confidence": 0.0-1.0, "refused": true }
+```
+
+| Key | `value` |
+| --- | --- |
+| `employer`, `jobTitle`, `workplace`, `destinationCountry`, `travelArrangedBy`, `route`, `urgency` | string |
+| `salary` | `{ "amount": number \| null, "currency": "THB", "period": "hourly" \| "daily" \| "weekly" \| "monthly" \| "yearly" \| "unknown" }` |
+| `workerFee` | string: `"none"` when the source says there is no fee, else the amount as written, e.g. `"15,000 THB"` |
+| `contract` | `official` \| `later` \| `none` \| `not_mentioned` |
+| `visaOrPermit` | `work_visa` \| `tourist` \| `none` \| `not_mentioned` |
+| `meetingPoint` | `airport` \| `border` \| `workplace` \| `driver_pickup` \| `unnamed` \| `not_mentioned` |
+| `documentRequest` | `passport_photo` \| `passport_hold` \| `id_copy` \| `none` \| `not_mentioned` |
+| `paymentRequest` | `before_contract` \| `personal_account` \| `none` \| `not_mentioned` |
+| `contactChannel` | `company_channel` \| `personal_chat_app` \| `phone` \| `email` |
+| `secrecyRequest` | boolean |
+
+- Enum values are English codes in every language. The app translates them for display.
+- `quote` stays in the language of the source. The server checks that the quote appears in the source text (whitespace-insensitive). When it does not, `quote` is `""` and `confidence` is at most 0.3. Quotes from screenshots cannot be checked and keep their confidence.
+- `refused: true` appears only when the source explicitly withholds the detail ("the address will be shared after you arrive"). `value` is then `""` (or the closest code for enum keys).
+- Extraction never returns `not_mentioned`; it returns `null` instead. `none` means the source explicitly says none ("no fee", "no documents needed").
+
+Errors: `400 bad_request` for a malformed body, `413 too_large` for an image over 4 MB, `502 upstream` when the model call fails or returns unusable output (the message says the job details could not be read; retry). The server never invents facts when the model fails.
 
 ### POST /v1/job/assess
 
-Assesses the extracted and user-confirmed facts through deterministic conflict rules, border town protection, grounding, and attention tiers.
-
 Request:
+
 ```json
 {
-  "jobId": "job_...",
-  "facts": {
-    "ad": { ... },
-    "chat": { ... }
-  },
+  "jobId": "job_3f9c0a1b2c3d4e5f",
+  "facts": { "ad": JobFacts | null, "chat": JobFacts | null },
   "language": "en" | "id" | "tl" | "my" | "th",
-  "context": { "home": "Myanmar", "destination": "Thailand" }
+  "context": { "home": "optional", "destination": "optional", "route": "optional" }
 }
 ```
 
-Response 200:
-Extends the standard `CheckResponse` with:
-- `attention`: `"lower" | "verify" | "pause"`
-- `attentionHeadline`: Short headline corresponding to the attention tier
-- `conflicts`: Array of `JobConflict` items showing both quotes and the conflicting terms
-- `stillUnclear`: Array of critical missing information items
-- `adFacts`, `chatFacts`: Confirmed facts
+- Send the facts as the user confirmed them. A key may be left out (treated as not stated) or set to `null`.
+- A user edit is the same `Fact` with the new `value` and `"edited": true`. Keep the original `quote`; the server ignores edited quotes. Enum edits must be one of the codes above and salary edits must be `{ amount, currency, period }`; anything else is `400 bad_request`. Marking a fact "not mentioned" is `null` (or `"not_mentioned"` for enum keys).
+- When `jobId` is still in the server memory, the server starts from its stored extraction: quotes and confidences come from it, and the request supplies only the values the user edited (`edited: true`) or removed (`null`). Keys missing from the request keep the stored fact. When the `jobId` is unknown or expired, the server uses `facts` as sent. `facts` is required when there is no stored extraction (`400 bad_request`).
+
+Response 200 is a `CheckResponse` (see `POST /v1/check`, `kind: "job"`, `scamType: "job_trafficking"` or `"none"`) plus:
+
+```json
+{
+  "attention": "lower" | "verify" | "pause",
+  "attentionHeadline": "localized tier text",
+  "conflicts": [
+    {
+      "field": "workerFee",
+      "code": "fee_vs_no_fee",
+      "fieldLabel": "localized, e.g. Worker fee",
+      "adValue": "none",
+      "adQuote": "No fee for workers",
+      "chatValue": "15,000 THB",
+      "chatQuote": "pay 15,000 baht before the contract",
+      "description": "localized, hedged sentence",
+      "family": "payment_route",
+      "severity": "high"
+    }
+  ],
+  "stillUnclear": ["localized sentence"],
+  "stillUnclearFields": ["workplace", "contract"],
+  "findings": [ { "code": "company_found" | "company_not_found" | "company_not_checked" | "recruiter_not_confirmed", "label": "localized" } ],
+  "usedStoredExtraction": true,
+  "adFacts": JobFacts | null,
+  "chatFacts": JobFacts | null
+}
+```
+
+- `title` equals `attentionHeadline`. Tier texts (English): `lower` "Few warning signs found, but important details may still be missing", `verify` "Some details do not add up, check them before you go", `pause` "Pause before you pay, send documents or travel". `verdict` keeps the `/v1/check` meaning: `safe` maps to `lower`, `careful` to `verify`, `danger` to `pause`.
+- Localized in `language`: `title`, `attentionHeadline`, `summary`, `spokenWarning`, every `flags[].label`, `conflicts[].fieldLabel` and `description`, `stillUnclear`, `findings[].label`. `flags[].evidence`, `adQuote` and `chatQuote` are quotes in the source language. `adValue` and `chatValue` are enum codes or the raw value.
+- `conflicts[].code` is one of `fee_vs_no_fee`, `documents_passport_photo`, `documents_passport_hold`, `documents_id_copy`, `contract_later`, `contract_pay_first`, `visa_tourist`, `visa_none`, `meeting_informal`, `employer_different`, `employer_refused`, `workplace_refused`, `salary_different`. A conflict needs both sources to state the field.
+- `findings`: `company_found` means a web search found a company with this name. It never lowers the risk. `recruiter_not_confirmed` is always reported when an employer is named: the server cannot confirm that the recruiter works for that company. `company_not_checked` means search did not run or did not finish.
+- `stillUnclearFields` are keys from `JobFacts` that neither source states (`workplace`, `contract`, `visaOrPermit`, `employer`, `salary`), in the same order as `stillUnclear`.
+- `usedStoredExtraction` is `true` when the server used its stored extraction for `jobId`.
+- `adFacts` and `chatFacts` are the facts the assessment used, with the original quotes.
+
+Errors: `400 bad_request` for malformed facts, an enum value outside the codes, or a missing `facts` with an unknown `jobId`. Assess never calls the model except for the company search; a search failure only adds `company_not_checked`.
 
 ## GET /healthz
 
