@@ -46,8 +46,8 @@ function blossom(cx: number, cy: number, r: number, petal: string, heart: string
   return [...petals, { circle: [cx, cy, r * 0.62], fill: heart }];
 }
 
-/** Full-colour doll. A rim colour outlines it so it separates from a dark or same-colour ground. */
-export function markShapes(rim?: string): MarkShape[] {
+/** Full-colour doll; face replaces the neutral eyes, cheeks and smile. A rim colour outlines it so it separates from a dark or same-colour ground. */
+export function markShapes(rim?: string, face?: MarkShape[]): MarkShape[] {
   const p = MARK_PATHS;
   const c = MARK_COLORS;
   const outline: MarkShape[] = rim
@@ -67,10 +67,12 @@ export function markShapes(rim?: string): MarkShape[] {
     ...blossom(50, 70.5, 2.6, c.gold, c.bodyDeep),
     { d: p.hair, fill: c.ink },
     { d: p.knot, stroke: c.gold, width: 1.6 },
-    { d: p.eyeLeft, fill: c.ink },
-    { d: p.eyeRight, fill: c.ink },
-    { circle: [35.5, 47.5, 3.8], fill: c.cheek, opacity: 0.8 },
-    { circle: [64.5, 47.5, 3.8], fill: c.cheek, opacity: 0.8 },
-    { d: p.smile, stroke: c.body, width: 2.2 },
+    ...(face ?? [
+      { d: p.eyeLeft, fill: c.ink },
+      { d: p.eyeRight, fill: c.ink },
+      { circle: [35.5, 47.5, 3.8], fill: c.cheek, opacity: 0.8 },
+      { circle: [64.5, 47.5, 3.8], fill: c.cheek, opacity: 0.8 },
+      { d: p.smile, stroke: c.body, width: 2.2 },
+    ]),
   ];
 }

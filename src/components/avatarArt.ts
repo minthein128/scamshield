@@ -101,6 +101,58 @@ const doll: AvatarArt = {
   view: [3, 0, 95],
 };
 
+export type DollMood = 'calm' | 'concerned' | 'worried';
+
+const eyeAt = (cx: number, ry = 3.7) => fill(ellipse(cx, 40, 3, ry), C_COL.hair);
+const cheeks = (opacity: number): Shape[] => [
+  { circle: [35.5, 47.5, 3.8], fill: C_COL.cheek, opacity },
+  { circle: [64.5, 47.5, 3.8], fill: C_COL.cheek, opacity },
+];
+
+/** Raised open palm on the doll's right, drawn as an outline pass and then a fill pass. */
+const PALM: Shape[] = [
+  line('M76 52 L86.5 35', C_COL.bodyDeep, 7.6),
+  line('M76 52 L86.5 35', C_COL.body, 5.6),
+  fill(ellipse(88.5, 29, 7.4, 6.4), C_COL.bodyDeep),
+  ...['M84.8 25 L84 16', 'M87.6 24 L87.4 13.5', 'M90.4 24 L90.8 14.5', 'M93 26 L94.2 18.5'].map(d => line(d, C_COL.bodyDeep, 5)),
+  fill(ellipse(88.5, 29, 6.2, 5.2), C_COL.face),
+  ...['M84.8 25 L84 16', 'M87.6 24 L87.4 13.5', 'M90.4 24 L90.8 14.5', 'M93 26 L94.2 18.5'].map(d => line(d, C_COL.face, 3.2)),
+];
+
+/** Face and hand for a verdict, replacing the neutral eyes, cheeks and smile. Same palette and stroke as the idle doll. */
+export function moodFace(mood: DollMood): Shape[] {
+  switch (mood) {
+    case 'calm':
+      return [
+        line('M38.8 41.2 Q41.5 37.4 44.2 41.2', C_COL.hair, 2.2),
+        line('M55.8 41.2 Q58.5 37.4 61.2 41.2', C_COL.hair, 2.2),
+        ...cheeks(0.8),
+        line('M44.4 47.6 Q50 54.2 55.6 47.6', C_COL.lips, 2.2),
+      ];
+    case 'concerned':
+      return [
+        line('M36.6 35.6 L45.4 32.8', C_COL.hair, 2),
+        line('M63.4 35.6 L54.6 32.8', C_COL.hair, 2),
+        eyeAt(41.5),
+        eyeAt(58.5),
+        ...cheeks(0.45),
+        line('M47 50.4 Q50 48.8 53 50.4', C_COL.lips, 2),
+      ];
+    case 'worried':
+      return [
+        line('M35.6 38 L45.6 32', C_COL.hair, 2.2),
+        line('M64.4 38 L54.4 32', C_COL.hair, 2.2),
+        eyeAt(41.5, 4.2),
+        eyeAt(58.5, 4.2),
+        dot(42.3, 38.6, 0.9, '#FFFFFF'),
+        dot(59.3, 38.6, 0.9, '#FFFFFF'),
+        ...cheeks(0.3),
+        line('M45.8 52 Q50 47.8 54.2 52', C_COL.lips, 2.2),
+        ...PALM,
+      ];
+  }
+}
+
 export const AVATAR_ART: Record<AvatarConcept, AvatarArt> = { C: doll };
 
 export const HALO_COLORS: Record<AvatarState, string> = {

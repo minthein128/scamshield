@@ -5,7 +5,7 @@ import { Text } from '../components/Text';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DollLoader from '../components/DollLoader';
 import { useReduceMotion } from '../hooks/useReduceMotion';
-import type { Verdict } from '../api/types';
+import type { CheckResponse, Verdict } from '../api/types';
 import { Button, LinkButton } from '../components/ui';
 import { useAuth } from '../state/AuthState';
 import { errorCopy, getApiClient } from '../api';
@@ -19,9 +19,11 @@ const { colors, fonts } = theme;
 
 const STEPS = ['read', 'pick', 'spot', 'links', 'score', 'write'] as const;
 const STEP_MS = 900;
+const HOLD_SAFE_MS = 1500;
+const HOLD_RISK_MS = 3600;
 
 export const CheckingScreen: React.FC<RootScreenProps<'Checking'>> = ({ navigation, route }) => {
-  const { t } = useTranslation('checking');
+  const { t } = useTranslation(['checking', 'common']);
   const { request, source, reported } = route.params;
   const { saveCheck } = useAppState();
   const [step, setStep] = useState(0);
@@ -30,6 +32,19 @@ export const CheckingScreen: React.FC<RootScreenProps<'Checking'>> = ({ navigati
   const { status } = useAuth();
   const [error, setError] = useState<(ErrorCopy & { code?: string }) | null>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const holdRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const openedRef = useRef(false);
+  const [result, setResult] = useState<CheckResponse | null>(null);
+
+  const openReport = useCallback(
+    (checked: CheckResponse) => {
+      if (openedRef.current) return;
+      openedRef.current = true;
+      if (holdRef.current) clearTimeout(holdRef.current);
+      navigation.replace('Report', { result: checked, language: request.language, fresh: true, ...(reported ? { reported } : {}) });
+    },
+    [navigation, request.language, reported],
+  );
 
   const run = useCallback(async () => {
     setError(null);
@@ -37,21 +52,25 @@ export const CheckingScreen: React.FC<RootScreenProps<'Checking'>> = ({ navigati
     const controller = new AbortController();
     abortRef.current = controller;
     try {
-      const result = await getApiClient().check(request, { signal: controller.signal });
-      await saveCheck(result, request.language, source);
-      setVerdict(result.verdict);
-      if (!reduceMotion) await new Promise(resolve => setTimeout(resolve, 1100));
+      const checked = await getApiClient().check(request, { signal: controller.signal });
+      await saveCheck(checked, request.language, source);
+      setResult(checked);
+      setVerdict(checked.verdict);
+      if (!reduceMotion) await new Promise(resolve => (holdRef.current = setTimeout(resolve, checked.verdict === 'safe' ? HOLD_SAFE_MS : HOLD_RISK_MS)));
       if (controller.signal.aborted) return;
-      navigation.replace('Report', { result, language: request.language, fresh: true, ...(reported ? { reported } : {}) });
+      openReport(checked);
     } catch (e) {
       if (e instanceof ApiError && e.code === 'cancelled') return;
       setError({ ...errorCopy(e), code: e instanceof ApiError ? e.code : undefined });
     }
-  }, [navigation, request, saveCheck, source, reported, reduceMotion]);
+  }, [openReport, request, saveCheck, source, reduceMotion]);
 
   useEffect(() => {
     run();
-    return () => abortRef.current?.abort();
+    return () => {
+      abortRef.current?.abort();
+      if (holdRef.current) clearTimeout(holdRef.current);
+    };
   }, [run]);
 
   useEffect(() => {
@@ -59,6 +78,9 @@ export const CheckingScreen: React.FC<RootScreenProps<'Checking'>> = ({ navigati
     const timer = setInterval(() => setStep(s => Math.min(s + 1, STEPS.length - 1)), STEP_MS);
     return () => clearInterval(timer);
   }, [error]);
+
+  const word = verdict ? t(`common:verdict.${verdict}`) : t('title');
+  const reassure = verdict === 'careful' || verdict === 'danger' ? t(`reassure.${verdict}`) : null;
 
   return (
     <SafeAreaView style={styles.root}>
@@ -73,15 +95,23 @@ export const CheckingScreen: React.FC<RootScreenProps<'Checking'>> = ({ navigati
           </View>
         ) : (
           <View style={styles.loader}>
-            <DollLoader step={step} verdict={verdict} label={t('title')} />
-            <Text accessibilityRole="header" style={styles.title}>{verdict ? t(`verdict.${verdict}`) : t('title')}</Text>
-            <Text testID="checking-stage" accessibilityLiveRegion="polite" style={styles.stage}>{verdict ? ' ' : t(`steps.${STEPS[step]}`)}</Text>
+            <DollLoader step={step} verdict={verdict} label={word} />
+            <Text testID="checking-verdict" accessibilityRole="header" accessibilityLiveRegion="polite" style={verdict ? styles.verdict : styles.title}>{word}</Text>
+            {verdict ? (
+              reassure ? <Text testID="checking-reassure" style={styles.reassure}>{reassure}</Text> : null
+            ) : (
+              <Text testID="checking-stage" accessibilityLiveRegion="polite" style={styles.stage}>{t(`steps.${STEPS[step]}`)}</Text>
+            )}
           </View>
         )}
       </View>
       <View style={styles.footer}>
         {error ? <Button testID="checking-retry" label={t('retry')} onPress={run} /> : null}
-        <Button label={error ? t('goBack') : t('cancel')} variant="secondary" onPress={() => navigation.goBack()} />
+        {result ? (
+          <Button testID="checking-see-why" label={t('seeWhy')} variant="secondary" onPress={() => openReport(result)} />
+        ) : (
+          <Button label={error ? t('goBack') : t('cancel')} variant="secondary" onPress={() => navigation.goBack()} />
+        )}
       </View>
     </SafeAreaView>
   );
@@ -90,8 +120,10 @@ export const CheckingScreen: React.FC<RootScreenProps<'Checking'>> = ({ navigati
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.deepDarkBackground },
   body: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24 },
-  loader: { alignItems: 'center', gap: 8 },
+  loader: { alignItems: 'center', gap: 10 },
   title: { color: colors.white, fontSize: 22, lineHeight: 30, fontFamily: fonts.bold },
+  verdict: { color: colors.white, fontSize: 36, lineHeight: 46, fontFamily: fonts.extraBold, letterSpacing: -0.3, textAlign: 'center' },
+  reassure: { color: colors.textLighter, fontSize: 17, lineHeight: 26, fontFamily: fonts.medium, textAlign: 'center', maxWidth: 320, marginTop: 4 },
   stage: { color: colors.textLight, fontSize: 14, lineHeight: 20, fontFamily: fonts.regular, textAlign: 'center', minHeight: 20 },
   footer: { paddingHorizontal: 24, paddingBottom: 24, gap: 10 },
   errorBox: { gap: 8, alignItems: 'center' },

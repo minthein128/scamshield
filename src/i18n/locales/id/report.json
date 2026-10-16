@@ -4,7 +4,7 @@
   },
   "seen_other": "Dilaporkan {{count}} kali oleh pengguna SafeRoute lain dalam 30 hari terakhir",
   "title": "Laporan risiko",
-  "a11yVerdict": "{{verdict}}. Skor {{score}} dari 100.",
+  "a11yVerdict": "{{verdict}}. Tingkat {{step}} dari 3.",
   "warn": "Beri tahu keluarga saya",
   "call": "Hubungi {{number}}",
   "callExt": "lalu minta sambungan lokal {{ext}}",
@@ -16,9 +16,9 @@
   "linkChecks": "Pemeriksaan tautan",
   "actions": "Hal yang dapat Anda lakukan",
   "severity": {
-    "high": "Risiko tinggi",
-    "medium": "Risiko sedang",
-    "low": "Risiko rendah"
+    "high": "Tanda serius",
+    "medium": "Perlu diperiksa",
+    "low": "Tanda ringan"
   },
   "domainAge_other": "Usia domain: {{count}} hari",
   "domainAgeUnknown": "Usia domain tidak diketahui",
