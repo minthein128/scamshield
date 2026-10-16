@@ -3,10 +3,13 @@ import type { ScamTypeId } from './content';
 
 const { colors } = theme;
 
+const NEUTRAL = { accent: colors.textPrimary, soft: colors.borderSubtle };
+
+/** One treatment for every scam type: ink on a warm tile. Hue is reserved for verdicts. */
 export const ACCENTS: Record<ScamTypeId, { accent: string; soft: string }> = {
-  jobs: { accent: colors.danger, soft: colors.dangerSoftBg },
-  romance: { accent: colors.indigoMedium, soft: '#E0E7FF' },
-  parcel: { accent: colors.cyanDark, soft: '#DDF3F7' },
-  agency: { accent: colors.tealDark, soft: '#DDF4F0' },
-  shop: { accent: colors.purpleDark, soft: '#F3E8FF' },
+  jobs: NEUTRAL,
+  romance: NEUTRAL,
+  parcel: NEUTRAL,
+  agency: NEUTRAL,
+  shop: NEUTRAL,
 };

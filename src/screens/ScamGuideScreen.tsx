@@ -59,7 +59,7 @@ export const ScamGuideScreen: React.FC<RootScreenProps<'ScamGuide'>> = ({ naviga
             return (
               <View key={i} style={styles.sign} accessible accessibilityLabel={`${flag?.title ?? t('guide.signFallback')}: ${s.text}`}>
                 <View style={styles.signIcon}>
-                  <Icon name={flag?.icon ?? 'flag'} size={18} color={colors.danger} />
+                  <Icon name={flag?.icon ?? 'flag'} size={18} color={colors.textPrimary} />
                 </View>
                 <Text style={[styles.signText, readable(tablet, 15, 22)]}>{s.text}</Text>
               </View>
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
   para: { color: colors.textPrimary, fontSize: 16, lineHeight: 25, fontFamily: fonts.regular },
   note: { color: colors.textMuted, fontSize: 13, lineHeight: 18, fontFamily: fonts.semiBold },
   sign: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
-  signIcon: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.dangerSoftBg, alignItems: 'center', justifyContent: 'center' },
+  signIcon: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.borderSubtle, alignItems: 'center', justifyContent: 'center' },
   signText: { flex: 1, color: colors.textPrimary, fontSize: 15, lineHeight: 22, fontFamily: fonts.regular, paddingTop: 4 },
   stop: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: colors.dangerSoftBg, borderRadius: 14, padding: 14, minHeight: 56 },
   stopIcon: { width: 40, height: 40, borderRadius: 20, backgroundColor: colors.danger, alignItems: 'center', justifyContent: 'center' },
