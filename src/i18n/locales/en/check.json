@@ -11,18 +11,22 @@
   "text": {
     "title": "Text message",
     "a11y": "Text or chat to check",
-    "placeholder": "Job post, chat messages or SMS"
+    "placeholder": "Job post, chat messages or SMS",
+    "hint": "Paste the message or post, or add a picture of it."
   },
   "link": {
     "label": "Link",
-    "a11y": "Link to check"
+    "a11y": "Link to check",
+    "hint": "Paste the link you want to check."
   },
   "screenshot": {
     "label": "Screenshot",
     "ready": "{{kb}} KB, ready to send",
     "preparing": "Preparing picture...",
     "upload": "Upload a screenshot",
-    "pick": "Pick a screenshot"
+    "pick": "Pick a screenshot",
+    "change": "Change",
+    "pickHint": "A picture from your phone"
   },
   "destination": {
     "label": "Where do you work or travel?",
@@ -51,14 +55,16 @@
       "title": "The job ad",
       "hint": "Paste the post, or add a picture of it.",
       "a11y": "Text of the job ad",
-      "placeholder": "Paste the job ad here"
+      "placeholder": "Paste the job ad here",
+      "pickHint": "A picture of the ad from your phone"
     },
     "chat": {
       "title": "What the recruiter asked you",
       "optional": "Optional",
       "hint": "Paste the messages, or add a picture. This may help us notice details that do not match the ad.",
       "a11y": "Text of the recruiter chat",
-      "placeholder": "Paste the chat with the recruiter here"
+      "placeholder": "Paste the chat with the recruiter here",
+      "pickHint": "A picture of the chat from your phone"
     },
     "submit": "Read these texts",
     "submitHint": "Add the job ad or the chat first",
@@ -172,5 +178,6 @@
         "no": "Not asked to keep it secret"
       }
     }
-  }
+  },
+  "or": "or"
 }

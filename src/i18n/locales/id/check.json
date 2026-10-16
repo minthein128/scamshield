@@ -14,18 +14,22 @@
   "text": {
     "title": "Pesan teks",
     "a11y": "Teks atau obrolan untuk diperiksa",
-    "placeholder": "Lowongan kerja, pesan obrolan, atau SMS"
+    "placeholder": "Lowongan kerja, pesan obrolan, atau SMS",
+    "hint": "Tempel pesan atau postingan, atau tambahkan gambarnya."
   },
   "link": {
     "label": "Tautan",
-    "a11y": "Tautan untuk diperiksa"
+    "a11y": "Tautan untuk diperiksa",
+    "hint": "Tempel tautan yang ingin Anda periksa."
   },
   "screenshot": {
     "label": "Tangkapan layar",
     "ready": "{{kb}} KB, siap dikirim",
     "preparing": "Menyiapkan gambar...",
     "upload": "Unggah tangkapan layar",
-    "pick": "Pilih tangkapan layar"
+    "pick": "Pilih tangkapan layar",
+    "change": "Ganti",
+    "pickHint": "Gambar dari ponsel Anda"
   },
   "destination": {
     "label": "Di mana Anda bekerja atau bepergian?",
@@ -54,14 +58,16 @@
       "title": "Iklan lowongan kerja",
       "hint": "Tempel unggahan ini, atau tambahkan fotonya.",
       "a11y": "Teks iklan lowongan kerja",
-      "placeholder": "Tempel iklan lowongan di sini"
+      "placeholder": "Tempel iklan lowongan di sini",
+      "pickHint": "Gambar iklan dari ponsel Anda"
     },
     "chat": {
       "title": "Pesan dari perekrut",
       "optional": "Opsional",
       "hint": "Tempel pesan, atau tambahkan foto. Ini bisa membantu kami melihat hal yang tidak sesuai dengan iklan.",
       "a11y": "Teks obrolan perekrut",
-      "placeholder": "Tempel obrolan dengan perekrut di sini"
+      "placeholder": "Tempel obrolan dengan perekrut di sini",
+      "pickHint": "Gambar obrolan dari ponsel Anda"
     },
     "submit": "Baca teks ini",
     "submitHint": "Tambahkan iklan lowongan atau obrolan terlebih dahulu",
@@ -175,5 +181,6 @@
         "no": "Tidak diminta merahasiakannya"
       }
     }
-  }
+  },
+  "or": "atau"
 }

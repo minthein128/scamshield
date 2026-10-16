@@ -1,15 +1,16 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { View, Image, StyleSheet, Platform, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import * as Clipboard from 'expo-clipboard';
 import { Screen } from '../components/Screen';
 import { Text, TextInput } from '../components/Text';
-import { Button, Card, Divider, Notice, SectionTitle } from '../components/ui';
+import { BlockIcon } from '../components/blockIcons';
+import { Button, Notice } from '../components/ui';
 import { Icon } from '../components/Icon';
 import { HeaderWithLeave } from '../components/LeaveQuickly';
 import { Select } from '../components/Select';
-import { JobSourceBlock } from '../components/JobSourceBlock';
-import { PasteButton } from '../components/PasteButton';
+import { SourceBlock } from '../components/SourceBlock';
+import { InputBlock, TextBox } from '../components/CheckBlocks';
 import { UI_LANGUAGES } from '../i18n/languages';
 import { countryName } from '../lib/countries';
 import { hasInput } from '../api';
@@ -126,18 +127,20 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
       footer={
         <>
           {ready ? null : <Text testID="check-submit-hint" style={styles.hint}>{isJob ? t('job.submitHint') : t('submitHint')}</Text>}
-          <Button testID="check-submit" label={isJob ? t('job.submit') : t('submit')} onPress={submit} disabled={!ready || busy} />
+          <Button testID="check-submit" label={isJob ? t('job.submit') : t('submit')} leading={<BlockIcon name="search" size={22} color={ready && !busy ? colors.white : colors.textSecondary} />} onPress={submit} disabled={!ready || busy} mutedDisabled />
         </>
       }
     >
       {isJob ? (
         <>
-          <JobSourceBlock
+          <SourceBlock
             testID="job-ad"
+            icon="briefcase"
             title={t('job.ad.title')}
             hint={t('job.ad.hint')}
             a11y={t('job.ad.a11y')}
             placeholder={t('job.ad.placeholder')}
+            pickHint={t('job.ad.pickHint')}
             text={text}
             image={image}
             busy={busy}
@@ -146,13 +149,14 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
             onPick={() => attachImage(pickScreenshot)}
             onRemove={() => setImage(null)}
           />
-          <Divider />
-          <JobSourceBlock
+          <SourceBlock
             testID="job-chat"
+            icon="chat"
             title={t('job.chat.title')}
             hint={t('job.chat.hint')}
             a11y={t('job.chat.a11y')}
             placeholder={t('job.chat.placeholder')}
+            pickHint={t('job.chat.pickHint')}
             optional
             text={chatText}
             image={chatImage}
@@ -162,75 +166,28 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
             onPick={() => attachImage(pickScreenshot, setChatImage)}
             onRemove={() => setChatImage(null)}
           />
-          <Divider />
         </>
       ) : (
         <>
-      <View style={styles.section}>
-        <View style={styles.labelRow}>
-          <SectionTitle>{t('text.title')}</SectionTitle>
-          <PasteButton label={t('common:actions.paste')} onPress={() => pasteInto('text')} />
-        </View>
-        <TextInput
-          testID="check-text"
-          accessibilityLabel={t('text.a11y')}
-          multiline
-          value={text}
-          onChangeText={setText}
-          placeholder={t('text.placeholder')}
-          placeholderTextColor={colors.textMuted}
-          style={[styles.input, styles.textArea]}
-        />
-      </View>
-
-      <Divider />
-
-      <View style={styles.section}>
-        <View style={styles.labelRow}>
-          <SectionTitle>{t('link.label')}</SectionTitle>
-          <PasteButton label={t('common:actions.paste')} onPress={() => pasteInto('url')} />
-        </View>
-        <TextInput
-          testID="check-url"
-          accessibilityLabel={t('link.a11y')}
-          value={url}
-          onChangeText={changeUrl}
-          autoCapitalize="none"
-          autoCorrect={false}
-          keyboardType="url"
-          placeholder="https://"
-          placeholderTextColor={colors.textMuted}
-          style={styles.input}
-        />
-      </View>
-
-      <Divider />
-
-      <View style={styles.section}>
-        <SectionTitle>{t('screenshot.label')}</SectionTitle>
-        <Card style={{ gap: 10 }}>
-          {image ? (
-            <View style={styles.imageRow}>
-              <Image source={{ uri: image.uri }} style={styles.thumb} resizeMode="cover" />
-              <View style={{ flex: 1, gap: 8 }}>
-                <Text style={styles.meta}>{t('screenshot.ready', { kb: Math.round(image.bytes / 1024) })}</Text>
-                <Button label={t('common:actions.remove')} variant="secondary" onPress={() => setImage(null)} style={styles.small} />
-              </View>
-            </View>
-          ) : (
-            <Button
-              testID="check-pick-image"
-              label={busy ? t('screenshot.preparing') : Platform.OS === 'web' ? t('screenshot.upload') : t('screenshot.pick')}
-              variant="secondary"
-              disabled={busy}
-              onPress={() => attachImage(pickScreenshot)}
-            />
-          )}
-        </Card>
-      </View>
-
-      <Divider />
-
+          <SourceBlock
+            testID="check"
+            icon="chat"
+            title={t('text.title')}
+            hint={t('text.hint')}
+            a11y={t('text.a11y')}
+            placeholder={t('text.placeholder')}
+            pickHint={t('screenshot.pickHint')}
+            text={text}
+            image={image}
+            busy={busy}
+            onText={setText}
+            onPaste={() => pasteInto('text')}
+            onPick={() => attachImage(pickScreenshot)}
+            onRemove={() => setImage(null)}
+          />
+          <InputBlock testID="check-link" icon="link" title={t('link.label')} hint={t('link.hint')}>
+            <TextBox testID="check-url" a11y={t('link.a11y')} placeholder="https://" value={url} onChange={changeUrl} onPaste={() => pasteInto('url')} pasteLabel={t('common:actions.paste')} multiline={false} url />
+          </InputBlock>
         </>
       )}
 
@@ -280,18 +237,12 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
 };
 
 const styles = StyleSheet.create({
-  label: { color: colors.textPrimary, fontSize: 14, lineHeight: 20, fontFamily: fonts.semiBold, includeFontPadding: false },
   section: { gap: 8 },
-  labelRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  label: { color: colors.textPrimary, fontSize: 14, lineHeight: 20, fontFamily: fonts.semiBold, includeFontPadding: false },
   input: { minHeight: 46, borderRadius: 12, borderWidth: 1, borderColor: colors.borderLight, backgroundColor: colors.white, paddingHorizontal: 14, paddingVertical: 10, color: colors.textPrimary, fontSize: 14, lineHeight: 19, fontFamily: fonts.regular },
-  textArea: { minHeight: 110, textAlignVertical: 'top' },
-  imageRow: { flexDirection: 'row', gap: 12 },
-  thumb: { width: 80, height: 110, borderRadius: 10, backgroundColor: colors.codeBg },
-  meta: { color: colors.textSecondary, fontSize: 14, lineHeight: 20, fontFamily: fonts.regular },
   hint: { color: colors.textSecondary, fontSize: 14, lineHeight: 20, fontFamily: fonts.medium, textAlign: 'center' },
   moreRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: 48 },
   moreText: { color: colors.textPrimary, fontSize: 16, lineHeight: 22, fontFamily: fonts.bold },
-  small: { minHeight: 48 },
 });
 
 export default CheckScreen;
