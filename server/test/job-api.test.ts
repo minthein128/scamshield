@@ -53,7 +53,7 @@ describe('Job Shield API', () => {
     expect(as.status).toBe(200);
     const res = await as.json();
     expect(res).toMatchObject({ kind: 'job', usedStoredExtraction: true, attention: 'pause' });
-    expect(res.conflicts.map((c: { code: string }) => c.code)).toEqual(['fee_vs_no_fee', 'contract_pay_first']);
+    expect(res.conflicts.map((c: { code: string }) => c.code)).toEqual(['fee_vs_no_fee', 'documents_passport_photo', 'contract_pay_first']);
     expect(res.adFacts.workerFee.quote).toBe('No fee for workers');
   });
 

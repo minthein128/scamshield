@@ -1,4 +1,4 @@
-import { score } from '../score.js';
+import { score, verdictFor } from '../score.js';
 import type { Family, Flag, Lang, Severity, Verdict } from '../types.js';
 import { mentionsBorderTown, readFee, salaryDiffers, sameEmployer } from './parse.js';
 import {
@@ -55,7 +55,10 @@ function conflict(
   };
 }
 
-/** Compares the same field across ad and chat. A conflict needs both sources to state the field. */
+/**
+ * Compares the same field across ad and chat. A conflict needs both sources to state the field, except
+ * documents: a passport photo or hold in the chat conflicts with an ad that mentions no documents.
+ */
 export function detectConflicts(ad: JobFacts | null, chat: JobFacts | null, lang: Lang = 'en'): JobConflict[] {
   if (!ad || !chat) return [];
   const out: JobConflict[] = [];
@@ -66,19 +69,16 @@ export function detectConflicts(ad: JobFacts | null, chat: JobFacts | null, lang
     }
   }
 
-  if (stated(ad.documentRequest) && stated(chat.documentRequest)) {
-    const adNormal = ad.documentRequest.value === 'none' || ad.documentRequest.value === 'id_copy';
+  const adDoc = stated(ad.documentRequest) ? ad.documentRequest : null;
+  if (stated(chat.documentRequest) && (!adDoc || adDoc.value === 'none' || adDoc.value === 'id_copy')) {
     const c = chat.documentRequest.value;
-    if (adNormal && c === 'passport_hold') {
-      out.push(
-        conflict('documentRequest', 'documents_passport_hold', ad.documentRequest, chat.documentRequest, 'trafficking', 'high', lang),
-      );
-    } else if (adNormal && c === 'passport_photo') {
-      out.push(
-        conflict('documentRequest', 'documents_passport_photo', ad.documentRequest, chat.documentRequest, 'trafficking', 'high', lang),
-      );
-    } else if (ad.documentRequest.value === 'none' && c === 'id_copy') {
-      out.push(conflict('documentRequest', 'documents_id_copy', ad.documentRequest, chat.documentRequest, 'trafficking', 'medium', lang));
+    const adSide = adDoc ?? { value: 'not_mentioned', quote: '', confidence: 1 };
+    if (c === 'passport_hold') {
+      out.push(conflict('documentRequest', 'documents_passport_hold', adSide, chat.documentRequest, 'trafficking', 'high', lang));
+    } else if (c === 'passport_photo') {
+      out.push(conflict('documentRequest', 'documents_passport_photo', adSide, chat.documentRequest, 'trafficking', 'high', lang));
+    } else if (adDoc?.value === 'none' && c === 'id_copy') {
+      out.push(conflict('documentRequest', 'documents_id_copy', adDoc, chat.documentRequest, 'trafficking', 'medium', lang));
     }
   }
 
@@ -208,7 +208,9 @@ export function collectFlags(ad: JobFacts | null, chat: JobFacts | null, conflic
   const fromConflicts: JobFlag[] = conflicts.map((c) => ({
     family: c.family,
     label: c.description,
-    evidence: `${SOURCE_NAME.ad[lang]}: "${c.adQuote}" / ${SOURCE_NAME.chat[lang]}: "${c.chatQuote}"`,
+    evidence: c.adQuote
+      ? `${SOURCE_NAME.ad[lang]}: "${c.adQuote}" / ${SOURCE_NAME.chat[lang]}: "${c.chatQuote}"`
+      : `${SOURCE_NAME.chat[lang]}: "${c.chatQuote}"`,
     severity: c.severity,
     field: c.field,
     source: 'both',
@@ -226,6 +228,18 @@ export function collectFlags(ad: JobFacts | null, chat: JobFacts | null, conflic
   });
 }
 
+/** Spec strength "strong": any one of these sets the job result to pause. */
+export const STRONG_CONFLICTS: ReadonlySet<ConflictCode> = new Set<ConflictCode>([
+  'fee_vs_no_fee',
+  'documents_passport_photo',
+  'documents_passport_hold',
+  'contract_later',
+  'contract_pay_first',
+  'visa_tourist',
+]);
+
+export const STRONG_CONFLICT_FLOOR = 70;
+
 export interface JobScore {
   verdict: Verdict;
   score: number;
@@ -237,7 +251,7 @@ export interface JobScore {
  * Scores with the shared engine. A border-town route counts only when a non-geographic signal is
  * also present; on its own it is context and does not raise the result.
  */
-export function scoreJob(flags: Array<Flag & { geographic?: boolean }>): JobScore {
+export function scoreJob(flags: Array<Flag & { geographic?: boolean }>, conflicts: JobConflict[] = []): JobScore {
   const nonGeo = flags.filter((f) => !f.geographic);
   const scored = nonGeo.length > 0 ? flags : [];
   const strip = (f: Flag & { geographic?: boolean; source?: unknown; field?: unknown }): Flag => ({
@@ -252,8 +266,13 @@ export function scoreJob(flags: Array<Flag & { geographic?: boolean }>): JobScor
     unsolicited: false,
     scamType: scored.length > 0 ? 'job_trafficking' : 'none',
   });
-  const overrides = nonGeo.length === 0 && flags.length > 0 ? [...res.overrides, 'border_context_only'] : res.overrides;
-  return { verdict: res.verdict, score: res.score, flags: scored.length > 0 ? res.flags : flags.map(strip), overrides };
+  const overrides = nonGeo.length === 0 && flags.length > 0 ? [...res.overrides, 'border_context_only'] : [...res.overrides];
+  let value = res.score;
+  if (conflicts.some((c) => STRONG_CONFLICTS.has(c.code)) && value < STRONG_CONFLICT_FLOOR) {
+    value = STRONG_CONFLICT_FLOOR;
+    overrides.push('strong_conflict');
+  }
+  return { verdict: verdictFor(value), score: value, flags: scored.length > 0 ? res.flags : flags.map(strip), overrides };
 }
 
 export function attentionFor(verdict: Verdict): AttentionTier {

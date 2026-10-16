@@ -1,12 +1,13 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { collectFlags, detectConflicts, scoreJob, singleSourceFlags, stillUnclear } from '../src/job/rules.js';
+import { collectFlags, detectConflicts, STRONG_CONFLICTS, scoreJob, singleSourceFlags, stillUnclear } from '../src/job/rules.js';
 import type { JobFacts } from '../src/job/types.js';
 import { f, facts, refused } from './helpers/job.js';
 
 const assess = (ad: JobFacts | null, chat: JobFacts | null) => {
   const conflicts = detectConflicts(ad, chat);
   const flags = collectFlags(ad, chat, conflicts);
-  return { conflicts, ...scoreJob(flags) };
+  return { conflicts, ...scoreJob(flags, conflicts) };
 };
 
 const salary = (amount: number, currency: string, period: 'monthly' | 'yearly' | 'daily') => f({ amount, currency, period }, `${amount}`);
@@ -42,6 +43,27 @@ describe('conflict rules', () => {
       code: 'documents_id_copy',
       severity: 'medium',
     });
+  });
+
+  it('documents: an ad that mentions no documents counts against a passport photo or hold in the chat', () => {
+    const photo = detectConflicts(
+      facts({ employer: f('Golden Lotus') }),
+      facts({ documentRequest: f('passport_photo' as const, 'send passport photo') }),
+    );
+    expect(photo).toEqual([
+      expect.objectContaining({
+        code: 'documents_passport_photo',
+        adValue: 'not_mentioned',
+        adQuote: '',
+        chatQuote: 'send passport photo',
+      }),
+    ]);
+    expect(detectConflicts(facts(), facts({ documentRequest: f('passport_hold' as const) }))[0]?.code).toBe('documents_passport_hold');
+    expect(detectConflicts(facts(), facts({ documentRequest: f('id_copy' as const) }))).toEqual([]);
+    expect(
+      detectConflicts(facts({ documentRequest: f('passport_photo' as const) }), facts({ documentRequest: f('passport_photo' as const) })),
+    ).toEqual([]);
+    expect(detectConflicts(null, facts({ documentRequest: f('passport_photo' as const) }))).toEqual([]);
   });
 
   it('contract: official in the ad against later, none or pay first in the chat', () => {
@@ -135,6 +157,59 @@ describe('conflict rules', () => {
     expect(c[0]?.fieldLabel).toBe('အလုပ်သမားပေးရသည့်ကြေး');
     expect(c[0]?.description).toMatch(/ကြော်ငြာ/);
     expect(c[0]).toMatchObject({ adQuote: 'အခမဲ့', chatQuote: 'ငွေ ၃ သိန်း ပေးရမယ်' });
+  });
+});
+
+describe('strong conflicts', () => {
+  const strong: Array<[string, JobFacts, JobFacts]> = [
+    ['fee_vs_no_fee', facts({ workerFee: f('none') }), facts({ workerFee: f('300 USD') })],
+    ['documents_passport_photo', facts(), facts({ documentRequest: f('passport_photo' as const) })],
+    ['documents_passport_hold', facts({ documentRequest: f('none' as const) }), facts({ documentRequest: f('passport_hold' as const) })],
+    ['contract_later', facts({ contract: f('official' as const) }), facts({ contract: f('later' as const) })],
+    ['contract_pay_first', facts({ contract: f('official' as const) }), facts({ paymentRequest: f('before_contract' as const) })],
+    ['visa_tourist', facts({ visaOrPermit: f('work_visa' as const) }), facts({ visaOrPermit: f('tourist' as const) })],
+  ];
+
+  it('covers exactly the strong rows of the spec table', () => {
+    expect([...STRONG_CONFLICTS].sort()).toEqual(strong.map(([code]) => code).sort());
+  });
+
+  it.each(strong)('%s alone reaches pause', (code, ad, chat) => {
+    const r = assess(ad, chat);
+    expect(r.conflicts.map((c) => c.code)).toEqual([code]);
+    expect(r.score).toBeGreaterThanOrEqual(70);
+    expect(r.verdict).toBe('danger');
+  });
+
+  it('fee vs no fee with contract later, all payment_route, reaches pause', () => {
+    const r = assess(
+      facts({ workerFee: f('none'), contract: f('official' as const) }),
+      facts({ workerFee: f('18000 THB'), contract: f('later' as const) }),
+    );
+    expect(r.verdict).toBe('danger');
+    expect(r.overrides).toContain('strong_conflict');
+  });
+
+  it('medium and soft conflicts do not force pause', () => {
+    expect(assess(facts({ meetingPoint: f('workplace' as const) }), facts({ meetingPoint: f('driver_pickup' as const) })).verdict).toBe(
+      'careful',
+    );
+    expect(assess(facts({ employer: f('Golden Lotus') }), facts({ employer: f('Silver Moon') })).verdict).toBe('careful');
+    const salary = (amount: number) => f({ amount, currency: 'THB', period: 'monthly' as const }, String(amount));
+    expect(assess(facts({ salary: salary(10000) }), facts({ salary: salary(20000) })).verdict).not.toBe('danger');
+  });
+
+  it('the legit eval pairs, as extracted live, stay at lower', () => {
+    const pairs = JSON.parse(readFileSync(new URL('./fixtures/job-legit-extractions.json', import.meta.url), 'utf8')) as Record<
+      string,
+      { ad: JobFacts; chat: JobFacts }
+    >;
+    expect(Object.keys(pairs)).toHaveLength(5);
+    for (const [id, p] of Object.entries(pairs)) {
+      const r = assess(p.ad, p.chat);
+      expect(r.conflicts, id).toEqual([]);
+      expect(r.verdict, id).toBe('safe');
+    }
   });
 });
 

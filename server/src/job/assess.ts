@@ -125,7 +125,7 @@ export async function assessJobOffer(req: JobAssessRequest, deps: AssessDeps = {
     flags.push(...grounded.flags.map((f) => ({ ...f, label: label(f), evidence: guardJobText(f.evidence, lang).text })));
   }
 
-  const scored = scoreJob(flags);
+  const scored = scoreJob(flags, conflicts);
   const attention = attentionFor(scored.verdict);
   const unclear = stillUnclear(ad, chat, lang);
 
