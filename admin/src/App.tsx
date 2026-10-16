@@ -84,7 +84,7 @@ function Logo() {
   return (
     <div className="logo">
       <img src="/logo-mark.svg" alt="" width={36} height={36} />
-      <span>SafeRoute <b>Admin</b></span>
+      <span>Kakwe <b>Admin</b></span>
     </div>
   );
 }
@@ -143,7 +143,7 @@ function SignIn() {
       >
         <Logo />
         <h1>Sign in</h1>
-        <p className="muted">Admin console for the SafeRoute team.</p>
+        <p className="muted">Admin console for the Kakwe team.</p>
         <button type="button" className="btn primary block" onClick={() => run(signInGoogle)}>Continue with Google</button>
         <div className="or">or</div>
         <label className="field"><span className="label">Email</span>

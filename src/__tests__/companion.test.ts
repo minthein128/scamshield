@@ -9,13 +9,13 @@ describe('voice companion strings', () => {
     await i18n.changeLanguage('en');
   });
 
-  const reused = ['verdictSafe', 'verdictCareful', 'verdictDanger', 'dismiss'];
+  const reused = ['verdictSafe', 'verdictCareful', 'verdictDanger', 'dismiss', 'appName'];
 
   it('has an English entry for every native key', () => {
     const strings = companionStrings();
     expect(Object.keys(strings).sort()).toEqual([...COMPANION_STRING_KEYS].sort());
     for (const key of COMPANION_STRING_KEYS) {
-      if (!reused.includes(key)) expect(strings[key]).toBe((en.companion as Record<string, string>)[key]);
+      if (!reused.includes(key)) expect(strings[key]).toBe((en.companion as Record<string, string>)[key].replace('$t(common:appName)', 'Kakwe'));
       expect(strings[key]).toBeTruthy();
       expect(strings[key].length).toBeLessThanOrEqual(160);
     }

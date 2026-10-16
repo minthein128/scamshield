@@ -6,7 +6,7 @@
   "signedInAs": "Naka-sign in bilang",
   "unavailable": {
     "title": "Hindi available ang mga account",
-    "body": "Hindi konektado ang bersyong ito sa serbisyo ng account. Gumagana pa rin nang buo ang SafeRoute kahit walang account."
+    "body": "Hindi konektado ang bersyong ito sa serbisyo ng account. Gumagana pa rin nang buo ang $t(common:appName) kahit walang account."
   },
   "createTitle": "Gumawa ng account",
   "signInTitle": "Mag-sign in",

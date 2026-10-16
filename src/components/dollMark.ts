@@ -1,5 +1,5 @@
 /**
- * The SafeRoute brand mark: the pyit taing htaung doll, simplified from avatarArt.ts so it reads at 24 px.
+ * The Kakwe brand mark: the pyit taing htaung doll, simplified from avatarArt.ts so it reads at 24 px.
  * Shared by BrandMark.tsx and scripts/render-brand.mjs, so keep it free of imports.
  */
 

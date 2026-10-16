@@ -30,14 +30,14 @@ internal object MessageGuardBridge {
     fun hasAccess(context: Context): Boolean =
         NotificationManagerCompat.getEnabledListenerPackages(context).contains(context.packageName)
 
-    /** True when Android may stop SafeRoute in the background to save battery. */
+    /** True when Android may stop Kakwe in the background to save battery. */
     fun isBatteryOptimized(context: Context): Boolean {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return false
         val power = context.getSystemService(Context.POWER_SERVICE) as? PowerManager ?: return false
         return !power.isIgnoringBatteryOptimizations(context.packageName)
     }
 
-    /** Opens the battery optimisation list, or SafeRoute's App info when a phone hides that list. */
+    /** Opens the battery optimisation list, or Kakwe's App info when a phone hides that list. */
     fun openBatterySettings(context: Context): Boolean {
         val intents = listOfNotNull(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS) else null,
@@ -97,6 +97,7 @@ internal object MessageGuardBridge {
         (options["language"] as? String)?.let { if (it.isNotBlank()) store.language = it }
         (options["shareSignals"] as? Boolean)?.let { store.shareSignals = it }
         (options["noticeBody"] as? String)?.let { store.noticeBody = it.take(120) }
+        (options["noticeTitle"] as? String)?.let { store.noticeTitle = it.take(40) }
         (options["noticeOpen"] as? String)?.let { store.noticeOpen = it.take(30) }
         return true
     }

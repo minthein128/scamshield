@@ -24,7 +24,7 @@
       "message": "Periksa koneksi internet Anda dan coba lagi."
     },
     "server_unreachable": {
-      "title": "SafeRoute tidak dapat dijangkau",
+      "title": "$t(common:appName) tidak dapat dijangkau",
       "message": "Internet Anda berfungsi, tetapi layanan pemeriksaan kami tidak menjawab saat ini. Coba lagi sebentar lagi."
     },
     "timeout": {

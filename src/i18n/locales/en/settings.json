@@ -17,7 +17,7 @@
   },
   "language": {
     "title": "Language",
-    "body": "The app, your reports, spoken warnings and Talk to SafeRoute all use this language."
+    "body": "The app, your reports, spoken warnings and Talk to $t(common:appName) all use this language."
   },
   "myCountry": "My country",
   "destination": "Where I will work or travel",
@@ -33,7 +33,7 @@
   },
   "diagnostics": {
     "title": "Diagnostics log",
-    "privacy": "This log stays on your phone. It contains no messages or personal details. Share it only if the SafeRoute team asks.",
+    "privacy": "This log stays on your phone. It contains no messages or personal details. Share it only if the $t(common:appName) team asks.",
     "all": "All",
     "errors": "Errors",
     "empty": "No log entries yet.",
@@ -41,7 +41,7 @@
     "copy": "Copy report",
     "share": "Share report",
     "clear": "Clear log",
-    "copied": "Report copied. Paste it in a message to the SafeRoute team.",
+    "copied": "Report copied. Paste it in a message to the $t(common:appName) team.",
     "clearTitle": "Clear the log?",
     "clearMessage": "This deletes all log entries on this phone.",
     "clearAction": "Clear",
@@ -54,9 +54,9 @@
     "share": "Help others: share anonymous scam patterns",
     "shareBody": "Off unless you turn it on. No screenshots and no message text are shared. Names and personal details are removed first, phone numbers and accounts are kept only as one-way codes, and website names may be kept. Shared patterns are deleted after 90 days. Report a scam always shares, because you choose to send it.",
     "history": "Keep check history on this phone",
-    "historyBody": "When this is off, SafeRoute keeps only the check you are looking at and deletes saved checks. Signed-in accounts also stop syncing checks.",
-    "p1": "Your checks are saved on this phone while history is on. Signed-in accounts also sync a short record of each check (verdict, scam type and SafeRoute's summary), trusted contacts and settings. Your messages, screenshots and links are never synced. Without an account, contacts saved earlier stay on this phone and new ones cannot be saved.",
-    "p2": "To check something, SafeRoute sends the text, link or screenshot to our check service, which uses Google AI models and Google Safe Browsing to assess it. We do not log the content.",
+    "historyBody": "When this is off, $t(common:appName) keeps only the check you are looking at and deletes saved checks. Signed-in accounts also stop syncing checks.",
+    "p1": "Your checks are saved on this phone while history is on. Signed-in accounts also sync a short record of each check (verdict, scam type and $t(common:appName)'s summary), trusted contacts and settings. Your messages, screenshots and links are never synced. Without an account, contacts saved earlier stay on this phone and new ones cannot be saved.",
+    "p2": "To check something, $t(common:appName) sends the text, link or screenshot to our check service, which uses Google AI models and Google Safe Browsing to assess it. We do not log the content.",
     "p3": "Each install gets an anonymous ID. We use it only to limit how many checks one person can run per hour.",
     "p4": "You can delete the data on this device at any time. Account holders can also delete their account and everything synced.",
     "policy": "Privacy policy",

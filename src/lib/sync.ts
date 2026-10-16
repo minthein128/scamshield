@@ -8,7 +8,7 @@ export const SCORE_BUCKET = 20;
 export const MAX_TITLE_CHARS = 300;
 export const MAX_SUMMARY_CHARS = 2000;
 
-/** Synced history: the verdict and SafeRoute's own words only. Never the user's message, quotes, links or sources. */
+/** Synced history: the verdict and Kakwe's own words only. Never the user's message, quotes, links or sources. */
 export interface HistoryDoc {
   createdAt: string;
   language: string;

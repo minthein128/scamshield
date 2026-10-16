@@ -342,7 +342,7 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
         main.postDelayed(tuckLater, TUCK_DELAY_MS)
     }
 
-    /** A pill with a short message about voice. A tap opens SafeRoute when [opensApp] is set, otherwise it closes. */
+    /** A pill with a short message about voice. A tap opens Kakwe when [opensApp] is set, otherwise it closes. */
     fun showNotice(message: String, opensApp: Boolean) {
         main.removeCallbacks(autoCollapse)
         untuck()

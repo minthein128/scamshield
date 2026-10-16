@@ -30,6 +30,7 @@ export interface ShieldCheckResult {
 /** Labels the overlay shows: verdict and error chips, card buttons and the voice companion. Missing keys fall back to English. */
 export const COMPANION_STRING_KEYS = [
   'name',
+  'appName',
   'verdictSafe',
   'verdictCareful',
   'verdictDanger',
@@ -113,6 +114,8 @@ export interface MessageGuardConfig {
   shareSignals?: boolean;
   /** Neutral notification body in the user's language. */
   noticeBody?: string;
+  /** App name for the notice title in the user's language. */
+  noticeTitle?: string;
   /** Notification button label in the user's language. */
   noticeOpen?: string;
 }
@@ -127,7 +130,7 @@ export interface MessageGuardStatus {
   listenerConnected?: boolean;
   /** A notice posted now would show: app notifications and the notice channel are on. */
   notificationsEnabled?: boolean;
-  /** Android may stop SafeRoute in the background to save battery. */
+  /** Android may stop Kakwe in the background to save battery. */
   batteryOptimized?: boolean;
   /** Labels of chosen apps that are not installed. */
   missingApps?: string[];
@@ -403,7 +406,7 @@ export async function takeUnsyncedResults(): Promise<ShieldCheckResult[]> {
   }
 }
 
-/** True when the user has granted SafeRoute notification access in system Settings. */
+/** True when the user has granted Kakwe notification access in system Settings. */
 export async function hasNotificationAccess(): Promise<boolean> {
   if (nativeShieldModule) {
     try {
@@ -415,7 +418,7 @@ export async function hasNotificationAccess(): Promise<boolean> {
   return mockNotificationAccess;
 }
 
-/** Opens the system notification access screen. The user turns SafeRoute on there. */
+/** Opens the system notification access screen. The user turns Kakwe on there. */
 export async function openNotificationAccessSettings(): Promise<boolean> {
   if (nativeShieldModule) {
     try {
@@ -515,7 +518,7 @@ export async function getMessageGuardActivity(afterSeq = -1): Promise<MessageGua
   return none;
 }
 
-/** Opens Android's battery optimisation settings, or SafeRoute's App info where a phone hides them. */
+/** Opens Android's battery optimisation settings, or Kakwe's App info where a phone hides them. */
 export async function openBatteryOptimizationSettings(): Promise<boolean> {
   if (nativeShieldModule) {
     try {

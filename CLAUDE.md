@@ -1,4 +1,4 @@
-# SafeRoute app
+# Kakwe app
 
 Expo SDK 52 / React Native, TypeScript strict. Android anti-scam app. The Expo web build is also deployed (Firebase Hosting) for judges.
 

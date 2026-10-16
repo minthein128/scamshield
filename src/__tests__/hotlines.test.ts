@@ -114,7 +114,7 @@ describe('radar helpers', () => {
     expect(defaultScope('TH', 'MM')).toBe('TH');
     expect(defaultScope(undefined, 'MM')).toBe('MM');
     expect(defaultScope()).toBe('GLOBAL');
-    expect(seenLine(19)).toBe('Reported 19 times by other SafeRoute users in the last 30 days');
+    expect(seenLine(19)).toBe('Reported 19 times by other Kakwe users in the last 30 days');
     expect(seenLine(1)).toMatch(/1 time by/);
     expect(seenLine(undefined)).toBeNull();
     expect(reportCountText(1)).toBe('1 report in 30 days');

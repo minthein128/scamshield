@@ -45,7 +45,7 @@ internal data class CardModel(
     val previewLabel: String = "This is what we checked",
     /** A voice notice rather than a check result. Dismissing it keeps the result. */
     val notice: Boolean = false,
-    /** Notice pill: a tap opens SafeRoute. */
+    /** Notice pill: a tap opens Kakwe. */
     val opensApp: Boolean = false,
 ) {
     val canExpand: Boolean get() = state != ShieldOverlay.State.ERROR

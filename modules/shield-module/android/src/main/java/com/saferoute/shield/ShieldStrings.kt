@@ -6,6 +6,7 @@ class ShieldStrings private constructor(private val values: Map<String, String>)
     operator fun get(key: String): String = values[key] ?: DEFAULTS[key] ?: key
 
     val name get() = this["name"]
+    val appName get() = this["appName"]
     val ask get() = this["ask"]
     val tapToRetry get() = this["tapToRetry"]
     val dismiss get() = this["dismiss"]
@@ -91,7 +92,8 @@ class ShieldStrings private constructor(private val values: Map<String, String>)
             "chipBusy" to "Service busy",
             "chipNotChecked" to "Not checked",
             "tapToRetry" to "Tap to retry",
-            "a11yShield" to "SafeRoute shield",
+            "appName" to "Kakwe",
+            "a11yShield" to "Kakwe shield",
             "a11yCheckScreen" to "Double tap to check the screen.",
             "a11yChecking" to "Checking the screen.",
             "a11yShowDetails" to "Double tap to show details.",
@@ -122,8 +124,8 @@ class ShieldStrings private constructor(private val values: Map<String, String>)
             "connecting" to "Connecting",
             "endA11y" to "End the conversation",
             "voiceChip" to "Pyit Taing Htaung",
-            "micDenied" to "Open SafeRoute to allow the microphone",
-            "needsForeground" to "Open SafeRoute once to allow voice",
+            "micDenied" to "Open Kakwe to allow the microphone",
+            "needsForeground" to "Open Kakwe once to allow voice",
             "unavailable" to "Voice is not available right now",
             "rateLimited" to "You have used many checks this hour",
             "busy" to "Another voice conversation is open",

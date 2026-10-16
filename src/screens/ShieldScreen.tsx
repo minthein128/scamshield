@@ -7,6 +7,7 @@ import { VoiceCompanionCard } from '../components/VoiceCompanionCard';
 import { ShieldCardView } from '../components/ShieldCard';
 import { Button, Card, ScreenHeader } from '../components/ui';
 import { useShieldControl } from '../hooks/useShieldControl';
+import { appName } from '../config/brand';
 import { toCheckResponse } from '../lib/shield';
 import { useAppState } from '../state/AppState';
 import type { RootScreenProps } from '../navigation/types';
@@ -14,10 +15,10 @@ import theme from '../theme/theme';
 
 const { colors, fonts } = theme;
 
-const STEPS = [
+const steps = () => [
   'Allow "Display over other apps" so the button can float over other apps.',
   'Allow notifications so Android keeps the shield running.',
-  'Allow screen capture. SafeRoute only looks at your screen when you tap the button.',
+  `Allow screen capture. ${appName()} only looks at your screen when you tap the button.`,
 ];
 
 export const ShieldScreen: React.FC<RootScreenProps<'Shield'>> = ({ navigation }) => {
@@ -47,7 +48,7 @@ export const ShieldScreen: React.FC<RootScreenProps<'Shield'>> = ({ navigation }
       <MessageGuardCard />
       <Card style={{ gap: 8 }}>
         <Text style={styles.title}>What the shield needs</Text>
-        {STEPS.map((s, i) => (
+        {steps().map((s, i) => (
           <Text key={s} style={styles.body}>{`${i + 1}. ${s}`}</Text>
         ))}
         <Text style={styles.body}>The screenshot goes to the check service only to be checked. It is not saved.</Text>

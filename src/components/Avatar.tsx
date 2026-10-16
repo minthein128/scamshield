@@ -1,3 +1,4 @@
+import { appName } from '../config/brand';
 import React, { useEffect, useRef } from 'react';
 import { Animated, Easing, StyleSheet, View } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
@@ -9,7 +10,7 @@ export type { AvatarConcept, AvatarState } from './avatarArt';
 interface Props {
   concept?: AvatarConcept;
   state: AvatarState;
-  /** 0..1 loudness of the active voice: SafeRoute's while speaking, the user's while listening. */
+  /** 0..1 loudness of the active voice: Kakwe's while speaking, the user's while listening. */
   level?: number;
   /** Disc diameter. The halo grows up to 30% past it, so leave room around the avatar. */
   size?: number;
@@ -40,7 +41,7 @@ const Layer: React.FC<{ art: AvatarArt; shapes: Shape[]; size: number }> = ({ ar
     </Svg>
   ) : null;
 
-/** SafeRoute's voice avatar, the pyit taing htaung doll: a halo that follows the voice and a gentle rock. */
+/** Kakwe's voice avatar, the pyit taing htaung doll: a halo that follows the voice and a gentle rock. */
 export const Avatar: React.FC<Props> = ({ concept = 'C', state, level = 0, size = 160, decorative }) => {
   const reduce = useReduceMotion();
   const art = AVATAR_ART[concept];
@@ -99,7 +100,7 @@ export const Avatar: React.FC<Props> = ({ concept = 'C', state, level = 0, size 
   const round = { width: size, height: size, borderRadius: size / 2 };
   const a11y = decorative
     ? { accessibilityElementsHidden: true, importantForAccessibility: 'no-hide-descendants' as const }
-    : { accessible: true, accessibilityRole: 'image' as const, accessibilityLabel: 'SafeRoute' };
+    : { accessible: true, accessibilityRole: 'image' as const, accessibilityLabel: appName() };
 
   return (
     <View style={{ width: size, height: size }} testID="avatar" pointerEvents="none" {...a11y}>

@@ -1,6 +1,6 @@
-# SafeRoute architecture
+# Kakwe architecture
 
-SafeRoute checks a job offer, message, link, listing or screenshot and returns a verdict, the evidence behind it and a spoken warning. The Android app calls one Cloud Run service. The service runs a six-stage pipeline and uses Google AI and Google Cloud services at each stage that needs them.
+Kakwe checks a job offer, message, link, listing or screenshot and returns a verdict, the evidence behind it and a spoken warning. The Android app calls one Cloud Run service. The service runs a six-stage pipeline and uses Google AI and Google Cloud services at each stage that needs them.
 
 ## Pipeline and Google services
 
@@ -47,11 +47,11 @@ Cloud Run (Hono)
 Android app --- POST /v1/speak {text, language} ---> Gemini TTS ---> WAV
 ```
 
-## Talk to SafeRoute (live voice)
+## Talk to Kakwe (live voice)
 
 After a check, the report screen offers a live voice conversation about that report. The app plays the approved spoken warning first, then opens a WebSocket to `/v1/live` on the same service. The server loads the report from the result cache (or takes the one the app sends), redacts personal data from it, builds a system instruction with the language rule, the likelihood rules and the verified hotlines for the user's home and destination countries, and relays 16 kHz microphone audio to the Gemini Live API and 24 kHz model audio back. Sessions end at 120 seconds, cost two checks, and are limited to one per user. The server stores no audio or text. It scans the model's spoken text with the language guard in detect-only mode and logs a count per session. The audio layer sits behind one interface (`docs/live-audio-contract.md`): the web build uses the Web Audio API and the Android build uses a native module.
 
 ## Language of verdicts
 
-SafeRoute cannot know that a message is a scam, so every sentence it shows or speaks describes signs and likelihood, not conclusions: "shows signs of", "looks like", "could be", "we could not verify". It never calls a named person, company, phone number or handle a criminal, and it reports observations ("asks for a fee before the job starts", "no licence record found in our search"). The prompts for extraction and grounding carry these rules with native examples in each output language. A language guard (`server/src/language-guard.ts`) then checks the model output against a curated list of certainty phrases in English, Bahasa Indonesia, Tagalog, Burmese and Thai. Thai has no spaces between words, so its patterns use lookbehinds for negation and hedge prefixes instead of word boundaries. It rewrites light cases ("is a scam" becomes "looks like a scam") and, when three or more phrases appear, asks the model once more inside the same time budget. Each rewrite is logged as `certainty_rewrite`, and `npm run eval` and the benchmark report the share of responses that carry certainty wording before and after the guard.
+Kakwe cannot know that a message is a scam, so every sentence it shows or speaks describes signs and likelihood, not conclusions: "shows signs of", "looks like", "could be", "we could not verify". It never calls a named person, company, phone number or handle a criminal, and it reports observations ("asks for a fee before the job starts", "no licence record found in our search"). The prompts for extraction and grounding carry these rules with native examples in each output language. A language guard (`server/src/language-guard.ts`) then checks the model output against a curated list of certainty phrases in English, Bahasa Indonesia, Tagalog, Burmese and Thai. Thai has no spaces between words, so its patterns use lookbehinds for negation and hedge prefixes instead of word boundaries. It rewrites light cases ("is a scam" becomes "looks like a scam") and, when three or more phrases appear, asks the model once more inside the same time budget. Each rewrite is logged as `certainty_rewrite`, and `npm run eval` and the benchmark report the share of responses that carry certainty wording before and after the guard.
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import Svg, { Circle, G, Path } from 'react-native-svg';
+import { useTranslation } from 'react-i18next';
 import { Text } from './Text';
 import { MARK_VIEW, markShapes, type MarkShape } from './dollMark';
 import { moodFace, type DollMood } from './avatarArt';
@@ -38,12 +39,19 @@ export const BrandMark: React.FC<{ size?: number; medallion?: string; mood?: Dol
   );
 };
 
-/** "Safe" in ink and "Route" in lacquer red; white and gold on dark grounds. */
-export const Wordmark: React.FC<{ size?: number; dark?: boolean; header?: boolean }> = ({ size = 32, dark, header }) => (
-  <Text accessibilityRole={header ? 'header' : undefined} style={[styles.word, { color: dark ? colors.white : colors.textPrimary, fontSize: Math.round(size * 0.62), lineHeight: Math.round(size * 0.8) }]}>
-    Safe<Text style={{ color: dark ? colors.brandGold : colors.brandRed }}>Route</Text>
-  </Text>
-);
+/** The name in ink, with the closing letters "we" in lacquer red; white and gold on dark grounds. Burmese reads in one colour. */
+export const Wordmark: React.FC<{ size?: number; dark?: boolean; header?: boolean }> = ({ size = 32, dark, header }) => {
+  const { t } = useTranslation();
+  const name = t('appName');
+  const latin = /^[A-Za-z]+$/.test(name);
+  const tail = dark ? colors.brandGold : colors.brandRed;
+  return (
+    <Text accessibilityRole={header ? 'header' : undefined} style={[styles.word, { color: dark ? colors.white : colors.textPrimary, fontSize: Math.round(size * 0.62), lineHeight: Math.round(size * 0.8) }]}>
+      {latin ? name.slice(0, -2) : name}
+      {latin ? <Text style={{ color: tail }}>{name.slice(-2)}</Text> : null}
+    </Text>
+  );
+};
 
 export const BrandLockup: React.FC<{ size?: number; dark?: boolean; header?: boolean }> = ({ size = 32, dark, header }) => (
   <View style={styles.row}>

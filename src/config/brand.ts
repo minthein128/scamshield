@@ -1,2 +1,6 @@
-/** The app name shown inside sentences. The rename changes this one value. */
-export const APP_NAME = 'SafeRoute';
+import { t } from '../i18n';
+
+/** The app name in the UI language (Kakwe, or ကာကွယ် in Burmese). The one source is common:appName. */
+export function appName(lng?: string): string {
+  return lng ? (t('common:appName', { lng }) as string) : (t('common:appName') as string);
+}

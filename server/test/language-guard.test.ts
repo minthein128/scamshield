@@ -144,7 +144,7 @@ describe('male speaker forms', () => {
   });
 });
 
-describe('promises SafeRoute cannot keep', () => {
+describe('promises Kakwe cannot keep', () => {
   it('finds promises in each language', () => {
     expect(findPromises('We will send you the numbers later.')).toHaveLength(1);
     expect(findPromises("I'll call the agency for you.")).toHaveLength(1);

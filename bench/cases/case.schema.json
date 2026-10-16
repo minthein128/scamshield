@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://saferoute.app/bench/case.schema.json",
-  "title": "SafeRoute bench v2 case",
+  "title": "Kakwe bench v2 case",
   "description": "One labelled screenshot. The bench sends the image through the real pipeline and checks the report against these labels.",
   "type": "object",
   "additionalProperties": false,

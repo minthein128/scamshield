@@ -20,7 +20,7 @@
   },
   "language": {
     "title": "Wika",
-    "body": "Ang app, mga ulat, mga babala sa boses, at Kausapin ang SafeRoute ay gumagamit ng wikang ito."
+    "body": "Ang app, mga ulat, mga babala sa boses, at Kausapin ang $t(common:appName) ay gumagamit ng wikang ito."
   },
   "myCountry": "Aking bansa",
   "destination": "Kung saan ako magtatrabaho o pupunta",
@@ -36,7 +36,7 @@
   },
   "diagnostics": {
     "title": "Diagnostics log",
-    "privacy": "Nananatili ang log na ito sa telepono mo. Walang laman itong mensahe o personal na detalye. Ibahagi lang kung hihingin ng SafeRoute team.",
+    "privacy": "Nananatili ang log na ito sa telepono mo. Walang laman itong mensahe o personal na detalye. Ibahagi lang kung hihingin ng $t(common:appName) team.",
     "all": "Lahat",
     "errors": "Mga error",
     "empty": "Wala pang tala sa log.",
@@ -44,7 +44,7 @@
     "copy": "Kopyahin ang ulat",
     "share": "Ibahagi ang ulat",
     "clear": "Burahin ang log",
-    "copied": "Nakopya ang ulat. I-paste ito sa mensahe sa SafeRoute team.",
+    "copied": "Nakopya ang ulat. I-paste ito sa mensahe sa $t(common:appName) team.",
     "clearTitle": "Buburahin ang log?",
     "clearMessage": "Buburahin nito ang lahat ng tala ng log sa teleponong ito.",
     "clearAction": "Burahin",
@@ -57,9 +57,9 @@
     "share": "Tumulong sa iba: magbahagi ng mga pattern ng scam nang hindi nagpapakilala",
     "shareBody": "Naka-off ito maliban kung i-on mo. Walang screenshot at walang text ng mensahe na ibinabahagi. Tinatanggal muna ang mga pangalan at personal na detalye, itinatago lang ang mga numero ng telepono at account bilang one-way code, at maaaring itabi ang mga pangalan ng website. Binubura ang mga ibinahaging pattern pagkalipas ng 90 araw. Palaging nagbabahagi ang Mag-ulat ng scam, dahil pinili mo itong ipadala.",
     "history": "I-save ang history ng pagsusuri sa teleponong ito",
-    "historyBody": "Kapag naka-off ito, itinatago lang ng SafeRoute ang pagsusuring tinitingnan mo at binubura ang mga naka-save na pagsusuri. Hihinto rin sa pag-sync ng mga pagsusuri ang mga naka-sign in na account.",
-    "p1": "Naka-save sa teleponong ito ang iyong mga pagsusuri habang naka-on ang history. Sini-sync din ng mga naka-sign in na account ang maikling tala ng bawat pagsusuri (resulta, posibleng uri ng scam, at buod ng SafeRoute), mga pinagkakatiwalaang contact, at mga setting. Hinding-hindi sini-sync ang iyong mga mensahe, screenshot, at link. Kung walang account, mananatili sa teleponong ito ang mga contact na na-save na dati, at hindi na makakapag-save ng bago.",
-    "p2": "Para suriin ang isang bagay, ipinapadala ng SafeRoute ang text, link, o screenshot sa aming serbisyo ng pagsusuri, na gumagamit ng Google AI models at Google Safe Browsing para suriin ito. Hindi namin itinatala ang nilalaman nito.",
+    "historyBody": "Kapag naka-off ito, itinatago lang ng $t(common:appName) ang pagsusuring tinitingnan mo at binubura ang mga naka-save na pagsusuri. Hihinto rin sa pag-sync ng mga pagsusuri ang mga naka-sign in na account.",
+    "p1": "Naka-save sa teleponong ito ang iyong mga pagsusuri habang naka-on ang history. Sini-sync din ng mga naka-sign in na account ang maikling tala ng bawat pagsusuri (resulta, posibleng uri ng scam, at buod ng $t(common:appName)), mga pinagkakatiwalaang contact, at mga setting. Hinding-hindi sini-sync ang iyong mga mensahe, screenshot, at link. Kung walang account, mananatili sa teleponong ito ang mga contact na na-save na dati, at hindi na makakapag-save ng bago.",
+    "p2": "Para suriin ang isang bagay, ipinapadala ng $t(common:appName) ang text, link, o screenshot sa aming serbisyo ng pagsusuri, na gumagamit ng Google AI models at Google Safe Browsing para suriin ito. Hindi namin itinatala ang nilalaman nito.",
     "p3": "Bawat pag-install ay binibigyan ng anonymous ID. Ginagamit lang namin ito para limitahan kung ilang pagsusuri ang puwedeng gawin ng isang tao bawat oras.",
     "p4": "Maaari mong burahin ang data sa teleponong ito anumang oras. Puwede ring burahin ng mga may account ang kanilang account at ang lahat ng naka-sync.",
     "policy": "Patakaran sa Privacy",

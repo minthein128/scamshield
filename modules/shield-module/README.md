@@ -1,6 +1,6 @@
 # shield-module
 
-Expo module for Android. It draws a floating bubble over other apps. A tap captures the screen with MediaProjection, posts one JPEG to `${apiUrl}/v1/check` (kind `screen`, see `docs/api-contract.md`) and shows the verdict on the bubble and in a compact result pill that expands into a sheet. A double tap (or "Ask" on a result) starts the voice companion: the user talks to SafeRoute about the screen while they keep using the other app.
+Expo module for Android. It draws a floating bubble over other apps. A tap captures the screen with MediaProjection, posts one JPEG to `${apiUrl}/v1/check` (kind `screen`, see `docs/api-contract.md`) and shows the verdict on the bubble and in a compact result pill that expands into a sheet. A double tap (or "Ask" on a result) starts the voice companion: the user talks to Kakwe about the screen while they keep using the other app.
 
 ## Layout
 
@@ -173,7 +173,7 @@ Bubble gesture, with a result card showing:
 
 ## Notifications
 
-The foreground-service notification is neutral: title "SafeRoute", text "Ready when you need it", channel "SafeRoute", `VISIBILITY_PRIVATE` with a public version that shows only "SafeRoute" (`ShieldNotification.kt`). It never names a check, a verdict or a scam. Message Guard warnings are separate (`MessageGuardNotifier.kt`).
+The foreground-service notification is neutral: title "Kakwe", text "Ready when you need it", channel "Kakwe", `VISIBILITY_PRIVATE` with a public version that shows only "Kakwe" (`ShieldNotification.kt`). It never names a check, a verdict or a scam. Message Guard warnings are separate (`MessageGuardNotifier.kt`).
 
 ## Message Guard
 
@@ -198,14 +198,14 @@ The Burmese lists are Unicode text. Zawgyi-encoded messages do not match. Tune t
 
 | Topic | Rule |
 | --- | --- |
-| Consent | Shown in the app before the system screen: what it reads, what leaves the phone, what never leaves, who processes it (SafeRoute's server and Google's AI), that it can be turned off, and that anyone holding the phone may see notices. "Turn on" and "Not now" have equal weight. Turning an extra app on asks again. Turning Message Guard off withdraws consent and clears the app list. Installs from before consent existed stay off. |
+| Consent | Shown in the app before the system screen: what it reads, what leaves the phone, what never leaves, who processes it (Kakwe's server and Google's AI), that it can be turned off, and that anyone holding the phone may see notices. "Turn on" and "Not now" have equal weight. Turning an extra app on asks again. Turning Message Guard off withdraws consent and clears the app list. Installs from before consent existed stay off. |
 | Sender | The notification title, sender, chat title and other participants never leave the device. A `Name:` prefix is cut from the text; a two-word or longer sender name is replaced with `[NAME]` anywhere in the text. A one-word title such as a brand name stays in the body. |
 | Redaction | Emails `[EMAIL]`, phone numbers `[PHONE]`, other runs of 6 or more digits `[NUMBER]`, a code next to a code word `[CODE]`. Account and card numbers become `[ACCOUNT]`: numbers after an account word (account, card, rekening, a/c, ending in, บัญชี, အကောင့် and others), masked cards (`**** 1234`), 13 to 19 digit runs and IBANs. Links keep scheme and host; path, query and user info become `/[PATH]`. Amounts like `1.500.000` and dates stay. |
 | Names | Conservative heuristic, `[NAME]` replaces the name and keeps the title: capitalised words after Hi, Hello, Dear, Mr, Mrs, Ms, Miss, Dr, Ko, Ma, U, Daw, Khun, Pak, Bu, Kuya, Ate, a.n.; Burmese ဒေါ် and ဦး followed by a space and a name, ကို and မ only after a greeting, at the start of a sentence or before the vocative ရေ; Thai คุณ followed by a name, but not when คุณ is the pronoun ("you") or part of a word such as ขอบคุณ or คุณสมบัติ. Generic words (Customer, Sir, Valued) stay. Names without such a marker are not detected. |
 | Length | Text is cut to 600 characters after redaction. |
 | Limits | The same message (ignoring digits and spacing) is checked once per 10 minutes. At most 20 checks per hour and 60 per day leave the device. The 61st check in a day is not sent; Message Guard pauses itself and the card shows why. Turning it on again resumes it without a new consent. |
 | Transparency log | The last 50 checks, at most 7 days old: time, app name, the exact redacted text and the verdict. Stored in `noBackupFilesDir`, so Android backup does not copy it. Never synced. "What Message Guard sent" on the card shows it and has "Delete all". |
-| Notice | Title "SafeRoute", body "A message may need a second look. Open to see why." in the app language, one "Open" action for `saferoute://report/<id>`. No verdict, no scam words, no quoted text. `VISIBILITY_PRIVATE`; the lock-screen version says only "SafeRoute". One default-importance channel, one gentle vibration for every verdict. |
+| Notice | Title "Kakwe", body "A message may need a second look. Open to see why." in the app language, one "Open" action for `saferoute://report/<id>`. No verdict, no scam words, no quoted text. `VISIBILITY_PRIVATE`; the lock-screen version says only "Kakwe". One default-importance channel, one gentle vibration for every verdict. |
 | Kill switch | "Turn off and remove access" on the card turns Message Guard off and opens Android's notification access screen, so the user can revoke access at the system level. |
 | Auth | The auth token is held in memory only, so a check after the app process died goes out without it and the server limits by IP. |
 
@@ -217,7 +217,7 @@ Notification access (`BIND_NOTIFICATION_LISTENER_SERVICE`) is a sensitive permis
 
 ## Voice companion
 
-The user talks to Pyit Taing Htaung (ပစ်တိုင်းထောင်), SafeRoute's roly-poly doll companion, through the bubble while another app stays in front. The overlay windows stay `NOT_FOCUSABLE`, so touches still reach the app below. Rules: `memory live-voice-rules` and `docs/live-audio-contract.md` (companion mode).
+The user talks to Pyit Taing Htaung (ပစ်တိုင်းထောင်), Kakwe's roly-poly doll companion, through the bubble while another app stays in front. The overlay windows stay `NOT_FOCUSABLE`, so touches still reach the app below. Rules: `memory live-voice-rules` and `docs/live-audio-contract.md` (companion mode).
 
 ### Start and end
 
@@ -279,7 +279,7 @@ The doll is `res/drawable-nodpi/companion_doll.png` (192 px, rendered from `asse
 
 The service type is `specialUse|mediaProjection|microphone`. Starting a while-in-use type (microphone) needs the app to be visible: [developer.android.com, restrictions on starting a foreground service from the background](https://developer.android.com/develop/background-work/services/fgs/restrictions-bg-start). The `SYSTEM_ALERT_WINDOW` exemption on that page covers starting a service from the background, not while-in-use access; on Android 14 `startForeground` with type microphone throws `SecurityException` without it.
 
-So the service adds the microphone type while SafeRoute is visible (`startShield`, and `OnActivityEntersForeground` in the module) whenever `RECORD_AUDIO` is granted, and only calls `startForeground` again at session start if the type is missing. If that call throws, the pill shows "Open SafeRoute once to allow voice"; a tap opens the Shield screen, which re-arms the type. On Android 11 to 13 a blocked mic records silence instead of throwing: 4 s of digital silence ends the session with the same notice. Missing `RECORD_AUDIO` shows "Open SafeRoute to allow the microphone". The app asks for it, after a short reason dialog, from the "Talk to Pyit Taing Htaung from the bubble" card and when the user starts a voice chat. Turning the shield on does not ask for it.
+So the service adds the microphone type while Kakwe is visible (`startShield`, and `OnActivityEntersForeground` in the module) whenever `RECORD_AUDIO` is granted, and only calls `startForeground` again at session start if the type is missing. If that call throws, the pill shows "Open Kakwe once to allow voice"; a tap opens the Shield screen, which re-arms the type. On Android 11 to 13 a blocked mic records silence instead of throwing: 4 s of digital silence ends the session with the same notice. Missing `RECORD_AUDIO` shows "Open Kakwe to allow the microphone". The app asks for it, after a short reason dialog, from the "Talk to Pyit Taing Htaung from the bubble" card and when the user starts a voice chat. Turning the shield on does not ask for it.
 
 ### Strings
 
@@ -296,8 +296,8 @@ So the service adds the microphone type while SafeRoute is visible (`startShield
 - [ ] Tap the bubble: Muted, the mic indicator goes off; tap again: Listening.
 - [ ] Incoming call or music app: Paused; after the call the session resumes.
 - [ ] End on the pill and a long press both end the session and keep the shield; drag to the close target closes both.
-- [ ] Android 14: kill SafeRoute from recents, start the shield from the Home switch, leave the app, double tap: voice works; if not, the pill says "Open SafeRoute once to allow voice".
-- [ ] "Ask me for the hotline" opens SafeRoute on Get help; TalkBack offers "Talk to Pyit Taing Htaung".
+- [ ] Android 14: kill Kakwe from recents, start the shield from the Home switch, leave the app, double tap: voice works; if not, the pill says "Open Kakwe once to allow voice".
+- [ ] "Ask me for the hotline" opens Kakwe on Get help; TalkBack offers "Talk to Pyit Taing Htaung".
 
 ## Signal sharing
 

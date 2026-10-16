@@ -121,7 +121,7 @@ export async function checkPage(
       const res = await fetchFn(current, {
         redirect: 'manual',
         signal: AbortSignal.timeout(6000),
-        headers: { 'user-agent': 'SafeRouteAdminBot/1.0 (+https://saferoute-aibc.web.app)', accept: 'text/html,text/plain' },
+        headers: { 'user-agent': 'KakweAdminBot/1.0 (+https://saferoute-aibc.web.app)', accept: 'text/html,text/plain' },
       });
       if (res.status >= 300 && res.status < 400) {
         const next = res.headers.get('location');
