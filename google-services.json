@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "151183717652-geaolhk07sat2kd7ake25mbii1qb4ij2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.saferoute.antifraud",
+            "certificate_hash": "1183b3e6427db46031b752594ddb0ecadaa0d043"
+          }
+        },
+        {
           "client_id": "151183717652-8f2a4c69jup4bi5nnugh4ammk1rnp8li.apps.googleusercontent.com",
           "client_type": 3
         }
