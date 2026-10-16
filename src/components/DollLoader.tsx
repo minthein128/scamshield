@@ -1,25 +1,24 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, Easing, Platform, StyleSheet, View } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
+import Svg, { Circle } from 'react-native-svg';
 import type { Verdict } from '../api/types';
 import { BrandMark } from './BrandMark';
 import type { DollMood } from './avatarArt';
 import { Icon, type IconName } from './Icon';
 import { useReduceMotion } from '../hooks/useReduceMotion';
+import { durations, ease, sway } from '../theme/motion';
 import theme from '../theme/theme';
 
 const { colors } = theme;
 const SIZE = 240;
-const DOLL = 140;
+const MEDALLION = 176;
+const DOLL = 136;
+const RING_R = 106;
+const CIRCUMFERENCE = 2 * Math.PI * RING_R;
+const CREEP_MS = 5000;
 const native = Platform.OS !== 'web';
 const HIDDEN = { accessibilityElementsHidden: true, importantForAccessibility: 'no-hide-descendants' as const };
-
-const STAGE_ICONS: { at: number; x: number; y: number; paths: string[] }[] = [
-  { at: 0, x: 6, y: 30, paths: ['M7 3h8l4 4v14H7z', 'M15 3v4h4', 'M10 12h6M10 16h6'] },
-  { at: 2, x: 190, y: 30, paths: ['M10.5 4a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13z', 'M16 16l5 5'] },
-  { at: 3, x: 6, y: 150, paths: ['M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1', 'M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1'] },
-  { at: 4, x: 190, y: 150, paths: ['M4 18a8 8 0 1 1 16 0', 'M12 18l4-6'] },
-];
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 /** Verdict marks: colour, plus a glyph whose shape differs, so the verdict never rests on colour alone. */
 export const VERDICT_MARK: Record<Verdict, { color: string; icon: IconName }> = {
@@ -31,78 +30,134 @@ export const VERDICT_MARK: Record<Verdict, { color: string; icon: IconName }> = 
 /** Face the doll wears for each verdict. */
 export const VERDICT_MOOD: Record<Verdict, DollMood> = { safe: 'calm', careful: 'concerned', danger: 'worried' };
 
-/** The doll rocks while the check runs, rights itself when the verdict lands, then shows the verdict mark. */
-export const DollLoader: React.FC<{ step: number; verdict?: Verdict | null; label: string; markIcon?: IconName }> = ({ step, verdict = null, label, markIcon }) => {
+/** One damped tumbler cycle: a soft nudge, swings that shrink to rest, then a pause. */
+function swayCycle(rock: Animated.Value): Animated.CompositeAnimation {
+  const leg = (durations.sway - sway.restMs) / sway.swings.length;
+  return Animated.sequence([
+    ...sway.swings.map((deg, i) =>
+      Animated.timing(rock, { toValue: deg, duration: leg, easing: i === 0 ? ease.out : ease.inOut, useNativeDriver: native }),
+    ),
+    Animated.delay(sway.restMs),
+  ]);
+}
+
+interface Props {
+  /** Ring share earned by finished work (0..1). 1 means the result is in. */
+  floor: number;
+  /** How far the ring may creep while it waits for the next real stage. */
+  ceiling: number;
+  verdict?: Verdict | null;
+  label: string;
+  markIcon?: IconName;
+}
+
+/** The doll sways while the ring fills with the check's real stages; the verdict lands in one move. */
+export const DollLoader: React.FC<Props> = ({ floor, ceiling, verdict = null, label, markIcon }) => {
   const reduce = useReduceMotion();
   const rock = useRef(new Animated.Value(0)).current;
+  const progress = useRef(new Animated.Value(0)).current;
+  const fill = useRef(new Animated.Value(0)).current;
   const badge = useRef(new Animated.Value(0)).current;
-  const pops = useRef(STAGE_ICONS.map(() => new Animated.Value(0))).current;
 
   useEffect(() => {
     if (reduce || verdict) return;
-    const side = (to: number) => Animated.timing(rock, { toValue: to, duration: 650, easing: Easing.inOut(Easing.sin), useNativeDriver: native });
-    const loop = Animated.loop(Animated.sequence([side(1), side(-1)]));
+    const loop = Animated.loop(swayCycle(rock));
     loop.start();
     return () => loop.stop();
   }, [reduce, verdict, rock]);
 
   useEffect(() => {
+    if (reduce) {
+      progress.setValue(floor);
+      return;
+    }
+    const steps = [Animated.timing(progress, { toValue: floor, duration: floor >= 1 ? durations.reveal : durations.step, easing: ease.out, useNativeDriver: false })];
+    if (ceiling > floor) {
+      steps.push(Animated.timing(progress, { toValue: floor + 0.85 * (ceiling - floor), duration: CREEP_MS, easing: Easing.out(Easing.cubic), useNativeDriver: false }));
+    }
+    const run = Animated.sequence(steps);
+    run.start();
+    return () => run.stop();
+  }, [floor, ceiling, reduce, progress]);
+
+  useEffect(() => {
     if (!verdict) {
+      fill.setValue(0);
       badge.setValue(0);
       return;
     }
     if (reduce) {
       rock.setValue(0);
-      badge.setValue(1);
+      Animated.parallel([
+        Animated.timing(fill, { toValue: 1, duration: durations.fade, easing: ease.out, useNativeDriver: false }),
+        Animated.timing(badge, { toValue: 1, duration: durations.fade, easing: ease.out, useNativeDriver: native }),
+      ]).start();
       return;
     }
     Animated.parallel([
-      Animated.spring(rock, { toValue: 0, friction: 3, tension: 90, useNativeDriver: native }),
-      Animated.sequence([Animated.delay(180), Animated.spring(badge, { toValue: 1, friction: 4, tension: 140, useNativeDriver: native })]),
+      Animated.spring(rock, { toValue: 0, stiffness: 220, damping: 20, mass: 1, useNativeDriver: native }),
+      Animated.timing(fill, { toValue: 1, duration: durations.reveal, easing: ease.out, useNativeDriver: false }),
+      Animated.sequence([Animated.delay(120), Animated.timing(badge, { toValue: 1, duration: durations.step, easing: ease.pop, useNativeDriver: native })]),
     ]).start();
-  }, [verdict, reduce, rock, badge]);
+  }, [verdict, reduce, rock, fill, badge]);
 
-  useEffect(() => {
-    STAGE_ICONS.forEach((icon, i) => {
-      const target = step >= icon.at ? 1 : 0;
-      if (reduce) pops[i].setValue(target);
-      else Animated.spring(pops[i], { toValue: target, friction: 5, tension: 120, useNativeDriver: native }).start();
-    });
-  }, [step, reduce, pops]);
-
-  const angle = rock.interpolate({ inputRange: [-1, 1], outputRange: ['-14deg', '14deg'] });
+  const angle = rock.interpolate({ inputRange: [-10, 10], outputRange: ['-10deg', '10deg'] });
+  const offset = (v: Animated.Value) => v.interpolate({ inputRange: [0, 1], outputRange: [CIRCUMFERENCE, 0], extrapolate: 'clamp' });
   const mark = verdict ? VERDICT_MARK[verdict] : null;
+  const badgeScale = reduce ? 1 : badge.interpolate({ inputRange: [0, 1], outputRange: [0.6, 1] });
+  const center = SIZE / 2;
 
   return (
     <View style={styles.root} accessible accessibilityRole={verdict ? 'image' : 'progressbar'} accessibilityLabel={label}>
-      <View style={[styles.glow, mark ? { borderColor: mark.color } : null]} {...HIDDEN} />
+      <View style={styles.medallion} {...HIDDEN} />
+      <Svg width={SIZE} height={SIZE} style={StyleSheet.absoluteFill} {...HIDDEN}>
+        <Circle cx={center} cy={center} r={RING_R} stroke={colors.textLighter} strokeOpacity={0.14} strokeWidth={3} fill="none" />
+        <AnimatedCircle
+          testID="loader-ring"
+          cx={center}
+          cy={center}
+          r={RING_R}
+          stroke={colors.textLighter}
+          strokeWidth={3}
+          strokeLinecap="round"
+          fill="none"
+          strokeDasharray={`${CIRCUMFERENCE} ${CIRCUMFERENCE}`}
+          strokeDashoffset={offset(progress)}
+          transform={`rotate(-90 ${center} ${center})`}
+        />
+        {mark ? (
+          <AnimatedCircle
+            cx={center}
+            cy={center}
+            r={RING_R}
+            stroke={mark.color}
+            strokeWidth={6}
+            strokeLinecap="round"
+            fill="none"
+            strokeDasharray={`${CIRCUMFERENCE} ${CIRCUMFERENCE}`}
+            strokeDashoffset={reduce ? 0 : offset(fill)}
+            opacity={reduce ? fill : 1}
+            transform={`rotate(-90 ${center} ${center})`}
+          />
+        ) : null}
+      </Svg>
       <Animated.View testID="loader-doll" style={[styles.doll, { transformOrigin: '50% 92%', transform: [{ rotate: angle }] }]}>
         <BrandMark size={DOLL} mood={verdict ? VERDICT_MOOD[verdict] : undefined} />
       </Animated.View>
       {mark ? (
-        <Animated.View testID={`loader-verdict-${verdict}`} {...HIDDEN} style={[styles.badge, { backgroundColor: mark.color, opacity: badge, transform: [{ scale: badge }] }]}>
-          <Icon name={markIcon ?? mark.icon} size={30} color={colors.white} />
+        <Animated.View testID={`loader-verdict-${verdict}`} {...HIDDEN} style={[styles.badge, { backgroundColor: mark.color, opacity: badge, transform: [{ scale: badgeScale }] }]}>
+          <Icon name={markIcon ?? mark.icon} size={28} color={colors.white} />
         </Animated.View>
       ) : null}
-      {STAGE_ICONS.map((icon, i) => (
-        <Animated.View key={icon.at} {...HIDDEN} style={[styles.stage, { left: icon.x, top: icon.y, opacity: verdict ? 0 : pops[i], transform: [{ scale: pops[i] }] }]}>
-          <Svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke={colors.brandGold} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-            {icon.paths.map(d => (
-              <Path key={d} d={d} />
-            ))}
-          </Svg>
-        </Animated.View>
-      ))}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   root: { width: SIZE, height: SIZE, alignItems: 'center', justifyContent: 'center' },
-  glow: { position: 'absolute', width: 184, height: 184, borderRadius: 92, backgroundColor: colors.brandGold, borderWidth: 5, borderColor: colors.brandGold },
+  medallion: { position: 'absolute', width: MEDALLION, height: MEDALLION, borderRadius: MEDALLION / 2, backgroundColor: colors.brandGold },
   doll: { width: DOLL, height: DOLL, marginTop: -6 },
-  badge: { position: 'absolute', right: 34, bottom: 30, width: 58, height: 58, borderRadius: 29, borderWidth: 3, borderColor: colors.white, alignItems: 'center', justifyContent: 'center' },
-  stage: { position: 'absolute', width: 44, height: 44, borderRadius: 22, backgroundColor: colors.slateDark, borderWidth: 1, borderColor: colors.borderDark, alignItems: 'center', justifyContent: 'center' },
+  badge: { position: 'absolute', right: 38, bottom: 34, width: 54, height: 54, borderRadius: 27, borderWidth: 3, borderColor: colors.deepDarkBackground, alignItems: 'center', justifyContent: 'center' },
 });
 
 export default DollLoader;

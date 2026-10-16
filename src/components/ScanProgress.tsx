@@ -1,7 +1,28 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { Animated, Platform, View, Text, StyleSheet } from 'react-native';
 import Svg, { Path, Rect } from 'react-native-svg';
+import { useReduceMotion } from '../hooks/useReduceMotion';
+import { durations, ease } from '../theme/motion';
 import theme from '../theme/theme';
+
+const native = Platform.OS !== 'web';
+
+/** A step's check mark fades in when the step is done. */
+const StepMark: React.FC<{ done: boolean }> = ({ done }) => {
+  const shown = useRef(new Animated.Value(done ? 1 : 0)).current;
+  useEffect(() => {
+    Animated.timing(shown, { toValue: done ? 1 : 0, duration: durations.fade, easing: ease.out, useNativeDriver: native }).start();
+  }, [done, shown]);
+  return (
+    <View style={styles.pendingCircle}>
+      <Animated.View style={[styles.checkCircle, styles.checkOver, { opacity: shown }]}>
+        <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
+          <Path d="M5 12l5 5L20 7" />
+        </Svg>
+      </Animated.View>
+    </View>
+  );
+};
 
 interface ScanProgressProps {
   steps: string[];
@@ -11,7 +32,13 @@ interface ScanProgressProps {
 }
 
 export const ScanProgress: React.FC<ScanProgressProps> = ({ steps, step, title, foundLabel }) => {
+  const reduce = useReduceMotion();
   const scanTop = 20 + 250 * Math.min(step / steps.length, 1);
+  const scan = useRef(new Animated.Value(scanTop)).current;
+  useEffect(() => {
+    if (reduce) scan.setValue(scanTop);
+    else Animated.timing(scan, { toValue: scanTop, duration: durations.reveal, easing: ease.out, useNativeDriver: native }).start();
+  }, [scanTop, reduce, scan]);
   return (
     <View style={styles.root}>
       <View style={styles.phoneGraphic}>
@@ -23,7 +50,7 @@ export const ScanProgress: React.FC<ScanProgressProps> = ({ steps, step, title, 
         <View style={styles.bar120} />
         <View style={styles.bar130} />
         <View style={styles.barFill} />
-        <View style={[styles.scanLine, { top: scanTop }]} />
+        <Animated.View style={[styles.scanLine, { transform: [{ translateY: scan }] }]} />
       </View>
 
       <View style={styles.statusSection}>
@@ -42,15 +69,7 @@ export const ScanProgress: React.FC<ScanProgressProps> = ({ steps, step, title, 
       <View style={styles.stepsContainer}>
         {steps.map((label, i) => (
           <View key={label} style={styles.stepRow}>
-            {step > i ? (
-              <View style={styles.checkCircle}>
-                <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
-                  <Path d="M5 12l5 5L20 7" />
-                </Svg>
-              </View>
-            ) : (
-              <View style={styles.pendingCircle} />
-            )}
+            <StepMark done={step > i} />
             <Text style={styles.stepLabel}>{label}</Text>
           </View>
         ))}
@@ -115,6 +134,7 @@ const styles = StyleSheet.create({
   },
   scanLine: {
     position: 'absolute',
+    top: 0,
     left: 0,
     right: 0,
     height: 4,
@@ -159,6 +179,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 14,
   },
+  checkOver: { position: 'absolute', top: -2, left: -2 },
   checkCircle: {
     width: 36,
     height: 36,
