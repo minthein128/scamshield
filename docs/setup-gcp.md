@@ -40,7 +40,7 @@ Override with `PROJECT`, `REGION`, `GH_REPO`, `BRANCH`, `ENV_FILE`, `GEMINI_MODE
 
 - Spark rejects `.apk` uploads ("Executable files are forbidden"). The APK is uploaded as `dist/dl/saferoute.pkg` and `firebase.json` rewrites `/saferoute.apk` to it, with the Android package content type.
 - Deploy by hand: `pnpm build:web`, copy the APK to `dist/dl/saferoute.pkg`, then `firebase deploy --only hosting --project saferoute-aibc`.
-- The release APK is signed with the debug key because no keystore secrets exist. Sideloading works.
+- Release APKs are signed with the private release key (see `docs/release-keystore.md`). The build fails on `main` and `feat/production` when the key secrets are missing.
 
 ## GitHub variables
 
@@ -56,7 +56,7 @@ Override with `PROJECT`, `REGION`, `GH_REPO`, `BRANCH`, `ENV_FILE`, `GEMINI_MODE
 | GCP_SERVICE_ACCOUNT | saferoute-deployer@saferoute-aibc.iam.gserviceaccount.com |
 | GCP_WORKLOAD_IDENTITY_PROVIDER | projects/151183717652/locations/global/workloadIdentityPools/github/providers/github-provider |
 
-Secrets are optional: `GCP_SA_KEY` (fallback when WIF is blocked) and `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD` for a release keystore.
+`GCP_SA_KEY` is optional (fallback when WIF is blocked). `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS` and `ANDROID_KEY_PASSWORD` are required on `main` and `feat/production`.
 
 `server.yml` deploys on push to `main` with Vertex AI (`GOOGLE_GENAI_USE_VERTEXAI=true`) through the runtime account. The script deploys with the Gemini key secret instead. A later `main` deploy replaces the env vars and secret mount set by the script, so keep one path.
 

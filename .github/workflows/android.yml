@@ -39,12 +39,25 @@ jobs:
       EXPO_NO_TELEMETRY: "1"
       CI: "true"
       NODE_OPTIONS: --max-old-space-size=4096
+      REQUIRE_RELEASE_SIGNING: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/feat/production' }}
       ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
       ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
       ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
       ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
+
+      - name: Require release signing secrets
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/feat/production'
+        run: |
+          missing=0
+          for name in ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD; do
+            if [ -z "${!name}" ]; then
+              echo "::error::$name is not set; refusing to ship a debug-signed APK from ${GITHUB_REF_NAME}"
+              missing=1
+            fi
+          done
+          exit $missing
 
       - uses: pnpm/action-setup@v4
         with:
