@@ -15,7 +15,8 @@ import {
   warnMessage,
 } from '../lib/report';
 import { callLabel } from '../lib/callLabel';
-import { scamTypeLabel, verdictLabel } from '../lib/labels';
+import { scamTypeLabel } from '../lib/labels';
+import { TIER_VERDICT, resultWord, stepWord, tierHeadline } from '../lib/attention';
 import { resolveCallTarget } from '../lib/hotlines';
 import { useLayout } from '../hooks/useLayout';
 import { useRuntimeConfig } from '../lib/runtimeConfig';
@@ -25,6 +26,7 @@ import { WarnFamilySheet } from '../components/WarnFamilySheet';
 import { Avatar } from '../components/Avatar';
 import { BrandMark } from '../components/BrandMark';
 import { VERDICT_MOOD } from '../components/DollLoader';
+import { ConflictCard } from '../components/ConflictCard';
 import { LiveVoiceSheet } from '../components/LiveVoiceSheet';
 import { FeedbackRow } from '../components/FeedbackRow';
 import { canGiveFeedback } from '../lib/feedback';
@@ -66,7 +68,13 @@ const FAMILY_ICONS: Record<string, IconName> = {
 export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, route }) => {
   const { t } = useTranslation(['report', 'common', 'live']);
   const { result, language, fresh, reported } = route.params;
-  const style = VERDICT_STYLES[result.verdict];
+  const tier = result.attention;
+  const level: Verdict = tier ? TIER_VERDICT[tier] : result.verdict;
+  const word = resultWord(result);
+  const style = VERDICT_STYLES[level];
+  const conflicts = result.conflicts ?? [];
+  const unclear = result.stillUnclear ?? [];
+  const findings = result.findings ?? [];
   const flags = groupFlags(result.flags).flatMap(g => g.flags);
   const sources = result.sources ?? [];
   const [warnOpen, setWarnOpen] = useState(false);
@@ -76,9 +84,9 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
   const layout = useLayout();
   const tablet = layout.isTablet;
   const narrow = width < 360;
-  const [hero, rest] = splitHero(result.summary);
-  const isDanger = result.verdict === 'danger';
-  const showTitle = !result.title.toLowerCase().includes(verdictLabel(result.verdict).toLowerCase());
+  const [hero, rest] = tier ? [tierHeadline(tier), result.summary] : splitHero(result.summary);
+  const isDanger = level === 'danger';
+  const showTitle = !tier && !result.title.toLowerCase().includes(word.toLowerCase());
 
   useEffect(() => {
     if (fresh && result.verdict !== 'safe') {
@@ -117,26 +125,26 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
     }
   };
 
-  const otherActions = result.actions.filter(a => a.type !== 'call' && a.type !== 'share' && !(result.verdict === 'safe' && a.type === 'learn'));
+  const otherActions = result.actions.filter(a => a.type !== 'call' && a.type !== 'share' && !(level === 'safe' && a.type === 'learn'));
 
   const leftTop = (
     <>
-      <View style={[styles.banner, { backgroundColor: style.background }]} testID={`verdict-${result.verdict}`} accessible accessibilityLabel={t('a11yVerdict', { verdict: verdictLabel(result.verdict), step: STEPS.indexOf(result.verdict) + 1 })}>
+      <View style={[styles.banner, { backgroundColor: style.background }]} testID={`verdict-${level}`} accessible accessibilityLabel={t('a11yVerdict', { verdict: word, step: STEPS.indexOf(level) + 1 })}>
         <View style={styles.bannerDoll}>
-          <BrandMark size={narrow ? 64 : 80} medallion="#FCEFD2" mood={VERDICT_MOOD[result.verdict]} />
+          <BrandMark size={narrow ? 64 : 80} medallion="#FCEFD2" mood={VERDICT_MOOD[level]} />
         </View>
         <View style={styles.bannerText}>
-          <Text style={styles.bannerTitle}>{verdictLabel(result.verdict)}</Text>
-          {result.scamType !== 'none' ? <Text style={[styles.bannerSub, { color: style.subtle }]}>{scamTypeLabel(result.scamType)}</Text> : null}
+          <Text style={styles.bannerTitle}>{word}</Text>
+          {result.scamType !== 'none' && !tier ? <Text style={[styles.bannerSub, { color: style.subtle }]}>{scamTypeLabel(result.scamType)}</Text> : null}
         </View>
       </View>
       <View style={styles.meter} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
         {STEPS.map(step => {
-          const on = step === result.verdict;
+          const on = step === level;
           return (
             <View key={step} testID={`meter-${step}`} style={styles.meterStep}>
               <View style={[styles.seg, { backgroundColor: on ? VERDICT_STYLES[step].background : colors.borderLight }]} />
-              <Text style={[styles.meterLabel, on && styles.meterLabelOn]}>{verdictLabel(step)}</Text>
+              <Text style={[styles.meterLabel, on && styles.meterLabelOn]}>{stepWord(step, tier)}</Text>
             </View>
           );
         })}
@@ -177,18 +185,56 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
         </View>
       ) : (
         <Card style={{ gap: 8 }}>
-          {showTitle ? <Text style={[styles.reportTitle, readable(tablet, 20, 28)]}>{result.title}</Text> : null}
-          <Text style={[styles.summary, readable(tablet, 16, 24)]}>{result.summary}</Text>
+          {tier ? <Text accessibilityRole="header" style={[styles.reportTitle, readable(tablet, 20, 28)]}>{hero}</Text> : showTitle ? <Text style={[styles.reportTitle, readable(tablet, 20, 28)]}>{result.title}</Text> : null}
+          <Text style={[styles.summary, readable(tablet, 16, 24)]}>{tier ? rest : result.summary}</Text>
         </Card>
       )}
 
+      {tier && tier !== 'pause' ? <Text testID="report-tier-note" style={styles.tierNote}>{t(`attention.note.${tier}`)}</Text> : null}
     </>
   );
   const rightPane = (
     <>
+      {conflicts.length > 0 ? (
+        <View testID="report-conflicts" style={{ gap: 12 }}>
+          <SectionTitle>{t('conflicts.title')}</SectionTitle>
+          {conflicts.map((c, i) => (
+            <ConflictCard key={`${c.field}-${i}`} conflict={c} tablet={tablet} />
+          ))}
+        </View>
+      ) : null}
+
+      {unclear.length > 0 ? (
+        <View testID="report-unclear" style={{ gap: 12 }}>
+          <SectionTitle>{t('unclear.title')}</SectionTitle>
+          <View style={styles.unclearList}>
+            {unclear.map((line, i) => (
+              <View key={`${line}-${i}`} style={styles.unclearRow}>
+                <Icon name="info" size={20} color={colors.textSecondary} />
+                <Text style={[styles.flagEvidence, styles.unclearText, readable(tablet, 14, 20)]}>{line}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+      ) : null}
+
+      {findings.length > 0 ? (
+        <View testID="report-findings" style={{ gap: 12 }}>
+          <SectionTitle>{t('findings.title')}</SectionTitle>
+          <View style={styles.unclearList}>
+            {findings.map((f, i) => (
+              <View key={`${f.code}-${i}`} style={styles.unclearRow}>
+                <Icon name="info" size={20} color={colors.textSecondary} />
+                <Text style={[styles.flagEvidence, styles.unclearText, readable(tablet, 14, 20)]}>{f.label}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+      ) : null}
+
       {flags.length > 0 ? (
         <View style={{ gap: 12 }}>
-          <SectionTitle>{result.verdict === 'safe' ? t('flagsSafe') : t('flagsRisky')}</SectionTitle>
+          <SectionTitle>{level === 'safe' ? t('flagsSafe') : t('flagsRisky')}</SectionTitle>
           {flags.map((flag, i) => {
             const sev = SEVERITY[flag.severity];
             return (
@@ -263,7 +309,7 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
       {!reported && canGiveFeedback(result) ? <FeedbackRow result={result} /> : null}
     </>
   );
-  const hasRight = flags.length > 0 || sources.length > 0 || result.linkChecks.length > 0;
+  const hasRight = conflicts.length > 0 || unclear.length > 0 || findings.length > 0 || flags.length > 0 || sources.length > 0 || result.linkChecks.length > 0;
 
   return (
     <Screen
@@ -274,7 +320,7 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
       footer={
         <>
           <Button testID="report-warn" label={t('warn')} icon="people" style={footerButton} onPress={() => setWarnOpen(true)} />
-          {result.verdict !== 'safe' ? (
+          {level !== 'safe' || tier ? (
             hotline?.dial ? (
               <Button testID="report-call" icon="phone" label={call.label} subLabel={call.sub} maxLines={3} subMaxLines={4} variant="secondary" style={footerButton} onPress={() => callNumber(hotline.dial ?? '')} />
             ) : (
@@ -328,6 +374,10 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
 };
 
 const styles = StyleSheet.create({
+  tierNote: { color: colors.textSecondary, fontSize: 14, lineHeight: 20, fontFamily: fonts.medium },
+  unclearList: { gap: 8, padding: 16, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.border, borderRadius: 16 },
+  unclearRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
+  unclearText: { flex: 1, minWidth: 0 },
   panes: { flexDirection: 'row', alignItems: 'flex-start', gap: PANE_GAP },
   pane: { flex: 1, flexBasis: 0, minWidth: 0, gap: 16 },
   footerButton: { flex: 1, flexBasis: 0, minWidth: 0 },

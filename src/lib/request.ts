@@ -1,5 +1,5 @@
 import { t } from '../i18n';
-import type { CheckKind, CheckRequest, LanguageCode } from '../api/types';
+import type { CheckKind, CheckRequest, JobExtractRequest, JobExtractSource, LanguageCode } from '../api/types';
 
 export interface CheckForm {
   kind: CheckKind;
@@ -42,4 +42,33 @@ export function sourceLabel(form: Pick<CheckForm, 'text' | 'url' | 'imageBase64'
   if (form.url.trim()) return form.url.trim().replace(/^https?:\/\//i, '').slice(0, 48);
   if (form.imageBase64) return form.destination.trim() ? t('check:source.screenshotAt', { place: form.destination.trim() }) : t('check:source.screenshot');
   return t('check:source.fallback');
+}
+
+export interface JobForm extends CheckForm {
+  chatText: string;
+  chatImageBase64?: string;
+  chatImageMimeType?: string;
+}
+
+function jobSource(text: string, imageBase64?: string, imageMimeType?: string): JobExtractSource | undefined {
+  const trimmed = text.trim();
+  if (!trimmed && !imageBase64) return undefined;
+  return { ...(trimmed ? { text: trimmed } : {}), ...(imageBase64 ? { imageBase64, imageMimeType: imageMimeType ?? 'image/jpeg' } : {}) };
+}
+
+export function buildJobRequest(form: JobForm): JobExtractRequest {
+  const destination = form.destination.trim();
+  const home = form.home?.trim();
+  const context = { ...(destination ? { destination } : {}), ...(home ? { home } : {}) };
+  const ad = jobSource(form.text, form.imageBase64, form.imageMimeType);
+  const chat = jobSource(form.chatText, form.chatImageBase64, form.chatImageMimeType);
+  return { ...(ad ? { ad } : {}), ...(chat ? { chat } : {}), language: form.language, ...(Object.keys(context).length ? { context } : {}) };
+}
+
+export function jobSourceLabel(form: JobForm): string {
+  const adText = form.text.trim();
+  if (adText) return adText.length > 48 ? `${adText.slice(0, 48)}...` : adText;
+  const hasAd = Boolean(form.text.trim() || form.imageBase64);
+  const hasChat = Boolean(form.chatText.trim() || form.chatImageBase64);
+  return t(hasAd && hasChat ? 'check:job.source.both' : hasChat ? 'check:job.source.chat' : 'check:job.source.ad');
 }

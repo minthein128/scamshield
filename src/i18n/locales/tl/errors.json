@@ -77,5 +77,11 @@
     "recentLogin": "Para sa iyong kaligtasan, mag-sign in muli at ulitin ang hakbang na ito.",
     "notAllowed": "Hindi pa puwedeng gamitin ang paraang ito sa pag-sign in.",
     "fallback": "May nagkaproblema. Pakisubukan muli."
+  },
+  "job": {
+    "unreadable": {
+      "title": "Hindi namin mabasa ang mga detalye ng trabaho",
+      "message": "Maaaring mahirap basahin ang teksto o larawan. Pakisubukan muli, o i-paste ang teksto."
+    }
   }
 }

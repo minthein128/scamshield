@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import DollLoader from '../components/DollLoader';
 import { useReduceMotion } from '../hooks/useReduceMotion';
 import type { CheckResponse, Verdict } from '../api/types';
+import { forHistory, resultWord } from '../lib/attention';
 import { Button, LinkButton } from '../components/ui';
 import { useAuth } from '../state/AuthState';
 import { errorCopy, getApiClient } from '../api';
@@ -18,13 +19,15 @@ import theme from '../theme/theme';
 const { colors, fonts } = theme;
 
 const STEPS = ['read', 'pick', 'spot', 'links', 'score', 'write'] as const;
+const EXTRACT_STEPS = 2;
 const STEP_MS = 900;
 const HOLD_SAFE_MS = 1500;
 const HOLD_RISK_MS = 3600;
 
 export const CheckingScreen: React.FC<RootScreenProps<'Checking'>> = ({ navigation, route }) => {
-  const { t } = useTranslation(['checking', 'common']);
-  const { request, source, reported } = route.params;
+  const { t } = useTranslation(['checking', 'common', 'errors']);
+  const { request, job, source, reported } = route.params;
+  const language = job ? job.request.language : (request?.language ?? 'en');
   const { saveCheck } = useAppState();
   const [step, setStep] = useState(0);
   const [verdict, setVerdict] = useState<Verdict | null>(null);
@@ -41,9 +44,9 @@ export const CheckingScreen: React.FC<RootScreenProps<'Checking'>> = ({ navigati
       if (openedRef.current) return;
       openedRef.current = true;
       if (holdRef.current) clearTimeout(holdRef.current);
-      navigation.replace('Report', { result: checked, language: request.language, fresh: true, ...(reported ? { reported } : {}) });
+      navigation.replace('Report', { result: checked, language, fresh: true, ...(reported ? { reported } : {}) });
     },
-    [navigation, request.language, reported],
+    [navigation, language, reported],
   );
 
   const run = useCallback(async () => {
@@ -52,8 +55,16 @@ export const CheckingScreen: React.FC<RootScreenProps<'Checking'>> = ({ navigati
     const controller = new AbortController();
     abortRef.current = controller;
     try {
-      const checked = await getApiClient().check(request, { signal: controller.signal });
-      await saveCheck(checked, request.language, source);
+      const client = getApiClient();
+      if (job?.phase === 'extract') {
+        const extraction = await client.extractJob(job.request, { signal: controller.signal });
+        if (controller.signal.aborted || openedRef.current) return;
+        openedRef.current = true;
+        navigation.replace('JobFacts', { extraction, extractRequest: job.request, source });
+        return;
+      }
+      const checked = job ? await client.assessJob(job.request, { signal: controller.signal }) : await client.check(request as NonNullable<typeof request>, { signal: controller.signal });
+      await saveCheck(forHistory(checked), language, source);
       setResult(checked);
       setVerdict(checked.verdict);
       if (!reduceMotion) await new Promise(resolve => (holdRef.current = setTimeout(resolve, checked.verdict === 'safe' ? HOLD_SAFE_MS : HOLD_RISK_MS)));
@@ -61,9 +72,11 @@ export const CheckingScreen: React.FC<RootScreenProps<'Checking'>> = ({ navigati
       openReport(checked);
     } catch (e) {
       if (e instanceof ApiError && e.code === 'cancelled') return;
-      setError({ ...errorCopy(e), code: e instanceof ApiError ? e.code : undefined });
+      const code = e instanceof ApiError ? e.code : undefined;
+      const unreadable = job?.phase === 'extract' && (code === 'upstream' || code === 'invalid_response');
+      setError({ ...(unreadable ? { title: t('errors:job.unreadable.title'), message: t('errors:job.unreadable.message') } : errorCopy(e)), code });
     }
-  }, [openReport, request, saveCheck, source, reduceMotion]);
+  }, [openReport, request, job, language, navigation, saveCheck, source, reduceMotion, t]);
 
   useEffect(() => {
     run();
@@ -75,11 +88,12 @@ export const CheckingScreen: React.FC<RootScreenProps<'Checking'>> = ({ navigati
 
   useEffect(() => {
     if (error) return;
-    const timer = setInterval(() => setStep(s => Math.min(s + 1, STEPS.length - 1)), STEP_MS);
+    const last = job?.phase === 'extract' ? EXTRACT_STEPS - 1 : STEPS.length - 1;
+    const timer = setInterval(() => setStep(s => Math.min(s + 1, last)), STEP_MS);
     return () => clearInterval(timer);
-  }, [error]);
+  }, [error, job]);
 
-  const word = verdict ? t(`common:verdict.${verdict}`) : t('title');
+  const word = result ? resultWord(result) : t('title');
   const reassure = verdict === 'careful' || verdict === 'danger' ? t(`reassure.${verdict}`) : null;
 
   return (
@@ -95,7 +109,7 @@ export const CheckingScreen: React.FC<RootScreenProps<'Checking'>> = ({ navigati
           </View>
         ) : (
           <View style={styles.loader}>
-            <DollLoader step={step} verdict={verdict} label={word} />
+            <DollLoader step={step} verdict={verdict} label={word} markIcon={result?.attention === 'lower' ? 'info' : undefined} />
             <Text testID="checking-verdict" accessibilityRole="header" accessibilityLiveRegion="polite" style={verdict ? styles.verdict : styles.title}>{word}</Text>
             {verdict ? (
               reassure ? <Text testID="checking-reassure" style={styles.reassure}>{reassure}</Text> : null

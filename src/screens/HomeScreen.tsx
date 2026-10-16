@@ -13,7 +13,8 @@ import { Button, Card, EmptyState, SectionTitle } from '../components/ui';
 import type { TabScreenProps } from '../navigation/types';
 import { useAppState } from '../state/AppState';
 import { VERDICT_STYLES } from '../lib/report';
-import { entryLabel, verdictLabel } from '../lib/labels';
+import { entryLabel } from '../lib/labels';
+import { resultWord } from '../lib/attention';
 import { formatRelative } from '../lib/time';
 import theme from '../theme/theme';
 
@@ -79,7 +80,7 @@ export const HomeScreen: React.FC<TabScreenProps<'Home'>> = ({ navigation }) => 
                 key={entry.id}
                 testID="recent-check"
                 accessibilityRole="button"
-                accessibilityLabel={`${verdictLabel(entry.result.verdict)}: ${entryLabel(entry.result, entry.source)}`}
+                accessibilityLabel={`${resultWord(entry.result)}: ${entryLabel(entry.result, entry.source)}`}
                 activeOpacity={0.7}
                 onPress={() => navigation.navigate('Report', { result: entry.result, language: entry.language })}
                 style={styles.recent}
@@ -90,7 +91,7 @@ export const HomeScreen: React.FC<TabScreenProps<'Home'>> = ({ navigation }) => 
                 </View>
                 <View style={[styles.verdict, { backgroundColor: v.chipBackground }]}>
                   <Icon name={VERDICT_GLYPH[entry.result.verdict]} size={16} color={v.chipForeground} />
-                  <Text style={[styles.verdictText, { color: v.chipForeground }]}>{verdictLabel(entry.result.verdict)}</Text>
+                  <Text style={[styles.verdictText, { color: v.chipForeground }]}>{resultWord(entry.result)}</Text>
                 </View>
               </TouchableOpacity>
             );

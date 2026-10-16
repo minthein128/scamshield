@@ -45,5 +45,132 @@
   "more": {
     "title": "More detail (optional)"
   },
-  "submitHint": "Add a message, link or screenshot first"
+  "submitHint": "Add a message, link or screenshot first",
+  "job": {
+    "ad": {
+      "title": "The job ad",
+      "hint": "Paste the post, or add a picture of it.",
+      "a11y": "Text of the job ad",
+      "placeholder": "Paste the job ad here"
+    },
+    "chat": {
+      "title": "What the recruiter asked you",
+      "optional": "Optional",
+      "hint": "Paste the messages, or add a picture. This may help us notice details that do not match the ad.",
+      "a11y": "Text of the recruiter chat",
+      "placeholder": "Paste the chat with the recruiter here"
+    },
+    "submit": "Read these texts",
+    "submitHint": "Add the job ad or the chat first",
+    "notMentioned": "Not mentioned",
+    "source": {
+      "ad": "Job ad",
+      "chat": "Recruiter chat",
+      "both": "Job ad and chat"
+    },
+    "facts": {
+      "title": "Is this right?",
+      "intro": "This is what we may have understood from your texts. Please fix anything that looks wrong. Your changes are used for this check only.",
+      "adGroup": "From the job ad",
+      "chatGroup": "From the recruiter chat",
+      "unclearNote": "Some details may be unclear. The marked ones may need a look.",
+      "pleaseCheck": "Please check",
+      "declined": "They may not have answered",
+      "edited": "Changed by you",
+      "quoteLabel": "Text it came from",
+      "noQuote": "You added this yourself",
+      "edit": "Edit",
+      "editA11y": "Edit {{field}}",
+      "done": "Done",
+      "reset": "Back to what we read",
+      "markNotMentioned": "Mark as not mentioned",
+      "add": "Add",
+      "amount": "Amount",
+      "currency": "Currency",
+      "currencyPlaceholder": "For example THB",
+      "period": "How often",
+      "feeChoice": "Fee or deposit",
+      "feeAmount": "How much, in the recruiter words",
+      "textPlaceholder": "Type what the text says",
+      "empty": "We could not find clear details in these texts. You can add them yourself, or go back and check the text.",
+      "submit": "Looks right, check it",
+      "submitHint": "You can still change details after you see the result.",
+      "noMatch": "We could not match this to the text, so please check it.",
+      "feeHint": "Please type the amount, for example 300 USD. The check may not use this detail without it."
+    },
+    "fields": {
+      "employer": "Employer",
+      "jobTitle": "Job title",
+      "workplace": "Workplace",
+      "destinationCountry": "Country",
+      "salary": "Salary",
+      "workerFee": "Fee for the worker",
+      "contract": "Contract",
+      "visaOrPermit": "Visa or permit",
+      "travelArrangedBy": "Who arranges travel",
+      "route": "Route",
+      "meetingPoint": "Meeting point",
+      "documentRequest": "Documents asked for",
+      "paymentRequest": "Payment asked for",
+      "urgency": "Time pressure",
+      "contactChannel": "How they contact you",
+      "secrecyRequest": "Asked to keep it secret"
+    },
+    "period": {
+      "hourly": "per hour",
+      "daily": "per day",
+      "weekly": "per week",
+      "monthly": "per month",
+      "yearly": "per year"
+    },
+    "values": {
+      "workerFee": {
+        "none": "No fee mentioned",
+        "some": "A fee or deposit is mentioned"
+      },
+      "contract": {
+        "official": "An official contract",
+        "later": "A contract later",
+        "none": "No contract",
+        "not_mentioned": "Not mentioned"
+      },
+      "visaOrPermit": {
+        "work_visa": "A work visa",
+        "tourist": "A tourist visa",
+        "none": "No visa",
+        "not_mentioned": "Not mentioned"
+      },
+      "meetingPoint": {
+        "airport": "An airport",
+        "border": "A border",
+        "workplace": "The workplace",
+        "driver_pickup": "A driver picks you up",
+        "unnamed": "A place not named",
+        "not_mentioned": "Not mentioned"
+      },
+      "documentRequest": {
+        "passport_photo": "A photo of your passport",
+        "passport_hold": "They keep your passport",
+        "id_copy": "A copy of your ID",
+        "none": "No documents",
+        "not_mentioned": "Not mentioned"
+      },
+      "paymentRequest": {
+        "before_contract": "Pay before a contract",
+        "personal_account": "Pay to a personal account",
+        "none": "No payment",
+        "not_mentioned": "Not mentioned"
+      },
+      "contactChannel": {
+        "company_channel": "A company channel",
+        "personal_chat_app": "A personal chat app",
+        "phone": "A phone number",
+        "email": "An email"
+      },
+      "secrecyRequest": {
+        "yes": "Asked to keep it secret",
+        "no": "Not asked to keep it secret"
+      }
+    }
+  }
 }

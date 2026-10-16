@@ -1,7 +1,7 @@
 import { ApiError, codeFromStatus } from './errors';
 import { createSseParser } from './sse';
-import type { ApiErrorBody, ApiErrorCode, CheckClient, CheckRequest, CheckResponse, CheckStage, CheckUpdate, FeedbackRequest, HealthResponse, Insights, RequestOptions, SpeakRequest, SpeakResponse } from './types';
-import { hasInput, isCheckResponse, normalizeResponse } from './validate';
+import type { ApiErrorBody, ApiErrorCode, CheckClient, CheckRequest, CheckResponse, CheckStage, CheckUpdate, FeedbackRequest, HealthResponse, Insights, JobAssessRequest, JobAssessResponse, JobExtractRequest, JobExtractResponse, RequestOptions, SpeakRequest, SpeakResponse } from './types';
+import { hasInput, hasJobInput, isCheckResponse, isJobExtractResponse, normalizeJobResponse, normalizeResponse } from './validate';
 
 export interface HttpClientConfig {
   baseUrl: string;
@@ -163,6 +163,17 @@ export function createHttpClient(config: HttpClientConfig): CheckClient {
       const body = (await send(`/v1/insights?country=${encodeURIComponent(country)}&days=30`, { method: 'GET' }, options)) as Insights | null;
       if (!body || !Array.isArray(body.risks)) throw new ApiError('invalid_response', 'Unexpected response shape');
       return { ...body, domains: body.domains ?? [] };
+    },
+    async extractJob(request: JobExtractRequest, options?: RequestOptions): Promise<JobExtractResponse> {
+      if (!hasJobInput(request.ad) && !hasJobInput(request.chat)) throw new ApiError('bad_request', 'Nothing to read');
+      const body = await send('/v1/job/extract', { method: 'POST', body: JSON.stringify(request) }, options, readJson, 'application/json', fetchImpl, checkTimeoutMs);
+      if (!isJobExtractResponse(body)) throw new ApiError('invalid_response', 'Unexpected response shape');
+      return { jobId: body.jobId, ad: body.ad ?? null, chat: body.chat ?? null };
+    },
+    async assessJob(request: JobAssessRequest, options?: RequestOptions): Promise<JobAssessResponse> {
+      const body = await send('/v1/job/assess', { method: 'POST', body: JSON.stringify(request) }, options, readJson, 'application/json', fetchImpl, checkTimeoutMs);
+      if (!isCheckResponse(body)) throw new ApiError('invalid_response', 'Unexpected response shape');
+      return normalizeJobResponse(body as JobAssessResponse);
     },
     async health(options?: RequestOptions): Promise<HealthResponse> {
       return (await send('/healthz', { method: 'GET' }, options)) as HealthResponse;

@@ -48,5 +48,132 @@
   "more": {
     "title": "Detail tambahan (opsional)"
   },
-  "submitHint": "Tambahkan pesan, tautan, atau tangkapan layar terlebih dahulu"
+  "submitHint": "Tambahkan pesan, tautan, atau tangkapan layar terlebih dahulu",
+  "job": {
+    "ad": {
+      "title": "Iklan lowongan kerja",
+      "hint": "Tempel unggahan ini, atau tambahkan fotonya.",
+      "a11y": "Teks iklan lowongan kerja",
+      "placeholder": "Tempel iklan lowongan di sini"
+    },
+    "chat": {
+      "title": "Pesan dari perekrut",
+      "optional": "Opsional",
+      "hint": "Tempel pesan, atau tambahkan foto. Ini bisa membantu kami melihat hal yang tidak sesuai dengan iklan.",
+      "a11y": "Teks obrolan perekrut",
+      "placeholder": "Tempel obrolan dengan perekrut di sini"
+    },
+    "submit": "Baca teks ini",
+    "submitHint": "Tambahkan iklan lowongan atau obrolan terlebih dahulu",
+    "notMentioned": "Tidak disebutkan",
+    "source": {
+      "ad": "Iklan lowongan kerja",
+      "chat": "Obrolan perekrut",
+      "both": "Iklan lowongan dan obrolan"
+    },
+    "facts": {
+      "title": "Apakah ini benar?",
+      "intro": "Ini hal yang mungkin kami pahami dari teks Anda. Harap perbaiki jika ada yang keliru. Perubahan Anda hanya digunakan untuk pemeriksaan ini.",
+      "adGroup": "Dari iklan lowongan kerja",
+      "chatGroup": "Dari obrolan perekrut",
+      "unclearNote": "Beberapa rincian mungkin kurang jelas. Bagian yang ditandai mungkin perlu Anda periksa.",
+      "pleaseCheck": "Harap periksa",
+      "declined": "Mungkin belum dijawab",
+      "edited": "Diubah oleh Anda",
+      "quoteLabel": "Teks asal",
+      "noQuote": "Anda menambahkan ini sendiri",
+      "edit": "Ubah",
+      "editA11y": "Ubah {{field}}",
+      "done": "Selesai",
+      "reset": "Kembali ke hasil awal",
+      "markNotMentioned": "Tandai tidak disebutkan",
+      "add": "Tambah",
+      "amount": "Jumlah",
+      "currency": "Mata uang",
+      "currencyPlaceholder": "Misalnya THB",
+      "period": "Seberapa sering",
+      "feeChoice": "Biaya atau uang jaminan",
+      "feeAmount": "Berapa banyak, sesuai kata perekrut",
+      "textPlaceholder": "Tuliskan isi teks tersebut",
+      "empty": "Kami belum menemukan rincian yang jelas dari teks ini. Anda bisa menambahkannya sendiri, atau kembali dan memeriksa teksnya.",
+      "submit": "Sudah pas, periksa sekarang",
+      "submitHint": "Anda masih bisa mengubah rincian setelah melihat hasilnya.",
+      "noMatch": "Kami tidak dapat mencocokkan ini dengan teks, jadi harap periksa kembali.",
+      "feeHint": "Silakan ketik jumlahnya, misalnya 300 USD. Pemeriksaan mungkin tidak dapat menggunakan rincian ini tanpanya."
+    },
+    "fields": {
+      "employer": "Pemberi kerja",
+      "jobTitle": "Nama pekerjaan",
+      "workplace": "Tempat kerja",
+      "destinationCountry": "Negara",
+      "salary": "Gaji",
+      "workerFee": "Biaya untuk pekerja",
+      "contract": "Kontrak",
+      "visaOrPermit": "Visa atau izin",
+      "travelArrangedBy": "Siapa yang mengatur perjalanan",
+      "route": "Rute",
+      "meetingPoint": "Tempat bertemu",
+      "documentRequest": "Dokumen yang diminta",
+      "paymentRequest": "Pembayaran yang diminta",
+      "urgency": "Desakan waktu",
+      "contactChannel": "Cara mereka menghubungi Anda",
+      "secrecyRequest": "Diminta merahasiakannya"
+    },
+    "period": {
+      "hourly": "per jam",
+      "daily": "per hari",
+      "weekly": "per minggu",
+      "monthly": "per bulan",
+      "yearly": "per tahun"
+    },
+    "values": {
+      "workerFee": {
+        "none": "Tidak ada biaya yang disebut",
+        "some": "Ada biaya atau uang muka yang disebut"
+      },
+      "contract": {
+        "official": "Kontrak resmi",
+        "later": "Kontrak diberikan nanti",
+        "none": "Tidak ada kontrak",
+        "not_mentioned": "Tidak disebutkan"
+      },
+      "visaOrPermit": {
+        "work_visa": "Visa kerja",
+        "tourist": "Visa turis",
+        "none": "Tidak ada visa",
+        "not_mentioned": "Tidak disebutkan"
+      },
+      "meetingPoint": {
+        "airport": "Bandara",
+        "border": "Perbatasan",
+        "workplace": "Tempat kerja",
+        "driver_pickup": "Sopir menjemput Anda",
+        "unnamed": "Tempat yang tidak disebutkan namanya",
+        "not_mentioned": "Tidak disebutkan"
+      },
+      "documentRequest": {
+        "passport_photo": "Foto paspor Anda",
+        "passport_hold": "Mereka menahan paspor Anda",
+        "id_copy": "Salinan kartu identitas Anda",
+        "none": "Tidak ada dokumen",
+        "not_mentioned": "Tidak disebutkan"
+      },
+      "paymentRequest": {
+        "before_contract": "Bayar sebelum ada kontrak",
+        "personal_account": "Bayar ke rekening pribadi",
+        "none": "Tidak ada pembayaran",
+        "not_mentioned": "Tidak disebutkan"
+      },
+      "contactChannel": {
+        "company_channel": "Saluran perusahaan",
+        "personal_chat_app": "Aplikasi pesan pribadi",
+        "phone": "Nomor telepon",
+        "email": "Email"
+      },
+      "secrecyRequest": {
+        "yes": "Diminta merahasiakannya",
+        "no": "Tidak diminta merahasiakannya"
+      }
+    }
+  }
 }

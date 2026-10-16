@@ -1,6 +1,7 @@
 import type { CheckResponse, FlagFamily, Severity, Verdict, Flag } from '../api/types';
 import { t } from '../i18n';
-import { familyLabel, verdictLabel } from './labels';
+import { familyLabel } from './labels';
+import { resultWord } from './attention';
 import theme from '../theme/theme';
 
 export interface VerdictStyle {
@@ -61,5 +62,5 @@ export function shareMessage(result: CheckResponse): string {
 
 export function warnMessage(result: CheckResponse): string {
   const summary = result.summary.length > 280 ? `${result.summary.slice(0, 277)}...` : result.summary;
-  return t('report:warnMessage', { verdict: verdictLabel(result.verdict).toLowerCase(), title: result.title, summary });
+  return t('report:warnMessage', { verdict: resultWord(result).toLowerCase(), title: result.title, summary });
 }
