@@ -44,6 +44,7 @@ Return JSON:
 - source_text: every word visible, in reading order, exactly as written, one line per message or line. Keep the original script. Do not translate, correct or complete text. Include names and numbers as shown.
 - low_confidence: lines or words in source_text you are not sure you read right (blurry, small, rare Burmese letters). Quote each one with a short reason. Empty if none. Do not guess to fill gaps.
 - numbers: every number, amount, percentage, date, phone number and account number visible. For each: as_written (exact characters), arabic (the same value with digits 0-9), script (my, latin, other), confident (false when the digits are small or could be confused). Burmese digits are ၀၁၂၃၄၅၆၇၈၉. Take special care: ၃ and ၂, ၅ and ၆, ၇ and ၈, ၀ and ၁ look alike.
+- app: the app shown in the screenshot UI: messenger, facebook, instagram, telegram, whatsapp, viber, sms, line, tiktok or other.
 - content_language: ISO 639-1 code of the main text (my, en, zh, th, ...).
 - home: the likely home country code of the person who received this (MM, TH, ID, PH or other). Use MM when the text is Burmese.
 - destination: country or town the message points to, only if the text says so. Else an empty string.
@@ -74,6 +75,7 @@ const schema = {
         required: ['as_written', 'arabic', 'script', 'confident'],
       },
     },
+    app: str1,
     content_language: str1,
     home: str1,
     destination: str1,
@@ -97,6 +99,7 @@ const schema = {
     'source_text',
     'low_confidence',
     'numbers',
+    'app',
     'content_language',
     'home',
     'destination',
@@ -115,6 +118,7 @@ interface Draft {
   source_text: string;
   low_confidence: string[];
   numbers: { as_written: string; arabic: string; script: string; confident: boolean }[];
+  app: string;
   content_language: string;
   home: string;
   destination: string;
@@ -188,7 +192,8 @@ for (const f of files) {
     if (d.is_scam !== 'yes') flagsOut.push(`NOT CLEARLY A SCAM: model says is_scam=${d.is_scam}.`);
     const homeCode = d.home && d.home.length === 2 ? d.home.toUpperCase() : home;
     const lang = USER_LANG[homeCode] ?? 'en';
-    const app = id.split('-')[1] ?? 'unspecified';
+    const folderApp = id.split('-')[1] ?? 'unspecified';
+    const app = folderApp === 'batch2' ? d.app || 'unspecified' : folderApp;
     const doc = {
       id,
       file: relative(outDir, path),

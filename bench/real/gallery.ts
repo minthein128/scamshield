@@ -11,7 +11,7 @@ if (flags.help || !str(flags.cases) || !str(flags.out)) {
   Builds one offline HTML page: original next to redacted image, draft labels, A/B outputs, CSV export.
   --cases DIR      private case files
   --out FILE       index.html to write (keep it outside git; image links are relative to it)
-  --orig DIR       out dir of the bench run on original images (holds results-v2/)
+  --orig DIR[,DIR]  out dir(s) of the bench run on original images (holds results-v2/)
   --redacted DIR   out dir of the bench run on redacted images
   --redacted-images DIR  redacted images (default: sibling "redacted" folder of the case dir's images)`);
   process.exit(flags.help ? 0 : 2);
@@ -31,32 +31,36 @@ type Cell = {
   output?: unknown;
 } | null;
 
-function loadResults(root?: string): Record<string, Record<string, Cell>> {
+function loadResults(roots?: string): Record<string, Record<string, Cell>> {
   const byPrompt: Record<string, Record<string, Cell>> = {};
-  if (!root) return byPrompt;
-  const dir = join(resolve(root), 'results-v2');
-  if (!existsSync(dir)) return byPrompt;
-  const latest = new Map<string, BenchResultV2>();
-  for (const f of readdirSync(dir)
-    .filter((x) => x.endsWith('.json') && !x.startsWith('ab-'))
-    .sort()) {
-    const r = JSON.parse(readFileSync(join(dir, f), 'utf8')) as BenchResultV2;
-    latest.set(r.prompt.name, r);
-  }
-  for (const [name, r] of latest) {
-    byPrompt[name] = Object.fromEntries(
-      r.cases.map((c) => [
-        c.id,
-        {
-          verdict: c.verdict,
-          score: c.score,
-          runs: c.runs ?? [],
-          critical: c.critical,
-          missed: c.facts.missed,
-          output: c.output,
-        } satisfies Cell,
-      ]),
-    );
+  for (const root of (roots ?? '').split(',').filter(Boolean)) {
+    const dir = join(resolve(root), 'results-v2');
+    if (!existsSync(dir)) continue;
+    const latest = new Map<string, BenchResultV2>();
+    for (const f of readdirSync(dir)
+      .filter((x) => x.endsWith('.json') && !x.startsWith('ab-'))
+      .sort()) {
+      const r = JSON.parse(readFileSync(join(dir, f), 'utf8')) as BenchResultV2;
+      latest.set(r.prompt.name, r);
+    }
+    for (const [name, r] of latest) {
+      byPrompt[name] = {
+        ...(byPrompt[name] ?? {}),
+        ...Object.fromEntries(
+          r.cases.map((c) => [
+            c.id,
+            {
+              verdict: c.verdict,
+              score: c.score,
+              runs: c.runs ?? [],
+              critical: c.critical,
+              missed: c.facts.missed,
+              output: c.output,
+            } satisfies Cell,
+          ]),
+        ),
+      };
+    }
   }
   return byPrompt;
 }

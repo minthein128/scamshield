@@ -61,8 +61,9 @@ export function sanitizeFacts(facts: FactEntry[] = [], boxes: Box[] = []): FactE
       out.push(f);
       continue;
     }
-    const variants = (f.variants ?? []).map((v) => sanitizeText(v, boxes)).filter((v) => !/\[(NAME|PHONE|HANDLE|REDACTED)\]/.test(v));
-    if (f.variants && !variants.length) continue;
+    const cleaned = (f.variants ?? []).map((v) => sanitizeText(v, boxes));
+    if (cleaned.some((v) => /\[(NAME|PHONE|HANDLE|REDACTED)\]/.test(v))) continue;
+    const variants = cleaned;
     out.push({ ...f, ...(f.variants ? { variants } : {}) });
   }
   return out;

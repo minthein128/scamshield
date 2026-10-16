@@ -36,6 +36,7 @@ Hide:
 - name: every personal name of a person (chat header, sender label, contact name, quoted-reply name, display name in a list), in any script. Also names of Facebook pages or channels that look like a person's name.
 - phone: every phone number, wherever it appears, including inside message text.
 - handle: every username, @handle, account id, bank or wallet account number, email address, and any link that contains a personal profile name or id (for example facebook.com/some.name). Keep scam website links that have no personal name.
+- other: a profile location line (for example 'Lives in ...'), a home or street address, and any login, verification or one-time code or token.
 Do not hide: message text, amounts, times, app buttons, status bar, ordinary words, scam domain names, company names for services such as KPay or Viber.
 For each region return box_2d as [ymin, xmin, ymax, xmax] on a 0 to 1000 scale, kind, and text (the exact characters under the box, empty for avatar and face).
 If the same name appears several times, return every occurrence. Return an empty list only when nothing needs hiding.`;
@@ -49,7 +50,7 @@ const schema = {
         type: 'OBJECT',
         properties: {
           box_2d: { type: 'ARRAY', items: { type: 'INTEGER' } },
-          kind: { type: 'STRING', enum: ['avatar', 'face', 'name', 'phone', 'handle'] },
+          kind: { type: 'STRING', enum: ['avatar', 'face', 'name', 'phone', 'handle', 'other'] },
           text: { type: 'STRING' },
         },
         required: ['box_2d', 'kind', 'text'],
@@ -59,8 +60,19 @@ const schema = {
   required: ['regions'],
 } as Schema;
 
-function pngSize(buf: Buffer): [number, number] {
-  return [buf.readUInt32BE(16), buf.readUInt32BE(20)];
+function imageSize(buf: Buffer): [number, number] {
+  if (buf.readUInt32BE(0) === 0x89504e47) return [buf.readUInt32BE(16), buf.readUInt32BE(20)];
+  let i = 2;
+  while (i < buf.length) {
+    if (buf[i] !== 0xff) {
+      i++;
+      continue;
+    }
+    const marker = buf[i + 1] as number;
+    if (marker >= 0xc0 && marker <= 0xcf && ![0xc4, 0xc8, 0xcc].includes(marker)) return [buf.readUInt16BE(i + 7), buf.readUInt16BE(i + 5)];
+    i += 2 + buf.readUInt16BE(i + 2);
+  }
+  throw new Error('unknown image size');
 }
 
 const files = readdirSync(dir)
@@ -78,7 +90,7 @@ for (const f of files) {
   }
   const imgPath = resolve(dirname(path), doc.file as string);
   const buf = readFileSync(imgPath);
-  const [w, h] = pngSize(buf);
+  const [w, h] = imageSize(buf);
   const pad = Math.max(3, Math.round(Math.min(w, h) * 0.008));
   try {
     const res = await client.models.generateContent({
