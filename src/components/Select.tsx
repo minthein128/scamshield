@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
   title: { color: colors.textPrimary, fontSize: 18, lineHeight: 24, fontFamily: fonts.bold },
   list: { gap: 8 },
   option: { minHeight: 52, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 12, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.white },
-  optionOn: { borderColor: colors.accent, backgroundColor: colors.brandBlueLight },
+  optionOn: { borderColor: colors.accent, backgroundColor: colors.accentSoft },
   optionText: { flex: 1, color: colors.textPrimary, fontSize: 16, lineHeight: 22, fontFamily: fonts.medium },
   optionTextOn: { fontFamily: fonts.bold, color: colors.safeText },
 });

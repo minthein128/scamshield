@@ -1,0 +1,42 @@
+id: marketplace-th
+file: ../public/v2/marketplace-th.png
+language: th
+home: TH
+app: marketplace
+kind: screen
+scam_type: marketplace_fraud
+expected_verdict: danger
+score_range: [60, 100]
+families: [too_good, payment_route, pressure]
+source_text: |
+  ดีลดี มือถือมือสอง
+  ออนไลน์
+  มือถือรุ่นท็อป สภาพ 99% ราคาแค่ 3,900 บาท (ปกติ 25,000)
+  นัดรับของแล้วจ่ายเงินสดได้ไหมคะ
+  ไม่สะดวกนัดรับค่ะ ไม่รับเก็บเงินปลายทาง ไม่ผ่านแอป ต้องโอนมัดจำ 1,000 บาทเข้าบัญชีส่วนตัวก่อน
+  มีคนจองอีก 3 คน ถ้าไม่โอนภายใน 10 นาทีจะขายให้คนอื่น ทักไลน์ @deedee_mobile99
+must_mention:
+  - id: price
+    variants: ["3900", "3,900", "ราคาถูก", "ถูกเกินจริง", "ถูกผิดปกติ"]
+  - id: deposit
+    variants: ["1000", "1,000", "มัดจำ"]
+  - personal_account
+  - id: off_platform
+    variants: ["ไม่ผ่านแอป", "นอกแอป", "นอกแพลตฟอร์ม", "เก็บเงินปลายทาง", "นัดรับ"]
+must_advise:
+  - dont_pay
+  - id: verify_official
+    variants: ["เก็บเงินปลายทาง", "นัดรับ", "ผ่านแอป", "ระบบชำระเงินของแอป"]
+must_not:
+  accuse: [ดีลดี, deedee_mobile99]
+synthetic:
+  layout: chat
+  sender: ดีลดี มือถือมือสอง
+  subtitle: ออนไลน์
+  messages:
+    - { from: them, text: "มือถือรุ่นท็อป สภาพ 99% ราคาแค่ 3,900 บาท (ปกติ 25,000)" }
+    - { from: me, text: "นัดรับของแล้วจ่ายเงินสดได้ไหมคะ" }
+    - { from: them, text: "ไม่สะดวกนัดรับค่ะ ไม่รับเก็บเงินปลายทาง ไม่ผ่านแอป ต้องโอนมัดจำ 1,000 บาทเข้าบัญชีส่วนตัวก่อน" }
+    - { from: them, text: "มีคนจองอีก 3 คน ถ้าไม่โอนภายใน 10 นาทีจะขายให้คนอื่น ทักไลน์ @deedee_mobile99" }
+notes: Fictional seller. Too-cheap phone, refuses meet-up and platform payment, deposit to a personal account.
+public: true

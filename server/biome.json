@@ -23,7 +23,9 @@
   "files": {
     "includes": [
       "**",
-      "!src/data/hotlines.generated.ts"
+      "!src/data/hotlines.generated.ts",
+      "!**/bench/results-v2",
+      "!**/bench/baseline-v2.json"
     ]
   }
 }

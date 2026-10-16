@@ -33,13 +33,13 @@ Slide 2 holds the track name and the criteria map. If the track changes to BFSI,
 
 ## To replace before submission
 
-`img/home.png`, `check.png`, `checking.png`, `verdict.png`, `safe.png` and `family.png` are real captures of the web build at 430px (2x) against the local backend. `shield.png` and `spot.png` are still mockup crops, because the Android overlay cannot run in a browser. Replace them with device screenshots when an APK is available.
+`img/home.png`, `check.png`, `checking.png`, `verdict.png`, `safe.png` and `family.png` are real captures of the web build at 430px (2x) against the local backend. `shield.png` is the in-app Screen shield demo board. `spot.png` is still a mockup crop, because the Android overlay cannot run in a browser. Replace both with device screenshots when an APK is available.
 
 | File | Slide | Content |
 | --- | --- | --- |
 | `img/home.png` | 4 | Home screen |
 | `img/family.png` | 4 | Family circle, missed check-in |
-| `img/shield.png` | 5 | Turn on Shield screen (mockup crop) |
+| `img/shield.png` | 5 | Screen shield how-to, step 1 (in-app demo board) |
 | `img/check.png` | 6 | Check form with a pasted job post |
 | `img/checking.png` | 6 | Checking screen, six stages |
 | `img/verdict.png` | 6 | Danger report with Listen button |

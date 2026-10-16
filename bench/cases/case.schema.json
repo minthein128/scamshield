@@ -1,0 +1,162 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://saferoute.app/bench/case.schema.json",
+  "title": "SafeRoute bench v2 case",
+  "description": "One labelled screenshot. The bench sends the image through the real pipeline and checks the report against these labels.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "file", "language", "source_text", "expected_verdict"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$", "description": "Unique case id. Matches the file name without .yaml." },
+    "file": { "type": "string", "minLength": 1, "description": "Image path relative to this case file (png, jpg or webp, under 4 MB)." },
+    "language": { "enum": ["en", "id", "tl", "my", "th"], "description": "The user's language. The report is requested in it." },
+    "content_language": { "type": "string", "description": "Language of the text in the screenshot when it differs from language." },
+    "kind": {
+      "enum": ["job", "message", "link", "shop", "agency", "screen"],
+      "description": "Shield kind sent with the request. Default screen."
+    },
+    "home": { "type": "string", "description": "User's home country: ISO code (MM) or name." },
+    "destination": { "type": "string", "description": "Destination country or town the message points to, sent as context.destination." },
+    "app": { "type": "string", "description": "Where the screenshot came from, for example telegram, sms, facebook, line." },
+    "scam_type": {
+      "enum": [
+        "job_trafficking",
+        "romance_pig_butchering",
+        "parcel_phishing",
+        "fake_agency",
+        "marketplace_fraud",
+        "investment",
+        "other",
+        "none"
+      ]
+    },
+    "source_text": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Every word visible in the screenshot, typed by the labeller in reading order."
+    },
+    "expected_verdict": { "enum": ["safe", "careful", "danger"] },
+    "score_range": {
+      "type": "array",
+      "items": { "type": "integer", "minimum": 0, "maximum": 100 },
+      "minItems": 2,
+      "maxItems": 2,
+      "description": "Acceptable score band [min, max]. Default: the band of expected_verdict."
+    },
+    "families": {
+      "type": "array",
+      "items": { "enum": ["too_good", "pressure", "payment_route", "identity", "link_risk", "known_bad", "trafficking"] },
+      "description": "Red-flag families a good report raises. Empty for a safe message."
+    },
+    "must_mention": {
+      "type": "array",
+      "description": "Critical facts the report must tell the user. A string names a library fact (passport, fee, telegram, border, link, crypto, personal_account, licence, visa, urgency).",
+      "items": {
+        "anyOf": [
+          { "type": "string", "minLength": 1 },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id"],
+            "properties": {
+              "id": { "type": "string", "minLength": 1 },
+              "variants": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1 },
+              "library": { "type": "boolean", "description": "Also accept the library synonyms for this id." }
+            }
+          }
+        ]
+      }
+    },
+    "must_advise": {
+      "type": "array",
+      "description": "Advice the report must give.",
+      "items": {
+        "anyOf": [
+          { "$ref": "#/$defs/advice" },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id"],
+            "properties": {
+              "id": { "$ref": "#/$defs/advice" },
+              "variants": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+            }
+          }
+        ]
+      }
+    },
+    "must_not": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "accuse": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "description": "Named people, companies or handles the report must not call criminals."
+        },
+        "advice": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "description": "Wrong advice the report must not give, such as pay the fee."
+        }
+      }
+    },
+    "translations": {
+      "type": "array",
+      "description": "The same content in other languages, for the cross-language robustness test.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["language", "source_text"],
+        "properties": {
+          "language": { "type": "string", "minLength": 2 },
+          "source_text": { "type": "string", "minLength": 1 },
+          "file": { "type": "string", "description": "Image of the translated content. Rendered from synthetic when absent." },
+          "synthetic": { "$ref": "#/$defs/scene" }
+        }
+      }
+    },
+    "synthetic": { "$ref": "#/$defs/scene" },
+    "notes": { "type": "string" },
+    "public": {
+      "type": "boolean",
+      "description": "true only for synthetic or fully blurred images. Model text is stored in results only for public cases."
+    },
+    "draft": { "type": "boolean", "description": "Set by bench:draft. A draft is not run until a person checks it and removes this field." }
+  },
+  "$defs": {
+    "advice": {
+      "enum": [
+        "dont_pay",
+        "dont_send_documents",
+        "dont_travel",
+        "verify_trusted",
+        "call_hotline",
+        "dont_click_link",
+        "block_report",
+        "verify_official"
+      ]
+    },
+    "scene": {
+      "type": "object",
+      "description": "Layout for rendering a fictional phone screenshot (bench:render).",
+      "additionalProperties": false,
+      "required": ["layout", "sender", "messages"],
+      "properties": {
+        "layout": { "enum": ["chat", "sms", "post"] },
+        "sender": { "type": "string" },
+        "subtitle": { "type": "string" },
+        "messages": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["from", "text"],
+            "properties": { "from": { "enum": ["them", "me", "time"] }, "text": { "type": "string" } }
+          }
+        }
+      }
+    }
+  }
+}

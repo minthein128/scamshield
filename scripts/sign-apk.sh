@@ -26,6 +26,9 @@ if [ -n "${ANDROID_KEYSTORE_BASE64:-}" ] && [ -n "${ANDROID_KEYSTORE_PASSWORD:-}
     --key-pass env:ANDROID_KEY_PASSWORD \
     "$out"
   echo "signed with release keystore"
+elif [ "${REQUIRE_RELEASE_SIGNING:-}" = "true" ]; then
+  echo "release keystore secrets missing; refusing to keep the debug signature" >&2
+  exit 1
 else
   echo "release keystore secrets missing; keeping debug signature"
 fi

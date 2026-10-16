@@ -28,7 +28,7 @@ export const JobVerdictScreen: React.FC<JobVerdictScreenProps> = ({ onNavigate }
         </View>
         <View style={{ alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row' }}>
           <View style={{ alignItems: 'center', gap: 14, flexDirection: 'row' }}>
-            <View style={{ width: 68, height: 68, borderRadius: 34, backgroundColor: '#C2410C', alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
+            <View style={{ width: 68, height: 68, borderRadius: 34, backgroundColor: '#9F1239', alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
               <Svg width={36} height={36} viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
                 <Path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" />
                 <Path d="M12 9v4" />
@@ -36,8 +36,8 @@ export const JobVerdictScreen: React.FC<JobVerdictScreenProps> = ({ onNavigate }
               </Svg>
             </View>
             <View style={{ flexDirection: 'column' }}>
-              <Text style={{ color: '#9A3412', fontSize: 34, fontFamily: theme.fonts.extraBold, letterSpacing: -0.5, lineHeight: 37, includeFontPadding: false }}>Danger</Text>
-              <Text style={{ color: '#9A3412', fontSize: 15, fontFamily: theme.fonts.semiBold, lineHeight: 20, includeFontPadding: false }}>Job offer abroad</Text>
+              <Text style={{ color: '#881337', fontSize: 34, fontFamily: theme.fonts.extraBold, letterSpacing: -0.5, lineHeight: 37, includeFontPadding: false }}>Danger</Text>
+              <Text style={{ color: '#881337', fontSize: 15, fontFamily: theme.fonts.semiBold, lineHeight: 20, includeFontPadding: false }}>Job offer abroad</Text>
             </View>
           </View>
           <Text style={{ backgroundColor: '#EEF2F6', paddingVertical: 6, paddingHorizontal: 10, borderRadius: 999, color: '#334155', fontSize: 13, fontFamily: theme.fonts.bold, lineHeight: 18, includeFontPadding: false }}>Bahasa</Text>
@@ -66,34 +66,34 @@ export const JobVerdictScreen: React.FC<JobVerdictScreenProps> = ({ onNavigate }
           </TouchableOpacity>
         ) : null}
         <View style={{ gap: 10, flexDirection: 'row' }}>
-          <View style={{ backgroundColor: '#FFF1E8', borderRadius: 16, paddingVertical: 14, paddingHorizontal: 8, flexDirection: 'column', alignItems: 'center', gap: 8, flex: 1 }}>
-            <Svg width={34} height={34} viewBox="0 0 24 24" fill="none" stroke="#9A3412" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+          <View style={{ backgroundColor: '#FFF0F2', borderRadius: 16, paddingVertical: 14, paddingHorizontal: 8, flexDirection: 'column', alignItems: 'center', gap: 8, flex: 1 }}>
+            <Svg width={34} height={34} viewBox="0 0 24 24" fill="none" stroke="#881337" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
               <Ellipse cx={12} cy={6} rx={7} ry={3} />
               <Path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6" />
               <Path d="M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6" />
             </Svg>
-            <Text style={{ color: '#7C2D12', textAlign: 'center', lineHeight: 18, fontFamily: theme.fonts.bold, includeFontPadding: false, fontSize: 14 }}>Pay too good to be true</Text>
+            <Text style={{ color: '#6F0F2C', textAlign: 'center', lineHeight: 18, fontFamily: theme.fonts.bold, includeFontPadding: false, fontSize: 14 }}>Pay too good to be true</Text>
           </View>
-          <View style={{ backgroundColor: '#FFF1E8', borderRadius: 16, paddingVertical: 14, paddingHorizontal: 8, flexDirection: 'column', alignItems: 'center', gap: 8, flex: 1 }}>
-            <Svg width={34} height={34} viewBox="0 0 24 24" fill="none" stroke="#9A3412" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+          <View style={{ backgroundColor: '#FFF0F2', borderRadius: 16, paddingVertical: 14, paddingHorizontal: 8, flexDirection: 'column', alignItems: 'center', gap: 8, flex: 1 }}>
+            <Svg width={34} height={34} viewBox="0 0 24 24" fill="none" stroke="#881337" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
               <Path d="M4 21V5l8-3 8 3v16" />
               <Path d="M9 21v-4h6v4" />
               <Path d="M9 9l6 6" />
               <Path d="M15 9l-6 6" />
             </Svg>
-            <Text style={{ color: '#7C2D12', textAlign: 'center', lineHeight: 18, fontFamily: theme.fonts.bold, includeFontPadding: false, fontSize: 14 }}>Company not found</Text>
+            <Text style={{ color: '#6F0F2C', textAlign: 'center', lineHeight: 18, fontFamily: theme.fonts.bold, includeFontPadding: false, fontSize: 14 }}>Company not found</Text>
           </View>
-          <View style={{ backgroundColor: '#FFF1E8', borderRadius: 16, paddingVertical: 14, paddingHorizontal: 8, flexDirection: 'column', alignItems: 'center', gap: 8, flex: 1 }}>
-            <Svg width={34} height={34} viewBox="0 0 24 24" fill="none" stroke="#9A3412" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+          <View style={{ backgroundColor: '#FFF0F2', borderRadius: 16, paddingVertical: 14, paddingHorizontal: 8, flexDirection: 'column', alignItems: 'center', gap: 8, flex: 1 }}>
+            <Svg width={34} height={34} viewBox="0 0 24 24" fill="none" stroke="#881337" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
               <Rect x={5} y={3} width={14} height={18} rx={2} />
               <Circle cx={12} cy={10} r={3} />
               <Path d="M9 16h6" />
             </Svg>
-            <Text style={{ color: '#7C2D12', textAlign: 'center', lineHeight: 18, fontFamily: theme.fonts.bold, includeFontPadding: false, fontSize: 14 }}>Asks for your passport</Text>
+            <Text style={{ color: '#6F0F2C', textAlign: 'center', lineHeight: 18, fontFamily: theme.fonts.bold, includeFontPadding: false, fontSize: 14 }}>Asks for your passport</Text>
           </View>
         </View>
         <Text style={{ flex: 1, color: '#0F1B2D', includeFontPadding: false, fontSize: 14, lineHeight: 19, fontFamily: theme.fonts.regular }}></Text>
-        <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('exit')} style={{ height: 60, borderRadius: 16, backgroundColor: '#1D4ED8', alignItems: 'center', justifyContent: 'center', gap: 10, flexDirection: 'row' }}>
+        <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('exit')} style={{ height: 60, borderRadius: 16, backgroundColor: '#1F1A17', alignItems: 'center', justifyContent: 'center', gap: 10, flexDirection: 'row' }}>
           <Svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
             <Circle cx={9} cy={8} r={3.5} />
             <Path d="M2.5 20a6.5 6.5 0 0 1 13 0" />

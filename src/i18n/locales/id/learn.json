@@ -125,8 +125,8 @@
         "caption": "Gaji besar, tiket pesawat gratis, dan tanpa syarat pengalaman."
       },
       "e2": {
-        "title": "Ketuk perisai",
-        "caption": "Perisai melihat info lowongan di layar Anda. Perisai meminta izin membuka tulisan yang tersembunyi."
+        "title": "Ketuk boneka",
+        "caption": "Boneka melihat postingan di layar Anda. Boneka meminta untuk membuka teks yang tersembunyi."
       },
       "e3": {
         "title": "SafeRoute memeriksanya",
@@ -143,7 +143,7 @@
         "caption": "Kata-kata ramah, lalu mulai membahas keuntungan mudah."
       },
       "e2": {
-        "title": "Ketuk perisai",
+        "title": "Ketuk boneka",
         "caption": "SafeRoute butuh pesan yang lebih lama untuk melihat cerita lengkapnya."
       },
       "e3": {
@@ -241,7 +241,7 @@
   "shieldSteps": {
     "s1": {
       "title": "Nyalakan Screen shield",
-      "caption": "Tombol kecil akan muncul di tepi layar Anda."
+      "caption": "Boneka Pyit Taing Htaung kecil ada di samping layar Anda."
     },
     "s2": {
       "title": "Ketuk jika ada yang aneh",

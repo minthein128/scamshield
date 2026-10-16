@@ -7,7 +7,9 @@
   "language": {
     "title": "เลือกภาษาของคุณ",
     "body": "SafeRoute จะแสดงเมนู เขียนรายงาน และอ่านคำเตือนเป็นภาษานี้ คุณสามารถเปลี่ยนภาษาได้ในภายหลัง",
-    "age": "SafeRoute สำหรับผู้มีอายุ 18 ปีขึ้นไป"
+    "age": "SafeRoute สำหรับผู้มีอายุ 18 ปีขึ้นไป",
+    "tagline": "เหมือนตุ๊กตา Pyit Taing Htaung เราช่วยให้คุณยืนหยัดได้เสมอ",
+    "heroA11y": "SafeRoute กับตุ๊กตา Pyit Taing Htaung"
   },
   "countries": {
     "fromTitle": "คุณมาจากประเทศไหน",

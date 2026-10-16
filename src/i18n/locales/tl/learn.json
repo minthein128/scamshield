@@ -125,8 +125,8 @@
         "caption": "Malaking sahod, libreng flight at walang kailangang karanasan."
       },
       "e2": {
-        "title": "I-tap ang shield",
-        "caption": "Nakikita ng shield ang post sa iyong screen. Humihiling ito na buksan ang nakatagong text."
+        "title": "Pindutin ang manika",
+        "caption": "Nakikita ng manika ang post sa iyong screen. Nagtatanong ito upang buksan ang nakatagong teksto."
       },
       "e3": {
         "title": "Sinusuri ito ng SafeRoute",
@@ -143,7 +143,7 @@
         "caption": "Mababait na salita, pagkatapos ay usapan tungkol sa madaling kita."
       },
       "e2": {
-        "title": "Pindutin ang shield",
+        "title": "Pindutin ang manika",
         "caption": "Kailangan ng SafeRoute ang mga naunang mensahe para makita ang buong kwento."
       },
       "e3": {
@@ -241,7 +241,7 @@
   "shieldSteps": {
     "s1": {
       "title": "I-on ang shield",
-      "caption": "May maliit na button sa gilid ng iyong screen."
+      "caption": "May maliit na manikang Pyit Taing Htaung sa gilid ng iyong screen."
     },
     "s2": {
       "title": "I-tap ito sa anumang kakaiba",

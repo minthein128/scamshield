@@ -22,8 +22,8 @@ export const ScamTaxonomyScreen: React.FC<ScamTaxonomyScreenProps> = ({ onNaviga
         <Text style={{ backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#DCE3EC', borderRadius: 999, paddingVertical: 6, paddingHorizontal: 12, color: '#0F1B2D', fontSize: 14, lineHeight: 19, fontFamily: theme.fonts.regular, includeFontPadding: false }}><Text>Payment route</Text> · off-platform, personal account, top-up</Text>
         <Text style={{ backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#DCE3EC', borderRadius: 999, paddingVertical: 6, paddingHorizontal: 12, color: '#0F1B2D', fontSize: 14, lineHeight: 19, fontFamily: theme.fonts.regular, includeFontPadding: false }}><Text>Identity</Text> · unknown, new or unverified</Text>
         <Text style={{ backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#DCE3EC', borderRadius: 999, paddingVertical: 6, paddingHorizontal: 12, color: '#0F1B2D', fontSize: 14, lineHeight: 19, fontFamily: theme.fonts.regular, includeFontPadding: false }}><Text>Link risk</Text> · odd domain, young site</Text>
-        <Text style={{ backgroundColor: '#FFF1E8', borderWidth: 1, borderColor: '#C2410C', borderRadius: 999, paddingVertical: 6, paddingHorizontal: 12, color: '#7C2D12', fontSize: 14, lineHeight: 19, fontFamily: theme.fonts.regular, includeFontPadding: false }}><Text>Known bad</Text> · Web Risk hit, reported before</Text>
-        <Text style={{ backgroundColor: '#FFF1E8', borderWidth: 1, borderColor: '#C2410C', borderRadius: 999, paddingVertical: 6, paddingHorizontal: 12, color: '#7C2D12', fontSize: 14, lineHeight: 19, fontFamily: theme.fonts.regular, includeFontPadding: false }}><Text>Trafficking</Text> · passport, visa, border route</Text>
+        <Text style={{ backgroundColor: '#FFF0F2', borderWidth: 1, borderColor: '#9F1239', borderRadius: 999, paddingVertical: 6, paddingHorizontal: 12, color: '#6F0F2C', fontSize: 14, lineHeight: 19, fontFamily: theme.fonts.regular, includeFontPadding: false }}><Text>Known bad</Text> · Web Risk hit, reported before</Text>
+        <Text style={{ backgroundColor: '#FFF0F2', borderWidth: 1, borderColor: '#9F1239', borderRadius: 999, paddingVertical: 6, paddingHorizontal: 12, color: '#6F0F2C', fontSize: 14, lineHeight: 19, fontFamily: theme.fonts.regular, includeFontPadding: false }}><Text>Trafficking</Text> · passport, visa, border route</Text>
       </View>
       <View style={{ gap: 28, flex: 1, flexDirection: 'row' }}>
         <View style={{ flexDirection: 'column', gap: 14, flex: 1 }}>
@@ -38,7 +38,7 @@ export const ScamTaxonomyScreen: React.FC<ScamTaxonomyScreenProps> = ({ onNaviga
             <Text style={{ color: '#0F1B2D', fontSize: 18, fontFamily: theme.fonts.extraBold, lineHeight: 24, includeFontPadding: false }}>Trafficking recruitment</Text>
             <Text style={{ color: '#334155', fontSize: 14, lineHeight: 21, fontFamily: theme.fonts.regular, includeFontPadding: false }}>A fake overseas job moves people across a border into a scam compound.</Text>
             <View style={{ flexWrap: 'wrap', gap: 6, flexDirection: 'row' }}>
-              <Text style={{ backgroundColor: '#FFF1E8', paddingVertical: 3, paddingHorizontal: 8, borderRadius: 6, color: '#7C2D12', fontSize: 12, fontFamily: theme.fonts.bold, lineHeight: 16, includeFontPadding: false }}>Trafficking</Text>
+              <Text style={{ backgroundColor: '#FFF0F2', paddingVertical: 3, paddingHorizontal: 8, borderRadius: 6, color: '#6F0F2C', fontSize: 12, fontFamily: theme.fonts.bold, lineHeight: 16, includeFontPadding: false }}>Trafficking</Text>
               <Text style={{ backgroundColor: '#EEF2F6', paddingVertical: 3, paddingHorizontal: 8, borderRadius: 6, color: '#334155', fontSize: 12, fontFamily: theme.fonts.bold, lineHeight: 16, includeFontPadding: false }}>Too good</Text>
               <Text style={{ backgroundColor: '#EEF2F6', paddingVertical: 3, paddingHorizontal: 8, borderRadius: 6, color: '#334155', fontSize: 12, fontFamily: theme.fonts.bold, lineHeight: 16, includeFontPadding: false }}>Pressure</Text>
             </View>
@@ -76,10 +76,10 @@ export const ScamTaxonomyScreen: React.FC<ScamTaxonomyScreenProps> = ({ onNaviga
             </Svg>
             <Text style={{ color: '#FFFFFF', lineHeight: 27, fontFamily: theme.fonts.extraBold, includeFontPadding: false, fontSize: 20 }}>Message shield</Text>
           </View>
-          <View style={{ backgroundColor: '#FFFFFF', borderWidth: 2, borderColor: '#C2410C', borderRadius: 16, paddingVertical: 15, paddingHorizontal: 17, flexDirection: 'column', gap: 8 }}>
+          <View style={{ backgroundColor: '#FFFFFF', borderWidth: 2, borderColor: '#9F1239', borderRadius: 16, paddingVertical: 15, paddingHorizontal: 17, flexDirection: 'column', gap: 8 }}>
             <View style={{ alignItems: 'center', justifyContent: 'space-between', gap: 8, flexDirection: 'row' }}>
               <Text style={{ color: '#0F1B2D', fontSize: 18, fontFamily: theme.fonts.extraBold, lineHeight: 24, includeFontPadding: false }}>Gambling bonus lure</Text>
-              <Text style={{ backgroundColor: '#C2410C', paddingVertical: 3, paddingHorizontal: 8, borderRadius: 6, color: '#FFFFFF', fontSize: 12, fontFamily: theme.fonts.extraBold, lineHeight: 16, includeFontPadding: false }}>Case study</Text>
+              <Text style={{ backgroundColor: '#9F1239', paddingVertical: 3, paddingHorizontal: 8, borderRadius: 6, color: '#FFFFFF', fontSize: 12, fontFamily: theme.fonts.extraBold, lineHeight: 16, includeFontPadding: false }}>Case study</Text>
             </View>
             <Text style={{ color: '#334155', fontSize: 14, lineHeight: 21, fontFamily: theme.fonts.regular, includeFontPadding: false }}>An unknown sender offers free credit and deposit bonuses on an illegal gambling site to take the deposit and personal data.</Text>
             <View style={{ flexWrap: 'wrap', gap: 6, flexDirection: 'row' }}>
@@ -95,7 +95,7 @@ export const ScamTaxonomyScreen: React.FC<ScamTaxonomyScreenProps> = ({ onNaviga
             <View style={{ flexWrap: 'wrap', gap: 6, flexDirection: 'row' }}>
               <Text style={{ backgroundColor: '#EEF2F6', paddingVertical: 3, paddingHorizontal: 8, borderRadius: 6, color: '#334155', fontSize: 12, fontFamily: theme.fonts.bold, lineHeight: 16, includeFontPadding: false }}>Link risk</Text>
               <Text style={{ backgroundColor: '#EEF2F6', paddingVertical: 3, paddingHorizontal: 8, borderRadius: 6, color: '#334155', fontSize: 12, fontFamily: theme.fonts.bold, lineHeight: 16, includeFontPadding: false }}>Pressure</Text>
-              <Text style={{ backgroundColor: '#FFF1E8', paddingVertical: 3, paddingHorizontal: 8, borderRadius: 6, color: '#7C2D12', fontSize: 12, fontFamily: theme.fonts.bold, lineHeight: 16, includeFontPadding: false }}>Known bad</Text>
+              <Text style={{ backgroundColor: '#FFF0F2', paddingVertical: 3, paddingHorizontal: 8, borderRadius: 6, color: '#6F0F2C', fontSize: 12, fontFamily: theme.fonts.bold, lineHeight: 16, includeFontPadding: false }}>Known bad</Text>
             </View>
           </View>
           <View style={{ backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#DCE3EC', borderRadius: 16, paddingVertical: 16, paddingHorizontal: 18, flexDirection: 'column', gap: 8 }}>
@@ -133,7 +133,7 @@ export const ScamTaxonomyScreen: React.FC<ScamTaxonomyScreenProps> = ({ onNaviga
               <Text style={{ backgroundColor: '#EEF2F6', paddingVertical: 3, paddingHorizontal: 8, borderRadius: 6, color: '#334155', fontSize: 12, fontFamily: theme.fonts.bold, lineHeight: 16, includeFontPadding: false }}>Too good</Text>
               <Text style={{ backgroundColor: '#EEF2F6', paddingVertical: 3, paddingHorizontal: 8, borderRadius: 6, color: '#334155', fontSize: 12, fontFamily: theme.fonts.bold, lineHeight: 16, includeFontPadding: false }}>Payment route</Text>
               <Text style={{ backgroundColor: '#EEF2F6', paddingVertical: 3, paddingHorizontal: 8, borderRadius: 6, color: '#334155', fontSize: 12, fontFamily: theme.fonts.bold, lineHeight: 16, includeFontPadding: false }}>Identity</Text>
-              <Text style={{ backgroundColor: '#FFF1E8', paddingVertical: 3, paddingHorizontal: 8, borderRadius: 6, color: '#7C2D12', fontSize: 12, fontFamily: theme.fonts.bold, lineHeight: 16, includeFontPadding: false }}>Known bad</Text>
+              <Text style={{ backgroundColor: '#FFF0F2', paddingVertical: 3, paddingHorizontal: 8, borderRadius: 6, color: '#6F0F2C', fontSize: 12, fontFamily: theme.fonts.bold, lineHeight: 16, includeFontPadding: false }}>Known bad</Text>
             </View>
           </View>
           <View style={{ backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#DCE3EC', borderRadius: 16, paddingVertical: 16, paddingHorizontal: 18, flexDirection: 'column', gap: 8 }}>

@@ -1,0 +1,36 @@
+id: hardneg-job-en
+file: ../public/v2/hardneg-job-en.png
+language: en
+home: MM
+destination: Malaysia
+app: chat
+kind: screen
+scam_type: none
+expected_verdict: safe
+score_range: [0, 40]
+families: []
+source_text: |
+  Harbourview Hotel HR
+  online
+  Hello Aung, congratulations again on the housekeeping job in Penang. Your contract is in the official recruitment portal.
+  Important: there is no recruitment fee. Please do not pay anyone who asks for money in our name. Keep your passport with you at all times; we never hold workers' passports.
+  Your visa interview is at the embassy on 12 November. Bring your own passport and the printed contract.
+  Questions: call the office number listed on the government register of licensed agencies.
+  Thank you, I will prepare everything.
+must_mention:
+  - id: no_fee
+    variants: ["no recruitment fee", "no fee", "no fees", "not ask for money", "does not ask for money", "doesn't ask for money", "no payment", "free of charge"]
+must_advise: [verify_official]
+must_not:
+  accuse: [Harbourview Hotel]
+synthetic:
+  layout: chat
+  sender: Harbourview Hotel HR
+  messages:
+    - { from: them, text: "Hello Aung, congratulations again on the housekeeping job in Penang. Your contract is in the official recruitment portal." }
+    - { from: them, text: "Important: there is no recruitment fee. Please do not pay anyone who asks for money in our name. Keep your passport with you at all times; we never hold workers' passports." }
+    - { from: them, text: "Your visa interview is at the embassy on 12 November. Bring your own passport and the printed contract." }
+    - { from: them, text: "Questions: call the office number listed on the government register of licensed agencies." }
+    - { from: me, text: "Thank you, I will prepare everything." }
+notes: Hard negative. A legitimate employer message full of trigger words (passport, fee, visa, embassy) that warns against the scam pattern.
+public: true

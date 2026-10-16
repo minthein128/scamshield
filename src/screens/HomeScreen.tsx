@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
   helpBody: { color: colors.dangerDark, fontSize: 14, lineHeight: 20, fontFamily: fonts.regular },
   pair: { flexDirection: 'row', gap: 16, alignItems: 'stretch' },
   pairItem: { flex: 1, flexBasis: 0, minWidth: 0 },
-  rowIcon: { width: 48, height: 48, borderRadius: 24, backgroundColor: colors.brandBlueLight, alignItems: 'center', justifyContent: 'center' },
+  rowIcon: { width: 48, height: 48, borderRadius: 24, backgroundColor: colors.brandGoldSoft, alignItems: 'center', justifyContent: 'center' },
 });
 
 export default HomeScreen;

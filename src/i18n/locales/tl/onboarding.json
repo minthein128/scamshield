@@ -7,7 +7,9 @@
   "language": {
     "title": "Piliin ang iyong wika",
     "body": "Ipapakita ng SafeRoute ang app at isusulat ang mga ulat at binibigkas na babala sa wikang ito. Maaari mo itong baguhin mamaya.",
-    "age": "Ang SafeRoute ay para sa mga taong may edad na 18 pataas."
+    "age": "Ang SafeRoute ay para sa mga taong may edad na 18 pataas.",
+    "tagline": "Tulad ng manikang Pyit Taing Htaung, tinutulungan ka naming manatiling nakatayo.",
+    "heroA11y": "SafeRoute, kasama ang manikang Pyit Taing Htaung"
   },
   "countries": {
     "fromTitle": "Taga-saan ka?",
