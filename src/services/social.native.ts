@@ -22,6 +22,7 @@ export async function signInWithGoogle(auth: Auth): Promise<void> {
     await linkOrSignIn(auth, GoogleAuthProvider.credential(idToken));
   } catch (e) {
     if (isErrorWithCode(e) && e.code === statusCodes.SIGN_IN_CANCELLED) throw cancelled();
+    console.warn('Google sign-in failed', (e as { code?: unknown })?.code, (e as Error)?.message);
     throw e;
   }
 }
