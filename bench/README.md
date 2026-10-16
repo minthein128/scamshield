@@ -167,6 +167,26 @@ With 12 seed cases a few points of difference is noise. Trust a difference when 
 
 `bench/cases/*.yaml` holds 24 fictional, publishable cases rendered to `bench/public/v2/` by `npm run bench:render`. 14 are risky: job trafficking (en, my, th), fake agency (my x2), pig butchering (en, th, my), parcel SMS (id, tl, th), a task scam (id) and two marketplace scams (th, en). 10 are safe, and 7 of those are hard negatives: real-looking employer, agency, bank, payslip and advisory messages that use the scam words (fee, passport, OTP, recruiter). There are 6 Burmese and 5 Thai cases, and four cases have translations. No real people, numbers or companies.
 
+## Real-data workflow
+
+Real screenshots stay outside git. Keep every image, case file, result and report under one private folder (mode 700) and point the commands at it. Commands run in `server/` and need `GEMINI_API_KEY`.
+
+| Step | Command | Output |
+| --- | --- | --- |
+| Draft labels | `npm run bench:label-real -- --dir IMAGES --out CASES` | one case file per image, `label_status: draft`, flags for unsure text and numbers |
+| Propose redaction boxes | `npm run bench:boxes -- --cases CASES` | `redaction_boxes` in each case file |
+| Redact | `uv run bench/real/redact.py --cases CASES --out REDACTED` | redacted images from the boxes |
+| Sanitised cases | `npm run bench:redact-cases -- --cases CASES --redacted REDACTED --out CASES_REDACTED` | case files for the redacted images, names and numbers replaced by placeholders |
+| Bench | `npm run bench:ab -- --cases CASES --out OUT --set NAME --b ../bench/prompts/facts-first.yaml --repeats 3 --variants none` | results, report and response cache under `OUT` |
+| Summary | `npm run bench:real-report -- --orig OUT_ORIG --redacted OUT_REDACTED` | critical failures, wrong numbers, verdict changes between original and redacted |
+| Review page | `npm run bench:gallery -- --cases CASES --out DIR/index.html --orig OUT_ORIG --redacted OUT_REDACTED` | offline page with CSV export |
+| Package | `npm run bench:package-hf -- --out FOLDER --cases CASES --redacted REDACTED` | local imagefolder dataset and card |
+| Publish | `scripts/publish-hf.sh OWNER/NAME [--dry-run]` | creates the dataset repo and uploads the folder |
+
+`--cases-dir` is an alias of `--cases`. `--out DIR` moves the results, the report and the response cache to `DIR`, so a private run leaves `bench/results-v2/` and `bench/RESULTS-v2.md` alone. With `--out`, results keep the model text for private cases, so keep `DIR` out of git.
+
+A person sets `label_status: reviewed` after checking each label, and `redaction: checked` after looking at each redacted image. The publish script refuses to run while any real image lacks `redaction: checked`. Draft labels make real-set scores provisional.
+
 ## Screenshot bench v1
 
 The v1 bench checks the verdict only, against a running server (`--api`) or `--inprocess`.
@@ -188,5 +208,7 @@ The v1 bench checks the verdict only, against a running server (`--api`) or `--i
 | `v2/cases.ts`, `v2/schema.ts`, `v2/validate.ts`, `cases/case.schema.json` | case loading and validation |
 | `v2/judge.ts`, `v2/draft.ts` | optional LLM judge, Gemini case drafts |
 | `v2/report.ts`, `RESULTS-v2.md` | v2 report |
+| `real/*.ts`, `real/redact.py`, `real/dataset-card.md` | real-data labelling, redaction, review page and dataset packaging |
+| `../scripts/publish-hf.sh` | guarded upload of the packaged dataset |
 | `v2/match.vtest.ts` | matcher unit tests (run by `npm test` in `server/`) |
 | `run.ts`, `labels.ts`, `report.ts`, `lib.ts` | v1 bench |
