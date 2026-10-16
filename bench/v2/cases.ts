@@ -49,6 +49,10 @@ export interface CaseFile {
   notes?: string;
   public?: boolean;
   draft?: boolean;
+  label_status?: 'draft' | 'reviewed';
+  labelled_by?: string;
+  redaction?: string;
+  redaction_boxes?: { x: number; y: number; w: number; h: number; kind?: string; text?: string; mode?: string }[];
 }
 
 export interface Translation {

@@ -122,7 +122,34 @@
       "type": "boolean",
       "description": "true only for synthetic or fully blurred images. Model text is stored in results only for public cases."
     },
-    "draft": { "type": "boolean", "description": "Set by bench:draft. A draft is not run until a person checks it and removes this field." }
+    "draft": {
+      "type": "boolean",
+      "description": "Set by bench:draft. A draft is not run until a person checks it and removes this field."
+    },
+    "label_status": { "enum": ["draft", "reviewed"], "description": "Real-data cases: draft until a person checks every field." },
+    "labelled_by": { "type": "string", "description": "Who or what wrote the labels, for example gemini-3.1-pro-preview or a person." },
+    "redaction": { "type": "string", "description": "Real-data cases: checked, or a note on what is still open." },
+    "redaction_boxes": {
+      "type": "array",
+      "description": "Regions blurred in the published copy, in pixels of the original image.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["x", "y", "w", "h"],
+        "properties": {
+          "x": { "type": "integer", "minimum": 0 },
+          "y": { "type": "integer", "minimum": 0 },
+          "w": { "type": "integer", "minimum": 1 },
+          "h": { "type": "integer", "minimum": 1 },
+          "kind": { "enum": ["avatar", "face", "name", "phone", "handle", "other"] },
+          "text": {
+            "type": "string",
+            "description": "The exact text under the box. Private case files only; the published metadata drops it."
+          },
+          "mode": { "enum": ["blur", "box"] }
+        }
+      }
+    }
   },
   "$defs": {
     "advice": {

@@ -272,9 +272,10 @@ export function scoreCase(c: Case, base: RunRecord, variants: RunRecord[]): Case
     critical,
     uncapped,
     composite: score,
-    output: c.public
-      ? { title: res.title, summary: res.summary, spokenWarning: res.spokenWarning, flags, actions: res.actions }
-      : undefined,
+    output:
+      c.public || process.env.BENCH_OUT_DIR
+        ? { title: res.title, summary: res.summary, spokenWarning: res.spokenWarning, flags, actions: res.actions }
+        : undefined,
   };
 }
 

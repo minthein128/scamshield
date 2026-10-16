@@ -2,7 +2,7 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { parseArgs } from '../lib.js';
 import { compareRuns } from './ab-core.js';
-import { COMMON_HELP, optionsFromFlags, printSummary, RESULTS_V2, runBench, writeResult } from './bench.js';
+import { COMMON_HELP, optionsFromFlags, printSummary, resultsDirV2, runBench, writeResult } from './bench.js';
 import { writeReportV2 } from './report.js';
 
 const flags = parseArgs(process.argv.slice(2));
@@ -29,9 +29,13 @@ try {
   printSummary(b);
   const aFile = writeResult(a);
   const bFile = writeResult(b);
-  const ab = compareRuns({ ...a, file: relative(RESULTS_V2, aFile) }, { ...b, file: relative(RESULTS_V2, bFile) }, Number(flags.tie ?? 1));
-  mkdirSync(RESULTS_V2, { recursive: true });
-  const out = join(RESULTS_V2, `ab-${b.date}-${a.prompt.name}-vs-${b.prompt.name}.json`);
+  const ab = compareRuns(
+    { ...a, file: relative(resultsDirV2(), aFile) },
+    { ...b, file: relative(resultsDirV2(), bFile) },
+    Number(flags.tie ?? 1),
+  );
+  mkdirSync(resultsDirV2(), { recursive: true });
+  const out = join(resultsDirV2(), `ab-${b.date}-${a.prompt.name}-vs-${b.prompt.name}.json`);
   writeFileSync(out, `${JSON.stringify(ab, null, 2)}\n`);
   writeReportV2();
   console.log(`\nA/B ${a.prompt.name} -> ${b.prompt.name}`);
@@ -45,7 +49,7 @@ try {
   console.log(
     `  paired: B wins ${ab.paired.wins}, loses ${ab.paired.losses}, ties ${ab.paired.ties}, sign test p=${ab.paired.p.toFixed(3)}. ${ab.paired.note}`,
   );
-  console.log(`wrote ${relative(process.cwd(), out)} and bench/RESULTS-v2.md`);
+  console.log(`wrote ${relative(process.cwd(), out)} and the report`);
 } catch (err) {
   console.error(`bench:ab: ${(err as Error).message}`);
   process.exit(2);

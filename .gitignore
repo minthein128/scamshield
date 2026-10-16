@@ -27,3 +27,12 @@ bench/private/
 server/eval/candidates.json
 
 bench/.cache/
+
+bench/real/original/
+bench/real/redacted/
+bench/real/cases*/
+bench/real/review/
+bench/real/*.private.json
+scamshield-datasets/
+saferoute-scam-screenshots/
+hf-token

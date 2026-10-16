@@ -1,6 +1,6 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
-import { extname, join } from 'node:path';
+import { extname, join, resolve } from 'node:path';
 import { BENCH_DIR, IMAGE_EXT } from '../lib.js';
 import { CASES_DIR, type Case, legacyCases, loadCases } from './cases.js';
 import { JUDGE_MODEL, judge } from './judge.js';
@@ -9,7 +9,9 @@ import { createRunner, loadPromptVariant, pool, type RunInput } from './runner.j
 import type { CaseScore, RunRecord } from './types.js';
 import { parsePlan, planVariants, type VariantPlan } from './variants.js';
 
-export const RESULTS_V2 = join(BENCH_DIR, 'results-v2');
+/** BENCH_OUT_DIR (set by --out) moves results, report and cache out of git, for private case sets. */
+export const outRoot = () => process.env.BENCH_OUT_DIR || '';
+export const resultsDirV2 = () => (outRoot() ? join(outRoot(), 'results-v2') : join(BENCH_DIR, 'results-v2'));
 export const BASELINE = join(BENCH_DIR, 'baseline-v2.json');
 
 export interface BenchOptions {
@@ -168,8 +170,8 @@ export async function runBench(opts: BenchOptions): Promise<BenchResultV2> {
 export const resultName = (r: BenchResultV2) => `${r.date}-${r.model}-${r.prompt.name}-${r.set}${r.origin === 'ab' ? '-ab' : ''}.json`;
 
 export function writeResult(r: BenchResultV2, name = resultName(r)): string {
-  mkdirSync(RESULTS_V2, { recursive: true });
-  const path = join(RESULTS_V2, name);
+  mkdirSync(resultsDirV2(), { recursive: true });
+  const path = join(resultsDirV2(), name);
   writeFileSync(path, `${JSON.stringify(r, null, 2)}\n`);
   return path;
 }
@@ -195,7 +197,8 @@ export function printSummary(r: BenchResultV2): void {
   );
 }
 
-export const COMMON_HELP = `  --cases DIR            case files (default bench/cases)
+export const COMMON_HELP = `  --cases DIR            case files (default bench/cases); --cases-dir is an alias, the DIR can be outside git
+  --out DIR              write results, report and response cache under DIR instead of bench/ (for private sets)
   --labels FILE          run an old labels.csv instead (verdict metrics only)
   --only id,id           run these case ids
   --model NAME           extraction model (default: GEMINI_MODEL or the server default)
@@ -212,8 +215,9 @@ export const COMMON_HELP = `  --cases DIR            case files (default bench/c
 const str = (v: string | true | undefined) => (typeof v === 'string' ? v : undefined);
 
 export function optionsFromFlags(flags: Record<string, string | true>): BenchOptions {
+  if (typeof flags.out === 'string') process.env.BENCH_OUT_DIR = resolve(flags.out);
   return {
-    cases: str(flags.cases),
+    cases: str(flags['cases-dir']) ?? str(flags.cases),
     labels: str(flags.labels),
     only: str(flags.only)?.split(','),
     promptVariant: str(flags['prompt-variant']),

@@ -3,12 +3,12 @@ import { join } from 'node:path';
 import { BENCH_DIR } from '../lib.js';
 import type { AbResult } from './ab-core.js';
 import type { BenchResultV2 } from './bench.js';
-import { RESULTS_V2 } from './bench.js';
+import { outRoot, resultsDirV2 } from './bench.js';
 import { CAPS, COST, type MetricKey, WEIGHTS } from './metrics.js';
 import type { CaseScore } from './types.js';
 import { describeVariant } from './variants.js';
 
-export const REPORT_V2 = join(BENCH_DIR, 'RESULTS-v2.md');
+export const reportPathV2 = () => (outRoot() ? join(outRoot(), 'RESULTS-v2.md') : join(BENCH_DIR, 'RESULTS-v2.md'));
 
 const pct = (x: number | null | undefined, d = 0) => (x === null || x === undefined ? 'n/a' : `${(100 * x).toFixed(d)}%`);
 const num = (x: number | null | undefined, d = 1) => (x === null || x === undefined ? 'n/a' : x.toFixed(d));
@@ -33,21 +33,21 @@ export const METRIC_LABEL: Record<MetricKey, string> = {
 };
 
 export function loadResults(): (BenchResultV2 & { file: string })[] {
-  if (!existsSync(RESULTS_V2)) return [];
-  return readdirSync(RESULTS_V2)
+  if (!existsSync(resultsDirV2())) return [];
+  return readdirSync(resultsDirV2())
     .filter((f) => f.endsWith('.json') && !f.startsWith('ab-'))
     .sort()
-    .map((f) => ({ ...(JSON.parse(readFileSync(join(RESULTS_V2, f), 'utf8')) as BenchResultV2), file: f }))
+    .map((f) => ({ ...(JSON.parse(readFileSync(join(resultsDirV2(), f), 'utf8')) as BenchResultV2), file: f }))
     .filter((r) => r.kind === 'bench-v2')
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
 }
 
 export function loadAb(): (AbResult & { file: string })[] {
-  if (!existsSync(RESULTS_V2)) return [];
-  return readdirSync(RESULTS_V2)
+  if (!existsSync(resultsDirV2())) return [];
+  return readdirSync(resultsDirV2())
     .filter((f) => f.startsWith('ab-') && f.endsWith('.json'))
     .sort()
-    .map((f) => ({ ...(JSON.parse(readFileSync(join(RESULTS_V2, f), 'utf8')) as AbResult), file: f }));
+    .map((f) => ({ ...(JSON.parse(readFileSync(join(resultsDirV2(), f), 'utf8')) as AbResult), file: f }));
 }
 
 interface Failure {
@@ -392,8 +392,8 @@ export function renderReportV2(results: BenchResultV2[], abs: AbResult[]): strin
 }
 
 export function writeReportV2(): string {
-  writeFileSync(REPORT_V2, `${renderReportV2(loadResults(), loadAb())}\n`);
-  return REPORT_V2;
+  writeFileSync(reportPathV2(), `${renderReportV2(loadResults(), loadAb())}\n`);
+  return reportPathV2();
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {

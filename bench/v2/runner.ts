@@ -16,7 +16,8 @@ import type { Case } from './cases.js';
 import { YAML } from './cases.js';
 import type { RunRecord, VariantKind } from './types.js';
 
-export const RESPONSE_CACHE = join(BENCH_DIR, '.cache', 'v2', 'responses');
+export const responseCacheDir = () =>
+  process.env.BENCH_OUT_DIR ? join(process.env.BENCH_OUT_DIR, 'cache', 'responses') : join(BENCH_DIR, '.cache', 'v2', 'responses');
 const CACHE_VERSION = 1;
 
 export const sha = (s: string | Buffer) => createHash('sha256').update(s).digest('hex');
@@ -197,7 +198,7 @@ export function createRunner(opts: RunnerOptions): Runner {
     keyOf,
     async run(i) {
       const key = keyOf(i);
-      const file = join(RESPONSE_CACHE, `${key}.json`);
+      const file = join(responseCacheDir(), `${key}.json`);
       if (opts.cache && existsSync(file)) {
         const hit = JSON.parse(readFileSync(file, 'utf8')) as RunRecord;
         return { ...refreshExplain(hit, i.c), sourceText: i.sourceText, cached: true };
@@ -220,7 +221,7 @@ export function createRunner(opts: RunnerOptions): Runner {
         try {
           const rec = await once(i);
           const out: RunRecord = { ...rec, key, cached: false };
-          mkdirSync(RESPONSE_CACHE, { recursive: true });
+          mkdirSync(responseCacheDir(), { recursive: true });
           writeFileSync(file, JSON.stringify({ ...out, sourceText: undefined }));
           return out;
         } catch (err) {
