@@ -1,57 +1,42 @@
-# SafeRoute pitch kit
+# Kakwe pitch kit
+
+Kakwe (ကာကွယ်) is the product name; the app build, package and URLs still say SafeRoute.
 
 | File | Purpose |
 | --- | --- |
-| `deck.md` | Marp source of the submission deck (12 slides) |
-| `theme.css` | Custom Marp theme `saferoute` (palette from `src/theme/theme.ts`, Plus Jakarta Sans from `assets/fonts`) |
+| `deck/index.html`, `deck/deck.css` | Source of the submission deck: 13 slides at 1920 x 1080 |
+| `deck/dolls.mts` | Writes the doll medallion and the three mood dolls to `deck/img/` from `src/components/dollMark.ts` and `avatarArt.ts` |
+| `deck/build.sh` | Renders `deck.pdf` with headless Chrome and page previews to `/tmp/kakwe-pages` |
 | `deck.pdf` | Rendered deck |
-| `video-script.md` | Timed shot list and voice-over for the video under 3 minutes |
+| `video-script.md` | Shot list and voice-over for the video under 3 minutes |
 | `demo-inputs.md` | Fictional test inputs for the demo flows |
-| `img/` | Phone-width (430px) screenshots of the running web app, plus mockup crops for the Android overlay |
+| `e2e/` | Screenshots from the end-to-end scripts; the deck uses some of them |
 
 ## Re-render the PDF
 
-Chrome comes from the Puppeteer cache. On Ubuntu 23.10 and later the Chrome sandbox is blocked, so use a wrapper that adds `--no-sandbox`.
-
 ```
-cat > /tmp/chrome-ns.sh <<'EOF'
-#!/bin/sh
-exec $(ls -d $HOME/.cache/puppeteer/chrome/linux-*/chrome-linux64/chrome | tail -1) --no-sandbox "$@"
-EOF
-chmod +x /tmp/chrome-ns.sh
-
-cd pitch
-CHROME_PATH=/tmp/chrome-ns.sh npx @marp-team/marp-cli --no-stdin \
-  --theme theme.css deck.md --pdf --allow-local-files -o deck.pdf
+pitch/deck/build.sh
 ```
 
-Where the sandbox works, set `CHROME_PATH` to the Chrome binary directly. Keep `--no-stdin`, or marp waits for input. To check layout, render PNGs with `pdftoppm -r 70 -png deck.pdf /tmp/s`.
+The script uses Chromium from the Playwright or Puppeteer cache (set `CHROME` to override) and `pdftoppm` for previews. Node 22.6 or later runs `dolls.mts` directly.
 
-## Edit the track
+## Screens in the deck
 
-Slide 2 holds the track name and the criteria map. If the track changes to BFSI, edit the heading `Track: ...`, the theme line and the paragraph below it. The title slide carries the track name once.
+| Slide | Screenshot |
+| --- | --- |
+| 5 | `verdict-report-danger-390x844-en.png`, `jobshield-result-conflicts-pause-en-390x844.png` (offline demo banner cropped) |
+| 6 | `bubble-doll-states.png` (overlay views on a drawn chat), `verdict-report-danger-390x844-my.png`, `contacts-signin-warn-en.png` |
+| 10 | `privacy-onboarding-sharing-en.png` |
+| 11 | `refine-01-onboarding-phone-my.png` (cropped below the logo) |
 
-## To replace before submission
+## Sources for the numbers
 
-`img/home.png`, `check.png`, `checking.png`, `verdict.png`, `safe.png` and `family.png` are real captures of the web build at 430px (2x) against the local backend. `shield.png` is the in-app Screen shield demo board. `spot.png` is still a mockup crop, because the Android overlay cannot run in a browser. Replace both with device screenshots when an APK is available.
-
-| File | Slide | Content |
-| --- | --- | --- |
-| `img/home.png` | 4 | Home screen |
-| `img/family.png` | 4 | Family circle, missed check-in |
-| `img/shield.png` | 5 | Screen shield how-to, step 1 (in-app demo board) |
-| `img/check.png` | 6 | Check form with a pasted job post |
-| `img/checking.png` | 6 | Checking screen, six stages |
-| `img/verdict.png` | 6 | Danger report with Listen button |
-| `img/safe.png` | 6 | Safe report |
-
-Unused spare images: `img/risk.png`, `img/chat.png`, `img/sms.png`, `img/spot.png`, `img/chatverdict.png` (mockup crops). `e2e/` holds the full-run screenshots of the four end-to-end checks.
-
-Other items to supply:
-
-- Team names and roles on slide 12 (placeholders `[NAME]`, `[Role]`).
-- Deployed web demo URL and contact email on slide 12.
-- Confirm the Firebase Hosting web demo is live before recording.
-- Web Risk is not yet verified live on Cloud Run. Verify before the video, or remove it from the demo narration.
-- Cost per check on slide 10 is an estimate. Replace it with the measured Cloud Billing figure after a test run. TTS pricing is unconfirmed for the deployed model.
-- Statistics (sources are in slide footers and speaker notes): OHCHR via UN News (2023), UNODC via OCCRP (July 2026), GASA and Feedzai (October 2025).
+| Claim | Source |
+| --- | --- |
+| 120,000 in Myanmar | OHCHR via UN News, 29 August 2023, news.un.org/en/story/2023/08/1140187 |
+| Text eval 31/31, 0 certainty phrases | `npm run eval` in `server/`, recorded in the root README |
+| Protection Score 89.7 on 24 synthetic cases | `bench/RESULTS-v2.md` |
+| About 67 on 96 real screenshots | Bench v2 production prompt, 54 + 42 real cases, mean over 3 runs (66.6 and 68.1), draft labels |
+| Job Shield 10/10 | `npm run eval:job` in `server/`, 16 October 2026 |
+| Dataset 93 real + 28 synthetic | huggingface.co/datasets/Rickaym/saferoute-scam-screenshots |
+| Safe Browsing test URL flagged | Live `/v1/check` on testsafebrowsing.appspot.com/s/phishing.html: High risk, `social_engineering` |
