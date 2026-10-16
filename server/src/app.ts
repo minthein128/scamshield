@@ -1,3 +1,6 @@
+import { createReadStream } from 'node:fs';
+import { stat } from 'node:fs/promises';
+import { Readable } from 'node:stream';
 import { Hono } from 'hono';
 import { bodyLimit } from 'hono/body-limit';
 import { cors } from 'hono/cors';
@@ -6,6 +9,7 @@ import { createConfigRoutes, type PublishedCache } from './admin/published.js';
 import { type AdminDeps, createAdminRoutes } from './admin/routes.js';
 import { bearerToken, type TokenVerifier } from './auth.js';
 import type { Config } from './config.js';
+import { downloadPage } from './download-page.js';
 import type { Feedback } from './feedback/service.js';
 import { parseFeedback } from './feedback/validate.js';
 import { type Intel, isCountry } from './intel/service.js';
@@ -48,6 +52,7 @@ export function createApp(
   const hourly = limits.hourly;
   const feedbackIp = createRateLimiter(cfg.rateLimitPerMin);
   const feedbackHourly = createRateLimiter(0, 3_600_000);
+  const apkHourly = createRateLimiter(0, 3_600_000);
 
   const anyOrigin = cfg.allowedOrigins.includes('*');
   const adminAllowed = new Set([...cfg.adminOrigins, ...cfg.allowedOrigins]);
@@ -64,6 +69,43 @@ export function createApp(
   app.get('/healthz', (c) => c.json({ ok: true, model: cfg.model, mock: cfg.mock }));
 
   app.get('/config.json', (c) => c.json({ apiUrl: cfg.publicApiUrl }, 200, { 'cache-control': 'no-cache' }));
+
+  const apkFile = async () => {
+    if (!cfg.apkPath) return null;
+    try {
+      const st = await stat(cfg.apkPath);
+      return st.isFile() ? st : null;
+    } catch {
+      return null;
+    }
+  };
+
+  app.get('/download', async (c) => {
+    const st = await apkFile();
+    return c.html(downloadPage({ version: cfg.apkVersion, bytes: st?.size }), 200, { 'cache-control': 'no-cache' });
+  });
+
+  app.on(['GET', 'HEAD'], '/download/saferoute.apk', async (c) => {
+    const ip = clientIp(c.req.header('x-forwarded-for'), c.req.header('x-real-ip'));
+    const decision = apkHourly.check(ip, cfg.apkPerHour);
+    if (!decision.allowed) {
+      return c.json(errorBody('rate_limited', 'Download limit reached, retry later'), 429, {
+        'retry-after': String(decision.retryAfterSec),
+      });
+    }
+    const st = await apkFile();
+    if (!st || !cfg.apkPath) return c.json(errorBody('bad_request', 'APK not available'), 404 as never);
+    const headers = {
+      'content-type': 'application/vnd.android.package-archive',
+      'content-disposition': 'attachment; filename="SafeRoute.apk"',
+      'content-length': String(st.size),
+      'cache-control': 'no-cache',
+      etag: `"${Math.floor(st.mtimeMs).toString(16)}-${st.size.toString(16)}"`,
+    };
+    if (c.req.method === 'HEAD') return new Response(null, { status: 200, headers });
+    const body = Readable.toWeb(createReadStream(cfg.apkPath)) as unknown as ReadableStream;
+    return new Response(body, { status: 200, headers });
+  });
 
   app.post(
     '/v1/check',

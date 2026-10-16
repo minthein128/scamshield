@@ -43,6 +43,8 @@ Link results add flags: a Web Risk hit adds `known_bad` (high); a domain under 1
 - `POST /v1/speak`: `{text, language}` returns a base64 WAV from Gemini TTS (`TTS_MODEL`, default `gemini-3.8-flash-tts`; unverified, see CLAUDE.md).
 - `GET /healthz`: `{ ok, model, mock }`.
 - `GET /config.json`: `{ apiUrl }` from `PUBLIC_API_URL` (default `https://saferoute-api.akkhayar.com`), `Cache-Control: no-cache`. The app reads it as its first config source.
+- `GET /download`: small HTML install page (English and Burmese, no external assets) for networks that block `*.web.app`.
+- `GET|HEAD /download/saferoute.apk`: streams the file at `APK_PATH` as `application/vnd.android.package-archive` with `Content-Length`, `Cache-Control: no-cache` and an mtime/size `ETag`. 404 when `APK_PATH` is unset or the file is missing. Outside the check rate limit; own limit of `APK_LIMIT_PER_HOUR` per IP.
 
 ## Environment
 
@@ -65,6 +67,8 @@ Link results add flags: a Web Risk hit adds `known_bad` (high); a domain under 1
 | `TTS_MODEL`, `TTS_VOICE` | speech model and voice | gemini-3.8-flash-tts, Kore |
 | `DEFAULT_HOTLINE` | call number when the destination is unknown (hotlines come from the shared data) | none |
 | `FIREBASE_PROJECT_ID` | project for ID token verification | `saferoute-aibc` |
+| `APK_PATH`, `APK_VERSION` | file served by `/download/saferoute.apk`; version shown on `/download` | unset |
+| `APK_LIMIT_PER_HOUR` | APK downloads per IP per hour | 20 |
 | `ANON_LIMIT_PER_HOUR`, `USER_LIMIT_PER_HOUR` | per-uid limits | 20, 60 |
 
 ## Local run
