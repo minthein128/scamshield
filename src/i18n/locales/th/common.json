@@ -1,4 +1,5 @@
 {
+  "appName": "Kakwe",
   "_meta": {
     "reviewed": false
   },
@@ -24,7 +25,7 @@
     "contactsA11y": "ผู้ติดต่อที่ไว้ใจ",
     "learn": "เรียนรู้"
   },
-  "loading": "กำลังโหลด SafeRoute...",
+  "loading": "กำลังโหลด $t(common:appName)...",
   "offlineDemo": "โหมดทดลองใช้งานแบบออฟไลน์",
   "copied": {
     "title": "คัดลอกแล้ว",

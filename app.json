@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "SafeRoute",
+    "name": "Kakwe",
     "slug": "saferoute",
     "version": "1.0.0",
     "orientation": "default",
@@ -75,7 +75,8 @@
         }
       ],
       "./plugins/with-abi-filters",
-      "./plugins/with-minimal-permissions"
+      "./plugins/with-minimal-permissions",
+      ["./plugins/with-localized-app-name", { "names": { "my": "ကာကွယ်" } }]
     ],
     "scheme": "saferoute",
     "icon": "./assets/icon.png"

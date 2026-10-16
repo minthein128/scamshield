@@ -124,7 +124,7 @@ describe('report', () => {
     diag.info('app', 'first');
     diag.warn('connection', 'health', { host: 'api.example.com', ok: false });
     const report = await buildDiagnosticsReport('my', async () => 'chosen api.example.com');
-    expect(report).toContain('SafeRoute diagnostics report');
+    expect(report).toContain('Kakwe diagnostics report');
     expect(report).toContain('language my');
     expect(report).toContain('chosen api.example.com');
     expect(report.indexOf('connection.health')).toBeLessThan(report.indexOf('app.first'));

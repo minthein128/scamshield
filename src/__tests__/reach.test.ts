@@ -123,7 +123,7 @@ describe('config sources', () => {
   it('builds a report with hosts and no user content', async () => {
     const { fetchImpl } = fakeFetch({ 'https://www.gstatic.com/generate_204': 'ok' });
     const report = await connectionReport({ version: '1.2.3', os: 'android' }, fetchImpl);
-    expect(report).toContain('SafeRoute 1.2.3 (android)');
+    expect(report).toContain('Kakwe 1.2.3 (android)');
     expect(report).toContain('probe www.gstatic.com/generate_204 ok');
     expect(report).toContain('online true');
   });

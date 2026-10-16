@@ -9,15 +9,15 @@
   "explain": {
     "mic": {
       "title": "Payagan ang mikropono",
-      "body": "Para makipag-usap kay Pyit Taing Htaung, kailangan ng SafeRoute ang mikropono mo. Ipinapadala ang boses mo sa Google para sumagot. Walang nire-record o sine-save."
+      "body": "Para makipag-usap kay Pyit Taing Htaung, kailangan ng $t(common:appName) ang mikropono mo. Ipinapadala ang boses mo sa Google para sumagot. Walang nire-record o sine-save."
     },
     "overlay": {
       "title": "Ipakita ang shield sa ibabaw ng ibang app",
       "body": "Lumulutang ang shield doll sa ibabaw ng ibang app para ma-tap mo ito kapag may kahina-hinala. Magbubukas ang Android ng settings page kung saan mo ito io-on."
     },
     "screen": {
-      "title": "Payagan ang SafeRoute na makita ang screen mo",
-      "body": "Kapag tinap mo ang doll, binabasa ng SafeRoute ang nasa screen mo para suriin ito. Kapag nag-tap ka lang. Hihingi ng kumpirmasyon ang Android."
+      "title": "Payagan ang $t(common:appName) na makita ang screen mo",
+      "body": "Kapag tinap mo ang doll, binabasa ng $t(common:appName) ang nasa screen mo para suriin ito. Kapag nag-tap ka lang. Hihingi ng kumpirmasyon ang Android."
     },
     "notifications": {
       "title": "Payagan ang mga notification",
@@ -29,21 +29,21 @@
     },
     "contacts": {
       "title": "Payagan ang contacts",
-      "body": "Binabasa lang ng SafeRoute ang isang contact kapag pinili mo ito, para punan ang pangalan at numero."
+      "body": "Binabasa lang ng $t(common:appName) ang isang contact kapag pinili mo ito, para punan ang pangalan at numero."
     }
   },
   "help": {
     "mic": {
       "title": "Naka-off ang mikropono",
-      "body": "Para makipag-usap kay Pyit Taing Htaung, buksan ang Settings, piliin ang Permissions, tapos Microphone, at payagan ito. Gumagana pa rin ang ibang bahagi ng SafeRoute kahit wala ito."
+      "body": "Para makipag-usap kay Pyit Taing Htaung, buksan ang Settings, piliin ang Permissions, tapos Microphone, at payagan ito. Gumagana pa rin ang ibang bahagi ng $t(common:appName) kahit wala ito."
     },
     "overlay": {
       "title": "Naka-off ang Display over other apps",
-      "body": "Para magamit ang shield, buksan ang Settings, hanapin ang Display over other apps, at payagan ang SafeRoute. Gumagana pa rin ang ibang bahagi ng SafeRoute kahit wala ito."
+      "body": "Para magamit ang shield, buksan ang Settings, hanapin ang Display over other apps, at payagan ang $t(common:appName). Gumagana pa rin ang ibang bahagi ng $t(common:appName) kahit wala ito."
     },
     "screen": {
       "title": "Hindi pinayagan ang access sa screen",
-      "body": "Kailangan ito ng shield para makita ang gusto mong suriin. I-on muli ang shield at piliin ang Start now. Gumagana pa rin ang ibang bahagi ng SafeRoute kahit wala ito."
+      "body": "Kailangan ito ng shield para makita ang gusto mong suriin. I-on muli ang shield at piliin ang Start now. Gumagana pa rin ang ibang bahagi ng $t(common:appName) kahit wala ito."
     },
     "contacts": {
       "title": "Naka-off ang contacts",

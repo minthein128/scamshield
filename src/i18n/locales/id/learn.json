@@ -6,7 +6,7 @@
   "tagline": "Ketahui tanda-tandanya sebelum membalas, membayar, atau bepergian.",
   "scamsHeading": "Penipuan yang sering terjadi",
   "flagsHeading": "7 tanda bahaya",
-  "flagsHint": "SafeRoute mencari tanda-tanda ini. Ketuk salah satu untuk mempelajari lebih lanjut.",
+  "flagsHint": "$t(common:appName) mencari tanda-tanda ini. Ketuk salah satu untuk mempelajari lebih lanjut.",
   "flagsHintA11y": "Membuka penjelasan",
   "shieldRow": {
     "title": "Cara kerja Screen shield",
@@ -48,7 +48,7 @@
       "body": "Pekerjaan, toko, dan bank resmi jarang meminta uang atau paspor Anda di awal."
     },
     "check": {
-      "title": "Periksa dengan SafeRoute",
+      "title": "Periksa dengan $t(common:appName)",
       "body": "Tempel teks atau tautan, atau tambahkan tangkapan layar."
     },
     "help": {
@@ -129,12 +129,12 @@
         "caption": "Boneka melihat postingan di layar Anda. Boneka meminta untuk membuka teks yang tersembunyi."
       },
       "e3": {
-        "title": "SafeRoute memeriksanya",
-        "caption": "SafeRoute membaca seluruh postingan dan mencari tanda bahaya."
+        "title": "$t(common:appName) memeriksanya",
+        "caption": "$t(common:appName) membaca seluruh postingan dan mencari tanda bahaya."
       },
       "e4": {
         "title": "Hasilnya",
-        "caption": "SafeRoute menunjukkan hasil risiko tinggi, lengkap dengan alasan dan langkah selanjutnya."
+        "caption": "$t(common:appName) menunjukkan hasil risiko tinggi, lengkap dengan alasan dan langkah selanjutnya."
       }
     },
     "romance": {
@@ -144,7 +144,7 @@
       },
       "e2": {
         "title": "Ketuk boneka",
-        "caption": "SafeRoute butuh pesan yang lebih lama untuk melihat cerita lengkapnya."
+        "caption": "$t(common:appName) butuh pesan yang lebih lama untuk melihat cerita lengkapnya."
       },
       "e3": {
         "title": "Gulir ke atas dan ketuk lagi",
@@ -158,7 +158,7 @@
     "parcel": {
       "e1": {
         "title": "Pesan masuk",
-        "caption": "SafeRoute memperingatkan Anda sebelum membuka tautan."
+        "caption": "$t(common:appName) memperingatkan Anda sebelum membuka tautan."
       },
       "e2": {
         "title": "Ketuk untuk melihat alasannya",
@@ -171,8 +171,8 @@
         "caption": "Halaman itu tertulis \"resmi\" dan menampilkan nomor izin."
       },
       "e2": {
-        "title": "SafeRoute memeriksanya",
-        "caption": "SafeRoute memeriksa nomor izin dan laporan tentang agensi tersebut."
+        "title": "$t(common:appName) memeriksanya",
+        "caption": "$t(common:appName) memeriksa nomor izin dan laporan tentang agensi tersebut."
       }
     },
     "shop": {
@@ -182,7 +182,7 @@
       },
       "e2": {
         "title": "Ketuk nama penjual",
-        "caption": "Minta SafeRoute untuk memeriksa siapa yang menjual."
+        "caption": "Minta $t(common:appName) untuk memeriksa siapa yang menjual."
       },
       "e3": {
         "title": "Buka halaman penjual",
@@ -190,7 +190,7 @@
       },
       "e4": {
         "title": "Hasilnya",
-        "caption": "SafeRoute menunjukkan tanda-tanda yang membuat tawaran ini tampak berisiko."
+        "caption": "$t(common:appName) menunjukkan tanda-tanda yang membuat tawaran ini tampak berisiko."
       }
     }
   },

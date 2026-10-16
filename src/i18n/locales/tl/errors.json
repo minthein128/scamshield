@@ -24,7 +24,7 @@
       "message": "Suriin ang iyong koneksyon sa internet at subukan muli."
     },
     "server_unreachable": {
-      "title": "Hindi maabot ang SafeRoute",
+      "title": "Hindi maabot ang $t(common:appName)",
       "message": "Gumagana ang internet mo, pero hindi sumasagot ang aming check service ngayon. Subukan ulit pagkatapos ng ilang sandali."
     },
     "timeout": {

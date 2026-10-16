@@ -1,3 +1,4 @@
+import { appName } from '../config/brand';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
@@ -77,7 +78,7 @@ const ShareIntentBridge: React.FC<{ ready: boolean }> = ({ ready }) => {
   return null;
 };
 
-const NEUTRAL_TITLE = { formatter: () => 'SafeRoute' };
+const NEUTRAL_TITLE = { formatter: () => appName() };
 
 const openReport = (result: CheckResponse, language: LanguageCode) => navigationRef.navigate('Report', { result, language });
 

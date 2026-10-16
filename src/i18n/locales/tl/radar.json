@@ -3,8 +3,8 @@
     "reviewed": false
   },
   "title": "Scam radar",
-  "intro_one": "Ang mga iniulat ng ibang gumagamit ng SafeRoute sa nakalipas na 30 araw. Ang mga pattern lang na nakita nang hindi bababa sa {{count}} beses ang ipinapakita.",
-  "intro_other": "Ang mga iniulat ng ibang gumagamit ng SafeRoute sa nakalipas na 30 araw. Ang mga pattern lang na nakita nang hindi bababa sa {{count}} beses ang ipinapakita.",
+  "intro_one": "Ang mga iniulat ng ibang gumagamit ng $t(common:appName) sa nakalipas na 30 araw. Ang mga pattern lang na nakita nang hindi bababa sa {{count}} beses ang ipinapakita.",
+  "intro_other": "Ang mga iniulat ng ibang gumagamit ng $t(common:appName) sa nakalipas na 30 araw. Ang mga pattern lang na nakita nang hindi bababa sa {{count}} beses ang ipinapakita.",
   "global": "Pandaigdig",
   "empty": {
     "title": "Wala pang sapat na ulat",

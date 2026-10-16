@@ -70,7 +70,7 @@ export const ShopVerdictScreen: React.FC<ShopVerdictScreenProps> = ({ onNavigate
             <Text style={{ color: '#FFFFFF', fontSize: 15, fontFamily: theme.fonts.bold, lineHeight: 20, includeFontPadding: false }}>Same seller photos reported before</Text>
           </View>
         </View>
-        <Text style={{ color: '#475569', fontFamily: theme.fonts.mono, fontSize: 11, lineHeight: 15, includeFontPadding: false }}>Sources: listing, seller page, SafeRoute reports</Text>
+        <Text style={{ color: '#475569', fontFamily: theme.fonts.mono, fontSize: 11, lineHeight: 15, includeFontPadding: false }}>Sources: listing, seller page, Kakwe reports</Text>
         <Text style={{ flex: 1, color: '#0F1B2D', includeFontPadding: false, fontSize: 14, lineHeight: 19, fontFamily: theme.fonts.regular }}></Text>
         <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('noop')} style={{ height: 58, borderRadius: 16, borderWidth: 0, backgroundColor: '#1F1A17' }}>
           <Text style={{ color: '#FFFFFF', fontSize: 18, fontFamily: theme.fonts.extraBold, lineHeight: 24, includeFontPadding: false }}>{"Report this seller"}</Text>

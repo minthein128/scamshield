@@ -1,3 +1,4 @@
+import { appName } from '../config/brand';
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 import { connectionReport } from '../config/runtime';
@@ -40,7 +41,7 @@ export async function buildDiagnosticsReport(language: string, connection?: () =
   ]);
   const lines = buildLogLines(entries);
   return [
-    `SafeRoute diagnostics report`,
+    `${appName('en')} diagnostics report`,
     `app ${version}`,
     `device ${deviceLine()}`,
     `language ${language}`,
