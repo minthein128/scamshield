@@ -203,3 +203,9 @@ Admin errors extend the error body: codes `unauthorized` (401), `forbidden` (403
 ## GET /healthz
 
 `{ "ok": true, "model": "...", "mock": false }`
+
+## GET /download, GET|HEAD /download/saferoute.apk
+
+`/download` returns a plain HTML install page (English and Burmese, no external assets) with the version (`APK_VERSION`), the file size and a link to the APK.
+
+`/download/saferoute.apk` streams the file at `APK_PATH`. Headers: `Content-Type: application/vnd.android.package-archive`, `Content-Disposition: attachment; filename="SafeRoute.apk"`, `Content-Length`, `Cache-Control: no-cache`, `ETag` (mtime and size). When `APK_PATH` is unset or the file is missing the response is 404 with the usual error body. Limit: `APK_LIMIT_PER_HOUR` (default 20) per IP, separate from the check limits; over it the response is 429 `rate_limited`.

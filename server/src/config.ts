@@ -41,6 +41,9 @@ export interface Config {
   liveMaxConcurrent: number;
   adminAiModel: string;
   adminAiPerHour: number;
+  apkPath?: string;
+  apkVersion?: string;
+  apkPerHour: number;
   intelPepper?: string;
   intelProject?: string;
   thinkingLevel?: 'MINIMAL' | 'LOW' | 'MEDIUM' | 'HIGH';
@@ -104,6 +107,9 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     liveMaxConcurrent: Number(env.LIVE_MAX_CONCURRENT ?? 20),
     adminAiModel: env.ADMIN_AI_MODEL || 'gemini-3.8-flash',
     adminAiPerHour: Number(env.ADMIN_AI_LIMIT_PER_HOUR ?? 30),
+    apkPath: env.APK_PATH?.trim() || undefined,
+    apkVersion: env.APK_VERSION?.trim() || undefined,
+    apkPerHour: Number(env.APK_LIMIT_PER_HOUR ?? 20),
     intelPepper: env.INTEL_PEPPER || undefined,
     intelProject: env.INTEL_PROJECT || project || 'saferoute-aibc',
     thinkingLevel: thinking(env.THINKING_LEVEL),
