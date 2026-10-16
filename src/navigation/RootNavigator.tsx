@@ -30,6 +30,7 @@ import ScamGuideScreen from '../screens/ScamGuideScreen';
 import ShieldHowToScreen from '../screens/ShieldHowToScreen';
 import { useSharedDraft } from '../hooks/useSharedDraft';
 import { useShieldDeepLink } from '../hooks/useShieldDeepLink';
+import { useShieldShareSync } from '../hooks/useShieldShareSync';
 import { Text } from '../components/Text';
 import theme from '../theme/theme';
 
@@ -87,6 +88,7 @@ export const RootNavigator: React.FC = () => {
   const [ready, setReady] = useState(false);
   const { ready: loaded, profile } = useAppState();
   useShieldTokenSync();
+  useShieldShareSync();
   useMessageGuardConfigSync();
   const onOnboardingDone = (next?: AfterOnboarding) => {
     if (next) setTimeout(() => navigationRef.navigate('Account', { mode: next }), 150);

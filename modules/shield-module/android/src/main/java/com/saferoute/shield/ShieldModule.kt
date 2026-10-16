@@ -74,6 +74,7 @@ class ShieldModule : Module() {
             val context = appContext.reactContext ?: return@AsyncFunction false
             if (!Settings.canDrawOverlays(context)) return@AsyncFunction false
             ShieldBridge.authToken = (options?.get("authToken") as? String).orEmpty()
+            ShieldBridge.shareSignals = options?.get("shareSignals") == true
             ShieldBridge.homeCountry = ShieldBridge.countryCode(options?.get("home"))
             ShieldBridge.destinationCountry = ShieldBridge.countryCode(options?.get("destination"))
             @Suppress("UNCHECKED_CAST")
@@ -84,6 +85,11 @@ class ShieldModule : Module() {
                 (options?.get("language") as? String)?.let { putExtra(ShieldService.EXTRA_LANGUAGE, it) }
             }
             ContextCompat.startForegroundService(context, intent)
+            true
+        }
+
+        AsyncFunction("setShareSignals") { enabled: Boolean ->
+            ShieldBridge.shareSignals = enabled
             true
         }
 

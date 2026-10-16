@@ -277,6 +277,10 @@ So the service adds the microphone type while SafeRoute is visible (`startShield
 - [ ] Android 14: kill SafeRoute from recents, start the shield from the Home switch, leave the app, double tap: voice works; if not, the pill says "Open SafeRoute once to allow voice".
 - [ ] "Ask me for the hotline" opens SafeRoute on Get help; TalkBack offers "Talk to Pyit Taing Htaung".
 
+## Signal sharing
+
+Scam-pattern sharing is opt-in. `startShield({ shareSignals })` and `setShieldShareSignals(enabled)` set it; native starts at false and every screen check sends `shareSignals` explicitly, `true` only after the user opted in. The app keeps it in step with the profile setting (`useShieldShareSync`).
+
 ## Auth token
 
 `startShield({ apiUrl, language, authToken })` takes an optional Firebase ID token that `CheckClient` sends as `Authorization: Bearer`. `setShieldAuthToken(token)` replaces it while the shield runs. Without a token the server limits by IP. The token is held in memory only (`ShieldBridge.authToken`).

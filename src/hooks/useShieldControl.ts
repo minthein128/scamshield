@@ -39,6 +39,7 @@ export interface ShieldControl {
 export function useShieldControl(): ShieldControl {
   const { language, profile } = useAppState();
   const { homeCountry, destinationCountry } = profile;
+  const shareSignals = profile.shareSignals === true;
   const apiUrl = useApiUrl();
   const support = shieldSupport(Platform.OS, apiUrl);
   const [running, setRunning] = useState(false);
@@ -90,6 +91,7 @@ export function useShieldControl(): ShieldControl {
         apiUrl: apiUrl ?? '',
         language,
         strings: companionStrings(),
+        shareSignals,
         ...(homeCountry ? { home: homeCountry } : {}),
         ...(destinationCountry ? { destination: destinationCountry } : {}),
         ...(token ? { authToken: token } : {}),
@@ -103,7 +105,7 @@ export function useShieldControl(): ShieldControl {
     } finally {
       busy.current = false;
     }
-  }, [language, refresh, apiUrl, homeCountry, destinationCountry]);
+  }, [language, refresh, apiUrl, homeCountry, destinationCountry, shareSignals]);
 
   useEffect(() => {
     refresh().catch(() => undefined);

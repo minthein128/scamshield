@@ -164,7 +164,7 @@ class ShieldService : Service(), ShieldOverlay.Listener {
                     "capture path=$path tap_to_jpeg_ms=${SystemClock.elapsedRealtime() - tapAt} crop=${jpeg.crop.toShortString()} " +
                         "frame_wait_ms=${jpeg.frameWaitMs} encode_ms=${jpeg.encodeMs}" + if (path == "mask") " bubble hidden_ms=0" else ""
                 )
-                val result = CheckClient.checkScreen(apiUrl, language, jpeg.bytes, ShieldBridge.authToken)
+                val result = CheckClient.checkScreen(apiUrl, language, jpeg.bytes, ShieldBridge.authToken, ShieldBridge.shareSignals)
                 main.post { onResult(result, jpeg.thumb) }
             } catch (e: CheckException) {
                 main.post { onFailure(e.message ?: "The check failed.") }

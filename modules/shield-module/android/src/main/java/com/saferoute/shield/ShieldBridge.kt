@@ -12,6 +12,8 @@ object ShieldBridge {
     @Volatile var consentCallback: ((Boolean) -> Unit)? = null
     @Volatile var eventSink: ((String, String) -> Unit)? = null
     @Volatile var authToken: String = ""
+    /** The user's opt-in to share scam patterns from screen checks. Off until the app says otherwise. */
+    @Volatile var shareSignals: Boolean = false
     @Volatile var homeCountry: String? = null
     @Volatile var destinationCountry: String? = null
     @Volatile var strings: ShieldStrings = ShieldStrings.DEFAULT
