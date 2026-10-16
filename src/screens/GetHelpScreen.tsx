@@ -5,7 +5,8 @@ import { Screen } from '../components/Screen';
 import { Grid } from '../components/Grid';
 import { useLayout } from '../hooks/useLayout';
 import { Text } from '../components/Text';
-import { Button, Card, EmptyState, LinkButton, Notice, Pill, ScreenHeader, SectionTitle } from '../components/ui';
+import { Button, Card, EmptyState, LinkButton, Notice, Pill, SectionTitle } from '../components/ui';
+import { HeaderWithLeave } from '../components/LeaveQuickly';
 import { countryLabel } from '../lib/countries';
 import { categoryLabel, allSections, helpSections, type Hotline } from '../lib/hotlines';
 import { useRuntimeConfig } from '../lib/runtimeConfig';
@@ -48,7 +49,7 @@ export const GetHelpScreen: React.FC<RootScreenProps<'GetHelp'>> = ({ navigation
   const sections = showAll || mine.length === 0 ? allSections() : mine;
 
   return (
-    <Screen wide header={<ScreenHeader title={t('title')} onBack={() => navigation.goBack()} />}>
+    <Screen wide header={<HeaderWithLeave title={t('title')} onBack={() => navigation.goBack()} />}>
       <Text style={styles.body}>{t('intro')}</Text>
 
       <Button testID="help-report-scam" label={t('reportScam')} variant="secondary" icon="flag" onPress={() => navigation.navigate('ReportScam')} />

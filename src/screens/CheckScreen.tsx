@@ -4,7 +4,8 @@ import { useTranslation } from 'react-i18next';
 import * as Clipboard from 'expo-clipboard';
 import { Screen } from '../components/Screen';
 import { Text, TextInput } from '../components/Text';
-import { Button, Card, Divider, LinkButton, Notice, ScreenHeader, SectionTitle } from '../components/ui';
+import { Button, Card, Divider, LinkButton, Notice, SectionTitle } from '../components/ui';
+import { HeaderWithLeave } from '../components/LeaveQuickly';
 import { Select } from '../components/Select';
 import { UI_LANGUAGES } from '../i18n/languages';
 import { countryName } from '../lib/countries';
@@ -86,7 +87,7 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
     <Screen
       header={
         <>
-          <ScreenHeader title={t('title')} />
+          <HeaderWithLeave title={t('title')} />
           <Select
             testID="check-kind"
             label={t('whatIsIt')}

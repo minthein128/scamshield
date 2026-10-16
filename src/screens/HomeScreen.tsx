@@ -71,7 +71,7 @@ export const HomeScreen: React.FC<TabScreenProps<'Home'>> = ({ navigation }) => 
       <View style={{ gap: 8 }}>
         <SectionTitle>{t('recent.title')}</SectionTitle>
         {history.length === 0 ? (
-          <EmptyState testID="recent-empty" title={t('recent.emptyTitle')} body={t('recent.emptyBody')} />
+          <EmptyState testID="recent-empty" title={t('recent.emptyTitle')} body={profile.keepHistory ? t('recent.emptyBody') : t('recent.historyOff')} />
         ) : (
           <Grid columns={Math.min(layout.columns, 2)} gap={layout.isTablet ? 12 : 8}>
             {history.slice(0, layout.isTablet ? 6 : 5).map(entry => {
