@@ -61,7 +61,7 @@ Each folder holds a `metadata.jsonl` file with one row per image.
 | `id`, `parent_id`, `variant` | Case id; for a translation, the id of the original case |
 | `language` | Language the report is requested in |
 | `content_language` | Language of the text in the image |
-| `app`, `home`, `destination` | Source app, home country of the reader, destination named in the message |
+| `app`, `home`, `destination` | App shown in the image (not the folder it was collected in), home country of the reader, destination named in the message |
 | `scam_type` | `job_trafficking`, `romance_pig_butchering`, `parcel_phishing`, `fake_agency`, `marketplace_fraud`, `investment`, `other`, `none` |
 | `expected_verdict` | `safe`, `careful` or `danger` |
 | `score_range` | Accepted risk score band, 0 to 100 |
@@ -70,13 +70,14 @@ Each folder holds a `metadata.jsonl` file with one row per image.
 | `must_mention` | Facts a good warning must state, each with accepted spellings in several languages |
 | `must_advise` | Advice a good warning must give |
 | `must_not_accuse`, `must_not_advice` | Names the report must not call criminals; wrong advice it must not give. In real rows the names are placeholders such as `[NAME]` |
-| `label_status` | `authored` for synthetic rows. `draft` for real rows until a person checks them |
+| `label_status` | `authored` for synthetic rows. `draft-2-model` for real rows: two models labelled them and no person has reviewed them yet |
+| `second_label` | Real rows only. An independent second labelling: `verdict`, `is_scam`, `scam_type`, `amounts`. Compare it with the main labels |
 | `labelled_by` | Who or what wrote the labels |
 | `redaction` | `not_needed` for synthetic rows. `checked` for real rows after a person looked at the redacted image |
 
 ## Labelling
 
-Real-image labels start as drafts written by a Gemini model that reads each image once and a second model that cross-checks the numbers. The draft says whether the image is a scam, proposes a verdict and lists the facts and advice. Lines the model could not read with confidence are flagged for review. Burmese transcription is unreliable, and Burmese digits are confused easily (for example ၃ and ၂). Treat drafts as provisional until `label_status` is `reviewed`.
+Real-image labels start as drafts written by a Gemini model that reads each image once, with a second Gemini model that cross-checks the numbers. A separate Claude model then labelled every image blind, and its verdict, scam flag, scam type and amounts are stored in `second_label`. The two labellers disagree on some cases, mostly on whether a known task or grant script without a payment ask is `careful` or `danger`. The draft says whether the image is a scam, proposes a verdict and lists the facts and advice. Lines the model could not read with confidence are flagged for review. Burmese transcription is unreliable, and Burmese digits are confused easily (for example ၃ and ၂). Treat labels as provisional until `label_status` is `reviewed`.
 
 ## Redaction
 

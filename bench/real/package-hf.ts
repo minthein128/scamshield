@@ -12,6 +12,8 @@ if (flags.help || !str(flags.out)) {
   --out DIR        target folder (it is emptied first)
   --cases DIR      private real case files (omit to package synthetic only)
   --redacted DIR   redacted images named <id>.png
+  --labels2 FILE   second labeller JSON; its app replaces the folder-derived app, its labels go in second_label
+  --id-map FILE    write the private map from published ids to case ids
   --exclude id,id  real case ids to leave out (exact duplicates)
   --synthetic DIR  synthetic case files (default bench/cases)`);
   process.exit(flags.help ? 0 : 2);
@@ -21,7 +23,18 @@ const out = resolve(str(flags.out) as string);
 const synDir = resolve(str(flags.synthetic) ?? CASES_DIR);
 const realDir = str(flags.cases) ? resolve(str(flags.cases) as string) : undefined;
 const exclude = new Set(str(flags.exclude)?.split(',') ?? []);
+const labels2 = str(flags.labels2) ? (JSON.parse(readFileSync(resolve(str(flags.labels2) as string), 'utf8')) as SecondLabel[]) : [];
+const idMapOut = str(flags['id-map']) ? resolve(str(flags['id-map']) as string) : undefined;
 const redDir = str(flags.redacted) ? resolve(str(flags.redacted) as string) : undefined;
+
+interface SecondLabel {
+  id: string;
+  app: string;
+  is_scam: string;
+  expected_verdict: string;
+  scam_type: string;
+  amounts?: unknown[];
+}
 
 interface Row {
   file_name: string;
@@ -48,6 +61,7 @@ interface Row {
   label_status: string;
   labelled_by: string;
   redaction: string;
+  second_label?: { labeller: string; verdict: string; is_scam: string; scam_type: string; amounts: string[] };
 }
 
 function toRow(
@@ -121,31 +135,54 @@ if (realDir && redDir) {
   const realOut = join(out, 'data', 'real_redacted');
   mkdirSync(realOut, { recursive: true });
   const problems: string[] = [];
-  for (const f of readdirSync(realDir)
+  const second = new Map(labels2.map((l) => [l.id, l]));
+  const files = readdirSync(realDir)
     .filter((x) => x.endsWith('.yaml') && !x.startsWith('_'))
-    .sort()) {
-    const raw = YAML.parse(readFileSync(join(realDir, f), 'utf8')) as CaseFile;
-    if (exclude.has(raw.id)) continue;
+    .sort()
+    .map((f) => YAML.parse(readFileSync(join(realDir, f), 'utf8')) as CaseFile)
+    .filter((c) => !exclude.has(c.id));
+  const seq = new Map<string, number>();
+  const idMap: Record<string, string> = {};
+  for (const raw of files) {
+    const s = second.get(raw.id);
+    const app = s?.app ?? raw.app ?? 'unspecified';
+    const n = (seq.get(app) ?? 0) + 1;
+    seq.set(app, n);
+    const pub = `real-${app.replace(/[^a-z0-9]+/g, '-')}-${String(n).padStart(3, '0')}`;
+    idMap[pub] = raw.id;
     const img = join(redDir, `${raw.id}.png`);
     if (!existsSync(img)) {
       problems.push(`${raw.id}: no redacted image`);
       continue;
     }
-    const clean = sanitizeCase(raw, `${raw.id}.png`);
-    const row = toRow(clean, {
-      fileName: `${raw.id}.png`,
-      source: 'real',
-      label: [raw.label_status ?? 'draft', raw.labelled_by ?? 'unknown'],
-      redaction: raw.redaction ?? 'unchecked',
-      accuse: true,
-    });
+    const clean = sanitizeCase({ ...raw, app }, `${pub}.png`);
+    const row = toRow(
+      { ...clean, id: pub },
+      {
+        fileName: `${pub}.png`,
+        source: 'real',
+        label: [s ? 'draft-2-model' : (raw.label_status ?? 'draft'), raw.labelled_by ?? 'unknown'],
+        redaction: raw.redaction ?? 'unchecked',
+        accuse: true,
+      },
+    );
+    if (s) {
+      row.second_label = {
+        labeller: 'claude',
+        verdict: s.expected_verdict,
+        is_scam: s.is_scam,
+        scam_type: s.scam_type,
+        amounts: (s.amounts ?? []).map((a) => (typeof a === 'string' ? a : JSON.stringify(a))),
+      };
+    }
     const soft = accuseInPublished(row, raw);
-    if (soft.length) console.warn(`package-hf: ${raw.id}: accused string still in metadata, check it is a visible brand: ${soft.length}`);
+    if (soft.length) console.warn(`package-hf: ${pub}: accused string still in metadata, check it is a visible brand: ${soft.length}`);
     const hit = leaks(row, raw.redaction_boxes);
-    if (hit.length) problems.push(`${raw.id}: redacted text still in metadata (${hit.length})`);
+    if (hit.length) problems.push(`${pub}: redacted text still in metadata (${hit.length})`);
     copyFileSync(img, join(realOut, row.file_name));
     realRows.push(row);
   }
+  if (idMapOut) writeFileSync(idMapOut, `${JSON.stringify(idMap, null, 1)}\n`);
   writeFileSync(join(realOut, 'metadata.jsonl'), jsonl(realRows));
   if (problems.length) {
     console.error(`package-hf: ${problems.length} problems\n  ${problems.join('\n  ')}`);
