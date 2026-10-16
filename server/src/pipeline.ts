@@ -7,7 +7,15 @@ import type { StreamOpts } from './extract-stream.js';
 import type { Feedback } from './feedback/service.js';
 import type { Grounder, GroundResult } from './ground.js';
 import { type Intel, NO_LOOKUP } from './intel/service.js';
-import { countCertainty, countMaleForms, genderCounters, guardExtraction, guardFlags, isHeavy } from './language-guard.js';
+import {
+  countCertainty,
+  countMaleForms,
+  foreignInExtraction,
+  genderCounters,
+  guardExtraction,
+  guardFlags,
+  isHeavy,
+} from './language-guard.js';
 import { log } from './log.js';
 import { score } from './score.js';
 import { Timings, timingStore } from './timing.js';
@@ -177,10 +185,12 @@ export function createPipeline(deps: PipelineDeps): Pipeline {
       let guarded = guardExtraction(first, req.language);
       const before0 = guarded.stats.before;
       let reasked = false;
-      if (isHeavy(before0) && left() > REASK_MIN_MS) {
+      const foreign0 = foreignInExtraction(first, req.language);
+      if (foreign0 > 0) log('INFO', 'foreign_script_hit', { lang: req.language, hits: foreign0 });
+      if ((isHeavy(before0) || foreign0 > 0) && left() > REASK_MIN_MS) {
         reasked = true;
         const again = await tm.span('reask', () => settle(deps.extractor.extract(req, { hedgeRetry: true }), left(), undefined));
-        if (again) guarded = guardExtraction(again, req.language);
+        if (again && foreignInExtraction(again, req.language) <= foreign0) guarded = guardExtraction(again, req.language);
       }
       tm.meta.reasked = reasked;
       const extraction = guarded.extraction;
@@ -193,6 +203,7 @@ export function createPipeline(deps: PipelineDeps): Pipeline {
           unsolicited: extraction.unsolicited,
           llmVerdict: extraction.verdictDraft,
           scamType: extraction.scamType,
+          language: req.language,
         });
 
       const rules = ownScore(extraction.flags, []);
@@ -272,6 +283,8 @@ export function createPipeline(deps: PipelineDeps): Pipeline {
       const [linkChecks, grounded, network] = await Promise.all([linksP, groundP, networkP]);
       const scoreStart = performance.now();
       const groundedGuard = guardFlags(grounded.flags, req.language);
+      if (groundedGuard.stats.dropped)
+        log('INFO', 'grounding_foreign_dropped', { lang: req.language, dropped: groundedGuard.stats.dropped });
       const ownFlags = [...extraction.flags, ...groundedGuard.flags];
       const scored = network.flags.length ? ownScore([...ownFlags, ...network.flags], linkChecks) : ownScore(ownFlags, linkChecks);
       const response = respond(scored, linkChecks, grounded.sources, network);
