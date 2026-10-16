@@ -10,8 +10,11 @@ import {
   historyMissingRemotely,
   historyToDoc,
   mergeHistory,
+  isLegacyDoc,
+  legacyToSlim,
+  MAX_SUMMARY_CHARS,
   profileToDoc,
-  stripImages,
+  scoreBucket,
 } from '../lib/sync';
 
 const entry = (n: number, createdAt = `2026-10-${String(10 + n).padStart(2, '0')}T08:00:00.000Z`): HistoryEntry => {
@@ -19,34 +22,71 @@ const entry = (n: number, createdAt = `2026-10-${String(10 + n).padStart(2, '0')
   return { id: result.id, createdAt, language: 'en', source: `offer ${n}`, result };
 };
 
+const SLIM_KEYS = ['createdAt', 'kind', 'language', 'scamType', 'scoreBucket', 'summary', 'title', 'verdict'];
+
+const detailed = (n: number): HistoryEntry => {
+  const e = entry(n);
+  const result = {
+    ...e.result,
+    verdict: 'danger' as const,
+    score: 87,
+    title: 'Job offer shows warning signs',
+    summary: 'The offer asks for a fee before the job starts.',
+    flags: [{ family: 'payment_route' as const, label: 'Fee first', evidence: 'Send 5000 baht to Khun Somchai at 0812345678', severity: 'high' as const }],
+    linkChecks: [{ url: 'https://pay-fee.example/a?u=me', webRisk: 'unknown' as const }],
+    sources: [{ title: 'Report', url: 'https://news.example/x' }],
+    actions: [{ label: 'Block 0812345678', type: 'block' as const, value: '0812345678' }],
+    spokenWarning: 'Do not pay Khun Somchai',
+    imageBase64: 'AAAA',
+  };
+  return { ...e, source: 'Hi Mya, send 5000 to 0812345678', result } as HistoryEntry;
+};
+
 describe('history sync mapping', () => {
-  it('round-trips a check through its document form', () => {
-    const e = entry(1);
-    const doc = historyToDoc(e);
-    expect(doc).not.toBeNull();
-    expect(typeof doc?.report).toBe('string');
-    expect(docToHistory(e.id, doc as unknown as Record<string, unknown>)).toEqual(e);
+  it('uploads only the verdict, score bucket, type, title, summary, language, kind and date', () => {
+    const doc = historyToDoc(detailed(1));
+    expect(Object.keys(doc).sort()).toEqual(SLIM_KEYS);
+    expect(doc).toMatchObject({ verdict: 'danger', scoreBucket: 80, kind: 'job', language: 'en', title: 'Job offer shows warning signs' });
+    const text = JSON.stringify(doc);
+    for (const leak of ['0812345678', 'Somchai', 'Mya', 'pay-fee.example', 'news.example', 'AAAA', 'evidence', 'source']) expect(text).not.toContain(leak);
   });
 
-  it('never stores screenshot data', () => {
-    const e = entry(2);
-    const withImage = { ...e, result: { ...e.result, imageBase64: 'AAAA', nested: { imageBase64: 'BBBB', keep: 1 } } } as unknown as HistoryEntry;
-    const doc = historyToDoc(withImage);
-    expect(doc?.report).not.toContain('imageBase64');
-    expect(doc?.report).not.toContain('AAAA');
-    expect(JSON.parse(doc?.report ?? '{}').nested).toEqual({ keep: 1 });
-    expect(stripImages({ a: [{ image: 'x', b: 1 }] })).toEqual({ a: [{ b: 1 }] });
-  });
-
-  it('skips a report that is too large for the rules', () => {
+  it('buckets scores 20 wide and clips long text', () => {
+    expect([0, 19, 20, 59, 60, 99, 100, -5, Number.NaN].map(scoreBucket)).toEqual([0, 0, 20, 40, 60, 80, 80, 0, 0]);
     const e = entry(3);
-    expect(historyToDoc({ ...e, result: { ...e.result, summary: 'x'.repeat(70000) } })).toBeNull();
+    const doc = historyToDoc({ ...e, result: { ...e.result, summary: 'x'.repeat(70000) } });
+    expect(doc.summary.length).toBe(MAX_SUMMARY_CHARS);
+  });
+
+  it('reads a slim document back as a report without flags', () => {
+    const e = detailed(4);
+    const back = docToHistory(e.id, historyToDoc(e) as unknown as Record<string, unknown>);
+    expect(back?.result).toMatchObject({ id: e.id, verdict: 'danger', score: 80, title: e.result.title, flags: [], linkChecks: [], actions: [] });
+    expect(back?.source).toBeUndefined();
+  });
+
+  it('rewrites an old full-report document in the slim shape', () => {
+    const e = detailed(5);
+    const legacy = { createdAt: e.createdAt, language: 'en', source: e.source, report: JSON.stringify(e.result) };
+    expect(isLegacyDoc(legacy)).toBe(true);
+    const slim = legacyToSlim(legacy);
+    expect(slim).toEqual(historyToDoc(e));
+    expect(JSON.stringify(slim)).not.toContain('0812345678');
+    expect(docToHistory(e.id, legacy)?.result.flags).toEqual([]);
   });
 
   it('drops malformed remote documents', () => {
     expect(docToHistory('a', { createdAt: 'x', report: '{oops' })).toBeNull();
-    expect(docToHistory('a', { createdAt: 'x', report: '{"verdict":"safe"}' })).toBeNull();
+    expect(docToHistory('a', { createdAt: 'x', report: '{"verdict":"maybe"}' })).toBeNull();
     expect(docToHistory('a', { report: '{}' })).toBeNull();
+    expect(docToHistory('a', { createdAt: 'x', verdict: 'nope' })).toBeNull();
+    expect(legacyToSlim({ createdAt: 'x', report: '{oops' })).toBeNull();
+  });
+
+  it('keeps the full local report when the account has the slim copy', () => {
+    const local = detailed(6);
+    const remote = docToHistory(local.id, historyToDoc(local) as unknown as Record<string, unknown>) as HistoryEntry;
+    expect(mergeHistory([local], [remote])[0].result.flags).toHaveLength(1);
   });
 
   it('merges local and remote by id, newest first, capped', () => {
@@ -80,9 +120,9 @@ describe('contacts and profile sync mapping', () => {
   });
 
   it('round-trips a profile and omits unset countries', () => {
-    const doc = profileToDoc({ onboarded: true, shareSignals: true, homeCountry: 'PH' }, 'tl', new Date('2026-10-14T00:00:00Z'));
+    const doc = profileToDoc({ onboarded: true, shareSignals: true, sharingAsked: true, keepHistory: true, homeCountry: 'PH' }, 'tl', new Date('2026-10-14T00:00:00Z'));
     expect(doc).toEqual({ language: 'tl', homeCountry: 'PH', updatedAt: '2026-10-14T00:00:00.000Z' });
-    expect(docToProfile(doc as unknown as Record<string, unknown>)).toEqual({ language: 'tl', profile: { onboarded: true, shareSignals: true, homeCountry: 'PH' } });
+    expect(docToProfile(doc as unknown as Record<string, unknown>)).toEqual({ language: 'tl', profile: { onboarded: true, shareSignals: false, sharingAsked: false, keepHistory: true, homeCountry: 'PH' } });
     expect(docToProfile({ language: 'zz' })).toBeNull();
   });
 });

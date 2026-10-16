@@ -16,7 +16,7 @@ import {
   validateContact,
   type TrustedContact,
 } from '../lib/contacts';
-import { HistoryEntry, addHistory, clearHistory, loadHistory, saveHistory } from '../lib/history';
+import { HistoryEntry, addHistory, clearHistory, historySlimmed, loadHistory, markHistorySlimmed, saveHistory } from '../lib/history';
 import {
   DEFAULT_PROFILE,
   PROFILE_KEY,
@@ -43,6 +43,8 @@ interface AppStateValue {
   finishOnboarding: (choices?: ProfileChoices) => void;
   history: HistoryEntry[];
   saveCheck: (result: CheckResponse, language: LanguageCode, source?: string) => Promise<void>;
+  /** Off deletes saved checks here and in the account, and stops saving and syncing them. */
+  setKeepHistory: (keep: boolean) => Promise<void>;
   contacts: TrustedContact[];
   addContact: (input: { name: string; phone: string }) => string | null;
   removeContact: (id: string) => void;
@@ -83,21 +85,29 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setSyncState('syncing');
     (async () => {
       try {
-        const snap = await cloud.pullAll(uid);
+        const keepsHistory = latest.current.profile.keepHistory;
+        const snap = await cloud.pullAll(uid, keepsHistory);
         if (cancelled) return;
         const { profile: localProfile, history: localHistory, contacts: localContacts } = latest.current;
         if (snap.profile) {
-          const adopted = { ...snap.profile, shareSignals: localProfile.shareSignals };
+          const { shareSignals, sharingAsked, keepHistory } = localProfile;
+          const adopted = { ...snap.profile, shareSignals, sharingAsked, keepHistory };
           setProfile(adopted);
           await saveProfile(adopted);
           if (snap.language) await setUiLanguage(snap.language);
         } else if (localProfile.onboarded) {
           await cloud.pushProfile(uid, localProfile, latest.current.language);
         }
-        const mergedHistory = mergeHistory(localHistory, snap.history);
-        setHistory(mergedHistory);
-        await saveHistory(mergedHistory);
-        await cloud.pushHistory(uid, historyMissingRemotely(mergedHistory, snap.history));
+        if (snap.legacyHistory > 0 || !(await historySlimmed(uid))) {
+          await cloud.slimRemoteHistory(uid);
+          await markHistorySlimmed(uid);
+        }
+        if (keepsHistory) {
+          const mergedHistory = mergeHistory(localHistory, snap.history);
+          setHistory(mergedHistory);
+          await saveHistory(mergedHistory);
+          await cloud.pushHistory(uid, historyMissingRemotely(mergedHistory, snap.history));
+        }
         const mergedContacts = mergeContacts(localContacts, snap.contacts);
         setContacts(mergedContacts);
         await saveContacts(mergedContacts);
@@ -130,11 +140,24 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const finishOnboarding = useCallback((choices?: ProfileChoices) => persistProfile(finishProfile(latest.current.profile, choices)), [persistProfile]);
 
   const saveCheck = useCallback(async (result: CheckResponse, lang: LanguageCode, source?: string) => {
+    if (!latest.current.profile.keepHistory) return;
     const entry: HistoryEntry = { id: result.id, createdAt: result.createdAt, language: lang, source, result };
     setHistory(await addHistory(entry));
     const id = latest.current.uid;
     if (id) cloud.pushHistory(id, [entry]).catch(() => setSyncState('error'));
   }, []);
+
+  const setKeepHistory = useCallback(
+    async (keep: boolean) => {
+      persistProfile(applyChoices(latest.current.profile, { keepHistory: keep }));
+      if (keep) return;
+      setHistory([]);
+      await clearHistory();
+      const id = latest.current.uid;
+      if (id) await cloud.deleteRemoteHistory(id).catch(() => setSyncState('error'));
+    },
+    [persistProfile],
+  );
 
   const addContact = useCallback((input: { name: string; phone: string }) => {
     const problem = validateContact(input);
@@ -185,6 +208,7 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       finishOnboarding,
       history,
       saveCheck,
+      setKeepHistory,
       contacts,
       addContact,
       removeContact,
@@ -192,7 +216,7 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       clearSyncedCopies,
       deleteLocalData,
     }),
-    [ready, profile, language, setLanguage, updateProfile, finishOnboarding, history, saveCheck, contacts, addContact, removeContact, syncState, clearSyncedCopies, deleteLocalData],
+    [ready, profile, language, setLanguage, updateProfile, finishOnboarding, history, saveCheck, setKeepHistory, contacts, addContact, removeContact, syncState, clearSyncedCopies, deleteLocalData],
   );
   return <AppStateContext.Provider value={value}>{children}</AppStateContext.Provider>;
 };

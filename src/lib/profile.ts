@@ -8,12 +8,16 @@ export const LEGACY_LANGUAGE_KEY = 'saferoute.language.v1';
 
 export interface Profile {
   onboarded: boolean;
+  /** Opt-in. Report a scam shares on its own because the tap is explicit. */
   shareSignals: boolean;
+  /** The sharing question was answered or skipped once. */
+  sharingAsked: boolean;
+  keepHistory: boolean;
   homeCountry?: CountryCode;
   destinationCountry?: CountryCode;
 }
 
-export const DEFAULT_PROFILE: Profile = { onboarded: false, shareSignals: true };
+export const DEFAULT_PROFILE: Profile = { onboarded: false, shareSignals: false, sharingAsked: false, keepHistory: true };
 
 export const LANGUAGE_CODES: LanguageCode[] = UI_LANGUAGE_CODES;
 
@@ -26,13 +30,15 @@ export function parseProfile(raw: unknown): Profile {
   const r = raw as Record<string, unknown>;
   return {
     onboarded: r.onboarded === true,
-    shareSignals: r.shareSignals !== false,
+    shareSignals: r.sharingAsked === true && r.shareSignals === true,
+    sharingAsked: r.sharingAsked === true,
+    keepHistory: r.keepHistory !== false,
     ...(isCountryCode(r.homeCountry) ? { homeCountry: r.homeCountry } : {}),
     ...(isCountryCode(r.destinationCountry) ? { destinationCountry: r.destinationCountry } : {}),
   };
 }
 
-export type ProfileChoices = Partial<Pick<Profile, 'homeCountry' | 'destinationCountry' | 'shareSignals'>>;
+export type ProfileChoices = Partial<Pick<Profile, 'homeCountry' | 'destinationCountry' | 'shareSignals' | 'sharingAsked' | 'keepHistory'>>;
 
 export function finishOnboarding(profile: Profile, choices: ProfileChoices = {}): Profile {
   return applyChoices({ ...profile, onboarded: true }, choices);
@@ -41,6 +47,8 @@ export function finishOnboarding(profile: Profile, choices: ProfileChoices = {})
 export function applyChoices(profile: Profile, choices: ProfileChoices): Profile {
   const next: Profile = { ...profile };
   if (typeof choices.shareSignals === 'boolean') next.shareSignals = choices.shareSignals;
+  if (typeof choices.sharingAsked === 'boolean') next.sharingAsked = choices.sharingAsked;
+  if (typeof choices.keepHistory === 'boolean') next.keepHistory = choices.keepHistory;
   if ('homeCountry' in choices) {
     if (choices.homeCountry) next.homeCountry = choices.homeCountry;
     else delete next.homeCountry;

@@ -21,6 +21,7 @@ const anonymous = uid => env.authenticatedContext(uid, { firebase: { sign_in_pro
 const guest = () => env.unauthenticatedContext().firestore();
 
 const history = { createdAt: '2026-10-14T10:00:00.000Z', language: 'en', source: 'Job offer', report: '{"verdict":"danger"}' };
+const slim = { createdAt: '2026-10-14T10:00:00.000Z', language: 'en', kind: 'job', verdict: 'danger', scoreBucket: 80, scamType: 'job_trafficking', title: 'Job offer shows warning signs', summary: 'It asks for a fee first.' };
 const contact = { name: 'Mother', phone: '+959123456', updatedAt: '2026-10-14T10:00:00.000Z' };
 const profile = { language: 'my', homeCountry: 'MM', updatedAt: '2026-10-14T10:00:00.000Z' };
 
@@ -55,6 +56,28 @@ describe('firestore rules', () => {
     await assertFails(setDoc(doc(db, 'users/alice/contacts/x5'), { ...contact, name: 'n'.repeat(81) }));
     await assertFails(setDoc(doc(db, 'users/alice/contacts/x6'), { ...contact, role: 'admin' }));
     await assertFails(setDoc(doc(db, 'users/alice'), { ...profile, admin: true }));
+  });
+
+  it('accepts the slim history shape and nothing extra', async () => {
+    const db = account('alice');
+    await assertSucceeds(setDoc(doc(db, 'users/alice/history/s1'), slim));
+    await assertSucceeds(setDoc(doc(db, 'users/alice/history/chk_1'), slim));
+    for (const extra of [{ flags: [] }, { source: 'Hi Mya' }, { report: '{}' }, { sources: [] }, { linkChecks: [] }]) {
+      await assertFails(setDoc(doc(db, 'users/alice/history/s2'), { ...slim, ...extra }));
+    }
+    const noSummary = { ...slim };
+    delete noSummary.summary;
+    await assertFails(setDoc(doc(db, 'users/alice/history/s3'), noSummary));
+    await assertFails(setDoc(doc(db, 'users/alice/history/s4'), { ...slim, verdict: 'scam' }));
+    await assertFails(setDoc(doc(db, 'users/alice/history/s5'), { ...slim, scoreBucket: 87 }));
+    await assertFails(setDoc(doc(db, 'users/alice/history/s6'), { ...slim, kind: 'chat' }));
+    await assertFails(setDoc(doc(db, 'users/alice/history/s7'), { ...slim, summary: 'x'.repeat(2001) }));
+    await assertFails(setDoc(doc(account('bob'), 'users/alice/history/s8'), slim));
+    await assertFails(setDoc(doc(anonymous('anon'), 'users/anon/history/s9'), slim));
+  });
+
+  it('still accepts the old full-report shape from older apps', async () => {
+    await assertSucceeds(setDoc(doc(account('alice'), 'users/alice/history/old1'), history));
   });
 
   it('denies every other path', async () => {
