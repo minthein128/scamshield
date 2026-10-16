@@ -190,6 +190,16 @@ class ShieldModule : Module() {
             MessageGuardBridge.log(context)
         }
 
+        AsyncFunction("getMessageGuardActivity") { afterSeq: Double ->
+            val context = appContext.reactContext ?: return@AsyncFunction null
+            MessageGuardBridge.activity(context, afterSeq.toLong())
+        }
+
+        AsyncFunction("openBatteryOptimizationSettings") {
+            val context = appContext.currentActivity ?: appContext.reactContext ?: return@AsyncFunction false
+            MessageGuardBridge.openBatterySettings(context)
+        }
+
         AsyncFunction("clearMessageGuardLog") {
             val context = appContext.reactContext ?: return@AsyncFunction false
             MessageGuardBridge.clearLog(context)

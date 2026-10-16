@@ -49,7 +49,7 @@ internal class MessageGuardLimiter(
         const val DEDUPE_MS = 10 * 60 * 1000L
         private const val HOUR_MS = 60 * 60 * 1000L
         private const val DAY_MS = 24 * HOUR_MS
-        private const val MAX_SEEN = 100
+        private const val MAX_SEEN = 300
 
         /** Same message with different digits or spacing maps to the same key. */
         fun keyFor(redacted: String): String {

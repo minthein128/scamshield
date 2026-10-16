@@ -96,6 +96,35 @@
     "notice": {
       "body": "Sebuah pesan mungkin perlu dicek lagi. Buka untuk melihat alasannya.",
       "open": "Buka"
+    },
+    "activity": {
+      "waiting": "Menunggu pesan dari aplikasi pilihan Anda.",
+      "last": "Pesan terakhir dari {{app}}, {{time}}: {{outcome}}",
+      "outcome": {
+        "notChosen": "tidak dibaca, aplikasi ini tidak ada di daftar Anda",
+        "paused": "tidak diperiksa, Message Guard dijeda",
+        "self": "pesan Anda sendiri, tidak diperiksa",
+        "noText": "tidak ada teks untuk diperiksa",
+        "hiddenPreview": "aplikasi menyembunyikan teksnya, jadi tidak bisa diperiksa. Nyalakan pratinjau pesan di aplikasi itu.",
+        "tooShort": "terlalu pendek untuk diperiksa, tidak dikirim",
+        "otp": "kode sekali pakai, tetap di ponsel Anda",
+        "notRisky": "tampak biasa, tidak dikirim",
+        "duplicate": "sama dengan pesan sebelumnya, tidak dikirim lagi",
+        "rateLimited": "tidak dikirim, batas per jam atau per hari sudah tercapai",
+        "sent": "dikirim untuk diperiksa, menunggu hasil",
+        "checkFailed": "pemeriksaan tidak selesai. Periksa koneksi internet Anda.",
+        "resultSafe": "sudah diperiksa, risiko rendah",
+        "resultWarned": "sudah diperiksa, SafeRoute mengirim pemberitahuan",
+        "noticeBlocked": "sudah diperiksa, tetapi notifikasi SafeRoute mati, jadi pemberitahuan tidak muncul"
+      }
+    },
+    "health": {
+      "accessOff": "Akses notifikasi mati, jadi Message Guard tidak bisa membaca pesan baru.",
+      "notConnected": "Android belum menjalankan Message Guard. Matikan lalu nyalakan lagi, atau mulai ulang ponsel.",
+      "notificationsOff": "Notifikasi SafeRoute mati, jadi Anda tidak akan melihat peringatan.",
+      "missingApps": "Tidak terpasang di ponsel ini: {{apps}}.",
+      "battery": "Android bisa menghentikan Message Guard untuk menghemat baterai.",
+      "batteryAction": "Izinkan berjalan di latar belakang"
     }
   }
 }

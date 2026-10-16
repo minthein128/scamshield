@@ -6,7 +6,7 @@ import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
 
-class CheckException(message: String) : Exception(message)
+class CheckException(message: String, val kind: String = "unknown") : Exception(message)
 
 object CheckClient {
     private const val CONNECT_TIMEOUT_MS = 10_000
