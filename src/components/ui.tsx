@@ -45,11 +45,13 @@ interface ButtonProps {
   accessibilityLabel?: string;
   /** Label lines before it is ellipsized. */
   maxLines?: number;
+  /** Sub label lines before it is ellipsized. */
+  subMaxLines?: number;
 }
 
 const LABEL_LINE = 20;
 
-export const Button: React.FC<ButtonProps> = ({ label, subLabel, onPress, variant = 'primary', disabled, style, testID, icon, leading, trailing, accessibilityLabel, maxLines = 2 }) => {
+export const Button: React.FC<ButtonProps> = ({ label, subLabel, onPress, variant = 'primary', disabled, style, testID, icon, leading, trailing, accessibilityLabel, maxLines = 2, subMaxLines = 2 }) => {
   const v = BUTTON_VARIANTS[variant];
   const firstLine = Math.round((scriptStyle(label, 'bold', LABEL_LINE).lineHeight ?? LABEL_LINE) * PixelRatio.getFontScale());
   return (
@@ -73,7 +75,7 @@ export const Button: React.FC<ButtonProps> = ({ label, subLabel, onPress, varian
         ) : null}
         <View style={[styles.buttonBody, trailing ? styles.buttonBodyFill : null]}>
           <Text numberOfLines={maxLines} ellipsizeMode="tail" style={[styles.buttonText, { color: v.color }]}>{label}</Text>
-          {subLabel ? <Text numberOfLines={2} ellipsizeMode="tail" style={[styles.buttonSub, { color: v.color }]}>{subLabel}</Text> : null}
+          {subLabel ? <Text numberOfLines={subMaxLines} ellipsizeMode="tail" style={[styles.buttonSub, { color: v.color }]}>{subLabel}</Text> : null}
         </View>
         {trailing ? <View style={styles.buttonIcon}>{trailing}</View> : null}
       </View>

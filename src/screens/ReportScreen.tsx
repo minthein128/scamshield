@@ -7,10 +7,9 @@ import { Text } from '../components/Text';
 import { Button, Card, LinkButton, Pill, SectionTitle } from '../components/ui';
 import { HeaderWithLeave } from '../components/LeaveQuickly';
 import { getApiClient } from '../api';
-import type { CheckAction } from '../api/types';
+import type { CheckAction, Verdict } from '../api/types';
 import {
   VERDICT_STYLES,
-  filledSegments,
   groupFlags,
   shareMessage,
   warnMessage,
@@ -24,6 +23,8 @@ import { seenLine } from '../lib/radar';
 import { callNumber } from '../lib/warn';
 import { WarnFamilySheet } from '../components/WarnFamilySheet';
 import { Avatar } from '../components/Avatar';
+import { BrandMark } from '../components/BrandMark';
+import { VERDICT_MOOD } from '../components/DollLoader';
 import { LiveVoiceSheet } from '../components/LiveVoiceSheet';
 import { FeedbackRow } from '../components/FeedbackRow';
 import { canGiveFeedback } from '../lib/feedback';
@@ -36,6 +37,15 @@ import theme, { readable } from '../theme/theme';
 const { colors, fonts } = theme;
 
 const PANE_GAP = 24;
+const STEPS: Verdict[] = ['safe', 'careful', 'danger'];
+
+/** The summary ends on the instruction: its last sentence leads, the explanation follows. */
+function splitHero(summary: string): [string, string] {
+  const text = summary.trim();
+  const sentences = (text.match(/[^.!?။。]+(?:[.!?။。]+|$)\s*/g) ?? []).map(x => x.trim()).filter(Boolean);
+  if (sentences.length < 2) return [text, ''];
+  return [sentences[sentences.length - 1], sentences.slice(0, -1).join(' ')];
+}
 
 const SEVERITY = {
   high: { bg: colors.dangerSoftBg, fg: colors.dangerSoftText, bar: colors.danger },
@@ -66,7 +76,9 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
   const layout = useLayout();
   const tablet = layout.isTablet;
   const narrow = width < 360;
-  const score = <Text style={[styles.score, narrow && styles.scoreNarrow]}>{result.score}<Text style={styles.scoreMax}>/100</Text></Text>;
+  const [hero, rest] = splitHero(result.summary);
+  const isDanger = result.verdict === 'danger';
+  const showTitle = !result.title.toLowerCase().includes(verdictLabel(result.verdict).toLowerCase());
 
   useEffect(() => {
     if (fresh && result.verdict !== 'safe') {
@@ -109,21 +121,25 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
 
   const leftTop = (
     <>
-      <View style={[styles.banner, narrow && styles.bannerNarrow, { backgroundColor: style.background }]} testID={`verdict-${result.verdict}`} accessible accessibilityLabel={t('a11yVerdict', { verdict: verdictLabel(result.verdict), score: result.score })}>
-        <View style={styles.bannerIcon}>
-          <Icon name={result.verdict === 'safe' ? 'checkCircle' : result.verdict === 'danger' ? 'octagon' : 'alert'} size={36} color={colors.white} />
+      <View style={[styles.banner, { backgroundColor: style.background }]} testID={`verdict-${result.verdict}`} accessible accessibilityLabel={t('a11yVerdict', { verdict: verdictLabel(result.verdict), step: STEPS.indexOf(result.verdict) + 1 })}>
+        <View style={styles.bannerDoll}>
+          <BrandMark size={narrow ? 64 : 80} medallion="#FCEFD2" mood={VERDICT_MOOD[result.verdict]} />
         </View>
-        {narrow ? score : null}
-        <View style={narrow ? styles.bannerTextNarrow : styles.bannerText}>
+        <View style={styles.bannerText}>
           <Text style={styles.bannerTitle}>{verdictLabel(result.verdict)}</Text>
-          <Text style={[styles.bannerSub, { color: style.subtle }]}>{scamTypeLabel(result.scamType)}</Text>
+          {result.scamType !== 'none' ? <Text style={[styles.bannerSub, { color: style.subtle }]}>{scamTypeLabel(result.scamType)}</Text> : null}
         </View>
-        {narrow ? null : score}
       </View>
-      <View style={styles.segments}>
-        {[0, 1, 2, 3].map(i => (
-          <View key={i} style={[styles.seg, { backgroundColor: i < filledSegments(result.score) ? style.background : colors.borderLight }]} />
-        ))}
+      <View style={styles.meter} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+        {STEPS.map(step => {
+          const on = step === result.verdict;
+          return (
+            <View key={step} testID={`meter-${step}`} style={styles.meterStep}>
+              <View style={[styles.seg, { backgroundColor: on ? VERDICT_STYLES[step].background : colors.borderLight }]} />
+              <Text style={[styles.meterLabel, on && styles.meterLabelOn]}>{verdictLabel(step)}</Text>
+            </View>
+          );
+        })}
       </View>
 
       {reported ? (
@@ -153,10 +169,18 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
         <Text testID="report-network" style={styles.network}>{seenLine(result.network?.seenCount)}</Text>
       ) : null}
 
-      <Card style={{ gap: 8 }}>
-        <Text style={[styles.reportTitle, readable(tablet, 20, 28)]}>{result.title}</Text>
-        <Text style={[styles.summary, readable(tablet, 16, 24)]}>{result.summary}</Text>
-      </Card>
+      {isDanger ? (
+        <View testID="report-hero" style={styles.hero}>
+          <Text accessibilityRole="header" style={[styles.heroText, readable(tablet, 24, 34)]}>{hero}</Text>
+          {rest ? <Text style={[styles.summary, readable(tablet, 16, 24)]}>{rest}</Text> : null}
+          {showTitle ? <Text style={styles.heroTitle}>{result.title}</Text> : null}
+        </View>
+      ) : (
+        <Card style={{ gap: 8 }}>
+          {showTitle ? <Text style={[styles.reportTitle, readable(tablet, 20, 28)]}>{result.title}</Text> : null}
+          <Text style={[styles.summary, readable(tablet, 16, 24)]}>{result.summary}</Text>
+        </Card>
+      )}
 
     </>
   );
@@ -252,7 +276,7 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
           <Button testID="report-warn" label={t('warn')} icon="people" style={footerButton} onPress={() => setWarnOpen(true)} />
           {result.verdict !== 'safe' ? (
             hotline?.dial ? (
-              <Button testID="report-call" icon="phone" label={call.label} subLabel={call.sub} variant="secondary" style={footerButton} onPress={() => callNumber(hotline.dial ?? '')} />
+              <Button testID="report-call" icon="phone" label={call.label} subLabel={call.sub} maxLines={3} subMaxLines={4} variant="secondary" style={footerButton} onPress={() => callNumber(hotline.dial ?? '')} />
             ) : (
               <Button testID="report-help" label={t('help')} variant="secondary" style={footerButton} onPress={() => navigation.navigate('GetHelp')} />
             )
@@ -308,18 +332,19 @@ const styles = StyleSheet.create({
   pane: { flex: 1, flexBasis: 0, minWidth: 0, gap: 16 },
   footerButton: { flex: 1, flexBasis: 0, minWidth: 0 },
   talkButton: { alignSelf: 'stretch', minHeight: 56 },
-  banner: { flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: 24, paddingVertical: 24, paddingHorizontal: 20 },
-  bannerIcon: { width: 56, height: 56, borderRadius: 28, backgroundColor: 'rgba(255,255,255,0.18)', alignItems: 'center', justifyContent: 'center' },
-  bannerTitle: { fontSize: 28, lineHeight: 34, fontFamily: fonts.extraBold, letterSpacing: -0.3, color: colors.white, includeFontPadding: false },
-  bannerSub: { fontSize: 14, lineHeight: 20, fontFamily: fonts.medium, includeFontPadding: false },
-  score: { fontSize: 32, lineHeight: 36, fontFamily: fonts.extraBold, color: colors.white },
-  scoreMax: { fontSize: 14, fontFamily: fonts.medium },
-  bannerNarrow: { flexWrap: 'wrap', paddingVertical: 20, paddingHorizontal: 16 },
+  banner: { flexDirection: 'row', alignItems: 'center', gap: 16, borderRadius: 24, paddingVertical: 20, paddingHorizontal: 20 },
+  bannerDoll: { width: 80, height: 80, alignItems: 'center', justifyContent: 'center' },
+  bannerTitle: { fontSize: 32, lineHeight: 40, fontFamily: fonts.extraBold, letterSpacing: -0.3, color: colors.white, includeFontPadding: false },
+  bannerSub: { fontSize: 15, lineHeight: 22, fontFamily: fonts.medium, includeFontPadding: false },
   bannerText: { flex: 1, minWidth: 0, gap: 4 },
-  bannerTextNarrow: { flexBasis: '100%', gap: 4 },
-  scoreNarrow: { marginLeft: 'auto' },
-  segments: { flexDirection: 'row', gap: 4, marginTop: -8 },
-  seg: { flex: 1, height: 8, borderRadius: 4 },
+  meter: { flexDirection: 'row', gap: 8 },
+  meterStep: { flex: 1, flexBasis: 0, minWidth: 0, gap: 6 },
+  seg: { height: 8, borderRadius: 4 },
+  meterLabel: { fontSize: 13, lineHeight: 18, fontFamily: fonts.medium, color: colors.textSecondary, textAlign: 'center' },
+  meterLabelOn: { fontFamily: fonts.extraBold, color: colors.textPrimary },
+  hero: { gap: 10, paddingVertical: 4 },
+  heroText: { fontSize: 24, lineHeight: 34, fontFamily: fonts.extraBold, color: colors.textPrimary },
+  heroTitle: { fontSize: 15, lineHeight: 22, fontFamily: fonts.medium, color: colors.textSecondary },
   thanks: { flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 16, paddingVertical: 14, paddingHorizontal: 16, backgroundColor: colors.safeBg },
   thanksText: { flex: 1, color: colors.safeText, fontSize: 15, lineHeight: 22, fontFamily: fonts.semiBold },
   network: { color: colors.textSecondary, fontSize: 14, lineHeight: 20, fontFamily: fonts.medium, textAlign: 'center' },

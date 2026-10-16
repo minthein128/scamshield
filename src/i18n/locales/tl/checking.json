@@ -11,13 +11,13 @@
     "score": "Sinusukat ang panganib",
     "write": "Isinusulat ang iyong babala"
   },
-  "verdict": {
-    "safe": "Mukhang mababang panganib",
-    "careful": "Hmm, mag-ingat",
-    "danger": "Mukhang mapanganib"
-  },
   "createAccount": "Gumawa ng libreng account",
   "retry": "Subukan muli",
   "goBack": "Bumalik",
-  "cancel": "Kanselahin"
+  "cancel": "Kanselahin",
+  "seeWhy": "Tingnan kung bakit",
+  "reassure": {
+    "careful": "Sinuri mo muna bago kumilos. Tama ang hakbang na iyon.",
+    "danger": "Sinuri mo muna bago kumilos. Tama ang hakbang na iyon."
+  }
 }

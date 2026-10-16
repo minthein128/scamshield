@@ -25,7 +25,7 @@ describe('DollLoader', () => {
 
   it('shows the verdict mark once the verdict lands', () => {
     render(<DollLoader step={5} verdict="danger" label="Checking" />);
-    expect(screen.getByTestId('loader-verdict-danger')).toBeTruthy();
+    expect(screen.getByTestId('loader-verdict-danger', { includeHiddenElements: true })).toBeTruthy();
   });
 
   it('gives every verdict its own glyph', () => {

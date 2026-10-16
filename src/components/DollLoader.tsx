@@ -3,6 +3,7 @@ import { Animated, Easing, Platform, StyleSheet, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import type { Verdict } from '../api/types';
 import { BrandMark } from './BrandMark';
+import type { DollMood } from './avatarArt';
 import { Icon, type IconName } from './Icon';
 import { useReduceMotion } from '../hooks/useReduceMotion';
 import theme from '../theme/theme';
@@ -11,6 +12,7 @@ const { colors } = theme;
 const SIZE = 240;
 const DOLL = 140;
 const native = Platform.OS !== 'web';
+const HIDDEN = { accessibilityElementsHidden: true, importantForAccessibility: 'no-hide-descendants' as const };
 
 const STAGE_ICONS: { at: number; x: number; y: number; paths: string[] }[] = [
   { at: 0, x: 6, y: 30, paths: ['M7 3h8l4 4v14H7z', 'M15 3v4h4', 'M10 12h6M10 16h6'] },
@@ -25,6 +27,9 @@ export const VERDICT_MARK: Record<Verdict, { color: string; icon: IconName }> = 
   careful: { color: colors.warningText, icon: 'alert' },
   danger: { color: colors.danger, icon: 'octagon' },
 };
+
+/** Face the doll wears for each verdict. */
+export const VERDICT_MOOD: Record<Verdict, DollMood> = { safe: 'calm', careful: 'concerned', danger: 'worried' };
 
 /** The doll rocks while the check runs, rights itself when the verdict lands, then shows the verdict mark. */
 export const DollLoader: React.FC<{ step: number; verdict?: Verdict | null; label: string }> = ({ step, verdict = null, label }) => {
@@ -69,18 +74,18 @@ export const DollLoader: React.FC<{ step: number; verdict?: Verdict | null; labe
   const mark = verdict ? VERDICT_MARK[verdict] : null;
 
   return (
-    <View style={styles.root} accessible accessibilityRole="progressbar" accessibilityLabel={label}>
-      <View style={[styles.glow, mark ? { borderColor: mark.color } : null]} />
+    <View style={styles.root} accessible accessibilityRole={verdict ? 'image' : 'progressbar'} accessibilityLabel={label}>
+      <View style={[styles.glow, mark ? { borderColor: mark.color } : null]} {...HIDDEN} />
       <Animated.View testID="loader-doll" style={[styles.doll, { transformOrigin: '50% 92%', transform: [{ rotate: angle }] }]}>
-        <BrandMark size={DOLL} />
+        <BrandMark size={DOLL} mood={verdict ? VERDICT_MOOD[verdict] : undefined} />
       </Animated.View>
       {mark ? (
-        <Animated.View testID={`loader-verdict-${verdict}`} style={[styles.badge, { backgroundColor: mark.color, opacity: badge, transform: [{ scale: badge }] }]}>
+        <Animated.View testID={`loader-verdict-${verdict}`} {...HIDDEN} style={[styles.badge, { backgroundColor: mark.color, opacity: badge, transform: [{ scale: badge }] }]}>
           <Icon name={mark.icon} size={30} color={colors.white} />
         </Animated.View>
       ) : null}
       {STAGE_ICONS.map((icon, i) => (
-        <Animated.View key={icon.at} style={[styles.stage, { left: icon.x, top: icon.y, opacity: verdict ? 0 : pops[i], transform: [{ scale: pops[i] }] }]}>
+        <Animated.View key={icon.at} {...HIDDEN} style={[styles.stage, { left: icon.x, top: icon.y, opacity: verdict ? 0 : pops[i], transform: [{ scale: pops[i] }] }]}>
           <Svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke={colors.brandGold} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
             {icon.paths.map(d => (
               <Path key={d} d={d} />

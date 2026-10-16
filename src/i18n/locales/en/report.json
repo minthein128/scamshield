@@ -2,7 +2,7 @@
   "seen_one": "Reported {{count}} time by other SafeRoute users in the last 30 days",
   "seen_other": "Reported {{count}} times by other SafeRoute users in the last 30 days",
   "title": "Risk report",
-  "a11yVerdict": "{{verdict}}. Score {{score}} out of 100.",
+  "a11yVerdict": "{{verdict}}. Step {{step}} of 3.",
   "warn": "Warn my family",
   "call": "Call {{number}}",
   "callExt": "then ask for local {{ext}}",
@@ -14,9 +14,9 @@
   "linkChecks": "Link checks",
   "actions": "What you can do",
   "severity": {
-    "high": "High risk",
-    "medium": "Medium risk",
-    "low": "Low risk"
+    "high": "Serious sign",
+    "medium": "Worth checking",
+    "low": "Minor sign"
   },
   "domainAge_one": "Domain age: {{count}} day",
   "domainAge_other": "Domain age: {{count}} days",

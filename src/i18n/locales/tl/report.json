@@ -5,7 +5,7 @@
   "seen_one": "Iniulat nang {{count}} beses ng iba pang gumagamit ng SafeRoute sa nakaraang 30 araw",
   "seen_other": "Iniulat nang {{count}} beses ng iba pang gumagamit ng SafeRoute sa nakaraang 30 araw",
   "title": "Ulat sa panganib",
-  "a11yVerdict": "{{verdict}}. Score na {{score}} mula sa 100.",
+  "a11yVerdict": "{{verdict}}. Antas {{step}} sa 3.",
   "warn": "Balaan ang pamilya ko",
   "call": "Tawagan ang {{number}}",
   "callExt": "tapos hingin ang local {{ext}}",
@@ -17,9 +17,9 @@
   "linkChecks": "Pagsusuri sa link",
   "actions": "Ang maaari mong gawin",
   "severity": {
-    "high": "Mataas na panganib",
-    "medium": "Katamtamang panganib",
-    "low": "Mababang panganib"
+    "high": "Seryosong palatandaan",
+    "medium": "Dapat suriin",
+    "low": "Maliit na palatandaan"
   },
   "domainAge_one": "Edad ng domain: {{count}} araw",
   "domainAge_other": "Edad ng domain: {{count}} araw",
