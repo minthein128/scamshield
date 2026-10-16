@@ -8,7 +8,7 @@
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#F4F6F8"
+      "backgroundColor": "#F7F3EE"
     },
     "ios": {
       "supportsTablet": true,
@@ -20,7 +20,7 @@
         "foregroundImage": "./assets/adaptive-foreground.png",
         "backgroundImage": "./assets/adaptive-background.png",
         "monochromeImage": "./assets/adaptive-monochrome.png",
-        "backgroundColor": "#1D4ED8"
+        "backgroundColor": "#1F1A17"
       },
       "permissions": [
         "SYSTEM_ALERT_WINDOW",
