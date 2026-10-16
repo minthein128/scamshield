@@ -34,13 +34,15 @@
     "body": "Ini akan membuka pesan teks berisi peringatan. Anda yang menentukan untuk mengirimnya atau tidak.",
     "addContact": "Tambah kontak tepercaya",
     "text": "Kirim SMS ke {{name}}",
-    "share": "Bagikan lewat cara lain"
+    "share": "Bagikan lewat cara lain",
+    "shareNow": "Bagikan peringatan ini"
   },
   "gate": {
     "body": "Masuk untuk menyimpan kontak tepercaya, agar kontak tersimpan dengan aman bersama akun Anda.",
     "signIn": "Masuk",
     "notNow": "Nanti saja",
     "unavailable": "Menyimpan kontak perlu akun, yang belum tersedia di versi ini.",
-    "legacy": "Masuk agar kontak ini tetap tersimpan bersama akun Anda."
+    "legacy": "Masuk agar kontak ini tetap tersimpan bersama akun Anda.",
+    "signInToSave": "Masuk untuk menyimpan kontak"
   }
 }

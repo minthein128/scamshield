@@ -31,13 +31,15 @@
     "body": "This opens a text message with the warning. You choose whether to send it.",
     "addContact": "Add a trusted contact",
     "text": "Text {{name}}",
-    "share": "Share another way"
+    "share": "Share another way",
+    "shareNow": "Share this warning"
   },
   "gate": {
     "body": "Sign in to save trusted contacts, so they are kept safely with your account.",
     "signIn": "Sign in",
     "notNow": "Not now",
     "unavailable": "Saving contacts needs an account, which is not available in this version.",
-    "legacy": "Sign in to keep these contacts with your account."
+    "legacy": "Sign in to keep these contacts with your account.",
+    "signInToSave": "Sign in to save contacts"
   }
 }

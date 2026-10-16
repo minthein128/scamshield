@@ -34,13 +34,15 @@
     "body": "Bubuksan nito ang text message na may babala. Ikaw ang pipili kung ipapadala ito.",
     "addContact": "Magdagdag ng pinagkakatiwalaang contact",
     "text": "I-text si {{name}}",
-    "share": "Ibahagi sa ibang paraan"
+    "share": "Ibahagi sa ibang paraan",
+    "shareNow": "Ibahagi ang babalang ito"
   },
   "gate": {
     "body": "Mag-sign in para mag-save ng mga pinagkakatiwalaang contact, para ligtas na maitago ang mga ito sa iyong account.",
     "signIn": "Mag-sign in",
     "notNow": "Huwag muna",
     "unavailable": "Kailangan ng account para mag-save ng contact, na hindi pa available sa bersyong ito.",
-    "legacy": "Mag-sign in para manatili ang mga contact na ito sa iyong account."
+    "legacy": "Mag-sign in para manatili ang mga contact na ito sa iyong account.",
+    "signInToSave": "Mag-sign in para mag-save ng contact"
   }
 }

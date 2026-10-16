@@ -129,14 +129,15 @@ describe('Warn my family without an account', () => {
     <WarnFamilySheet visible message="Careful: scam" onClose={onClose} onAddContact={onAdd} />
   );
 
-  it('keeps the share fallback and gates only the add button', async () => {
+  it('puts sharing first and offers sign-in as the secondary action', async () => {
     const onAdd = jest.fn();
     await mount(sheet(onAdd));
-    fireEvent.press(await screen.findByTestId('warn-add'));
-    expect(onAdd).not.toHaveBeenCalled();
-    expect(screen.getByTestId('contacts-gate')).toBeTruthy();
-    fireEvent.press(screen.getByTestId('contacts-gate-sign-in'));
+    expect(await screen.findByText('Share this warning')).toBeTruthy();
+    expect(screen.queryByTestId('warn-add')).toBeNull();
+    expect(screen.getByText('Sign in to save trusted contacts, so they are kept safely with your account.')).toBeTruthy();
+    fireEvent.press(screen.getByTestId('warn-sign-in'));
     expect(mockNavigate).toHaveBeenCalledWith('Account', { mode: 'signIn' });
+    expect(onAdd).not.toHaveBeenCalled();
   });
 
   it('shares the warning with no account', async () => {
@@ -150,8 +151,8 @@ describe('Warn my family without an account', () => {
   it('shares with no account when auth is unavailable', async () => {
     mockStatus = { kind: 'unavailable' };
     await mount(sheet());
-    fireEvent.press(await screen.findByTestId('warn-add'));
-    expect(screen.queryByTestId('contacts-gate-sign-in')).toBeNull();
+    expect(await screen.findByText('Saving contacts needs an account, which is not available in this version.')).toBeTruthy();
+    expect(screen.queryByTestId('warn-sign-in')).toBeNull();
     fireEvent.press(screen.getByTestId('warn-share'));
     expect(notify.shareText).toHaveBeenCalledWith('Careful: scam');
   });

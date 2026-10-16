@@ -50,9 +50,7 @@ for (const lang of ['en', 'my']) {
   await page.$eval(sel('check-submit'), e => e.click());
   await page.waitForSelector(sel('report-warn'), { timeout: 120000 });
   await page.$eval(sel('report-warn'), e => e.click());
-  await page.waitForSelector(sel('warn-add'));
-  await page.$eval(sel('warn-add'), e => e.click());
-  await page.waitForSelector(sel('contacts-gate'));
+  await page.waitForSelector(sel('warn-sign-in'));
   await sleep(600);
   await page.screenshot({ path: join(OUT, `contacts-signin-warn-${lang}.png`) });
   await page.close();

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Modal, Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Text } from './Text';
@@ -6,7 +6,6 @@ import { Button } from './ui';
 import { useAppState } from '../state/AppState';
 import { shareText } from '../lib/notify';
 import { textContact } from '../lib/warn';
-import { ContactsGate } from './ContactsGate';
 import { useOpenSignIn } from '../hooks/useOpenSignIn';
 import { useSheetLayout } from './useSheetLayout';
 import theme from '../theme/theme';
@@ -24,11 +23,12 @@ export const WarnFamilySheet: React.FC<Props> = ({ visible, message, onClose, on
   const { t } = useTranslation(['contacts', 'common']);
   const { contacts, contactAccess } = useAppState();
   const openSignIn = useOpenSignIn();
-  const [gateOpen, setGateOpen] = useState(false);
-  const close = () => {
-    setGateOpen(false);
-    onClose();
+  const close = onClose;
+  const share = () => {
+    shareText(message).catch(() => undefined);
+    close();
   };
+  const signedOutEmpty = contacts.length === 0 && contactAccess !== 'allowed';
   const { height } = useWindowDimensions();
   const sheet = useSheetLayout();
   return (
@@ -37,34 +37,36 @@ export const WarnFamilySheet: React.FC<Props> = ({ visible, message, onClose, on
       <Pressable accessibilityLabel={t('common:actions.close')} style={styles.backdrop} onPress={close} />
       <View style={[styles.sheet, sheet.sheet]} testID="warn-sheet">
         <Text accessibilityRole="header" style={styles.title}>{t('warn.title')}</Text>
-        <Text style={styles.body}>{t('warn.body')}</Text>
-        {contacts.length === 0 ? (
-          contactAccess === 'allowed' ? (
-            <Button testID="warn-add" label={t('warn.addContact')} onPress={() => { close(); onAddContact(); }} />
-          ) : gateOpen ? (
-            <ContactsGate
-              access={contactAccess}
-              onSignIn={() => { close(); openSignIn(); }}
-              onDismiss={() => setGateOpen(false)}
-            />
-          ) : (
-            <Button testID="warn-add" label={t('warn.addContact')} onPress={() => setGateOpen(true)} />
-          )
+        {signedOutEmpty ? null : <Text style={styles.body}>{t('warn.body')}</Text>}
+        {signedOutEmpty ? (
+          <>
+            <Button testID="warn-share" label={t('warn.shareNow')} onPress={share} />
+            <Text testID="warn-gate-note" style={styles.body}>{contactAccess === 'unavailable' ? t('gate.unavailable') : t('gate.body')}</Text>
+            {contactAccess === 'signIn' ? (
+              <Button testID="warn-sign-in" label={t('gate.signInToSave')} variant="secondary" onPress={() => { close(); openSignIn(); }} />
+            ) : null}
+          </>
         ) : (
-          contacts.map(c => (
-            <Button
-              key={c.id}
-              testID={`warn-${c.id}`}
-              label={t('warn.text', { name: c.name })}
-              onPress={() => {
-                textContact(c, message).catch(() => undefined);
-                close();
-              }}
-            />
-          ))
+          <>
+            {contacts.length === 0 ? (
+              <Button testID="warn-add" label={t('warn.addContact')} onPress={() => { close(); onAddContact(); }} />
+            ) : (
+              contacts.map(c => (
+                <Button
+                  key={c.id}
+                  testID={`warn-${c.id}`}
+                  label={t('warn.text', { name: c.name })}
+                  onPress={() => {
+                    textContact(c, message).catch(() => undefined);
+                    close();
+                  }}
+                />
+              ))
+            )}
+            {contacts.length > 0 && contactAccess === 'signIn' ? <Text testID="warn-legacy" style={styles.body}>{t('gate.legacy')}</Text> : null}
+            <Button testID="warn-share" label={t('warn.share')} variant="secondary" onPress={share} />
+          </>
         )}
-        {contacts.length > 0 && contactAccess === 'signIn' ? <Text testID="warn-legacy" style={styles.body}>{t('gate.legacy')}</Text> : null}
-        <Button testID="warn-share" label={t('warn.share')} variant="secondary" onPress={() => { shareText(message).catch(() => undefined); close(); }} />
         <Button label={t('common:actions.cancel')} variant="secondary" onPress={close} />
       </View>
       </View>
