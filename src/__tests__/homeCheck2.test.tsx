@@ -267,6 +267,35 @@ describe('Check page v3', () => {
     expect(screen.getByTestId('job-chat-text').props.value).toBe('');
   });
 
+  it('the Paste chip comes back when the box is cleared, and shows in each empty Job offer step', async () => {
+    (Clipboard.hasStringAsync as jest.Mock).mockResolvedValue(true);
+    renderCheck();
+    await waitFor(() => expect(screen.getByTestId('check-text-clip')).toBeTruthy());
+    await act(async () => { fireEvent.press(screen.getByTestId('check-text-clip')); });
+    expect(screen.queryByTestId('check-text-clip')).toBeNull();
+    fireEvent.changeText(screen.getByTestId('check-text'), '');
+    expect(screen.getByTestId('check-text-clip')).toBeTruthy();
+
+    fireEvent.press(screen.getByTestId('check-mode-job'));
+    await act(async () => { fireEvent.press(screen.getByTestId('job-ad-text-clip')); });
+    expect(screen.getByTestId('job-ad-text').props.value).toBe('copied text');
+    expect(screen.getByTestId('job-chat-text-clip')).toBeTruthy();
+    await act(async () => { fireEvent.press(screen.getByTestId('job-chat-text-clip')); });
+    expect(screen.getByTestId('job-chat-text').props.value).toBe('copied text');
+  });
+
+  it('a clipboard read error on any Paste chip shows the clipboard notice', async () => {
+    (Clipboard.hasStringAsync as jest.Mock).mockResolvedValue(true);
+    (Clipboard.getStringAsync as jest.Mock).mockRejectedValue(new Error('denied'));
+    renderCheck();
+    await waitFor(() => expect(screen.getByTestId('check-text-clip')).toBeTruthy());
+    for (const id of ['check-text-clip', 'job-ad-text-clip', 'job-chat-text-clip']) {
+      if (id === 'job-ad-text-clip') fireEvent.press(screen.getByTestId('check-mode-job'));
+      await act(async () => { fireEvent.press(screen.getByTestId(id)); });
+      expect(screen.getByText('Your clipboard is empty.')).toBeTruthy();
+    }
+  });
+
   it('More details unfolds the two existing fields', () => {
     renderCheck();
     expect(screen.queryByTestId('check-destination')).toBeNull();
