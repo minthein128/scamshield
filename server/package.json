@@ -33,6 +33,12 @@
     "bench:validate": "tsx ../bench/v2/validate.ts",
     "bench:render": "tsx ../bench/v2/render.ts",
     "bench:draft": "tsx ../bench/v2/draft.ts",
+    "bench:label-real": "tsx ../bench/real/label.ts",
+    "bench:boxes": "tsx ../bench/real/boxes.ts",
+    "bench:redact-cases": "tsx ../bench/real/sanitize.ts",
+    "bench:package-hf": "tsx ../bench/real/package-hf.ts",
+    "bench:gallery": "tsx ../bench/real/gallery.ts",
+    "bench:real-report": "tsx ../bench/real/analyze.ts",
     "config:seed-hotlines": "tsx src/admin/seed-hotlines.ts",
     "admin:grant": "tsx src/admin/grant.ts",
     "live:smoke": "tsx eval/live-smoke.ts"
