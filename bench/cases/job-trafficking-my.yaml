@@ -1,0 +1,42 @@
+id: job-trafficking-my
+file: ../public/v2/job-trafficking-my.png
+language: my
+home: MM
+destination: Thailand
+app: chat
+scam_type: job_trafficking
+expected_verdict: danger
+score_range: [70, 100]
+families: [trafficking, payment_route, pressure]
+source_text: |
+  ကိုဇော် အလုပ်အကိုင်
+  ဒီနေ့ 09:40
+  ထိုင်းနိုင်ငံ မြဝတီ-မဲဆောက် နယ်စပ်အနီးရှိ ကုမ္ပဏီတွင် အွန်လိုင်း ဈေးကွက်ရှာဖွေရေး ဝန်ထမ်း အမြန်လိုအပ်သည်။ လစာ ဘတ် ၃၅,၀၀၀ နှင့် ဘောနပ်စ်။
+  အတွေ့အကြုံ မလိုပါ။ ပတ်စ်ပို့ မရှိလည်း ရပါတယ်၊ ကျွန်တော်တို့ စီစဉ်ပေးမယ်။ ကားခ၊ စားစရိတ် အခမဲ့။
+  ကြိုတင်ကြေး ကျပ် ၃၀၀,၀၀၀ ကို ဒီနေ့ လွှဲပေးပါ။ နေရာ ၂ ခုပဲ ကျန်တော့တယ်။ ညနေ ၇ နာရီ မြဝတီမှာ ကားလာကြိုမယ်။
+  ကုမ္ပဏီ နာမည် ဘာလဲ
+  နာမည် မမေးပါနဲ့။ Telegram @mw_bright_jobs မှာ ဆက်သွယ်ပါ။
+must_mention:
+  - border
+  - id: advance_fee
+    variants: ["300000", "၃၀၀,၀၀၀", "၃ သိန်း", "သုံးသိန်း", "ကြိုတင်ကြေး", "ကြိုတင်ငွေ"]
+  - id: myawaddy
+    variants: ["မြဝတီ", "Myawaddy", "เมียวดี"]
+  - id: passport
+    library: true
+    variants: ["ပတ်စ်ပို့", "ပတ်စပို့"]
+must_advise: [dont_pay, dont_travel, verify_trusted, call_hotline]
+must_not:
+  accuse: [ကိုဇော်, mw_bright_jobs]
+synthetic:
+  layout: chat
+  sender: ကိုဇော် အလုပ်အကိုင်
+  messages:
+    - { from: time, text: "ဒီနေ့ 09:40" }
+    - { from: them, text: "ထိုင်းနိုင်ငံ မြဝတီ-မဲဆောက် နယ်စပ်အနီးရှိ ကုမ္ပဏီတွင် အွန်လိုင်း ဈေးကွက်ရှာဖွေရေး ဝန်ထမ်း အမြန်လိုအပ်သည်။ လစာ ဘတ် ၃၅,၀၀၀ နှင့် ဘောနပ်စ်။" }
+    - { from: them, text: "အတွေ့အကြုံ မလိုပါ။ ပတ်စ်ပို့ မရှိလည်း ရပါတယ်၊ ကျွန်တော်တို့ စီစဉ်ပေးမယ်။ ကားခ၊ စားစရိတ် အခမဲ့။" }
+    - { from: them, text: "ကြိုတင်ကြေး ကျပ် ၃၀၀,၀၀၀ ကို ဒီနေ့ လွှဲပေးပါ။ နေရာ ၂ ခုပဲ ကျန်တော့တယ်။ ညနေ ၇ နာရီ မြဝတီမှာ ကားလာကြိုမယ်။" }
+    - { from: me, text: "ကုမ္ပဏီ နာမည် ဘာလဲ" }
+    - { from: them, text: "နာမည် မမေးပါနဲ့။ Telegram @mw_bright_jobs မှာ ဆက်သွယ်ပါ။" }
+notes: Fictional. Burmese recruitment to Myawaddy with an advance fee, no passport and a hidden company name.
+public: true

@@ -1,0 +1,37 @@
+id: agency-my
+file: ../public/v2/agency-my.png
+language: my
+home: MM
+destination: Malaysia
+app: facebook
+scam_type: fake_agency
+expected_verdict: danger
+score_range: [60, 100]
+families: [payment_route, identity, pressure, too_good]
+source_text: |
+  ရွှေလမ်း ပြည်ပအလုပ်အကိုင် အေဂျင်စီ
+  Sponsored
+  မလေးရှား စက်ရုံ အလုပ်များ - ဗီဇာ နှင့် အလုပ် အာမခံသည်။
+  အေဂျင့်ကြေး ကျပ် ၂,၅၀၀,၀၀၀ ကို ကြိုတင်ပေးရပါမည်။ စရံငွေ ကျပ် ၅၀၀,၀၀၀ ကို ယနေ့ ကိုယ်ပိုင် မိုဘိုင်းငွေအကောင့်သို့ လွှဲပါ။
+  လိုင်စင် သက်တမ်းတိုးနေဆဲ ဖြစ်ပါသည်။ ၂ ပတ်အတွင်း ထွက်ခွာရမည်။ နေရာ အကန့်အသတ်ရှိသည်။
+  ဖုန်း ၀၉ ၅၅၅ ၀၁၀ ၁၀၁
+must_mention:
+  - id: agent_fee
+    variants: ["2500000", "၂,၅၀၀,၀၀၀", "၂၅ သိန်း", "နှစ်ဆယ့်ငါးသိန်း", "အေဂျင့်ကြေး", "ကြေး"]
+  - id: deposit
+    variants: ["500000", "၅၀၀,၀၀၀", "၅ သိန်း", "ငါးသိန်း", "စရံ"]
+  - licence
+  - personal_account
+must_advise: [dont_pay, verify_official, verify_trusted]
+must_not:
+  accuse: [ရွှေလမ်း]
+synthetic:
+  layout: post
+  sender: ရွှေလမ်း ပြည်ပအလုပ်အကိုင် အေဂျင်စီ
+  messages:
+    - { from: them, text: "မလေးရှား စက်ရုံ အလုပ်များ - ဗီဇာ နှင့် အလုပ် အာမခံသည်။" }
+    - { from: them, text: "အေဂျင့်ကြေး ကျပ် ၂,၅၀၀,၀၀၀ ကို ကြိုတင်ပေးရပါမည်။ စရံငွေ ကျပ် ၅၀၀,၀၀၀ ကို ယနေ့ ကိုယ်ပိုင် မိုဘိုင်းငွေအကောင့်သို့ လွှဲပါ။" }
+    - { from: them, text: "လိုင်စင် သက်တမ်းတိုးနေဆဲ ဖြစ်ပါသည်။ ၂ ပတ်အတွင်း ထွက်ခွာရမည်။ နေရာ အကန့်အသတ်ရှိသည်။" }
+    - { from: them, text: "ဖုန်း ၀၉ ၅၅၅ ၀၁၀ ၁၀၁" }
+notes: Fictional agency. Upfront agent fee, deposit to a personal wallet, licence "being renewed". The phone number is a placeholder.
+public: true

@@ -10,7 +10,7 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc -p tsconfig.build.json",
     "start": "node dist/index.js",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p ../bench",
     "lint": "biome check src test eval ../bench",
     "format": "biome check --write src test",
     "test": "vitest run",
@@ -26,6 +26,13 @@
     "bench": "tsx ../bench/run.ts",
     "bench:labels": "tsx ../bench/labels.ts",
     "bench:report": "tsx ../bench/report.ts",
+    "bench:v2": "tsx ../bench/v2/run.ts",
+    "bench:v2:report": "tsx ../bench/v2/report.ts",
+    "bench:ab": "tsx ../bench/v2/ab.ts",
+    "bench:gate": "tsx ../bench/v2/gate.ts",
+    "bench:validate": "tsx ../bench/v2/validate.ts",
+    "bench:render": "tsx ../bench/v2/render.ts",
+    "bench:draft": "tsx ../bench/v2/draft.ts",
     "config:seed-hotlines": "tsx src/admin/seed-hotlines.ts",
     "admin:grant": "tsx src/admin/grant.ts",
     "live:smoke": "tsx eval/live-smoke.ts"
@@ -45,6 +52,7 @@
     "@types/node": "^26.6.5",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
-    "vitest": "^5.0.4"
+    "vitest": "^5.0.4",
+    "yaml": "^2.9.1"
   }
 }

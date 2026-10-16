@@ -1,0 +1,69 @@
+id: job-trafficking-en
+file: ../public/v2/job-trafficking-en.png
+language: en
+home: PH
+destination: Thailand
+app: chat
+scam_type: job_trafficking
+expected_verdict: danger
+score_range: [70, 100]
+families: [trafficking, too_good, pressure, identity]
+source_text: |
+  Ms Lin - HR
+  online
+  Today 10:12
+  URGENT HIRING: Customer Service Staff in Thailand
+  Company: Silver Lotus Digital Co. (Mae Sot office)
+  Salary: USD 1,500 per month + bonus, free room and food
+  No experience, no English test. We pay your ticket. No work visa needed, tourist entry is fine.
+  Send a photo of your passport today to book your seat. Only 3 seats left. Our driver picks you up at the border at night.
+  Can I tell my family first?
+  Better not, it will slow the process. Message me on Telegram: @silverlotus_hr22
+must_mention:
+  - passport
+  - border
+  - id: salary
+    variants: ["1500", "USD 1,500", "1,500 dollars"]
+  - id: mae_sot
+    variants: ["Mae Sot", "แม่สอด", "မဲဆောက်"]
+  - id: telegram
+    variants: ["@silverlotus_hr22", "silverlotus_hr22", "Telegram"]
+  - id: no_work_visa
+    variants: ["visa", "tourist"]
+must_advise: [dont_send_documents, dont_travel, verify_trusted, call_hotline]
+must_not:
+  accuse: [Silver Lotus Digital, Ms Lin, silverlotus_hr22]
+  advice: [you can trust this, safe to travel, go ahead and send]
+translations:
+  - language: th
+    file: ../public/v2/job-trafficking-en.th.png
+    source_text: |
+      ด่วน! รับสมัครพนักงานบริการลูกค้าในประเทศไทย
+      บริษัท ซิลเวอร์โลตัส ดิจิทัล (สำนักงานแม่สอด)
+      เงินเดือน 1,500 ดอลลาร์สหรัฐ + โบนัส ฟรีที่พักและอาหาร
+      ไม่ต้องมีประสบการณ์ ไม่ต้องสอบภาษาอังกฤษ เราออกค่าตั๋วให้ ไม่ต้องมีวีซ่าทำงาน เข้าแบบนักท่องเที่ยวได้
+      ส่งรูปพาสปอร์ตมาวันนี้เพื่อจองที่นั่ง เหลือแค่ 3 ที่ คนขับของเราจะไปรับที่ชายแดนตอนกลางคืน
+      บอกครอบครัวก่อนได้ไหม
+      อย่าเลย จะทำให้ช้า ทักมาทาง Telegram: @silverlotus_hr22
+    synthetic:
+      layout: chat
+      sender: คุณหลิน ฝ่ายบุคคล
+      messages:
+        - { from: time, text: "วันนี้ 10:12" }
+        - { from: them, text: "ด่วน! รับสมัครพนักงานบริการลูกค้าในประเทศไทย\nบริษัท ซิลเวอร์โลตัส ดิจิทัล (สำนักงานแม่สอด)\nเงินเดือน 1,500 ดอลลาร์สหรัฐ + โบนัส ฟรีที่พักและอาหาร" }
+        - { from: them, text: "ไม่ต้องมีประสบการณ์ ไม่ต้องสอบภาษาอังกฤษ เราออกค่าตั๋วให้ ไม่ต้องมีวีซ่าทำงาน เข้าแบบนักท่องเที่ยวได้" }
+        - { from: them, text: "ส่งรูปพาสปอร์ตมาวันนี้เพื่อจองที่นั่ง เหลือแค่ 3 ที่ คนขับของเราจะไปรับที่ชายแดนตอนกลางคืน" }
+        - { from: me, text: "บอกครอบครัวก่อนได้ไหม" }
+        - { from: them, text: "อย่าเลย จะทำให้ช้า ทักมาทาง Telegram: @silverlotus_hr22" }
+synthetic:
+  layout: chat
+  sender: Ms Lin - HR
+  messages:
+    - { from: time, text: "Today 10:12" }
+    - { from: them, text: "URGENT HIRING: Customer Service Staff in Thailand\nCompany: Silver Lotus Digital Co. (Mae Sot office)\nSalary: USD 1,500 per month + bonus, free room and food" }
+    - { from: them, text: "No experience, no English test. We pay your ticket. No work visa needed, tourist entry is fine." }
+    - { from: them, text: "Send a photo of your passport today to book your seat. Only 3 seats left. Our driver picks you up at the border at night." }
+    - { from: me, text: "Can I tell my family first?" }
+    - { from: them, text: "Better not, it will slow the process. Message me on Telegram: @silverlotus_hr22" }
+notes: Fictional. Classic scam-compound recruitment with passport request, border pickup and secrecy.
+public: true

@@ -1,0 +1,30 @@
+id: parcel-tl
+file: ../public/v2/parcel-tl.png
+language: tl
+home: PH
+app: sms
+scam_type: parcel_phishing
+expected_verdict: danger
+score_range: [60, 100]
+families: [payment_route, pressure, link_risk]
+source_text: |
+  BilisPadala PH
+  Text message
+  BilisPadala: Hindi maihatid ang iyong parsela dahil kulang ang address. Magbayad ng ₱45 na redelivery fee sa loob ng 24 oras: https://bilispadala-redeliver.example/ph Kung hindi, ibabalik ang parsela sa nagpadala.
+must_mention:
+  - id: fee
+    variants: ["45", "₱45", "bayad", "magbayad", "fee"]
+  - link
+  - id: deadline
+    variants: ["24 oras", "24 hours", "madalian", "minamadali", "pagmamadali"]
+must_advise: [dont_click_link, dont_pay, verify_official]
+must_not:
+  accuse: [BilisPadala]
+synthetic:
+  layout: sms
+  sender: BilisPadala PH
+  messages:
+    - { from: time, text: "Text message - Today 11:20" }
+    - { from: them, text: "BilisPadala: Hindi maihatid ang iyong parsela dahil kulang ang address. Magbayad ng ₱45 na redelivery fee sa loob ng 24 oras: https://bilispadala-redeliver.example/ph Kung hindi, ibabalik ang parsela sa nagpadala." }
+notes: Fictional courier brand, Tagalog redelivery-fee phishing.
+public: true
