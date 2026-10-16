@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { AppState, PermissionsAndroid, Platform } from 'react-native';
+import { AppState, Platform } from 'react-native';
 import * as ShieldModule from 'shield-module';
 import type { MessageGuardApp, MessageGuardLogEntry } from 'shield-module';
 import { t } from '../i18n';
 import { diag, errorCode } from '../lib/diagLog';
+import { ensureNotifications } from '../lib/permissions';
 import { useApiUrl } from '../config/runtime';
 import { useAppState } from '../state/AppState';
 import { shieldSupport, type ShieldSupport } from './useShieldControl';
@@ -74,9 +75,7 @@ export function useMessageGuard(): MessageGuardControl {
   }, [support]);
 
   const turnOn = useCallback(async () => {
-    if (Number(Platform.Version) >= 33) {
-      await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
-    }
+    await ensureNotifications('guardNotifications');
     await ShieldModule.setMessageGuardEnabled(true);
     diag.info('messageGuard', 'enabled');
     setError(null);

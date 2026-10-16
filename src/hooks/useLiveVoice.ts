@@ -4,6 +4,7 @@ import type { CheckResponse, LanguageCode } from '../api/types';
 import { ensureApiUrl } from '../config/runtime';
 import { createLiveAudio } from '../lib/liveAudio';
 import { createLiveSession, type LiveAction, type LiveSessionDeps, type LiveView, type SocketLike } from '../lib/liveSession';
+import { ensureMicrophone } from '../lib/permissions';
 import { speak, stopSpeaking } from '../lib/speech';
 import { getAuthToken } from '../services/token';
 
@@ -38,6 +39,7 @@ export const realDeps: LiveSessionDeps = {
   getToken: getAuthToken,
   playWarning,
   stopWarning: stopSpeaking,
+  ensureMic: () => ensureMicrophone(),
 };
 
 const IDLE: LiveView = { state: 'idle', caption: '', userCaption: '', remainingSec: 120, muted: false, error: null, fallback: false, warning: false, endedBy: null };

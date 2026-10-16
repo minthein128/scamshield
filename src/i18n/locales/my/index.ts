@@ -10,9 +10,10 @@ import home from './home.json';
 import learn from './learn.json';
 import live from './live.json';
 import onboarding from './onboarding.json';
+import permissions from './permissions.json';
 import radar from './radar.json';
 import report from './report.json';
 import settings from './settings.json';
 import shield from './shield.json';
 
-export default { account, check, checking, common, contacts, errors, feedback, help, home, learn, live, onboarding, radar, report, settings, shield };
+export default { account, check, checking, common, contacts, errors, feedback, help, home, learn, live, onboarding, permissions, radar, report, settings, shield };

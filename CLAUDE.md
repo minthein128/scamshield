@@ -35,11 +35,16 @@ Other env vars: `EXPO_PUBLIC_APK_URL` (download link on web), `EXPO_PUBLIC_FIREB
 
 ## Shield overlay (Android)
 
-- `src/screens/ShieldScreen.tsx` asks for POST_NOTIFICATIONS (Android 13+), then screen capture, then calls `startShield({ apiUrl, language, authToken })`. The same flow runs from the switch on Home (`useShieldControl`). "Check this screen now" calls `checkScreenNow()`.
+- `src/screens/ShieldScreen.tsx` explains and asks for "Display over other apps", then POST_NOTIFICATIONS (Android 13+, optional), then screen capture, then calls `startShield({ apiUrl, language, authToken })`. The same flow runs from the switch on Home (`useShieldControl`). "Check this screen now" calls `checkScreenNow()`.
 - Overlay results are saved to recent checks by `useShieldSync` (listener plus `takeUnsyncedResults()` on start). `saferoute://report/<id>` opens the report through `useShieldDeepLink`.
 - The native client is blocked from cleartext `http://` by Android. `EXPO_PUBLIC_API_URL` must be `https://` for the shield. Cleartext is not enabled. The web build and `pnpm web` may use `http://localhost`.
 - The shield needs `EXPO_PUBLIC_API_URL`; it does not use the mock.
 - After editing `modules/shield-module`, run `rm -rf node_modules/shield-module node_modules/live-audio && pnpm install (or copy modules/<name> into node_modules/<name> if pnpm skips the link)` (the `file:` dependency is copied).
+
+## Permissions
+
+- Nothing is requested at app start or in onboarding. Each permission is asked when its feature is used, after a short reason dialog (`src/components/PermissionHost.tsx`, strings in the `permissions` namespace). Use `ensureMicrophone`, `ensureNotifications`, `ensureContacts`, `explainPermission` and `showPermissionHelp` from `src/lib/permissions.ts`; never call `PermissionsAndroid.request` directly.
+- Photos use the system photo picker (no permission). `plugins/with-minimal-permissions.js` strips CAMERA, storage, media and WRITE_CONTACTS from the merged manifest. Add a permission to its list only with a feature that needs it.
 
 ## Rules
 
