@@ -1,10 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Platform, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import Constants from 'expo-constants';
-import * as Clipboard from 'expo-clipboard';
-import { apiHost, checkHealth, connectionReport, refreshApiUrl, useApiUrl } from '../config/runtime';
-import { notify } from '../lib/notify';
+import { apiHost, checkHealth, refreshApiUrl, useApiUrl } from '../config/runtime';
 import theme from '../theme/theme';
 import { Text } from './Text';
 import { Button, Card } from './ui';
@@ -13,7 +10,7 @@ const { colors, fonts } = theme;
 
 type Health = 'checking' | 'ok' | 'down';
 
-export const ConnectionCard: React.FC = () => {
+export const ConnectionCard: React.FC<{ onOpenLog: () => void }> = ({ onOpenLog }) => {
   const { t } = useTranslation('settings');
   const url = useApiUrl();
   const [health, setHealth] = useState<Health>('checking');
@@ -33,18 +30,6 @@ export const ConnectionCard: React.FC = () => {
     await probe(await refreshApiUrl().catch(() => url));
   };
 
-  const [copying, setCopying] = useState(false);
-  const copyReport = async () => {
-    setCopying(true);
-    try {
-      const report = await connectionReport({ version: Constants.expoConfig?.version ?? '', os: Platform.OS });
-      await Clipboard.setStringAsync(report);
-      notify(t('connection.copyReport'), t('connection.copied'));
-    } finally {
-      setCopying(false);
-    }
-  };
-
   const label = health === 'checking' ? t('connection.checking') : health === 'ok' ? t('connection.healthy') : t('connection.unhealthy');
   return (
     <Card style={{ gap: 8 }} testID="settings-connection">
@@ -53,7 +38,7 @@ export const ConnectionCard: React.FC = () => {
         <Text testID="settings-connection-status" style={[styles.strong, health === 'down' && { color: colors.danger }]}>{label}</Text>
       </View>
       <Button testID="settings-recheck" label={t('connection.recheck')} variant="secondary" onPress={recheck} disabled={health === 'checking'} />
-      <Button testID="settings-copy-report" label={t('connection.copyReport')} variant="secondary" onPress={copyReport} disabled={copying} />
+      <Button testID="settings-open-log" label={t('connection.openLog')} variant="secondary" onPress={onOpenLog} />
     </Card>
   );
 };

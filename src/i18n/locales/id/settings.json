@@ -32,8 +32,25 @@
     "checking": "Memeriksa...",
     "none": "Tidak ada alamat server",
     "recheck": "Periksa ulang koneksi",
-    "copyReport": "Salin laporan koneksi",
-    "copied": "Laporan koneksi disalin. Tempel ke pesan untuk tim SafeRoute."
+    "openLog": "Log diagnostik"
+  },
+  "diagnostics": {
+    "title": "Log diagnostik",
+    "privacy": "Log ini tetap di ponsel Anda. Isinya tidak memuat pesan atau data pribadi. Bagikan hanya jika tim SafeRoute memintanya.",
+    "all": "Semua",
+    "errors": "Kesalahan",
+    "empty": "Belum ada catatan log.",
+    "emptyErrors": "Tidak ada kesalahan tercatat.",
+    "copy": "Salin laporan",
+    "share": "Bagikan laporan",
+    "clear": "Hapus log",
+    "copied": "Laporan disalin. Tempel di pesan ke tim SafeRoute.",
+    "clearTitle": "Hapus log?",
+    "clearMessage": "Ini menghapus semua catatan log di ponsel ini.",
+    "clearAction": "Hapus",
+    "levelError": "Kesalahan",
+    "levelWarn": "Peringatan",
+    "levelInfo": "Info"
   },
   "privacy": {
     "title": "Privasi",
@@ -47,7 +64,8 @@
     "p4": "Anda dapat menghapus data di perangkat ini kapan saja. Pemilik akun juga dapat menghapus akun dan semua data yang disinkronkan.",
     "policy": "Kebijakan privasi",
     "deleteInfo": "Cara menghapus data Anda",
-    "deleteLocal": "Hapus data di perangkat ini"
+    "deleteLocal": "Hapus data di perangkat ini",
+    "p5": "Log diagnostik di ponsel ini mencatat kode kesalahan dan waktu proses. Isinya tidak memuat pesan atau data pribadi. Log hanya dibagikan jika Anda memilih mengirimnya."
   },
   "confirm": {
     "signOut": {

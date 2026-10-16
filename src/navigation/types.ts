@@ -34,6 +34,7 @@ export type RootStackParamList = {
   Tabs: NavigatorScreenParams<TabParamList> | undefined;
   Account: { mode?: 'signUp' | 'signIn' } | undefined;
   Settings: undefined;
+  Diagnostics: undefined;
   GetHelp: undefined;
   Radar: undefined;
   ReportScam: undefined;
