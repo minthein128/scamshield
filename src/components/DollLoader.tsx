@@ -32,7 +32,7 @@ export const VERDICT_MARK: Record<Verdict, { color: string; icon: IconName }> = 
 export const VERDICT_MOOD: Record<Verdict, DollMood> = { safe: 'calm', careful: 'concerned', danger: 'worried' };
 
 /** The doll rocks while the check runs, rights itself when the verdict lands, then shows the verdict mark. */
-export const DollLoader: React.FC<{ step: number; verdict?: Verdict | null; label: string }> = ({ step, verdict = null, label }) => {
+export const DollLoader: React.FC<{ step: number; verdict?: Verdict | null; label: string; markIcon?: IconName }> = ({ step, verdict = null, label, markIcon }) => {
   const reduce = useReduceMotion();
   const rock = useRef(new Animated.Value(0)).current;
   const badge = useRef(new Animated.Value(0)).current;
@@ -81,7 +81,7 @@ export const DollLoader: React.FC<{ step: number; verdict?: Verdict | null; labe
       </Animated.View>
       {mark ? (
         <Animated.View testID={`loader-verdict-${verdict}`} {...HIDDEN} style={[styles.badge, { backgroundColor: mark.color, opacity: badge, transform: [{ scale: badge }] }]}>
-          <Icon name={mark.icon} size={30} color={colors.white} />
+          <Icon name={markIcon ?? mark.icon} size={30} color={colors.white} />
         </Animated.View>
       ) : null}
       {STAGE_ICONS.map((icon, i) => (

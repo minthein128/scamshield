@@ -2,7 +2,7 @@ import type { CompositeScreenProps } from '@react-navigation/native';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { NavigatorScreenParams } from '@react-navigation/native';
-import type { CheckRequest, CheckResponse, LanguageCode } from '../api/types';
+import type { CheckRequest, CheckResponse, JobAssessRequest, JobExtractRequest, JobExtractResponse, LanguageCode } from '../api/types';
 import type { Draft } from '../lib/share';
 import type { ScamTypeId } from '../screens/learn/content';
 
@@ -12,6 +12,14 @@ export interface CheckParams {
   draft?: Draft;
   intent?: CheckIntent;
   nonce?: number;
+}
+
+export type JobStep = { phase: 'extract'; request: JobExtractRequest } | { phase: 'assess'; request: JobAssessRequest };
+
+export interface JobFactsParams {
+  extraction: JobExtractResponse;
+  extractRequest: JobExtractRequest;
+  source?: string;
 }
 
 export type TabParamList = {
@@ -29,7 +37,8 @@ export type RootStackParamList = {
   GetHelp: undefined;
   Radar: undefined;
   ReportScam: undefined;
-  Checking: { request: CheckRequest; source?: string; reported?: boolean };
+  Checking: { request: CheckRequest; source?: string; reported?: boolean; job?: undefined } | { job: JobStep; source?: string; request?: undefined; reported?: undefined };
+  JobFacts: JobFactsParams;
   Report: { result: CheckResponse; language: LanguageCode; fresh?: boolean; reported?: boolean };
   Shield: undefined;
   ScamGuide: { type: ScamTypeId };

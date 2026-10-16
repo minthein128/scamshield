@@ -20,15 +20,17 @@ interface SelectProps<T extends string> {
   options: SelectOption<T>[];
   onChange: (value: T) => void;
   testID?: string;
+  /** Shown while `value` matches no option, instead of the first option. */
+  placeholder?: string;
 }
 
 /** A tappable field that opens a list of options. Works the same on Android and web. */
-export function Select<T extends string>({ label, value, options, onChange, testID }: SelectProps<T>) {
+export function Select<T extends string>({ label, value, options, onChange, testID, placeholder }: SelectProps<T>) {
   const { t } = useTranslation('common');
   const { height } = useWindowDimensions();
   const sheet = useSheetLayout();
   const [open, setOpen] = useState(false);
-  const current = options.find(o => o.value === value) ?? options[0];
+  const current = options.find(o => o.value === value) ?? (placeholder ? undefined : options[0]);
 
   const choose = (next: T) => {
     setOpen(false);
@@ -41,13 +43,13 @@ export function Select<T extends string>({ label, value, options, onChange, test
       <TouchableOpacity
         testID={testID}
         accessibilityRole="button"
-        accessibilityLabel={`${label}: ${current?.label ?? ''}`}
+        accessibilityLabel={`${label}: ${current?.label ?? placeholder ?? ''}`}
         accessibilityState={{ expanded: open }}
         activeOpacity={0.7}
         onPress={() => setOpen(true)}
         style={styles.field}
       >
-        <Text numberOfLines={1} style={styles.value}>{current?.label}</Text>
+        <Text numberOfLines={1} style={[styles.value, !current && styles.placeholder]}>{current?.label ?? placeholder}</Text>
         <View style={styles.caret}>
           <Icon name="chevron" size={20} color={colors.textSecondary} />
         </View>
@@ -91,6 +93,7 @@ const styles = StyleSheet.create({
   label: { color: colors.textPrimary, fontSize: 14, lineHeight: 20, fontFamily: fonts.semiBold, includeFontPadding: false },
   field: { minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: 8, borderRadius: 12, borderWidth: 1, borderColor: colors.borderLight, backgroundColor: colors.white, paddingHorizontal: 14, paddingVertical: 8 },
   value: { flex: 1, color: colors.textPrimary, fontSize: 15, lineHeight: 21, fontFamily: fonts.medium },
+  placeholder: { color: colors.textMuted },
   caret: { transform: [{ rotate: '90deg' }] },
   overlay: { width: '100%', justifyContent: 'flex-end', alignItems: 'center' },
   backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(15,27,45,0.5)' },

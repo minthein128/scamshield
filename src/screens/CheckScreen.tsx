@@ -8,23 +8,19 @@ import { Button, Card, Divider, Notice, SectionTitle } from '../components/ui';
 import { Icon } from '../components/Icon';
 import { HeaderWithLeave } from '../components/LeaveQuickly';
 import { Select } from '../components/Select';
+import { JobSourceBlock } from '../components/JobSourceBlock';
+import { PasteButton } from '../components/PasteButton';
 import { UI_LANGUAGES } from '../i18n/languages';
 import { countryName } from '../lib/countries';
 import { hasInput } from '../api';
 import type { CheckKind } from '../api/types';
 import { PreparedImage, pickScreenshot, prepareImage } from '../lib/image';
-import { KIND_OPTIONS, buildRequest, looksLikeUrl, sourceLabel } from '../lib/request';
+import { KIND_OPTIONS, buildJobRequest, buildRequest, jobSourceLabel, looksLikeUrl, sourceLabel } from '../lib/request';
 import type { TabScreenProps } from '../navigation/types';
 import { useAppState } from '../state/AppState';
 import theme from '../theme/theme';
 
 const { colors, fonts } = theme;
-
-const PasteButton: React.FC<{ label: string; onPress: () => void }> = ({ label, onPress }) => (
-  <TouchableOpacity accessibilityRole="button" accessibilityLabel={label} activeOpacity={0.7} onPress={onPress} style={styles.paste}>
-    <Text style={styles.pasteText}>{label}</Text>
-  </TouchableOpacity>
-);
 
 export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, route }) => {
   const { t } = useTranslation(['check', 'common']);
@@ -36,6 +32,8 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
   const [url, setUrl] = useState('');
   const [destination, setDestination] = useState(countryName(profile.destinationCountry));
   const [image, setImage] = useState<PreparedImage | null>(null);
+  const [chatText, setChatText] = useState('');
+  const [chatImage, setChatImage] = useState<PreparedImage | null>(null);
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
 
@@ -49,12 +47,12 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
     if (!kindChosen.current && looksLikeUrl(value)) setKindState('link');
   }, []);
 
-  const attachImage = useCallback(async (loader: () => Promise<PreparedImage | null>) => {
+  const attachImage = useCallback(async (loader: () => Promise<PreparedImage | null>, target: (image: PreparedImage) => void = setImage) => {
     setBusy(true);
     setNotice(null);
     try {
       const prepared = await loader();
-      if (prepared) setImage(prepared);
+      if (prepared) target(prepared);
     } catch {
       setNotice(t('errors.image'));
     } finally {
@@ -62,16 +60,17 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
     }
   }, [t]);
 
-  const pasteInto = useCallback(async (target: 'text' | 'url') => {
+  const pasteInto = useCallback(async (target: 'text' | 'url' | 'chat') => {
     const value = (await Clipboard.getStringAsync()).trim();
     if (!value) {
       setNotice(t('errors.clipboardEmpty'));
       return;
     }
     setNotice(null);
-    if (target === 'url' || looksLikeUrl(value)) changeUrl(value);
+    if (target === 'chat') setChatText(value);
+    else if (target === 'url' || (looksLikeUrl(value) && kind !== 'job')) changeUrl(value);
     else setText(value);
-  }, [t, changeUrl]);
+  }, [t, changeUrl, kind]);
 
   const nonce = route.params?.nonce;
   useEffect(() => {
@@ -96,9 +95,17 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
   }, [nonce]);
 
   const form = { kind, text, url, destination, home: countryName(profile.homeCountry), shareSignals: profile.shareSignals, imageBase64: image?.base64, imageMimeType: image?.mimeType, language };
-  const ready = hasInput({ text, url, imageBase64: image?.base64 });
+  const isJob = kind === 'job';
+  const ready = isJob
+    ? hasInput({ text, imageBase64: image?.base64 }) || hasInput({ text: chatText, imageBase64: chatImage?.base64 })
+    : hasInput({ text, url, imageBase64: image?.base64 });
 
   const submit = () => {
+    if (isJob) {
+      const jobForm = { ...form, chatText, chatImageBase64: chatImage?.base64, chatImageMimeType: chatImage?.mimeType };
+      navigation.getParent()?.navigate('Checking', { job: { phase: 'extract', request: buildJobRequest(jobForm) }, source: jobSourceLabel(jobForm) });
+      return;
+    }
     navigation.getParent()?.navigate('Checking', { request: buildRequest(form), source: sourceLabel(form) });
   };
 
@@ -118,11 +125,47 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
       }
       footer={
         <>
-          {ready ? null : <Text testID="check-submit-hint" style={styles.hint}>{t('submitHint')}</Text>}
-          <Button testID="check-submit" label={t('submit')} onPress={submit} disabled={!ready || busy} />
+          {ready ? null : <Text testID="check-submit-hint" style={styles.hint}>{isJob ? t('job.submitHint') : t('submitHint')}</Text>}
+          <Button testID="check-submit" label={isJob ? t('job.submit') : t('submit')} onPress={submit} disabled={!ready || busy} />
         </>
       }
     >
+      {isJob ? (
+        <>
+          <JobSourceBlock
+            testID="job-ad"
+            title={t('job.ad.title')}
+            hint={t('job.ad.hint')}
+            a11y={t('job.ad.a11y')}
+            placeholder={t('job.ad.placeholder')}
+            text={text}
+            image={image}
+            busy={busy}
+            onText={setText}
+            onPaste={() => pasteInto('text')}
+            onPick={() => attachImage(pickScreenshot)}
+            onRemove={() => setImage(null)}
+          />
+          <Divider />
+          <JobSourceBlock
+            testID="job-chat"
+            title={t('job.chat.title')}
+            hint={t('job.chat.hint')}
+            a11y={t('job.chat.a11y')}
+            placeholder={t('job.chat.placeholder')}
+            optional
+            text={chatText}
+            image={chatImage}
+            busy={busy}
+            onText={setChatText}
+            onPaste={() => pasteInto('chat')}
+            onPick={() => attachImage(pickScreenshot, setChatImage)}
+            onRemove={() => setChatImage(null)}
+          />
+          <Divider />
+        </>
+      ) : (
+        <>
       <View style={styles.section}>
         <View style={styles.labelRow}>
           <SectionTitle>{t('text.title')}</SectionTitle>
@@ -188,6 +231,9 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
 
       <Divider />
 
+        </>
+      )}
+
       <View style={styles.section}>
         <TouchableOpacity
           testID="check-more"
@@ -242,8 +288,6 @@ const styles = StyleSheet.create({
   imageRow: { flexDirection: 'row', gap: 12 },
   thumb: { width: 80, height: 110, borderRadius: 10, backgroundColor: colors.codeBg },
   meta: { color: colors.textSecondary, fontSize: 14, lineHeight: 20, fontFamily: fonts.regular },
-  paste: { minHeight: 48, minWidth: 72, marginRight: -8, paddingHorizontal: 12, alignItems: 'flex-end', justifyContent: 'center' },
-  pasteText: { color: colors.accent, fontSize: 15, lineHeight: 20, fontFamily: fonts.bold },
   hint: { color: colors.textSecondary, fontSize: 14, lineHeight: 20, fontFamily: fonts.medium, textAlign: 'center' },
   moreRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: 48 },
   moreText: { color: colors.textPrimary, fontSize: 16, lineHeight: 22, fontFamily: fonts.bold },
