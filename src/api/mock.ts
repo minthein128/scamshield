@@ -11,6 +11,7 @@ import type {
   Verdict,
 } from './types';
 import { hasInput } from './validate';
+import { mockAssessJob, mockExtractJob } from './mockJob';
 
 export interface MockOptions {
   delayMs?: number;
@@ -162,6 +163,15 @@ export function createMockClient(options: MockOptions = {}): CheckClient {
     },
     async health() {
       return { ok: true, model: 'mock-heuristic-v1', mock: true };
+    },
+    async extractJob(request, opts) {
+      const result = mockExtractJob(request);
+      await wait(opts?.signal, Math.round(delayMs * 0.6));
+      return result;
+    },
+    async assessJob(request, opts) {
+      await wait(opts?.signal, Math.round(delayMs * 0.6));
+      return mockAssessJob(request);
     },
   };
 }
