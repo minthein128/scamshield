@@ -142,7 +142,7 @@ class ScreenCapturer(
      * Blocks like [captureJpeg] and paints over [masks] (real screen pixels) before encoding.
      * Returns [Capture.Busy] when the area around a mask is not plain enough to fill.
      */
-    fun capture(notBefore: Long, waitMs: Long, masks: List<Rect>): Capture {
+    fun capture(notBefore: Long, waitMs: Long, masks: List<Rect>, onFrame: () -> Unit = {}): Capture {
         synchronized(lock) {
             if (released) return Capture.None
             resizeIfNeeded()
@@ -155,6 +155,7 @@ class ScreenCapturer(
             }
             val image = latest ?: return Capture.None
             val waited = SystemClock.elapsedRealtime() - start
+            onFrame()
             val bytes = encode(image, masks) ?: return Capture.Busy
             return Capture.Jpeg(bytes, waited, SystemClock.elapsedRealtime() - start - waited)
         }

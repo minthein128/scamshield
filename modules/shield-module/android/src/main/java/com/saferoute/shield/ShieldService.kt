@@ -152,9 +152,12 @@ class ShieldService : Service(), ShieldOverlay.Listener {
                 if (shot is ScreenCapturer.Capture.Busy) {
                     path = "fade"
                     val fadedBy = onMain { overlay?.fadeForCapture() } ?: SystemClock.elapsedRealtime()
-                    shot = currentCapturer.capture(fadedBy + FRAME_AFTER_FADE_MS, FADE_FRAME_WAIT_MS, emptyList())
+                    shot = currentCapturer.capture(fadedBy + FRAME_AFTER_FADE_MS, FADE_FRAME_WAIT_MS, emptyList()) {
+                        main.post { overlay?.afterCapture() }
+                    }
+                } else {
+                    main.post { overlay?.afterCapture() }
                 }
-                main.post { overlay?.afterCapture() }
                 val jpeg = (shot as? ScreenCapturer.Capture.Jpeg)
                     ?: throw CheckException("Could not read the screen. Tap the shield to try again.")
                 Log.i(
