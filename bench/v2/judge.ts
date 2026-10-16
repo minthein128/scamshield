@@ -11,7 +11,7 @@ export const JUDGE_MODEL = 'gemini-3.8-flash';
 const JUDGE_CACHE = join(BENCH_DIR, '.cache', 'v2', 'judge');
 const RUBRIC_VERSION = 1;
 
-export const RUBRIC = `You review one report from SafeRoute, an anti-scam app for migrant workers in Southeast Asia.
+export const RUBRIC = `You review one report from Kakwe, an anti-scam app for migrant workers in Southeast Asia.
 Imagine the reader: a frightened 22-year-old migrant worker with limited reading skill, reading on a phone in their own language.
 Question: after reading this report, would they understand what is going on and exactly what to do next?
 

@@ -1,4 +1,4 @@
-# SafeRoute progress report
+# Kakwe progress report
 
 Status date: 15 October 2026. Submission deadline: 18 October 2026 (3 days left). Entry: Google Cloud AI Builder Cup 2026, track "Sustainability & Social Impact" (`pitch/deck.md`, slide 2).
 
@@ -7,7 +7,7 @@ Audience: Ricky and the team. Sources are repo files unless marked. Items marked
 ## Contents
 
 1. TL;DR
-2. What SafeRoute is
+2. What Kakwe is
 3. How it looks
 4. How it works
 5. Quality and numbers
@@ -27,9 +27,9 @@ Audience: Ricky and the team. Sources are repo files unless marked. Items marked
 - Missing for submission: public repo, demo video under 3 minutes, team names in the deck, benchmark screenshots, and device tests of the Android-only features.
 - Deadline: 18 October 2026, three days from today.
 
-## 2. What SafeRoute is
+## 2. What Kakwe is
 
-SafeRoute checks a job offer, message, link or screenshot for scams and human trafficking. It explains the result in the user's language (`README.md`).
+Kakwe checks a job offer, message, link or screenshot for scams and human trafficking. It explains the result in the user's language (`README.md`).
 
 Who it is for (`pitch/deck.md`, slides 3 and 4):
 
@@ -173,7 +173,7 @@ The team compared several logo concepts. The pin-shield mark was chosen and now 
 | --- | --- | --- |
 | Check text, link or screenshot | Open Check, paste or upload, pick the report language, tap check. The loader runs six stages. The report opens. | `CLAUDE.md`, `pitch/video-script.md` |
 | Floating shield (Android) | Switch on the shield on Home. The app asks for notifications, then screen capture. A bubble floats over other apps. One tap captures the screen and posts one JPEG to `/v1/check`. A pill shows the verdict and expands to a sheet. "Full report" opens `saferoute://report/<id>`. | `modules/shield-module/README.md`, `CLAUDE.md` |
-| Share to SafeRoute (Android) | Share text or an image from another app into SafeRoute. It opens Check with the draft. | `CLAUDE.md` (`useSharedDraft.android.ts`) |
+| Share to Kakwe (Android) | Share text or an image from another app into Kakwe. It opens Check with the draft. | `CLAUDE.md` (`useSharedDraft.android.ts`) |
 | Report a scam | From Get help, fill the form. The report becomes a confirmed signal with weight 1. | `docs/intel-design.md` |
 | Feedback on a verdict | Mark the verdict right or wrong, and name the right type. A wrong risky verdict counts 0.25. A missed scam counts as confirmed. | `docs/intel-design.md` |
 | Warn contacts | On a risky result, send a warning to trusted contacts by SMS. | `src/screens/ContactsScreen.tsx` (inferred from screen name; not verified) |
@@ -336,7 +336,7 @@ An estimate, not a measurement: about USD 0.006 per check without grounding and 
 | Offline demo API | Mock, dev builds only | `src/api/mock.ts`; shows an "Offline demo mode" banner (`CLAUDE.md`) |
 | Floating shield | Partly device-tested | The owner tried an early build and said it "works really well". A drag bug was fixed but is unverified **(lead)** |
 | Google sign-in on Android | Not device-tested by the team **(lead)** | |
-| Share to SafeRoute | Not device-tested by the team **(lead)** | |
+| Share to Kakwe | Not device-tested by the team **(lead)** | |
 | Contact picker and SMS | Not device-tested by the team **(lead)** | |
 | Message Guard (notification scanning) | In progress, not merged | Branch `feat/notifguard`, 3 commits ahead of `feat/production` |
 | Latency work (overlap, SSE, caches) | In progress, not merged | Branch `feat/perf`, has local unpushed commits and uncommitted edits |
@@ -454,7 +454,7 @@ In priority order:
 
 1. **Link billing** to `saferoute-aibc`, run `scripts/deploy-cloudrun.sh`, check `/healthz`, confirm Web Risk stops returning 403. Then re-run the text eval against Cloud Run.
 2. **Make the repo public.** Only the owner can.
-3. **Real-phone test pass:** floating shield (including the drag fix), Google sign-in, share-to-SafeRoute, contact picker and SMS.
+3. **Real-phone test pass:** floating shield (including the drag fix), Google sign-in, share-to-Kakwe, contact picker and SMS.
 4. **Merge decisions:** decide if Message Guard and the latency work go in. If they do, merge, rebuild and test on a device. If not, say they are future work.
 5. **Record the video** under 3 minutes from `pitch/video-script.md`. Check `/healthz` shows `mock:false` first. Add the file as `media/demo.mp4`.
 6. **Fix the deck:** team names and roles, deployed URL and contact email, slide 10 numbers (use 27/27, p50 3.1 s, p95 4.8 s and the current test count), the Family Guardian wording. Re-render the PDF and copy to `media/`.

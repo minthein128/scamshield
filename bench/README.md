@@ -1,6 +1,6 @@
 # Benchmarks
 
-**TLDR.** Bench v2 asks one question per screenshot: did SafeRoute give a frightened, low-literacy migrant worker the right information to stay safe? It runs the real pipeline in process, checks the report with deterministic matchers in eight areas, and combines them into a **Protection Score** from 0 to 100. A critical failure (telling someone a dangerous message is safe, inventing a phone number, accusing a named person) caps the case score whatever else went well. The prompt is swappable from a file, so a prompt change is one A/B command and one gate command.
+**TLDR.** Bench v2 asks one question per screenshot: did Kakwe give a frightened, low-literacy migrant worker the right information to stay safe? It runs the real pipeline in process, checks the report with deterministic matchers in eight areas, and combines them into a **Protection Score** from 0 to 100. A critical failure (telling someone a dangerous message is safe, inventing a phone number, accusing a named person) caps the case score whatever else went well. The prompt is swappable from a file, so a prompt change is one A/B command and one gate command.
 
 | Bench | Input | Command (in `server/`) | Output |
 | --- | --- | --- | --- |

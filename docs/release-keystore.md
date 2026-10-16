@@ -39,11 +39,11 @@ Here `pw.txt` holds only the password, with no newline.
 
 ## One-time tester migration
 
-Android refuses to update an app signed with a different key. Every tester must uninstall the old SafeRoute once before installing the first release-signed build. Local history is lost. Synced data returns after sign-in.
+Android refuses to update an app signed with a different key. Every tester must uninstall the old SafeRoute build (now named Kakwe) once before installing the first release-signed build. Local history is lost. Synced data returns after sign-in.
 
 Message for testers:
 
-> The next SafeRoute build uses a new, private signing key. Please uninstall the current SafeRoute app first, then install the new build.
+> The next Kakwe build uses a new, private signing key. Please uninstall the current SafeRoute app first, then install the new build.
 > Your local history will be cleared, and your synced data comes back when you sign in.
 
 ## Check a built APK
