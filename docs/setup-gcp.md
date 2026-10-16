@@ -23,13 +23,15 @@ TLDR: Firebase (Auth, Firestore, Hosting) stays in `saferoute-aibc` (no billing)
 | Firestore | `FIREBASE_PROJECT_ID=saferoute-aibc`, `INTEL_PROJECT=saferoute-aibc` | config, admin, intel and feedback stores and token checks use the Firebase project |
 | Web Risk | ADC as `sg-dev`, billed to `crtest-511817` | Web Risk rejects API keys; Safe Browsing stays as the fallback |
 | `APK_PATH` | unset | `/download` and `/download/saferoute.apk` answer 302 to `https://saferoute-aibc.web.app/saferoute.apk` |
-| `PUBLIC_API_URL` | unset (default `https://saferoute-api.akkhayar.com`) | `/config.json` keeps pointing the app at the stable hostname |
+| `PUBLIC_API_URL` | `https://sg-dev-808112092414.asia-southeast1.run.app` (script default, override with the env var) | `/config.json` points the app at the run.app URL |
 | Instances | min 1, max 2 | no cold start; the in-memory limits and caches are per instance |
 | Concurrency, timeout | 80, 3600 s | a `/v1/live` socket holds one request slot for its whole session |
 | Memory | 1 GiB, `NODE_OPTIONS=--max-old-space-size=768` | |
 | Access | `--no-invoker-iam-check` | the organisation policy blocks `allUsers`; the app calls the API without Google auth |
 
-Cloud Run reserves `/healthz` on `run.app` URLs (Google answers 404 before the request reaches the container). The server also answers `/health`; probe that on `run.app`.
+Cloud Run reserves `/healthz` on `run.app` URLs (Google answers 404 before the request reaches the container). The server also answers `/health`; probe that on `run.app`. The app probes `/health` and retries `/healthz` only on a 404, so servers older than `/health` still pass.
+
+The app does not need a Cloudflare hop. Builds 1.0.172 to 1.0.198 keep using `saferoute-api.akkhayar.com` and probe `/healthz` only, so keep that host and the web.app `config.json` pointing at it until those installs update.
 
 ## Deploy
 
@@ -86,7 +88,7 @@ curl -s https://sg-dev-808112092414.asia-southeast1.run.app/v1/config/hotlines |
 
 | Name | Value |
 |---|---|
-| EXPO_PUBLIC_API_URL | API base URL (tunnel now, Cloud Run later) |
+| EXPO_PUBLIC_API_URL | `https://sg-dev-808112092414.asia-southeast1.run.app` for the final build; optional `EXPO_PUBLIC_STABLE_API_URL` and `EXPO_PUBLIC_FALLBACK_API_URL` override the primary and fallback candidates |
 | EXPO_PUBLIC_APK_URL | https://saferoute-aibc.web.app/saferoute.apk |
 | GCP_PROJECT_ID | saferoute-aibc |
 | GCP_REGION | asia-southeast1 |
