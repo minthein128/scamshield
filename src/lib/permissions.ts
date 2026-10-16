@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { PermissionsAndroid, Platform, type Permission } from 'react-native';
 
 export type PermissionKind = 'mic' | 'overlay' | 'screen' | 'notifications' | 'guardNotifications' | 'contacts';
@@ -11,6 +12,7 @@ interface Host {
 
 let host: Host | null = null;
 const explainedThisSession = new Set<PermissionKind>();
+export const EXPLAINED_KEY = 'saferoute.permissions.explained.v1';
 
 export function registerPermissionHost(next: Host): () => void {
   host = next;
@@ -32,6 +34,24 @@ export async function explainOnce(kind: PermissionKind): Promise<boolean> {
   return ok;
 }
 
+async function explainedKinds(): Promise<string[]> {
+  try {
+    const list: unknown = JSON.parse((await AsyncStorage.getItem(EXPLAINED_KEY)) ?? '[]');
+    return Array.isArray(list) ? list.filter((k): k is string => typeof k === 'string') : [];
+  } catch {
+    return [];
+  }
+}
+
+/** Explains once per install, for optional permissions. Later calls resolve false without asking. */
+export async function explainOnceEver(kind: PermissionKind): Promise<boolean> {
+  const list = await explainedKinds();
+  if (list.includes(kind)) return false;
+  const ok = await explainPermission(kind);
+  await AsyncStorage.setItem(EXPLAINED_KEY, JSON.stringify([...list, kind])).catch(() => undefined);
+  return ok;
+}
+
 export function showPermissionHelp(kind: HelpKind): void {
   host?.help(kind);
 }
@@ -48,19 +68,20 @@ export interface AndroidPermissionApi {
   explain: (kind: PermissionKind) => Promise<boolean>;
 }
 
-const realApi = (): AndroidPermissionApi => ({
+export const permissionApi = (overrides: Partial<AndroidPermissionApi> = {}): AndroidPermissionApi => ({
   platform: Platform.OS,
   version: Platform.Version,
   check: p => PermissionsAndroid.check(p),
   request: p => PermissionsAndroid.request(p),
   explain: explainPermission,
+  ...overrides,
 });
 
 /** Check, then explain, then show the system dialog. Never prompts when already granted. */
 export async function ensureAndroidPermission(
   kind: PermissionKind,
   permission: Permission,
-  api: AndroidPermissionApi = realApi(),
+  api: AndroidPermissionApi = permissionApi(),
 ): Promise<PermissionResult> {
   if (api.platform !== 'android') return (await api.explain(kind)) ? 'granted' : 'declined';
   if (await api.check(permission).catch(() => false)) return 'granted';
@@ -76,7 +97,7 @@ export const ensureMicrophone = (api?: AndroidPermissionApi) =>
 /** Asks only on Android 13+. Features that post notices still run when this is refused. */
 export async function ensureNotifications(
   kind: 'notifications' | 'guardNotifications',
-  api: AndroidPermissionApi = realApi(),
+  api: AndroidPermissionApi = permissionApi(),
 ): Promise<PermissionResult> {
   if (api.platform !== 'android' || Number(api.version) < 33) return 'granted';
   return ensureAndroidPermission(kind, PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS, api);

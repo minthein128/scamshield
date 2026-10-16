@@ -6,7 +6,7 @@ import { t } from '../i18n';
 import { useApiUrl } from '../config/runtime';
 import { companionStrings } from '../lib/companionStrings';
 import { diag, errorCode } from '../lib/diagLog';
-import { ensureNotifications, explainOnce, explainPermission, showPermissionHelp } from '../lib/permissions';
+import { ensureNotifications, explainOnce, explainOnceEver, explainPermission, permissionApi, showPermissionHelp } from '../lib/permissions';
 import { isCleartext } from '../lib/shield';
 import { getAuthToken } from '../services/token';
 import { useAppState } from '../state/AppState';
@@ -87,7 +87,7 @@ export function useShieldControl(): ShieldControl {
       }
       awaitingOverlay.current = false;
       setStep('notifications');
-      const notified = await ensureNotifications('notifications');
+      const notified = await ensureNotifications('notifications', permissionApi({ explain: explainOnceEver }));
       if (notified !== 'granted') diag.info('shield', 'notifications_not_granted', { result: notified });
       setStep('capture');
       if (!(await explainOnce('screen'))) {

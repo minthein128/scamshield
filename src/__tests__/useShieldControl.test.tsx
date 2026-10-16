@@ -107,4 +107,22 @@ describe('useShieldControl', () => {
     expect(result.current.running).toBe(true);
     expect(result.current.error).toBeNull();
   });
+
+  it('shows the notifications reason once, not on every turn-on', async () => {
+    explain.mockImplementation(async kind => kind !== 'notifications');
+    const { result } = await mount();
+    await act(async () => {
+      await result.current.setEnabled(true);
+    });
+    await act(async () => {
+      await result.current.setEnabled(true);
+    });
+    resetPermissionSession();
+    await act(async () => {
+      await result.current.setEnabled(true);
+    });
+    expect(explain.mock.calls.filter(([k]) => k === 'notifications')).toHaveLength(1);
+    expect(PermissionsAndroid.request).not.toHaveBeenCalled();
+    expect(shield.startShield).toHaveBeenCalledTimes(3);
+  });
 });
