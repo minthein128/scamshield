@@ -11,6 +11,9 @@ import android.graphics.PixelFormat
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.graphics.Rect
+import android.os.SystemClock
+import android.util.Log
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
@@ -199,26 +202,62 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
         }
     }
 
-    fun hideForCapture() {
-        main.removeCallbacks(autoCollapse)
-        bubble.animate().cancel()
-        bubble.visibility = View.INVISIBLE
-        cardRoot?.visibility = View.INVISIBLE
-        pillRoot?.visibility = View.INVISIBLE
-    }
-
+    /**
+     * Starts the check loader at once. The bubble stays where it is (no untuck) until the frame is
+     * captured, so the mask rects from [captureRects] match the frame.
+     */
     fun setChecking() {
+        main.removeCallbacks(autoCollapse)
         removeCardNow()
         cardModel = null
         pillRoot?.visibility = View.VISIBLE
         setState(State.CHECKING)
+        showBubbleNow()
+    }
+
+    /** Screen rects (real pixels, shadow margin included) of every overlay window now on screen. */
+    fun captureRects(): List<Rect> {
+        val out = ArrayList<Rect>()
+        if (bubbleAttached && bubble.visibility == View.VISIBLE) {
+            out += Rect(bubbleParams.x, bubbleParams.y, bubbleParams.x + bubbleSize, bubbleParams.y + bubbleSize)
+        }
+        for (root in listOfNotNull(cardRoot, pillRoot)) {
+            if (root.visibility != View.VISIBLE || root.width == 0) continue
+            val loc = IntArray(2)
+            root.getLocationOnScreen(loc)
+            out += Rect(loc[0], loc[1], loc[0] + root.width, loc[1] + root.height)
+        }
+        return out
+    }
+
+    private var fadedAt = 0L
+
+    /** Fallback when masking would erase content: fade every window out in [FADE_OUT_MS]. Returns when it is fully out. */
+    fun fadeForCapture(): Long {
+        fadedAt = SystemClock.elapsedRealtime()
+        for (v in listOfNotNull(bubble, cardRoot, pillRoot)) {
+            v.animate().cancel()
+            v.animate().alpha(0f).setDuration(FADE_OUT_MS).setListener(null).start()
+        }
+        return fadedAt + FADE_OUT_MS
+    }
+
+    /** Ends a fade fallback: windows fade back with the loader still running. */
+    fun restoreAfterCapture() {
+        if (fadedAt == 0L) return afterCapture()
+        val started = fadedAt
+        fadedAt = 0L
+        for (v in listOfNotNull(cardRoot, pillRoot)) v.animate().alpha(1f).setDuration(FADE_IN_MS).start()
+        bubble.animate().alpha(1f).setDuration(FADE_IN_MS).withEndAction {
+            Log.i(TAG, "bubble hidden_ms=${SystemClock.elapsedRealtime() - started} path=fade")
+        }.start()
+        afterCapture()
+    }
+
+    /** The frame is captured: the bubble may move again. */
+    fun afterCapture() {
+        if (fadedAt != 0L) return restoreAfterCapture()
         untuck()
-        bubble.visibility = View.VISIBLE
-        bubble.alpha = 0f
-        bubble.scaleX = 0.7f
-        bubble.scaleY = 0.7f
-        bubble.animate().alpha(1f).scaleX(1f).scaleY(1f).setDuration(220)
-            .setInterpolator(ResultCardView.EASE).start()
     }
 
     fun setResult(json: JSONObject) {
@@ -477,18 +516,11 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
             bubble.contentDescription = "${strings.name}. $label. " + if (voice.muted || voice.paused) strings.unmuteA11y else strings.muteA11y
             return
         }
-        val text = when (state) {
-            State.IDLE -> "SafeRoute Shield. Double tap to check the screen."
-            State.CHECKING -> "SafeRoute Shield. Checking the screen."
-            State.SAFE -> "SafeRoute Shield. Result: safe. Double tap to show details."
-            State.CAREFUL -> "SafeRoute Shield. Result: be careful. Double tap to show details."
-            State.DANGER -> "SafeRoute Shield. Result: high risk. Double tap to show details."
-            State.ERROR -> "SafeRoute Shield. The check failed. Double tap to retry."
-        }
-        bubble.contentDescription = text
+        bubble.contentDescription = bubbleDescription(state, strings.name)
     }
 
     private fun showBubbleNow() {
+        fadedAt = 0L
         bubble.animate().cancel()
         bubble.visibility = View.VISIBLE
         bubble.alpha = 1f
@@ -941,6 +973,9 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
     companion object {
         private const val AUTO_COLLAPSE_MS = 8000L
         private const val NOTICE_MS = 6000L
+        const val FADE_OUT_MS = 60L
+        const val FADE_IN_MS = 120L
+        private const val TAG = "ShieldCapture"
         private const val LEVEL_TICK_MS = 33L
         private val VERDICT_STATES = setOf(State.SAFE, State.CAREFUL, State.DANGER)
         private const val TUCK_DELAY_MS = 1800L
@@ -1033,3 +1068,13 @@ internal class DragMachine(private val slop: Int) {
 }
 
 internal data class ResumeCard(val model: CardModel, val expanded: Boolean)
+
+/** TalkBack text for the bubble outside a voice session. The doll is the shield, so the name leads. */
+internal fun bubbleDescription(state: ShieldOverlay.State, name: String): String = when (state) {
+    ShieldOverlay.State.IDLE -> "$name, SafeRoute shield. Double tap to check the screen."
+    ShieldOverlay.State.CHECKING -> "$name, SafeRoute shield. Checking the screen."
+    ShieldOverlay.State.SAFE -> "$name, SafeRoute shield. Result: safe. Double tap to show details."
+    ShieldOverlay.State.CAREFUL -> "$name, SafeRoute shield. Result: be careful. Double tap to show details."
+    ShieldOverlay.State.DANGER -> "$name, SafeRoute shield. Result: high risk. Double tap to show details."
+    ShieldOverlay.State.ERROR -> "$name, SafeRoute shield. The check failed. Double tap to retry."
+}

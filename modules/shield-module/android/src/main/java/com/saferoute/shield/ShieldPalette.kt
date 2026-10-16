@@ -13,6 +13,10 @@ internal class ShieldPalette(val dark: Boolean) {
     val accent = if (dark) 0xFF8FB0FF.toInt() else 0xFF1D4ED8.toInt()
     val shadow = if (dark) 0x99000000.toInt() else 0x40000000
     val targetFill = if (dark) 0xE6334155.toInt() else 0xE60F1B2D.toInt()
+    /** Ask chip: solid brand blue, so it never reads as a verdict chip (red, amber) or as a black hole in dark mode. */
+    val askFill = if (dark) 0xFF8FB0FF.toInt() else 0xFF1D4ED8.toInt()
+    val askPressed = if (dark) 0xFFB9CDFF.toInt() else 0xFF1E3A8A.toInt()
+    val askText = if (dark) 0xFF0F1B2D.toInt() else 0xFFFFFFFF.toInt()
 
     fun ring(state: ShieldOverlay.State): Int = when (state) {
         ShieldOverlay.State.IDLE -> if (dark) 0xFF475569.toInt() else 0xFFCBD5E1.toInt()

@@ -142,7 +142,13 @@ internal class ResultCardView(
             ellipsize = TextUtils.TruncateAt.END
         }
         header.addView(titleView, titleParams())
-        if (model.canAsk) header.addView(askChip(), LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(36)).apply { marginEnd = dp(2) })
+        if (model.canAsk) {
+            header.addView(askChip(), LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(48)).apply {
+                marginEnd = dp(2)
+                topMargin = -dp(4)
+                bottomMargin = -dp(4)
+            })
+        }
         if (model.canExpand) {
             header.addView(chevron, LayoutParams(dp(36), dp(36)))
         }
@@ -186,26 +192,30 @@ internal class ResultCardView(
     }
 
     private fun askChip(): View {
+        val radius = dp(18).toFloat()
+        fun pill(color: Int) = GradientDrawable().apply { cornerRadius = radius; setColor(color) }
+        val states = android.graphics.drawable.StateListDrawable().apply {
+            addState(intArrayOf(android.R.attr.state_pressed), pill(palette.askPressed))
+            addState(intArrayOf(), pill(palette.askFill))
+        }
+        val inset = android.graphics.drawable.InsetDrawable(states, 0, dp(6), 0, dp(6))
+        val mask = android.graphics.drawable.InsetDrawable(pill(0xFFFFFFFF.toInt()), 0, dp(6), 0, dp(6))
         val chip = LinearLayout(context).apply {
             orientation = HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
-            setPadding(dp(8), 0, dp(12), 0)
+            setPadding(dp(10), 0, dp(14), 0)
             minimumWidth = dp(48)
+            minimumHeight = dp(48)
             isClickable = true
             isFocusable = true
             contentDescription = model.askDescription
-            val shapeBg = GradientDrawable().apply {
-                cornerRadius = dp(18).toFloat()
-                setColor((palette.accent and 0x00FFFFFF) or 0x1F000000)
-            }
-            val mask = GradientDrawable().apply { cornerRadius = dp(18).toFloat(); setColor(0xFFFFFFFF.toInt()) }
-            background = RippleDrawable(ColorStateList.valueOf((palette.accent and 0x00FFFFFF) or 0x33000000), shapeBg, mask)
+            background = RippleDrawable(ColorStateList.valueOf((palette.askText and 0x00FFFFFF) or 0x33000000), inset, mask)
             setOnClickListener { callbacks.onAsk() }
         }
-        chip.addView(MicIconView(context, palette.accent), LayoutParams(dp(18), dp(18)))
+        chip.addView(MicIconView(context, palette.askText), LayoutParams(dp(16), dp(16)))
         chip.addView(
-            text(model.askLabel, 13f, palette.accent, fonts.bold).apply { maxLines = 1 },
-            LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply { marginStart = dp(4) }
+            text(model.askLabel, 13f, palette.askText, fonts.bold).apply { maxLines = 1 },
+            LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply { marginStart = dp(5) }
         )
         return chip
     }
@@ -403,12 +413,14 @@ internal class ResultCardView(
         }
     }
 
-    internal class MicIconView(context: Context, private val color: Int) : View(context) {
+    internal class MicIconView(context: Context, private val tint: Int) : View(context) {
         private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            this.color = color
+            color = tint
             strokeCap = Paint.Cap.ROUND
         }
         private val oval = android.graphics.RectF()
+
+        val paintColorForTest: Int get() = paint.color
 
         init {
             importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO

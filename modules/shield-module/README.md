@@ -51,7 +51,7 @@ cd android
 The compile check does not exercise runtime behavior. Verify these on a real device:
 
 1. Overlay permission, then `requestScreenCapturePermission()`, then `startShield({ apiUrl, language })`.
-2. Tap the bubble in another app. The bubble disappears for about 0.3 s, fades back with a progress ring, then shows the verdict ring and a result pill.
+2. Tap the bubble in another app. The bubble stays on screen and the doll starts rocking under the scan sweep at once (after the 300 ms double-tap window), then shows the verdict ring, a verdict badge and a result pill. `adb logcat -s ShieldCapture` prints the capture path and timings.
 3. "Full report" opens `saferoute://report/<id>`. The app must declare the `saferoute` scheme and read the result with `getShieldResult(id)`.
 4. Android 14 and up: the consent dialog must appear again after the user stops sharing from the status bar chip.
 
@@ -71,12 +71,20 @@ Three windows exist. All use `TYPE_APPLICATION_OVERLAY` with `NOT_FOCUSABLE | NO
 
 | State | Ring (light / dark) | Glyph | Notes |
 | --- | --- | --- | --- |
-| Idle | `#CBD5E1` / `#475569` | Brand blue shield | Half-tucked at the edge: 20dp of the circle sits off screen, 48dp stay visible |
-| Checking | Faint static blue track | Blue shield that pulses (scale 1.0 to 1.05) while a scan line sweeps down it, 1.4 s per pass | Bubble is hidden during capture, then fades and scales in from 70%. With animator scale 0 the shield is static |
-| Safe | `#1D4ED8` / `#8FB0FF` (theme safe is blue) | Shield with check | Pill auto-collapses after 8 s, bubble returns to idle |
-| Careful | `#B45309` / `#FBBF24` | Shield with "!" | Pill stays until dismissed |
-| Danger | `#C2410C` / `#FB923C` | Shield with alert triangle | Pill stays until dismissed |
-| Error | `#64748B` / `#94A3B8` | Shield with "!" | Neutral pill with "Tap to retry" |
+| Idle | `#CBD5E1` / `#475569` | Pyit Taing Htaung doll | Half-tucked at the edge: 20dp of the circle sits off screen, 48dp stay visible |
+| Checking | Faint static blue track | Doll rocking (about 9 degrees) under a blue scan sweep, 1.4 s per pass | The bubble stays visible; see "Capture without hiding". With animator scale 0 the doll is static |
+| Safe | `#1D4ED8` / `#8FB0FF` (theme safe is blue) | Doll with a check badge | Pill auto-collapses after 8 s, bubble returns to idle |
+| Careful | `#B45309` / `#FBBF24` | Doll with a "!" badge | Pill stays until dismissed |
+| Danger | `#C2410C` / `#FB923C` | Doll with an alert-triangle badge | Pill stays until dismissed |
+| Error | `#64748B` / `#94A3B8` | Doll with a grey "!" badge | Neutral pill with "Tap to retry" |
+
+The badge is a 17dp circle in the ring color at the doll's lower right, with a white mark. The doll is `res/drawable-nodpi/companion_doll.png`; without it the old shield glyph is drawn. Every state, light and dark, is in `pitch/e2e/bubble-doll-states.png` (from `ShieldSnapshotTest`).
+
+### Capture without hiding
+
+A tap starts the loader at once and the bubble stays put (it untucks only after the frame is taken). The capturer grabs the first frame at least 34 ms after the tap, so a dismissed result card is gone, then paints over every overlay window rect (bubble window with its 12dp shadow margin, companion pill) with the average color of a ring around it before JPEG encoding (`CaptureMask`).
+
+When the ring is busy (luminance spread over 20 of 255, for example text or a photo next to the bubble), filling would erase content, so the capture falls back: the windows fade to alpha 0 in 60 ms, the first frame 17 ms later is taken (150 ms cap), and they fade back in 120 ms with the loader still running.
 
 On a verdict the shield pops (scale 80% to 100% with overshoot, 340 ms) while its mark fades in, in the verdict color. Shapes and colors come from `src/theme/theme.ts`.
 
@@ -94,6 +102,7 @@ Gestures:
 - Position: the card window is anchored, not tied to the bubble every frame. It is placed once per rest position by `AnchorMath`. It is below the bubble when the bubble is in the upper half of the screen, above it otherwise. It is anchored to the bubble's side edge with a 12dp margin.
 - Enter: alpha 0 to 1 and scale 45% to 100% about the bubble center, 200 ms, `cubic-bezier(0.2, 0, 0, 1)`. Exit is 170 ms.
 - Collapsed: a pill at least 48dp tall with radius 24dp. It holds a verdict chip (12sp bold, 14dp radius), a one-line title (14sp semibold, ellipsized) and a chevron.
+- Ask chip (results only): solid brand blue `#1D4ED8` with white text and mic (6.7:1), dark mode `#8FB0FF` with `#0F1B2D` (7.7:1); pressed `#1E3A8A` / `#B9CDFF`. The visible chip is 36dp tall inside a 48dp touch target. Blue keeps it apart from the red and amber verdict chips.
 - Expanded (tap, 220 ms): width grows to min(344dp, screen - 48dp), radius goes to 20dp, a detail area opens. It holds a summary (14sp, up to 4 lines), up to 3 flag rows (18dp severity icon, 13sp, up to 2 lines) and two text buttons, "Dismiss" and "Full report" (48dp tall, at least 48dp wide).
 - Surface: theme surface color, 1dp border, 10dp elevation. Font is Plus Jakarta Sans (Regular, SemiBold, Bold) from `assets/fonts` in the APK, system sans if the load fails.
 - Swipe left or right to dismiss. Past 40% of the width, or a fast fling, it flies off. Otherwise it springs back.
@@ -122,8 +131,8 @@ Safe: one 18 ms tick. Careful: one 35 ms pulse. Danger: three strong pulses (45,
 ### State diagram
 
 ```
-            tap                    hide 250 ms, capture, upload
-  IDLE ───────────────► (hidden) ───────────────────────────► CHECKING
+            tap (bubble stays, loader starts)   capture with masks, upload
+  IDLE ─────────────────────────────────► CHECKING ─────────────────────
    ▲  ▲                                                        │
    │  │ Dismiss, swipe, 8 s (safe only)        verdict         ▼
    │  └──────────────── SAFE / CAREFUL / DANGER ◄───────────────┤

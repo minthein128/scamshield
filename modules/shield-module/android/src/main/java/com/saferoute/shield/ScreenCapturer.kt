@@ -3,6 +3,7 @@ package com.saferoute.shield
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.PixelFormat
+import android.graphics.Rect
 import android.hardware.display.DisplayManager
 import android.hardware.display.VirtualDisplay
 import android.media.Image
@@ -39,6 +40,7 @@ class ScreenCapturer(
     private var latestAt = 0L
     private var width = 0
     private var height = 0
+    private var realWidth = 0
     private var released = false
 
     init {
@@ -76,6 +78,7 @@ class ScreenCapturer(
             realH = metrics.heightPixels
         }
         val dpi = context.resources.displayMetrics.densityDpi
+        realWidth = realW
         if (realW <= MAX_WIDTH) return Triple(realW, realH, dpi)
         val scale = MAX_WIDTH.toFloat() / realW
         val scaledDpi = (dpi * scale).roundToInt().coerceAtLeast(72)
@@ -124,23 +127,40 @@ class ScreenCapturer(
         height = h
     }
 
+    /** Outcome of one capture. [Busy] means the masks would erase content; nothing was encoded. */
+    sealed class Capture {
+        class Jpeg(val bytes: ByteArray, val frameWaitMs: Long, val encodeMs: Long) : Capture()
+        object Busy : Capture()
+        object None : Capture()
+    }
+
     /** Blocks. Returns a JPEG of a frame that arrived at or after notBefore (elapsedRealtime), else the newest. */
-    fun captureJpeg(notBefore: Long, waitMs: Long): ByteArray? {
+    fun captureJpeg(notBefore: Long, waitMs: Long): ByteArray? =
+        (capture(notBefore, waitMs, emptyList()) as? Capture.Jpeg)?.bytes
+
+    /**
+     * Blocks like [captureJpeg] and paints over [masks] (real screen pixels) before encoding.
+     * Returns [Capture.Busy] when the area around a mask is not plain enough to fill.
+     */
+    fun capture(notBefore: Long, waitMs: Long, masks: List<Rect>): Capture {
         synchronized(lock) {
-            if (released) return null
+            if (released) return Capture.None
             resizeIfNeeded()
-            val deadline = SystemClock.elapsedRealtime() + waitMs
+            val start = SystemClock.elapsedRealtime()
+            val deadline = start + waitMs
             while (!released && latestAt < notBefore) {
                 val remaining = deadline - SystemClock.elapsedRealtime()
                 if (remaining <= 0) break
                 lock.wait(remaining)
             }
-            val image = latest ?: return null
-            return encode(image)
+            val image = latest ?: return Capture.None
+            val waited = SystemClock.elapsedRealtime() - start
+            val bytes = encode(image, masks) ?: return Capture.Busy
+            return Capture.Jpeg(bytes, waited, SystemClock.elapsedRealtime() - start - waited)
         }
     }
 
-    private fun encode(image: Image): ByteArray {
+    private fun encode(image: Image, masks: List<Rect> = emptyList()): ByteArray? {
         val plane = image.planes[0]
         val pixelStride = plane.pixelStride
         val rowPadding = plane.rowStride - pixelStride * image.width
@@ -151,7 +171,18 @@ class ScreenCapturer(
         )
         plane.buffer.rewind()
         padded.copyPixelsFromBuffer(plane.buffer)
-        val bitmap = if (rowPadding == 0) padded else Bitmap.createBitmap(padded, 0, 0, image.width, image.height)
+        val cropped = if (rowPadding == 0) padded else Bitmap.createBitmap(padded, 0, 0, image.width, image.height)
+        val bitmap = if (masks.isEmpty() || cropped.isMutable) cropped else cropped.copy(Bitmap.Config.ARGB_8888, true).also {
+            if (cropped !== padded) cropped.recycle()
+        }
+        if (masks.isNotEmpty()) {
+            val scale = if (realWidth > 0) image.width.toFloat() / realWidth else 1f
+            if (!CaptureMask.maskBitmap(bitmap, masks, scale)) {
+                if (bitmap !== padded) bitmap.recycle()
+                padded.recycle()
+                return null
+            }
+        }
         var bytes = ByteArray(0)
         for (quality in QUALITIES) {
             val out = ByteArrayOutputStream()
