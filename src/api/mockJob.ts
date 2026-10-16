@@ -201,8 +201,8 @@ function conflictsOf(ad: JobFacts | null | undefined, chat: JobFacts | null | un
   if (!ad || !chat) return found;
   if (ad.workerFee?.value === 'none' && chat.workerFee && chat.workerFee.value !== 'none') found.push({ field: 'workerFee', code: 'fee_vs_no_fee', family: 'payment_route', severity: 'high', text: c.fee, ad: ad.workerFee, chat: chat.workerFee });
   const docs = chat.documentRequest?.value;
-  if ((docs === 'passport_photo' || docs === 'passport_hold') && ad.documentRequest && (ad.documentRequest.value === 'none' || ad.documentRequest.value === 'not_mentioned'))
-    found.push({ field: 'documentRequest', code: docs === 'passport_hold' ? 'documents_passport_hold' : 'documents_passport_photo', family: 'trafficking', severity: 'high', text: c.documents, ad: ad.documentRequest, chat: chat.documentRequest ?? undefined });
+  if ((docs === 'passport_photo' || docs === 'passport_hold') && (!ad.documentRequest || ad.documentRequest.value === 'none' || ad.documentRequest.value === 'not_mentioned'))
+    found.push({ field: 'documentRequest', code: docs === 'passport_hold' ? 'documents_passport_hold' : 'documents_passport_photo', family: 'trafficking', severity: 'high', text: c.documents, ad: ad.documentRequest ?? undefined, chat: chat.documentRequest ?? undefined });
   if (ad.contract?.value === 'official' && chat.contract?.value === 'later') found.push({ field: 'contract', code: 'contract_later', family: 'payment_route', severity: 'high', text: c.contract, ad: ad.contract, chat: chat.contract });
   if (ad.visaOrPermit?.value === 'work_visa' && chat.visaOrPermit?.value === 'tourist') found.push({ field: 'visaOrPermit', code: 'visa_tourist', family: 'trafficking', severity: 'high', text: c.visa, ad: ad.visaOrPermit, chat: chat.visaOrPermit });
   if (ad.meetingPoint?.value === 'workplace' && chat.meetingPoint && ['driver_pickup', 'border', 'unnamed'].includes(chat.meetingPoint.value)) found.push({ field: 'meetingPoint', code: 'meeting_informal', family: 'trafficking', severity: 'medium', text: c.meeting, ad: ad.meetingPoint, chat: chat.meetingPoint });
@@ -228,11 +228,14 @@ function singleSignals(chat: JobFacts | null | undefined, c: JobMockCopy): Found
 
 const WEIGHT: Record<Severity, number> = { high: 40, medium: 22, low: 10 };
 
+const STRONG = new Set(['fee_vs_no_fee', 'documents_passport_photo', 'documents_passport_hold', 'contract_later', 'contract_pay_first', 'visa_tourist']);
+
 function tierOf(all: Found[]): { tier: AttentionTier; score: number } {
   const byFamily = new Map<FlagFamily, Severity>();
   for (const f of all) if (!byFamily.has(f.family) || RANK[f.severity] > RANK[byFamily.get(f.family) as Severity]) byFamily.set(f.family, f.severity);
   let score = 8 + [...byFamily.values()].reduce((sum, s) => sum + WEIGHT[s], 0);
   if (byFamily.get('trafficking') === 'high') score = Math.max(score, 82);
+  if (all.some(f => f.code && STRONG.has(f.code))) score = Math.max(score, 70);
   score = Math.min(score, 98);
   return { tier: score >= 70 ? 'pause' : score >= 35 ? 'verify' : 'lower', score };
 }
@@ -254,7 +257,7 @@ export function mockAssessJob(request: JobAssessRequest): JobAssessResponse {
     field: f.field,
     ...(f.code ? { code: f.code } : {}),
     fieldLabel: c.fieldLabels[f.field as keyof JobMockCopy['fieldLabels']] ?? f.field,
-    adValue: show(f.ad),
+    adValue: f.ad ? show(f.ad) : 'not_mentioned',
     adQuote: f.ad?.quote ?? '',
     chatValue: show(f.chat),
     chatQuote: f.chat?.quote ?? '',

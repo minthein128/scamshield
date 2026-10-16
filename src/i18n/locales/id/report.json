@@ -56,7 +56,9 @@
   "conflicts": {
     "title": "Yang tidak cocok",
     "adSays": "Di iklan tertulis",
-    "chatSays": "Di obrolan tertulis"
+    "chatSays": "Di obrolan tertulis",
+    "adNoDocuments": "Iklan tidak menyebutkan dokumen",
+    "adNotMentioned": "Iklan tidak menyebutkan hal ini"
   },
   "unclear": {
     "title": "Masih belum jelas"

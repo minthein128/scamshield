@@ -55,7 +55,9 @@
   "conflicts": {
     "title": "What doesn't match",
     "adSays": "The ad says",
-    "chatSays": "The chat says"
+    "chatSays": "The chat says",
+    "adNoDocuments": "The ad does not mention documents",
+    "adNotMentioned": "The ad does not mention this"
   },
   "unclear": {
     "title": "Still unclear"

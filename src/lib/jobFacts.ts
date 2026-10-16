@@ -87,6 +87,7 @@ export function parseAmount(raw: string | number | null | undefined): number | n
 export function isEmptyValue(def: FieldDef, value: FactValue | null): boolean {
   if (value === null || value === undefined) return true;
   if (def.kind === 'salary') return parseAmount((value as SalaryValue).amount) === null;
+  if (def.kind === 'fee' && value === FEE_MENTIONED) return true;
   if (typeof value === 'string') return !value.trim();
   return false;
 }

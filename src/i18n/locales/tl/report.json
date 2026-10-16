@@ -58,7 +58,9 @@
   "conflicts": {
     "title": "Mga hindi nagtutugma",
     "adSays": "Sabi sa patalastas",
-    "chatSays": "Sabi sa chat"
+    "chatSays": "Sabi sa chat",
+    "adNoDocuments": "Hindi binanggit sa patalastas ang mga dokumento",
+    "adNotMentioned": "Hindi ito binanggit sa patalastas"
   },
   "unclear": {
     "title": "Hindi pa malinaw"

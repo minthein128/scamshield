@@ -30,6 +30,8 @@ const FAMILY_ICONS: Record<string, IconName> = {
 export const ConflictCard: React.FC<{ conflict: JobConflict; tablet?: boolean }> = ({ conflict, tablet = false }) => {
   const { t } = useTranslation('report');
   const sev = SEVERITY[conflict.severity] ?? SEVERITY.low;
+  const adMissing = !conflict.adQuote && (!conflict.adValue || conflict.adValue === 'not_mentioned');
+  const adText = adMissing ? t(conflict.field === 'documentRequest' ? 'conflicts.adNoDocuments' : 'conflicts.adNotMentioned') : conflict.adQuote || plainValueLabel(conflict.field, conflict.adValue);
   return (
     <View testID={`conflict-${conflict.field}`} style={styles.card}>
       <View style={styles.head}>
@@ -44,7 +46,7 @@ export const ConflictCard: React.FC<{ conflict: JobConflict; tablet?: boolean }>
       <Text style={[styles.description, readable(tablet, 14, 20)]}>{conflict.description}</Text>
       <View style={styles.quoteBox}>
         <Text style={styles.quoteLabel}>{t('conflicts.adSays')}</Text>
-        <Text testID={`conflict-${conflict.field}-ad`} style={[styles.quoteText, readable(tablet, 14, 20)]}>{conflict.adQuote || plainValueLabel(conflict.field, conflict.adValue)}</Text>
+        <Text testID={`conflict-${conflict.field}-ad`} style={[styles.quoteText, readable(tablet, 14, 20)]}>{adText}</Text>
       </View>
       <View style={styles.quoteBox}>
         <Text style={styles.quoteLabel}>{t('conflicts.chatSays')}</Text>

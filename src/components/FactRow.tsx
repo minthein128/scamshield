@@ -79,6 +79,7 @@ const Editor: React.FC<Props> = ({ source, fieldKey, fact, onValue }) => {
           {some ? (
             <View style={styles.editorGroup}>
               <Text style={styles.editorLabel}>{t('job.facts.feeAmount')}</Text>
+              <Text style={styles.noQuote}>{t('job.facts.feeHint')}</Text>
               <TextInput testID={`${id}-input`} accessibilityLabel={t('job.facts.feeAmount')} value={current === FEE_MENTIONED ? '' : String(current)} onChangeText={v => onValue(v.trim() ? v : FEE_MENTIONED)} placeholder={t('job.facts.textPlaceholder')} placeholderTextColor={colors.textMuted} style={styles.input} />
             </View>
           ) : null}

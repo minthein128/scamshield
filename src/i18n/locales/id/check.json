@@ -98,7 +98,8 @@
       "empty": "Kami belum menemukan rincian yang jelas dari teks ini. Anda bisa menambahkannya sendiri, atau kembali dan memeriksa teksnya.",
       "submit": "Sudah pas, periksa sekarang",
       "submitHint": "Anda masih bisa mengubah rincian setelah melihat hasilnya.",
-      "noMatch": "Kami tidak dapat mencocokkan ini dengan teks, jadi harap periksa kembali."
+      "noMatch": "Kami tidak dapat mencocokkan ini dengan teks, jadi harap periksa kembali.",
+      "feeHint": "Silakan ketik jumlahnya, misalnya 300 USD. Pemeriksaan mungkin tidak dapat menggunakan rincian ini tanpanya."
     },
     "fields": {
       "employer": "Pemberi kerja",

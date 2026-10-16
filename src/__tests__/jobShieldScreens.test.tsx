@@ -141,4 +141,14 @@ describe('conflict list', () => {
     );
     expect(textOf('conflict-contract-chat')).toBe('A contract later');
   });
+
+  it('says the ad does not mention documents when the ad has no value or quote', () => {
+    render(
+      <ConflictCard
+        conflict={{ field: 'documentRequest', code: 'documents_passport_photo', fieldLabel: 'Documents', adValue: 'not_mentioned', adQuote: '', chatValue: 'passport_photo', chatQuote: 'send a photo of your passport', description: 'x', family: 'trafficking', severity: 'high' }}
+      />,
+    );
+    expect(textOf('conflict-documentRequest-ad')).toBe('The ad does not mention documents');
+    expect(textOf('conflict-documentRequest-chat')).toBe('send a photo of your passport');
+  });
 });

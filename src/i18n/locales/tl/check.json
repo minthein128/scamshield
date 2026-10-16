@@ -98,7 +98,8 @@
       "empty": "Wala kaming nakitang malinaw na detalye sa mga tekstong ito. Maaari mo itong idagdag mismo, o bumalik at suriin ang teksto.",
       "submit": "Mukhang tama, suriin ito",
       "submitHint": "Maaari mo pa ring baguhin ang mga detalye pagkatapos mong makita ang resulta.",
-      "noMatch": "Hindi namin ito maitugma sa teksto, kaya pakitingnan ito."
+      "noMatch": "Hindi namin ito maitugma sa teksto, kaya pakitingnan ito.",
+      "feeHint": "Pakilagay ang halaga, halimbawa 300 USD. Maaaring hindi magamit sa pagsusuri ang detalyeng ito kung wala ito."
     },
     "fields": {
       "employer": "Employer",

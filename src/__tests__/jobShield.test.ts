@@ -3,6 +3,7 @@ import { createMockClient } from '../api/mock';
 import type { FactField, JobFacts } from '../api/types';
 import {
   FIELD_DEFS,
+  FEE_MENTIONED,
   NO_FEE,
   draftFromFacts,
   enumOptions,
@@ -178,5 +179,32 @@ describe('attention tiers', () => {
       const all = JSON.stringify((['lower', 'verify', 'pause'] as const).map(tierHeadline).concat(['lower', 'verify', 'pause'].map(k => i18n.t(`report:attention.note.${k}` as never)).filter(Boolean)));
       expect(all).not.toMatch(/proceed with caution|no major conflicts|\bsafe\b/i);
     }
+  });
+});
+
+describe('real server replies', () => {
+  const fixture = require('./fixtures/jobShieldServer.json') as { extract: import('../api/types').JobExtractResponse; assess: import('../api/types').JobAssessResponse };
+  const { isJobExtractResponse, normalizeJobResponse, isCheckResponse } = require('../api/validate') as typeof import('../api/validate');
+
+  it('reads an extract reply and sends the facts back untouched when nothing was edited', () => {
+    expect(isJobExtractResponse(fixture.extract)).toBe(true);
+    expect(toFacts(draftFromFacts(fixture.extract.chat))).toEqual(fixture.extract.chat);
+    expect(toFacts(draftFromFacts(fixture.extract.ad))).toEqual(fixture.extract.ad);
+    expect(draftFromFacts(fixture.extract.chat).contactChannel && isUnclear(draftFromFacts(fixture.extract.chat).contactChannel)).toBe(true);
+  });
+
+  it('reads an assess reply with conflicts, findings and a documents conflict the ad never mentions', () => {
+    expect(isCheckResponse(fixture.assess)).toBe(true);
+    const out = normalizeJobResponse(fixture.assess);
+    expect(out.attention).toBe('pause');
+    expect(out.findings?.map(f => f.code)).toEqual(expect.arrayContaining(['recruiter_not_confirmed']));
+    const docs = out.conflicts.find(c => c.code === 'documents_passport_photo');
+    expect(docs).toMatchObject({ adValue: 'not_mentioned', adQuote: '' });
+  });
+
+  it('keeps a fee choice out of the request until the user types an amount', () => {
+    const draft = setValue(draftFromFacts(fixture.extract.chat), 'workerFee', FEE_MENTIONED);
+    expect(toFacts(draft).workerFee).toBeNull();
+    expect(toFacts(setValue(draft, 'workerFee', '300 USD')).workerFee).toMatchObject({ value: '300 USD', edited: true });
   });
 });
