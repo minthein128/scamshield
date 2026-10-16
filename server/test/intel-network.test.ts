@@ -194,7 +194,25 @@ describe('pipeline integration', () => {
     const intel = createIntel({ store, pepper: 'p' });
     await make(intel).run({ kind: 'job', language: 'en', text: 'offer', shareSignals: false });
     expect(store.signals.size).toBe(0);
+    await make(intel).run({ kind: 'job', language: 'en', text: 'offer', shareSignals: true });
+    expect(store.signals.size).toBe(1);
+  });
+
+  it('shares only on opt-in or an explicit report', async () => {
+    const store = createMemoryStore();
+    const intel = createIntel({ store, pepper: 'p' });
     await make(intel).run({ kind: 'job', language: 'en', text: 'offer' });
+    expect(store.signals.size).toBe(0);
+    await make(intel).run({
+      kind: 'job',
+      language: 'en',
+      text: 'offer',
+      reported: true,
+      reportedType: 'job_trafficking',
+      shareSignals: false,
+    });
+    expect(store.signals.size).toBe(0);
+    await make(intel).run({ kind: 'job', language: 'en', text: 'offer', reported: true, reportedType: 'job_trafficking' });
     expect(store.signals.size).toBe(1);
   });
 

@@ -146,7 +146,7 @@ describe('pipeline latency features', () => {
     };
     const p = createPipeline({ ...base(), correlator: createMockCorrelator(), intel: intel as never, recordAfterResponse: true });
     let deferred: Promise<unknown> | undefined;
-    await p.run({ kind: 'job', language: 'en', text: 'job abroad' }, { afterResponse: (d) => (deferred = d) });
+    await p.run({ kind: 'job', language: 'en', text: 'job abroad', shareSignals: true }, { afterResponse: (d) => (deferred = d) });
     expect(recorded).toEqual([]);
     await deferred;
     expect(recorded).toEqual(['done']);

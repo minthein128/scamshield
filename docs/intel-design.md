@@ -8,7 +8,7 @@ TLDR: every risky check leaves one anonymous, redacted signal. Signals feed coun
 check request -> Extract (Gemini: flags + template + sender indicators)
               -> Redact  (regex pass over Gemini output, hashing of indicators)
               -> Correlate (Web Risk, RDAP, network lookup)  -> Score -> response (+ network)
-              -> Record signal (careful or danger only, unless shareSignals=false)
+              -> Record signal (careful or danger only, and only with shareSignals=true or a report)
 ```
 
 ## Redaction (two passes, fail closed)
@@ -33,7 +33,7 @@ Written by firebase-admin only. `firestore.rules` denies all client access.
 | --- | --- |
 | scamType, flag family + severity, verdict, score bucket (20 wide), kind, language, home and destination country, redacted template (max 300 chars), campaign label, cluster id, hashed indicators, public domains, UTC day, `expireAt` | uid, IP, image, raw text, flag evidence, victim PII, clear phone/handle/account |
 
-Retention is 90 days, enforced on `expireAt`. A request with `shareSignals: false` writes nothing. Safe verdicts write nothing. With a verified uid (`req.uid`, set by the auth layer, never read from the body) each signal carries `rk = HMAC(pepper, uid + day)`. It changes every day, so it cannot be linked across days or reversed. Every counter (type, indicator, domain, campaign) counts one `rk` once per day, using marker docs in `intel_seen` (2 day expiry). Without a uid the document id is a keyed hash of day, scam type and indicators, so the same scam re-checked on the same day counts once.
+Retention is 90 days, enforced on `expireAt`. Sharing is opt-in: a request without `shareSignals: true` writes nothing, except a report-a-scam request, which shares unless it says `shareSignals: false`. Safe verdicts write nothing. With a verified uid (`req.uid`, set by the auth layer, never read from the body) each signal carries `rk = HMAC(pepper, uid + day)`. It changes every day, so it cannot be linked across days or reversed. Every counter (type, indicator, domain, campaign) counts one `rk` once per day, using marker docs in `intel_seen` (2 day expiry). Without a uid the document id is a keyed hash of day, scam type and indicators, so the same scam re-checked on the same day counts once.
 
 ## Aggregation: `intel_aggregates`
 
@@ -81,7 +81,7 @@ Storage for the loop, all redacted and written by firebase-admin only:
 | `intel_feedback` | one doc per check: correctness, outcome, actual verdict and type, redacted template | 90 days |
 | `intel_tally` | counters per model scam type and per input language, plus report counts and `lostMoney` yes or no | none (counts only) |
 
-Nothing stores a uid, IP, raw text, image or the check id itself. A check made with `shareSignals: false` writes no link, so it cannot get feedback. `npm run feedback:report` prints the tally (admin only: it needs service credentials, and no HTTP route exposes it). `npm run feedback:export` writes false alarms and misses as labelled eval cases to `server/eval/candidates.json`. That file is gitignored: the text is a redacted model rewrite of a real message, and two redaction passes make a leak unlikely but not impossible, so it must not enter a public repo. A person reviews a case and copies it into `eval/cases.ts` to make it a regression test. `EVAL_CANDIDATES=1 npm run eval` runs the candidates too.
+Nothing stores a uid, IP, raw text, image or the check id itself. A check made without sharing writes no link, so it cannot get feedback. `npm run feedback:report` prints the tally (admin only: it needs service credentials, and no HTTP route exposes it). `npm run feedback:export` writes false alarms and misses as labelled eval cases to `server/eval/candidates.json`. That file is gitignored: the text is a redacted model rewrite of a real message, and two redaction passes make a leak unlikely but not impossible, so it must not enter a public repo. A person reviews a case and copies it into `eval/cases.ts` to make it a regression test. `EVAL_CANDIDATES=1 npm run eval` runs the candidates too.
 
 ## API
 

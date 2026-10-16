@@ -41,7 +41,10 @@ function setup(env: Record<string, string> = {}) {
       body: JSON.stringify(body),
     });
   const check = async (text: string, extra: Record<string, unknown> = {}, token?: string) =>
-    (await (await post('/v1/check', { kind: 'job', language: 'en', text, ...extra }, token)).json()) as { id: string; verdict: string };
+    (await (await post('/v1/check', { kind: 'job', language: 'en', text, shareSignals: true, ...extra }, token)).json()) as {
+      id: string;
+      verdict: string;
+    };
   const days = (id: string) => Object.values(store.aggs.get(id)?.real.days ?? {}).reduce((a, b) => a + b, 0);
   return { app, post, check, store, fstore, intel, feedback, days };
 }

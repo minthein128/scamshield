@@ -110,7 +110,7 @@ describe('reporter key', () => {
     const res = await app.request('/v1/check', {
       method: 'POST',
       headers: { 'content-type': 'application/json', ...(token ? { authorization: `Bearer ${token}` } : {}) },
-      body: JSON.stringify({ kind: 'job', text: 'Urgent data entry jobs in Mae Sot', language: 'en' }),
+      body: JSON.stringify({ kind: 'job', text: 'Urgent data entry jobs in Mae Sot', language: 'en', shareSignals: true }),
     });
     expect(res.status).toBe(200);
     await new Promise((r) => setTimeout(r, 20));
