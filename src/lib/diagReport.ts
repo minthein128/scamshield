@@ -25,7 +25,7 @@ export function formatEntry(e: DiagEntry): string {
 
 function deviceLine(): string {
   const model = (Platform.constants as { Model?: string } | undefined)?.Model;
-  return [model, `${Platform.OS} ${Platform.Version}`].filter(Boolean).join(', ');
+  return [model, [Platform.OS, Platform.Version].filter(v => v !== undefined && v !== '').join(' ')].filter(Boolean).join(', ');
 }
 
 export function buildLogLines(entries: DiagEntry[]): string[] {
