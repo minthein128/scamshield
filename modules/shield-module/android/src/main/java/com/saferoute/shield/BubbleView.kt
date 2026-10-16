@@ -82,6 +82,11 @@ internal class BubbleView(context: Context, palette: ShieldPalette) : View(conte
     private val scanPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val levelRing = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE }
     private val avatarPaint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
+    private val badgePath = Path()
+    private val badgeOutline = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.STROKE
+        strokeJoin = Paint.Join.ROUND
+    }
     private val micPath = Path()
     private var thinker: ValueAnimator? = null
     private var thinkPhase = 0f
@@ -176,7 +181,8 @@ internal class BubbleView(context: Context, palette: ShieldPalette) : View(conte
 
     private fun drawVoice(canvas: Canvas, cx: Float, cy: Float, radius: Float, accent: Int) {
         if ((voice == Voice.LISTENING || voice == Voice.SPEAKING) && level > 0.02f) {
-            levelRing.color = (accent and 0x00FFFFFF) or ((0x30 + (0x70 * level).toInt()) shl 24)
+            val halo = if (voice == Voice.LISTENING) palette.brandRed else palette.brandGold
+            levelRing.color = (halo and 0x00FFFFFF) or ((0x40 + (0x80 * level).toInt()) shl 24)
             levelRing.strokeWidth = (2f + 3f * level) * d
             canvas.drawCircle(cx, cy, radius + (1.5f + 7f * level) * d, levelRing)
         }
@@ -280,20 +286,43 @@ internal class BubbleView(context: Context, palette: ShieldPalette) : View(conte
         drawVerdictBadge(canvas, cx + inner * 0.72f, cy + inner * 0.72f)
     }
 
-    /** Small verdict badge on the doll: check (safe), "!" (careful, error), alert triangle (danger). */
+    /** Verdict badge on the doll, shaped like the app's marks: check in a circle (safe), "!" in a triangle (careful), "!" in an octagon (danger), grey "!" circle (error). */
     private fun drawVerdictBadge(canvas: Canvas, bx: Float, by: Float) {
         val state = shieldState
         if (state == ShieldOverlay.State.IDLE || state == ShieldOverlay.State.CHECKING) return
-        val r = 8.5f * d
-        val alpha = (markAlpha * 255).toInt()
-        glyph.color = palette.surface
-        canvas.drawCircle(bx, by, r + 1.5f * d, glyph)
-        glyph.color = palette.ring(state)
-        canvas.drawCircle(bx, by, r, glyph)
+        val r = 9f * d
         val m = 2f * r
         matrix.setScale(m, m)
         matrix.postTranslate(bx - r, by - r)
-        val white = (0x00FFFFFF) or (alpha shl 24)
+        badgePath.reset()
+        when (state) {
+            ShieldOverlay.State.CAREFUL -> {
+                badgePath.moveTo(0.5f, 0.02f)
+                badgePath.lineTo(1.0f, 0.92f)
+                badgePath.lineTo(0.0f, 0.92f)
+                badgePath.close()
+            }
+            ShieldOverlay.State.DANGER -> {
+                val a = 0.29f
+                badgePath.moveTo(a, 0f)
+                badgePath.lineTo(1f - a, 0f)
+                badgePath.lineTo(1f, a)
+                badgePath.lineTo(1f, 1f - a)
+                badgePath.lineTo(1f - a, 1f)
+                badgePath.lineTo(a, 1f)
+                badgePath.lineTo(0f, 1f - a)
+                badgePath.lineTo(0f, a)
+                badgePath.close()
+            }
+            else -> badgePath.addCircle(0.5f, 0.5f, 0.5f, Path.Direction.CW)
+        }
+        badgePath.transform(matrix)
+        badgeOutline.color = palette.surface
+        badgeOutline.strokeWidth = 3f * d
+        canvas.drawPath(badgePath, badgeOutline)
+        glyph.color = palette.ring(state)
+        canvas.drawPath(badgePath, glyph)
+        val white = 0x00FFFFFF or ((markAlpha * 255).toInt() shl 24)
         mark.color = white
         mark.strokeWidth = 0.12f * m
         markPath.reset()
@@ -304,20 +333,15 @@ internal class BubbleView(context: Context, palette: ShieldPalette) : View(conte
                 markPath.lineTo(0.44f, 0.67f)
                 markPath.lineTo(0.72f, 0.36f)
             }
-            ShieldOverlay.State.DANGER -> {
-                mark.strokeWidth = 0.09f * m
-                markPath.moveTo(0.5f, 0.22f)
-                markPath.lineTo(0.78f, 0.74f)
-                markPath.lineTo(0.22f, 0.74f)
-                markPath.close()
-                markPath.moveTo(0.5f, 0.40f)
-                markPath.lineTo(0.5f, 0.56f)
-                dotPath.addCircle(0.5f, 0.64f, 0.04f, Path.Direction.CW)
+            ShieldOverlay.State.CAREFUL -> {
+                markPath.moveTo(0.5f, 0.36f)
+                markPath.lineTo(0.5f, 0.62f)
+                dotPath.addCircle(0.5f, 0.78f, 0.065f, Path.Direction.CW)
             }
             else -> {
                 markPath.moveTo(0.5f, 0.24f)
                 markPath.lineTo(0.5f, 0.56f)
-                dotPath.addCircle(0.5f, 0.73f, 0.065f, Path.Direction.CW)
+                dotPath.addCircle(0.5f, 0.74f, 0.065f, Path.Direction.CW)
             }
         }
         markPath.transform(matrix)
@@ -353,7 +377,7 @@ internal class BubbleView(context: Context, palette: ShieldPalette) : View(conte
             val r = 7.5f * d
             glyph.color = palette.surface
             canvas.drawCircle(bx, by, r + 1.5f * d, glyph)
-            glyph.color = palette.accent
+            glyph.color = palette.brandRed
             canvas.drawCircle(bx, by, r, glyph)
             val m = 9f * d
             matrix.setScale(m, m)

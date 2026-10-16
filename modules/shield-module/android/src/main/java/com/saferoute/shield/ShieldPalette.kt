@@ -3,28 +3,36 @@ package com.saferoute.shield
 import android.content.Context
 import android.content.res.Configuration
 
-/** Colors for the overlay, taken from src/theme/theme.ts. The dark set is derived from the same palette. */
+/**
+ * Colors for the overlay, matching src/theme/theme.ts and docs/brand.md: lacquer black for interactive
+ * elements, warm neutrals, red and gold only in the doll and its halo, blue only for Low risk, deep
+ * crimson for High risk. The dark set is derived from the same palette.
+ */
 internal class ShieldPalette(val dark: Boolean) {
-    val surface = if (dark) 0xFF1E293B.toInt() else 0xFFFFFFFF.toInt()
-    val border = if (dark) 0xFF334155.toInt() else 0xFFDCE3EC.toInt()
-    val textPrimary = if (dark) 0xFFE2E8F0.toInt() else 0xFF0F1B2D.toInt()
-    val textSecondary = if (dark) 0xFFCBD5E1.toInt() else 0xFF475569.toInt()
-    val textMuted = if (dark) 0xFF94A3B8.toInt() else 0xFF64748B.toInt()
-    val accent = if (dark) 0xFF8FB0FF.toInt() else 0xFF1D4ED8.toInt()
-    val shadow = if (dark) 0x99000000.toInt() else 0x40000000
-    val targetFill = if (dark) 0xE6334155.toInt() else 0xE60F1B2D.toInt()
-    /** Ask chip: solid brand blue, so it never reads as a verdict chip (red, amber) or as a black hole in dark mode. */
-    val askFill = if (dark) 0xFF8FB0FF.toInt() else 0xFF1D4ED8.toInt()
-    val askPressed = if (dark) 0xFFB9CDFF.toInt() else 0xFF1E3A8A.toInt()
-    val askText = if (dark) 0xFF0F1B2D.toInt() else 0xFFFFFFFF.toInt()
+    val surface = if (dark) 0xFF2E2723.toInt() else 0xFFFFFFFF.toInt()
+    val border = if (dark) 0xFF4A403A.toInt() else 0xFFE6DED3.toInt()
+    val textPrimary = if (dark) 0xFFEFE8DF.toInt() else 0xFF1F1A17.toInt()
+    val textSecondary = if (dark) 0xFFDDD3C7.toInt() else 0xFF57504A.toInt()
+    val textMuted = if (dark) 0xFFA89E94.toInt() else 0xFF6B635C.toInt()
+    /** Lacquer black in light mode (buttons, links); the cream page colour on dark. */
+    val accent = if (dark) 0xFFF7F3EE.toInt() else 0xFF1F1A17.toInt()
+    val shadow = if (dark) 0x99000000.toInt() else 0x401F1A17
+    val targetFill = if (dark) 0xE64A403A.toInt() else 0xE61F1A17.toInt()
+    /** The doll's colours, for the voice halo and the listening badge only. */
+    val brandRed = 0xFFB8321C.toInt()
+    val brandGold = 0xFFF2B01E.toInt()
+    /** Ask chip: the app's primary button (lacquer black, white text and mic); inverted on dark. */
+    val askFill = if (dark) 0xFFF7F3EE.toInt() else 0xFF1F1A17.toInt()
+    val askPressed = if (dark) 0xFFDDD3C7.toInt() else 0xFF3D3631.toInt()
+    val askText = if (dark) 0xFF1F1A17.toInt() else 0xFFFFFFFF.toInt()
 
     fun ring(state: ShieldOverlay.State): Int = when (state) {
-        ShieldOverlay.State.IDLE -> if (dark) 0xFF475569.toInt() else 0xFFCBD5E1.toInt()
+        ShieldOverlay.State.IDLE -> if (dark) 0xFF6B635C.toInt() else 0xFFD7CDC0.toInt()
         ShieldOverlay.State.CHECKING -> accent
-        ShieldOverlay.State.SAFE -> accent
+        ShieldOverlay.State.SAFE -> if (dark) 0xFF8FB0FF.toInt() else 0xFF1D4ED8.toInt()
         ShieldOverlay.State.CAREFUL -> if (dark) 0xFFFBBF24.toInt() else 0xFFB45309.toInt()
-        ShieldOverlay.State.DANGER -> if (dark) 0xFFFB923C.toInt() else 0xFFC2410C.toInt()
-        ShieldOverlay.State.ERROR -> if (dark) 0xFF94A3B8.toInt() else 0xFF64748B.toInt()
+        ShieldOverlay.State.DANGER -> if (dark) 0xFFE11D48.toInt() else 0xFF9F1239.toInt()
+        ShieldOverlay.State.ERROR -> if (dark) 0xFFA89E94.toInt() else 0xFF6B635C.toInt()
     }
 
     fun glyph(state: ShieldOverlay.State): Int =
@@ -33,15 +41,15 @@ internal class ShieldPalette(val dark: Boolean) {
     fun chipBackground(state: ShieldOverlay.State): Int = when (state) {
         ShieldOverlay.State.SAFE -> if (dark) 0xFF1E3A8A.toInt() else 0xFFDBE5FF.toInt()
         ShieldOverlay.State.CAREFUL -> if (dark) 0xFF78350F.toInt() else 0xFFFEF3C7.toInt()
-        ShieldOverlay.State.DANGER -> if (dark) 0xFF9A3412.toInt() else 0xFFC2410C.toInt()
-        else -> if (dark) 0xFF334155.toInt() else 0xFFEEF2F6.toInt()
+        ShieldOverlay.State.DANGER -> 0xFF9F1239.toInt()
+        else -> if (dark) 0xFF4A403A.toInt() else 0xFFF1EBE3.toInt()
     }
 
     fun chipText(state: ShieldOverlay.State): Int = when (state) {
         ShieldOverlay.State.SAFE -> if (dark) 0xFFDBE5FF.toInt() else 0xFF1E3A8A.toInt()
         ShieldOverlay.State.CAREFUL -> if (dark) 0xFFFDE68A.toInt() else 0xFF854D0E.toInt()
         ShieldOverlay.State.DANGER -> 0xFFFFFFFF.toInt()
-        else -> if (dark) 0xFFE2E8F0.toInt() else 0xFF334155.toInt()
+        else -> if (dark) 0xFFEFE8DF.toInt() else 0xFF3D3631.toInt()
     }
 
     fun severity(severity: String): Int = when (severity) {

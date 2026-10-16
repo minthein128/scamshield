@@ -58,7 +58,7 @@ internal class CompanionPillView(
             marginStart = dp(10)
             marginEnd = dp(4)
         })
-        val end = text(14f, palette.ring(ShieldOverlay.State.DANGER), fonts.bold).apply {
+        val end = text(14f, palette.accent, fonts.bold).apply {
             this.text = strings.end
             gravity = Gravity.CENTER
             minHeight = dp(48)

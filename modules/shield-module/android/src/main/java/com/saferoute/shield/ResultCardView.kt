@@ -174,7 +174,7 @@ internal class ResultCardView(
                 isFocusable = true
                 contentDescription = "${severityWord(flag.severity)} flag: ${flag.text}"
             }
-            row.addView(FlagIconView(context, palette.severity(flag.severity), palette.surface), LayoutParams(dp(18), dp(18)).apply {
+            row.addView(FlagIconView(context, palette.severity(flag.severity), palette.surface, flag.severity), LayoutParams(dp(18), dp(18)).apply {
                 topMargin = dp(1)
             })
             row.addView(
@@ -476,8 +476,10 @@ internal class ResultCardView(
         }
     }
 
-    private class FlagIconView(context: Context, private val color: Int, private val glyph: Int) : View(context) {
+    /** Severity mark shaped like the app's: octagon (high), triangle (medium), circle (low). */
+    private class FlagIconView(context: Context, private val color: Int, private val glyph: Int, private val severity: String) : View(context) {
         private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+        private val shape = android.graphics.Path()
 
         init {
             importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
@@ -489,7 +491,31 @@ internal class ResultCardView(
             val cy = height / 2f
             paint.style = Paint.Style.FILL
             paint.color = color
-            canvas.drawCircle(cx, cy, 9f * d, paint)
+            val r = 9f * d
+            shape.reset()
+            when (severity) {
+                "high" -> {
+                    val a = 0.41f * r
+                    shape.moveTo(cx - a, cy - r)
+                    shape.lineTo(cx + a, cy - r)
+                    shape.lineTo(cx + r, cy - a)
+                    shape.lineTo(cx + r, cy + a)
+                    shape.lineTo(cx + a, cy + r)
+                    shape.lineTo(cx - a, cy + r)
+                    shape.lineTo(cx - r, cy + a)
+                    shape.lineTo(cx - r, cy - a)
+                    shape.close()
+                }
+                "medium" -> {
+                    shape.moveTo(cx, cy - r * 1.05f)
+                    shape.lineTo(cx + r * 1.1f, cy + r * 0.9f)
+                    shape.lineTo(cx - r * 1.1f, cy + r * 0.9f)
+                    shape.close()
+                }
+                else -> shape.addCircle(cx, cy, r, android.graphics.Path.Direction.CW)
+            }
+            canvas.drawPath(shape, paint)
+            if (severity == "medium") canvas.translate(0f, 1.5f * d)
             paint.color = glyph
             paint.style = Paint.Style.STROKE
             paint.strokeCap = Paint.Cap.ROUND

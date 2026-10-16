@@ -71,14 +71,14 @@ Three windows exist. All use `TYPE_APPLICATION_OVERLAY` with `NOT_FOCUSABLE | NO
 
 | State | Ring (light / dark) | Glyph | Notes |
 | --- | --- | --- | --- |
-| Idle | `#CBD5E1` / `#475569` | Pyit Taing Htaung doll | Half-tucked at the edge: 20dp of the circle sits off screen, 48dp stay visible |
-| Checking | Faint static blue track | Doll rocking (about 9 degrees) under a blue scan sweep, 1.4 s per pass | The bubble stays visible; see "Capture without hiding". With animator scale 0 the doll is static |
-| Safe | `#1D4ED8` / `#8FB0FF` (theme safe is blue) | Doll with a check badge | Pill auto-collapses after 8 s, bubble returns to idle |
-| Careful | `#B45309` / `#FBBF24` | Doll with a "!" badge | Pill stays until dismissed |
-| Danger | `#C2410C` / `#FB923C` | Doll with an alert-triangle badge | Pill stays until dismissed |
-| Error | `#64748B` / `#94A3B8` | Doll with a grey "!" badge | Neutral pill with "Tap to retry" |
+| Idle | `#D7CDC0` / `#6B635C` | Pyit Taing Htaung doll on its gold disc | Half-tucked at the edge: 20dp of the circle sits off screen, 48dp stay visible |
+| Checking | Faint lacquer-black track | Doll rocking (about 9 degrees) under an ink scan sweep, 1.4 s per pass | The bubble stays visible; see "Capture without hiding". With animator scale 0 the doll is static |
+| Safe | `#1D4ED8` / `#8FB0FF` (blue is used only for Low risk) | Doll with a check in a circle | Pill auto-collapses after 8 s, bubble returns to idle |
+| Careful | `#B45309` / `#FBBF24` | Doll with "!" in a triangle | Pill stays until dismissed |
+| Danger | `#9F1239` / `#E11D48` (deep crimson, never the doll's red) | Doll with "!" in an octagon | Pill stays until dismissed |
+| Error | `#6B635C` / `#A89E94` | Doll with a grey "!" circle | Neutral pill with "Tap to retry" |
 
-The badge is a 17dp circle in the ring color at the doll's lower right, with a white mark. The doll is `res/drawable-nodpi/companion_doll.png`; without it the old shield glyph is drawn. Every state, light and dark, is in `pitch/e2e/bubble-doll-states.png` (from `ShieldSnapshotTest`).
+The badge (18dp) sits at the doll's lower right in the ring color with a white mark; its shape repeats the app's verdict marks, so the verdict never rests on color alone. Colors follow `src/theme/theme.ts` and `docs/brand.md`; `BrandPaletteTest` fails when they drift. The doll is `res/drawable-nodpi/companion_doll.png`; without it the old shield glyph is drawn. Every state, light and dark, is in `pitch/e2e/bubble-doll-states.png` (from `ShieldSnapshotTest`).
 
 ### Capture without hiding
 
@@ -90,7 +90,7 @@ When the ring is busy (luminance spread over 20 of 255, for example text or a ph
 
 On a verdict the shield pops (scale 80% to 100% with overshoot, 340 ms) while its mark fades in, in the verdict color. Shapes and colors come from `src/theme/theme.ts`.
 
-Circle fill is the theme surface (`#FFFFFF`, dark `#1E293B`). Ring width is 3dp. The shadow is a 8dp blur, 3dp offset.
+Circle fill is the theme surface (`#FFFFFF`, dark `#2E2723`). Ring width is 3dp. The shadow is a 8dp blur, 3dp offset.
 
 Gestures:
 
@@ -104,7 +104,9 @@ Gestures:
 - Position: the card window is anchored, not tied to the bubble every frame. It is placed once per rest position by `AnchorMath`. It is below the bubble when the bubble is in the upper half of the screen, above it otherwise. It is anchored to the bubble's side edge with a 12dp margin.
 - Enter: alpha 0 to 1 and scale 45% to 100% about the bubble center, 200 ms, `cubic-bezier(0.2, 0, 0, 1)`. Exit is 170 ms.
 - Collapsed: a pill at least 48dp tall with radius 24dp. It holds a verdict chip (12sp bold, 14dp radius), a one-line title (14sp semibold, ellipsized) and a chevron.
-- Ask chip (results only): solid brand blue `#1D4ED8` with white text and mic (6.7:1), dark mode `#8FB0FF` with `#0F1B2D` (7.7:1); pressed `#1E3A8A` / `#B9CDFF`. The visible chip is 36dp tall inside a 48dp touch target. Blue keeps it apart from the red and amber verdict chips.
+- Ask chip (results only): the app's primary button, lacquer black `#1F1A17` with white text and a white mic (17:1), pressed `#3D3631`; on dark it inverts to cream `#F7F3EE` with ink text. The visible chip is 36dp tall inside a 48dp touch target. Blue stays reserved for Low risk and red and gold for the doll.
+- Voice halo: the doll's red `#B8321C` while listening (also the mic badge), gold `#F2B01E` while thinking or speaking, as in `src/components/avatarArt.ts`. The End control is lacquer black, not crimson.
+- Flag icons: "!" in an octagon (high), triangle (medium) or circle (low).
 - Expanded (tap, 220 ms): width grows to min(344dp, screen - 48dp), radius goes to 20dp, a detail area opens. It holds a summary (14sp, up to 4 lines), up to 3 flag rows (18dp severity icon, 13sp, up to 2 lines) and two text buttons, "Dismiss" and "Full report" (48dp tall, at least 48dp wide).
 - Surface: theme surface color, 1dp border, 10dp elevation. Font is Plus Jakarta Sans (Regular, SemiBold, Bold) from `assets/fonts` in the APK, system sans if the load fails.
 - Swipe left or right to dismiss. Past 40% of the width, or a fast fling, it flies off. Otherwise it springs back.
@@ -114,8 +116,8 @@ Gestures:
 | --- | --- | --- |
 | Safe | `#DBE5FF` / `#1E3A8A` | `#1E3A8A` / `#DBE5FF` |
 | Be careful | `#FEF3C7` / `#854D0E` | `#78350F` / `#FDE68A` |
-| High risk | `#C2410C` / `#FFFFFF` | `#9A3412` / `#FFFFFF` |
-| Error | `#EEF2F6` / `#334155` | `#334155` / `#E2E8F0` |
+| High risk | `#9F1239` / `#FFFFFF` | `#9F1239` / `#FFFFFF` |
+| Error | `#F1EBE3` / `#3D3631` | `#4A403A` / `#EFE8DF` |
 
 Dark mode follows the system setting. The service re-reads it in `onConfigurationChanged`.
 
