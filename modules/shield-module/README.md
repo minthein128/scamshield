@@ -84,6 +84,8 @@ The badge is a 17dp circle in the ring color at the doll's lower right, with a w
 
 A tap starts the loader at once and the bubble stays put (it untucks only after the frame is taken). The capturer grabs the first frame at least 34 ms after the tap, so a dismissed result card is gone, then paints over every overlay window rect (bubble window with its 12dp shadow margin, companion pill) with the average color of a ring around it before JPEG encoding (`CaptureMask`).
 
+Before encoding, the frame is also cropped to drop the status bar with the notification shade area and display cutout (top inset) and the navigation bar (bottom, or side in landscape), using the current window insets; no inset may remove more than 20% of a side. A 480 px copy of exactly what was sent stays in memory for the expanded sheet ("This is what we checked", tap to enlarge full screen, tap to close). It is never written to disk and is dropped when the card closes.
+
 When the ring is busy (luminance spread over 20 of 255, for example text or a photo next to the bubble), filling would erase content, so the capture falls back: the windows fade to alpha 0 in 60 ms, the first frame 17 ms later is taken (150 ms cap), and they fade back in 120 ms with the loader still running.
 
 On a verdict the shield pops (scale 80% to 100% with overshoot, 340 ms) while its mark fades in, in the verdict color. Shapes and colors come from `src/theme/theme.ts`.
@@ -164,6 +166,10 @@ Bubble gesture, with a result card showing:
 ### Preview
 
 `./gradlew :shield-module:testDebugUnitTest` also runs `ShieldDragTest` (anchor maths for left, right, top, bottom and nav-bar positions, the drag state machine, and drag, close and configuration change against a real overlay). It renders every state, light and dark, to `android/build/shield-snapshots/*.png` with Robolectric native graphics. Elevation shadows and the Plus Jakarta Sans fonts are not part of that render (the test has no APK assets), so check those on a device.
+
+## Notifications
+
+The foreground-service notification is neutral: title "SafeRoute", text "Ready when you need it", channel "SafeRoute", `VISIBILITY_PRIVATE` with a public version that shows only "SafeRoute" (`ShieldNotification.kt`). It never names a check, a verdict or a scam. Message Guard warnings are separate (`MessageGuardNotifier.kt`).
 
 ## Message Guard
 

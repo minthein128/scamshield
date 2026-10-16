@@ -40,6 +40,8 @@
   "companion": {
     "name": "Pyit Taing Htaung",
     "ask": "Ask",
+    "whatWeChecked": "This is what we checked",
+    "previewClose": "Tap to close. This picture is not saved.",
     "askA11y": "Ask Pyit Taing Htaung about this result",
     "talkA11y": "Talk to Pyit Taing Htaung",
     "listening": "Listening",

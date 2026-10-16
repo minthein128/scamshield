@@ -29,6 +29,20 @@ class ShieldSnapshotTest {
         for (dark in listOf(false, true)) render(dark)
     }
 
+    /** A stand-in for the sent screenshot: a chat-like page with message bubbles. */
+    private fun fakeShot(): Bitmap {
+        val bmp = Bitmap.createBitmap(240, 480, Bitmap.Config.ARGB_8888)
+        val c = android.graphics.Canvas(bmp)
+        c.drawColor(0xFFECE5DD.toInt())
+        val p = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG)
+        for (i in 0 until 6) {
+            p.color = if (i % 2 == 0) 0xFFFFFFFF.toInt() else 0xFFDCF8C6.toInt()
+            val left = if (i % 2 == 0) 12f else 80f
+            c.drawRoundRect(left, 24f + i * 74f, left + 148f, 80f + i * 74f, 12f, 12f, p)
+        }
+        return bmp
+    }
+
     private fun model(state: ShieldOverlay.State): CardModel {
         val chip = ShieldPalette.chipLabel(state)
         return when (state) {
@@ -53,7 +67,7 @@ class ShieldSnapshotTest {
                     FlagRow("Link does not match the bank domain: secure-bnk.example", "high"),
                     FlagRow("Asks you to keep this secret", "medium")
                 ),
-                true, "High risk. Fake bank asks you to transfer money", canAsk = true, askLabel = "Ask"
+                true, "High risk. Fake bank asks you to transfer money", canAsk = true, askLabel = "Ask", preview = fakeShot()
             )
         }
     }
@@ -89,7 +103,7 @@ class ShieldSnapshotTest {
 
     private fun render(dark: Boolean) {
         val palette = ShieldPalette(dark)
-        val bitmap = Bitmap.createBitmap((380 * d).toInt(), (750 * d).toInt(), Bitmap.Config.ARGB_8888)
+        val bitmap = Bitmap.createBitmap((380 * d).toInt(), (830 * d).toInt(), Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
         canvas.drawColor(if (dark) 0xFF0F1B2D.toInt() else 0xFFF4F6F8.toInt())
 

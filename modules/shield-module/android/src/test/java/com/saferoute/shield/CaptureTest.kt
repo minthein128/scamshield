@@ -113,6 +113,41 @@ class CaptureTest {
         assertEquals(white, bmp.getPixel(539, 389))
     }
 
+    // ---- crop: no status bar, shade or navigation bar ----
+
+    @Test
+    fun cropRemovesTheSystemBarsAtTheCaptureScale() {
+        assertEquals(Rect(0, 99, 1080, 2232), CaptureMask.cropRect(1080, 2400, intArrayOf(0, 99, 0, 168), 1f))
+        assertEquals("scaled to a 1080 px capture of a 1440 px screen", Rect(0, 75, 1080, 1674), CaptureMask.cropRect(1080, 1800, intArrayOf(0, 99, 0, 168), 0.75f))
+        assertEquals("landscape navigation bar on the right", Rect(0, 60, 2232, 1080), CaptureMask.cropRect(2400, 1080, intArrayOf(0, 60, 168, 0), 1f))
+        assertEquals("no insets keeps the frame", Rect(0, 0, 1080, 2400), CaptureMask.cropRect(1080, 2400, intArrayOf(0, 0, 0, 0), 1f))
+    }
+
+    @Test
+    fun bogusInsetsNeverEatTheScreen() {
+        val r = CaptureMask.cropRect(1080, 2400, intArrayOf(0, 2000, 0, 2000), 1f)
+        assertEquals(Rect(0, 480, 1080, 1920), r)
+        assertTrue(r.height() >= 2400 * 0.6)
+    }
+
+    // ---- neutral notification ----
+
+    @Test
+    fun foregroundNotificationIsNeutralAndPrivate() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val n = ShieldNotification.build(context, "ShieldProtectionChannel", null)
+        val title = n.extras.getCharSequence(android.app.Notification.EXTRA_TITLE).toString()
+        val text = n.extras.getCharSequence(android.app.Notification.EXTRA_TEXT).toString()
+        assertEquals("SafeRoute", title)
+        assertEquals("Ready when you need it", text)
+        assertEquals(android.app.Notification.VISIBILITY_PRIVATE, n.visibility)
+        val pub = n.publicVersion
+        assertEquals("SafeRoute", pub.extras.getCharSequence(android.app.Notification.EXTRA_TITLE).toString())
+        assertNull(pub.extras.getCharSequence(android.app.Notification.EXTRA_TEXT))
+        val all = listOf(title, text, ShieldNotification.CHANNEL_NAME, ShieldNotification.CHANNEL_DESCRIPTION).joinToString(" ")
+        assertFalse(all, Regex("scam|risk|danger|fraud|careful|safe |verdict|warning|check|screen|shield", RegexOption.IGNORE_CASE).containsMatchIn(all))
+    }
+
     // ---- ask chip contrast ----
 
     @Test
@@ -205,6 +240,20 @@ class CaptureTest {
         advance(30)
         overlay.setResult(JSONObject("""{"verdict":"safe","title":"t","summary":"s","flags":[]}"""))
         assertEquals(1f, overlay.bubbleViewForTest.alpha, 0f)
+    }
+
+    @Test
+    fun thePreviewOfWhatWasSentLivesOnlyWithTheCard() {
+        val thumb = Bitmap.createBitmap(48, 100, Bitmap.Config.ARGB_8888)
+        overlay.setResult(JSONObject("""{"verdict":"careful","title":"t","summary":"s","flags":[]}"""), thumb)
+        advance(400)
+        assertTrue(overlay.cardModelForTest!!.preview === thumb)
+        overlay.openPreviewForTest()
+        assertTrue(overlay.hasPreviewWindow)
+        overlay.reset()
+        advance(400)
+        assertFalse("the enlarged preview closes with the card", overlay.hasPreviewWindow)
+        assertNull("no reference is kept after the card closes", overlay.cardModelForTest)
     }
 
     @Test

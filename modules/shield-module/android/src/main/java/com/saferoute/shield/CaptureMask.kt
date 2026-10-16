@@ -108,6 +108,22 @@ internal object CaptureMask {
         return true
     }
 
+    /** Largest share of a side that a system-bar inset may remove; guards against bogus insets. */
+    const val MAX_INSET_SHARE = 0.2f
+
+    /**
+     * The part of a w x h capture that is sent: without the status bar and the shade area above it,
+     * and without the navigation bar. [insets] are left, top, right, bottom in real screen pixels.
+     */
+    fun cropRect(w: Int, h: Int, insets: IntArray, scale: Float): Rect {
+        fun cut(px: Int, side: Int) = (px * scale + 0.999f).toInt().coerceIn(0, (side * MAX_INSET_SHARE).toInt())
+        val r = Rect(cut(insets[0], w), cut(insets[1], h), w - cut(insets[2], w), h - cut(insets[3], h))
+        return if (r.width() > 0 && r.height() > 0) r else Rect(0, 0, w, h)
+    }
+
+    /** Width of the in-memory preview of what was sent. */
+    const val THUMB_WIDTH = 480
+
     /** WCAG 2 contrast ratio of two opaque colours. */
     fun contrast(a: Int, b: Int): Double {
         fun lum(c: Int): Double {

@@ -31,6 +31,8 @@ export interface ShieldCheckResult {
 export const COMPANION_STRING_KEYS = [
   'name',
   'ask',
+  'whatWeChecked',
+  'previewClose',
   'askA11y',
   'talkA11y',
   'listening',

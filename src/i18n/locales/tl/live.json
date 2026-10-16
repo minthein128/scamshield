@@ -43,6 +43,8 @@
   "companion": {
     "name": "Pyit Taing Htaung",
     "ask": "Magtanong",
+    "whatWeChecked": "Ito ang sinuri namin",
+    "previewClose": "Pindutin para isara. Hindi nai-save ang larawang ito.",
     "askA11y": "Tanungin si Pyit Taing Htaung tungkol sa resulta na ito",
     "talkA11y": "Kausapin si Pyit Taing Htaung",
     "listening": "Nakikinig",

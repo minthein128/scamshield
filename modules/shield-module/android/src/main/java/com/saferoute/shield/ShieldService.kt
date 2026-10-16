@@ -20,7 +20,6 @@ import android.os.IBinder
 import android.os.Looper
 import android.os.SystemClock
 import android.util.Log
-import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
 import org.json.JSONObject
@@ -162,11 +161,11 @@ class ShieldService : Service(), ShieldOverlay.Listener {
                     ?: throw CheckException("Could not read the screen. Tap the shield to try again.")
                 Log.i(
                     TAG,
-                    "capture path=$path tap_to_jpeg_ms=${SystemClock.elapsedRealtime() - tapAt} " +
+                    "capture path=$path tap_to_jpeg_ms=${SystemClock.elapsedRealtime() - tapAt} crop=${jpeg.crop.toShortString()} " +
                         "frame_wait_ms=${jpeg.frameWaitMs} encode_ms=${jpeg.encodeMs}" + if (path == "mask") " bubble hidden_ms=0" else ""
                 )
                 val result = CheckClient.checkScreen(apiUrl, language, jpeg.bytes, ShieldBridge.authToken)
-                main.post { onResult(result) }
+                main.post { onResult(result, jpeg.thumb) }
             } catch (e: CheckException) {
                 main.post { onFailure(e.message ?: "The check failed.") }
             } catch (e: InterruptedException) {
@@ -189,13 +188,13 @@ class ShieldService : Service(), ShieldOverlay.Listener {
         return value
     }
 
-    private fun onResult(result: JSONObject) {
+    private fun onResult(result: JSONObject, preview: android.graphics.Bitmap? = null) {
         val id = result.optString("id").ifBlank { "chk_local_${System.currentTimeMillis()}" }
         val json = result.toString()
         lastId = id
         lastJson = json
         busy.set(false)
-        overlay?.setResult(result)
+        overlay?.setResult(result, preview)
         ShieldBridge.publishResult(id, json)
         pendingCheck?.let {
             pendingCheck = null
@@ -436,26 +435,22 @@ class ShieldService : Service(), ShieldOverlay.Listener {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                "SafeRoute Shield",
+                ShieldNotification.CHANNEL_NAME,
                 NotificationManager.IMPORTANCE_LOW
-            ).apply { description = "Shows while the SafeRoute shield button is on" }
+            ).apply {
+                description = ShieldNotification.CHANNEL_DESCRIPTION
+                lockscreenVisibility = Notification.VISIBILITY_PRIVATE
+            }
             val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             manager.createNotificationChannel(channel)
         }
     }
 
     private fun buildNotification(): Notification {
-        val builder = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("SafeRoute Shield is on")
-            .setContentText("Tap the floating shield to check what is on your screen.")
-            .setSmallIcon(android.R.drawable.ic_dialog_info)
-            .setOngoing(true)
-        packageManager.getLaunchIntentForPackage(packageName)?.let { launch ->
-            builder.setContentIntent(
-                PendingIntent.getActivity(this, 0, launch, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
-            )
+        val launch = packageManager.getLaunchIntentForPackage(packageName)?.let {
+            PendingIntent.getActivity(this, 0, it, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
         }
-        return builder.build()
+        return ShieldNotification.build(this, CHANNEL_ID, launch)
     }
 
     override fun onDestroy() {

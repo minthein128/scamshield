@@ -129,14 +129,34 @@ class ScreenCapturer(
 
     /** Outcome of one capture. [Busy] means the masks would erase content; nothing was encoded. */
     sealed class Capture {
-        class Jpeg(val bytes: ByteArray, val frameWaitMs: Long, val encodeMs: Long) : Capture()
+        /** [thumb] is a small copy of exactly what was encoded, for "This is what we checked". Memory only. */
+        class Jpeg(val bytes: ByteArray, val frameWaitMs: Long, val encodeMs: Long, val thumb: Bitmap?, val crop: Rect) : Capture()
         object Busy : Capture()
         object None : Capture()
     }
 
     /** Blocks. Returns a JPEG of a frame that arrived at or after notBefore (elapsedRealtime), else the newest. */
     fun captureJpeg(notBefore: Long, waitMs: Long): ByteArray? =
-        (capture(notBefore, waitMs, emptyList()) as? Capture.Jpeg)?.bytes
+        (capture(notBefore, waitMs, emptyList()) as? Capture.Jpeg)?.also { it.thumb?.recycle() }?.bytes
+
+    private class Sent(val bytes: ByteArray, val thumb: Bitmap?, val crop: Rect)
+
+    /** Status bar (with cutout) and navigation bar insets in real pixels: left, top, right, bottom. */
+    private fun systemInsets(): IntArray {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val wm = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+            val types = android.view.WindowInsets.Type.statusBars() or android.view.WindowInsets.Type.navigationBars() or
+                android.view.WindowInsets.Type.displayCutout()
+            val i = wm.currentWindowMetrics.windowInsets.getInsetsIgnoringVisibility(types)
+            return intArrayOf(i.left, i.top, i.right, i.bottom)
+        }
+        val res = context.resources
+        fun dimen(name: String): Int {
+            val id = res.getIdentifier(name, "dimen", "android")
+            return if (id > 0) res.getDimensionPixelSize(id) else 0
+        }
+        return intArrayOf(0, dimen("status_bar_height"), 0, dimen("navigation_bar_height"))
+    }
 
     /**
      * Blocks like [captureJpeg] and paints over [masks] (real screen pixels) before encoding.
@@ -156,12 +176,12 @@ class ScreenCapturer(
             val image = latest ?: return Capture.None
             val waited = SystemClock.elapsedRealtime() - start
             onFrame()
-            val bytes = encode(image, masks) ?: return Capture.Busy
-            return Capture.Jpeg(bytes, waited, SystemClock.elapsedRealtime() - start - waited)
+            val sent = encode(image, masks) ?: return Capture.Busy
+            return Capture.Jpeg(sent.bytes, waited, SystemClock.elapsedRealtime() - start - waited, sent.thumb, sent.crop)
         }
     }
 
-    private fun encode(image: Image, masks: List<Rect> = emptyList()): ByteArray? {
+    private fun encode(image: Image, masks: List<Rect> = emptyList()): Sent? {
         val plane = image.planes[0]
         val pixelStride = plane.pixelStride
         val rowPadding = plane.rowStride - pixelStride * image.width
@@ -173,27 +193,33 @@ class ScreenCapturer(
         plane.buffer.rewind()
         padded.copyPixelsFromBuffer(plane.buffer)
         val cropped = if (rowPadding == 0) padded else Bitmap.createBitmap(padded, 0, 0, image.width, image.height)
+        val scale = if (realWidth > 0) image.width.toFloat() / realWidth else 1f
         val bitmap = if (masks.isEmpty() || cropped.isMutable) cropped else cropped.copy(Bitmap.Config.ARGB_8888, true).also {
             if (cropped !== padded) cropped.recycle()
         }
         if (masks.isNotEmpty()) {
-            val scale = if (realWidth > 0) image.width.toFloat() / realWidth else 1f
             if (!CaptureMask.maskBitmap(bitmap, masks, scale)) {
                 if (bitmap !== padded) bitmap.recycle()
                 padded.recycle()
                 return null
             }
         }
+        val crop = runCatching { CaptureMask.cropRect(bitmap.width, bitmap.height, systemInsets(), scale) }
+            .getOrDefault(Rect(0, 0, bitmap.width, bitmap.height))
+        val sent = Bitmap.createBitmap(bitmap, crop.left, crop.top, crop.width(), crop.height())
         var bytes = ByteArray(0)
         for (quality in QUALITIES) {
             val out = ByteArrayOutputStream()
-            bitmap.compress(Bitmap.CompressFormat.JPEG, quality, out)
+            sent.compress(Bitmap.CompressFormat.JPEG, quality, out)
             bytes = out.toByteArray()
             if (bytes.size <= MAX_BYTES) break
         }
-        if (bitmap !== padded) bitmap.recycle()
-        padded.recycle()
-        return bytes
+        val thumbW = minOf(CaptureMask.THUMB_WIDTH, sent.width)
+        val thumb = runCatching {
+            Bitmap.createScaledBitmap(sent, thumbW, maxOf(1, sent.height * thumbW / sent.width), true)
+        }.getOrNull()
+        listOf(sent, bitmap, padded).distinct().filter { it !== thumb }.forEach { it.recycle() }
+        return Sent(bytes, thumb, crop)
     }
 
     fun release(stopProjection: Boolean = true) {

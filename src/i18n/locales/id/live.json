@@ -43,6 +43,8 @@
   "companion": {
     "name": "Pyit Taing Htaung",
     "ask": "Tanya",
+    "whatWeChecked": "Ini yang kami periksa",
+    "previewClose": "Ketuk untuk menutup. Foto ini tidak disimpan.",
     "askA11y": "Tanya Pyit Taing Htaung tentang hasil ini",
     "talkA11y": "Bicara dengan Pyit Taing Htaung",
     "listening": "Mendengarkan",

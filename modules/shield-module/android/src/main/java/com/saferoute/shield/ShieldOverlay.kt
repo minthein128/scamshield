@@ -187,6 +187,7 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
     fun remove() {
         main.removeCallbacksAndMessages(null)
         main.removeCallbacks(ticker)
+        removePreview()
         companion = null
         removePillNow()
         removeCardNow()
@@ -260,7 +261,8 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
         untuck()
     }
 
-    fun setResult(json: JSONObject) {
+    /** [preview] is the in-memory copy of what was sent; it lives only as long as the card. */
+    fun setResult(json: JSONObject, preview: android.graphics.Bitmap? = null) {
         lastJson = json
         val verdict = json.optString("verdict")
         val next = when (verdict) {
@@ -285,6 +287,8 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
             canAsk = true,
             askLabel = strings.ask,
             askDescription = strings.askA11y,
+            preview = preview,
+            previewLabel = strings.whatWeChecked,
         )
         noticeReturn = null
         if (companion != null) {
@@ -562,6 +566,9 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
                 closeNotice()
             }
             override fun onAsk() = listener.onAsk()
+            override fun onPreview() {
+                model.preview?.let { showPreview(it) }
+            }
             override fun onFullReport() = listener.onOpenReport()
             override fun onDismissClicked() = if (model.notice) closeNotice() else listener.onDismiss()
             override fun onSwipedAway() = if (model.notice) closeNotice() else listener.onDismiss()
@@ -676,7 +683,61 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
             }).start()
     }
 
+    private var previewRoot: View? = null
+
+    /** Enlarged "This is what we checked". Any tap closes it; it also closes with the card. */
+    private fun showPreview(bitmap: android.graphics.Bitmap) {
+        removePreview()
+        val root = FrameLayout(context).apply {
+            setBackgroundColor(0xE6000000.toInt())
+            isClickable = true
+            contentDescription = strings.whatWeChecked + ". " + strings.previewClose
+            setOnClickListener { removePreview() }
+        }
+        val image = android.widget.ImageView(context).apply {
+            setImageBitmap(bitmap)
+            scaleType = android.widget.ImageView.ScaleType.FIT_CENTER
+            importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+        }
+        root.addView(image, FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT).apply {
+            setMargins(dp(24), dp(72), dp(24), dp(96))
+        })
+        val caption = android.widget.TextView(context).apply {
+            text = strings.whatWeChecked + "\n" + strings.previewClose
+            setTextColor(0xFFFFFFFF.toInt())
+            textSize = 14f
+            gravity = Gravity.CENTER
+            typeface = fonts.semiBold
+            importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+        }
+        root.addView(caption, FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM).apply {
+            setMargins(dp(24), 0, dp(24), dp(32))
+        })
+        val params = WindowManager.LayoutParams(
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.MATCH_PARENT,
+            overlayType,
+            baseFlags,
+            PixelFormat.TRANSLUCENT
+        )
+        try {
+            windowManager.addView(root, params)
+            previewRoot = root
+        } catch (_: Exception) {
+        }
+    }
+
+    private fun removePreview() {
+        val root = previewRoot ?: return
+        previewRoot = null
+        try {
+            windowManager.removeView(root)
+        } catch (_: Exception) {
+        }
+    }
+
     private fun removeCardNow() {
+        removePreview()
         main.removeCallbacks(autoCollapse)
         val root = cardRoot ?: return
         enterAnim?.cancel()
@@ -947,6 +1008,8 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
     internal val bubbleParamsForTest: WindowManager.LayoutParams get() = bubbleParams
     internal val hasCardWindow: Boolean get() = cardRoot != null
     internal val hasPillWindow: Boolean get() = pillRoot != null
+    internal val hasPreviewWindow: Boolean get() = previewRoot != null
+    internal fun openPreviewForTest() = cardModel?.preview?.let { showPreview(it) }
     internal val pillForTest: CompanionPillView? get() = pillView
     internal val bubbleVoiceForTest: BubbleView.Voice get() = bubble.voice
     internal val cardModelForTest: CardModel? get() = cardModel

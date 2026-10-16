@@ -40,6 +40,9 @@ internal data class CardModel(
     val canAsk: Boolean = false,
     val askLabel: String = "Ask",
     val askDescription: String = "Ask Pyit Taing Htaung about this result",
+    /** In-memory copy of the screenshot that was sent. Never written to disk. */
+    val preview: android.graphics.Bitmap? = null,
+    val previewLabel: String = "This is what we checked",
     /** A voice notice rather than a check result. Dismissing it keeps the result. */
     val notice: Boolean = false,
     /** Notice pill: a tap opens SafeRoute. */
@@ -50,6 +53,7 @@ internal data class CardModel(
 
 internal interface CardCallbacks {
     fun onAsk() {}
+    fun onPreview() {}
     fun onRetry()
     fun onFullReport()
     fun onDismissClicked()
@@ -181,6 +185,7 @@ internal class ResultCardView(
                 topMargin = dp(10)
             })
         }
+        model.preview?.let { details.addView(previewRow(it), LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply { topMargin = dp(12) }) }
         val actions = LinearLayout(context).apply { orientation = HORIZONTAL; gravity = Gravity.END }
         actions.addView(textButton("Dismiss", palette.textMuted, fonts.semiBold) { callbacks.onDismissClicked() })
         if (model.canOpenReport) {
@@ -218,6 +223,37 @@ internal class ResultCardView(
             LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply { marginStart = dp(5) }
         )
         return chip
+    }
+
+    /** "This is what we checked": a small thumbnail of the sent screenshot. Tap to enlarge. */
+    private fun previewRow(bitmap: android.graphics.Bitmap): View {
+        val row = LinearLayout(context).apply {
+            orientation = HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            minimumHeight = dp(48)
+            isClickable = true
+            isFocusable = true
+            contentDescription = model.previewLabel
+            setOnClickListener { callbacks.onPreview() }
+        }
+        val h = dp(PREVIEW_DP)
+        val w = maxOf(dp(24), h * bitmap.width / maxOf(1, bitmap.height))
+        val image = android.widget.ImageView(context).apply {
+            setImageBitmap(bitmap)
+            scaleType = android.widget.ImageView.ScaleType.CENTER_CROP
+            importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
+            background = GradientDrawable().apply {
+                cornerRadius = dp(6).toFloat()
+                setStroke(maxOf(1, d.toInt()), palette.border)
+            }
+            clipToOutline = true
+        }
+        row.addView(image, LayoutParams(w, h))
+        row.addView(
+            text(model.previewLabel, 13f, palette.textSecondary, fonts.semiBold).apply { maxLines = 2 },
+            LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f).apply { marginStart = dp(12) }
+        )
+        return row
     }
 
     private fun titleParams() = LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f).apply {
@@ -466,6 +502,7 @@ internal class ResultCardView(
 
     companion object {
         const val PILL_RADIUS_DP = 24f
+        const val PREVIEW_DP = 72
         const val SHEET_RADIUS_DP = 20f
         val EASE = PathInterpolator(0.2f, 0f, 0f, 1f)
     }
