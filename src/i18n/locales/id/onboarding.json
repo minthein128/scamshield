@@ -13,29 +13,26 @@
   },
   "countries": {
     "fromTitle": "Dari mana asal Anda?",
-    "fromBody": "Ini berguna agar nomor bantuan yang tepat muncul lebih dulu.",
-    "toTitle": "Ke mana Anda akan bekerja atau bepergian?",
-    "toBody": "Boleh dilewati. Lewati jika Anda belum tahu."
+    "fromBody": "Ini berguna agar nomor bantuan yang tepat muncul lebih dulu."
   },
   "how": {
-    "title": "Cara SafeRoute membantu",
-    "body": "Tiga hal, tidak perlu pengaturan apa pun.",
+    "title": "Yang dilakukan SafeRoute",
     "check": {
-      "title": "Periksa sebelum setuju",
-      "body": "Tempel tawaran kerja, pesan, atau tautan, atau bagikan tangkapan layar. SafeRoute mencari tanda-tanda peringatan perdagangan orang dan penipuan."
+      "title": "Periksa sebelum berangkat",
+      "body": "Tunjukkan iklan kerja, pesan, atau tautan."
     },
-    "explain": {
-      "title": "Lihat alasannya, dalam bahasa Anda",
-      "body": "Anda mendapat hasil penilaian yang jelas, alasan di baliknya, dan peringatan suara dalam bahasa yang Anda pilih."
+    "doll": {
+      "title": "Ketuk boneka",
+      "body": "Boneka memeriksa layar Anda di aplikasi apa pun."
+    },
+    "call": {
+      "title": "Minta bantuan",
+      "body": "Nomor bantuan untuk negara Anda."
     },
     "warn": {
-      "title": "Beri tahu keluarga dan dapatkan bantuan",
-      "body": "Kirim peringatan ke orang yang Anda percayai dan temukan nomor bantuan resmi untuk negara yang penting bagi Anda."
+      "title": "Peringatkan keluarga",
+      "body": "Kirim peringatan ke orang yang Anda percaya."
     }
-  },
-  "shield": {
-    "title": "Nyalakan Screen shield",
-    "body": "Boleh dilewati. Anda juga bisa menyalakannya nanti dari layar utama."
   },
   "sharing": {
     "title": "Bantu sesama: bagikan pola penipuan tanpa nama",
@@ -49,9 +46,23 @@
     "no": "Tidak, terima kasih"
   },
   "account": {
-    "title": "Gunakan SafeRoute sesuai kebutuhan Anda",
-    "body": "Semua fitur bisa digunakan tanpa akun. Hasil pemeriksaan Anda tetap tersimpan di perangkat ini.",
-    "note": "Akun bersifat pilihan. Akun menyimpan riwayat dan Kontak tepercaya agar tidak hilang jika berganti ponsel, serta menambah batas periksa per jam.",
+    "title": "Mau membuat akun?",
+    "without": {
+      "heading": "Tanpa akun, Anda bisa:",
+      "check": "Memeriksa tawaran kerja, pesan, tautan, dan gambar",
+      "voice": "Bicara dengan boneka lewat suara",
+      "doll": "Memakai boneka di layar Anda (Android)",
+      "call": "Menelepon nomor bantuan dan membagikan peringatan",
+      "limit": "Hingga {{n}} pemeriksaan per jam"
+    },
+    "with": {
+      "heading": "Dengan akun, Anda juga mendapat:",
+      "contacts": "Menyimpan kontak darurat",
+      "warn": "Mengirim peringatan siap pakai dengan satu ketukan",
+      "restore": "Memulihkan pemeriksaan dan kontak di ponsel baru",
+      "limit": "Hingga {{n}} pemeriksaan per jam"
+    },
+    "free": "Gratis",
     "anonymous": "Lanjutkan tanpa akun",
     "signUp": "Buat akun",
     "signIn": "Saya sudah punya akun"

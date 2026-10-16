@@ -8,7 +8,6 @@ import { TabIcon } from './TabIcons';
 import { TabRail } from './TabRail';
 import { useLayout } from '../hooks/useLayout';
 import type { RootStackParamList, TabParamList } from './types';
-import type { AfterOnboarding } from '../lib/onboarding';
 import HomeScreen from '../screens/HomeScreen';
 import CheckScreen from '../screens/CheckScreen';
 import CheckingScreen from '../screens/CheckingScreen';
@@ -95,9 +94,6 @@ export const RootNavigator: React.FC = () => {
   useShieldTokenSync();
   useShieldShareSync();
   useMessageGuardConfigSync();
-  const onOnboardingDone = (next?: AfterOnboarding) => {
-    if (next) setTimeout(() => navigationRef.navigate('Account', { mode: next }), 150);
-  };
   if (!loaded) return null;
   const inApp = profile.onboarded && profile.sharingAsked;
   return (
@@ -120,7 +116,10 @@ export const RootNavigator: React.FC = () => {
             <Stack.Screen name="ShieldHowTo" component={ShieldHowToScreen} />
           </>
         ) : (
-          <Stack.Screen name="Onboarding">{() => <OnboardingScreen onDone={onOnboardingDone} />}</Stack.Screen>
+          <>
+            <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+            <Stack.Screen name="Account" component={AccountScreen} />
+          </>
         )}
       </Stack.Navigator>
       <ShareIntentBridge ready={ready && inApp} />
