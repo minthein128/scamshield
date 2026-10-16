@@ -1,112 +1,110 @@
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/brand/logo-horizontal-dark.png">
-  <img src="assets/brand/logo-horizontal.png" alt="SafeRoute" height="64">
+  <source media="(prefers-color-scheme: dark)" srcset="assets/readme/cover-dark.png">
+  <img src="assets/readme/cover.png" alt="SafeRoute: spot a job scam before you pay, send documents or travel. Phone screens show a Job Shield report, a High risk verdict and the floating doll bubble over a chat app. Works in English, Burmese, Bahasa Indonesia, Tagalog and Thai. Built with Gemini and Google Cloud." width="100%">
 </picture>
 
 # SafeRoute
 
-An Android app and web demo that checks a job offer, message, link or screenshot for scams and human trafficking, and explains the result in the user's language. Built for the Google Cloud AI Builder Cup 2026.
+Migrant workers from Myanmar, Thailand, Indonesia and the Philippines find jobs through social media ads and chat apps. Some of those offers lead to debt, forced scam work or trafficking, and the warning signs are easy to miss in a second language. SafeRoute is an Android app and a web demo that checks a job ad, message, link or screenshot before the person pays, sends documents or travels. It explains what it found in the user's own language and points to a verified hotline. Built for the Google Cloud AI Builder Cup 2026.
+
+**[Web demo](https://saferoute-aibc.web.app)** · **[Android APK](https://saferoute-api.akkhayar.com/download)** · **[Dataset](https://huggingface.co/datasets/Rickaym/saferoute-scam-screenshots)** · **[Pitch deck](pitch/deck.pdf)**
+
+## Features
+
+| Feature | What it does |
+| --- | --- |
+| **Check anything** | Paste a message or link, or share a screenshot. Get **Low risk**, **Be careful** or **High risk**, the quoted words behind it, and a verified hotline for your home and destination countries. |
+| **Job Shield** | Compares the job ad with what the recruiter asks in chat and shows each gap, such as "no fees" in the ad and a deposit in the chat. |
+| **Screen bubble** (Android) | A floating Pyit Taing Htaung doll checks whatever is on screen, in any app, with one tap. |
+| **Message Guard** (Android, opt-in) | Watches notifications from the chat apps you choose and flags risky messages. |
+| **Voice companion** | Talk to Pyit Taing Htaung about a report in your language, on Gemini Live. |
+| **Warn my family** | Sends the warning to a trusted contact by SMS or the share sheet. |
+| **Scam network** (opt-in) | A risky check adds one anonymous, redacted signal. Repeat numbers and handles are matched as keyed hashes and raise the next person's warning. |
+| **Languages** | English, Burmese, Bahasa Indonesia, Tagalog and Thai, for the app, the reports and the spoken warnings. |
 
 <p align="center">
-  <img src="pitch/e2e/rebrand-06-home-history-phone-en.png" width="230" alt="Home">
-  <img src="pitch/e2e/rebrand-04-checking-verdict-phone-en.png" width="230" alt="Checking, with the verdict mark">
-  <img src="pitch/e2e/rebrand-05-report-danger-phone-en.png" width="230" alt="Risk report">
+  <img src="pitch/e2e/refine-02-home-phone-en.png" width="200" alt="Home screen with recent checks">
+  <img src="pitch/e2e/jobshield-facts-pause-en-390x844.png" width="200" alt="Job Shield asks the user to confirm the facts it read">
+  <img src="pitch/e2e/verdict-report-danger-390x844-my.png" width="200" alt="High risk report in Burmese">
 </p>
-
-The mascot and mark is the Pyit Taing Htaung, the Myanmar roly-poly doll that always gets back up. See [docs/brand.md](docs/brand.md).
-
-Team: TBD
-
-## Try it
-
-- Web demo: https://saferoute-aibc.web.app
-- Android APK: https://saferoute-aibc.web.app/saferoute.apk (allow installs from your browser)
-- Testers: accept the Firebase App Distribution invite email, install Firebase App Tester, then download SafeRoute from it. New builds arrive as notifications.
-
-## Demo video
-
-[media/demo.mp4](media/demo.mp4), under 3 minutes. See [media/README.md](media/README.md).
-
-## Pitch deck
-
-[media/SafeRoute-deck.pdf](media/SafeRoute-deck.pdf)
 
 ## How it works
 
 ```mermaid
 flowchart LR
-  A[App or web] --> B[Cloud Run API]
-  B --> C[Extract: Gemini API]
-  C --> D[Detect: Search grounding]
-  C --> E[Correlate: Web Risk, RDAP]
-  D --> F[Score: rules engine]
-  E --> F
-  F --> G[Explain: Gemini TTS]
+  IN[Message, link<br/>or screenshot] --> X[Extract<br/>Gemini, JSON schema]
+  X --> GR[Ground<br/>Gemini + Google Search]
+  X --> L[Links<br/>Web Risk + RDAP]
+  X --> N[Scam network<br/>hashed lookup]
+  X --> G[Likelihood-language<br/>guard]
+  GR --> G
+  G --> S[Score<br/>deterministic rules]
+  L --> S
+  N --> S
+  S --> E[Explain<br/>verdict, reasons, hotline,<br/>Gemini TTS]
 ```
 
-1. The app sends text, a link or a screenshot to one Cloud Run service.
-2. One Gemini call reads the input, including image text, and returns red flags as JSON.
-3. Gemini with Google Search grounding checks that named agencies and companies exist.
-4. Google Web Risk and RDAP check each link and the domain age.
-5. A deterministic rules engine sets the score and verdict: safe, careful or danger.
-6. The report and a spoken warning come back in English, Bahasa Indonesia, Tagalog or Burmese.
+1. One multimodal Gemini call reads the text or image and returns red flags, entities and links as schema-checked JSON.
+2. Gemini with Google Search grounding checks whether named agencies and companies exist. Only organisation names, website hosts and the country go to search.
+3. Web Risk and RDAP check every link and its domain age. The scam network checks hashed phone numbers and handles.
+4. A language guard rewrites certainty wording ("is a scam" becomes "looks like a scam") in all five languages, and asks the model again when the output has three or more such phrases.
+5. A deterministic rules engine sets the score and verdict. The model finds evidence; it cannot raise a verdict on its own.
+6. The report and a spoken warning come back in the user's language.
 
-Details: [docs/architecture.md](docs/architecture.md) and [docs/api-contract.md](docs/api-contract.md).
+Details: [docs/architecture.md](docs/architecture.md), [docs/api-contract.md](docs/api-contract.md), [docs/intel-design.md](docs/intel-design.md).
+
+## Safety and privacy
+
+- **Likelihood, never accusation.** Reports say "shows signs of" and never call a named person or company a criminal.
+- **Leave quickly.** One button on every report clears the screen back to Home and stops any audio.
+- **Nothing stored from the check.** Images and message text are not stored or logged. Synced history keeps only the verdict, a score band, the title and the summary, and history can be turned off.
+- **Consent first.** Signal sharing is off until the user turns it on during setup or in Settings. Message Guard explains what it reads and asks for each app.
+- **Hashed network.** Phones, handles and accounts are stored as HMAC-SHA256 hashes, signals expire after 90 days, and clients cannot read the network directly.
 
 ## Benchmarks
 
-Both benchmarks run the real pipeline with `gemini-3.5-flash-lite`. Full results and history: [bench/RESULTS.md](bench/RESULTS.md).
+The [Protection Score](bench/README.md) asks one question per screenshot: did SafeRoute give a frightened, low-literacy reader the right information to stay safe? It scores eight areas from 0 to 100, and critical failures (calling a dangerous message safe, inventing a phone number, accusing a named person) cap the case score.
 
-**Text eval (27 cases)**, 2026-10-14. Four languages: en, id, tl, my. Source: `bench/results/2026-10-14-gemini-3.5-flash-lite-text-eval.json`.
+All runs use `gemini-3.5-flash-lite` and the production prompt. A public evaluation set of 28 synthetic and 51 real redacted screenshots is on [Hugging Face](https://huggingface.co/datasets/Rickaym/saferoute-scam-screenshots).
 
-| Accuracy | p50 | p95 |
+| Set | Cases | Result |
 | --- | --- | --- |
-| 27/27 | 3.1 s | 4.8 s |
+| Synthetic screenshots, 5 languages ([results](bench/RESULTS-v2.md)) | 24 | Protection Score **89.7**. 0 critical failures, 0 dangerous messages called safe, 0 false alarms, 48/48 quotes found in the image, verdict stable in 98% of 210 variants (blur, crop, dark mode, prompt injection) |
+| Synthetic text eval (`server/eval`) | 31 | **31/31** correct, 0 responses with certainty wording after the guard, p50 2.8 s, p95 4.4 s |
+| Real redacted screenshots | 54 | Protection Score **66.6**, provisional, on draft labels |
 
-**Screenshot bench (N screenshots)**
+## Built with
 
-| Status | Accuracy | False positives | p50 | p95 | PII leaks |
-| --- | --- | --- | --- | --- | --- |
-| pending: screenshots being collected | - | - | - | - | - |
-
-The harness is checked on 6 synthetic screenshots (6/6 risky or safe matched). How to run it and the label format: [bench/README.md](bench/README.md).
-
-## Privacy
-
-- Screenshots and text are used for the check only. They are not stored and not logged.
-- A risky check adds one anonymous, redacted signal to a shared scam radar. Phones and handles are stored as keyed hashes. Users can opt out in Settings. See [docs/intel-design.md](docs/intel-design.md).
-- History and trusted contacts stay on the device unless the user signs in. Account deletion is in Settings and at `/delete-account`.
-
-## Repo layout
-
-| Path | Contents |
+| Google service | Use |
 | --- | --- |
-| `src/` | Expo (React Native) app: screens, API client, state |
-| `modules/shield-module/` | Android overlay that checks the current screen |
-| `server/` | Hono and TypeScript API on Gemini, Web Risk and RDAP |
-| `server/eval/` | Text eval with 27 labelled cases |
-| `bench/` | Screenshot benchmark, results and synthetic images |
-| `docs/` | Architecture, API contract, GCP setup |
-| `pitch/` | Deck source, demo inputs and video script |
-| `media/` | Deck PDF and demo video |
-| `scripts/` | Cloud Run deploy and APK signing |
+| Gemini API (`@google/genai`) | Extraction with a JSON response schema (`gemini-3.5-flash-lite`), Job Shield fact extraction |
+| Grounding with Google Search | Checks that agencies and companies exist and looks for scam reports |
+| Gemini text-to-speech | Spoken warnings, so Burmese and Thai work on phones with no matching voice (`gemini-3.8-flash-tts`) |
+| Gemini Live API | The voice companion (`gemini-3.8-live`) |
+| Web Risk API | Known malicious links |
+| Firebase Auth, Firestore | Anonymous and Google sign-in, synced history and contacts, the scam network |
+| Firebase Hosting, App Distribution | The web demo and tester builds |
 
-## Run locally
+The API is a Hono service in TypeScript. It also runs on Vertex AI with `GOOGLE_GENAI_USE_VERTEXAI=true`, and `scripts/deploy-cloudrun.sh` deploys it to Cloud Run.
+
+## Run it locally
 
 ```bash
 pnpm install --frozen-lockfile
-pnpm web                                  # web app, offline mock API
-pnpm check                                # typecheck, lint, tests
-cd server && npm ci && MOCK=1 npm run dev # API on :8080 with canned answers
-GEMINI_API_KEY=... npm run dev            # same API with the real model
+EXPO_PUBLIC_OFFLINE_MOCK=1 pnpm web    # web app with the offline mock API
+pnpm web                               # web app against the live API
+pnpm check                             # typecheck, lint, tests
+
+cd server && npm ci
+MOCK=1 npm run dev                     # API on :8080 with canned answers
+GEMINI_API_KEY=... npm run dev         # API with the real model
+GEMINI_API_KEY=... npm run eval        # text eval
 ```
 
-Point the app at an API with `EXPO_PUBLIC_API_URL=http://localhost:8080 pnpm web`. Code layout notes for contributors are in `CLAUDE.md`.
+Deploy notes: [docs/setup-gcp.md](docs/setup-gcp.md). Repo layout and contributor rules: [CLAUDE.md](CLAUDE.md).
 
-## Deploy
+## Team and licence
 
-See [docs/setup-gcp.md](docs/setup-gcp.md).
+Team: Ricky and Min Thein Kyaw.
 
-## License
-
-[MIT](LICENSE)
+[MIT](LICENSE). The doll is the Pyit Taing Htaung, the Myanmar roly-poly doll that always gets back up ([brand notes](docs/brand.md)).
