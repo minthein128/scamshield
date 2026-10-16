@@ -6,6 +6,7 @@ import { Button } from './ui';
 import { useAppState } from '../state/AppState';
 import { shareText } from '../lib/notify';
 import { textContact } from '../lib/warn';
+import { useOpenSignIn } from '../hooks/useOpenSignIn';
 import { useSheetLayout } from './useSheetLayout';
 import theme from '../theme/theme';
 
@@ -20,33 +21,53 @@ interface Props {
 
 export const WarnFamilySheet: React.FC<Props> = ({ visible, message, onClose, onAddContact }) => {
   const { t } = useTranslation(['contacts', 'common']);
-  const { contacts } = useAppState();
+  const { contacts, contactAccess } = useAppState();
+  const openSignIn = useOpenSignIn();
+  const close = onClose;
+  const share = () => {
+    shareText(message).catch(() => undefined);
+    close();
+  };
+  const signedOutEmpty = contacts.length === 0 && contactAccess !== 'allowed';
   const { height } = useWindowDimensions();
   const sheet = useSheetLayout();
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={close}>
       <View style={[styles.overlay, { height }, sheet.overlay]}>
-      <Pressable accessibilityLabel={t('common:actions.close')} style={styles.backdrop} onPress={onClose} />
+      <Pressable accessibilityLabel={t('common:actions.close')} style={styles.backdrop} onPress={close} />
       <View style={[styles.sheet, sheet.sheet]} testID="warn-sheet">
         <Text accessibilityRole="header" style={styles.title}>{t('warn.title')}</Text>
-        <Text style={styles.body}>{t('warn.body')}</Text>
-        {contacts.length === 0 ? (
-          <Button label={t('warn.addContact')} onPress={() => { onClose(); onAddContact(); }} />
+        {signedOutEmpty ? null : <Text style={styles.body}>{t('warn.body')}</Text>}
+        {signedOutEmpty ? (
+          <>
+            <Button testID="warn-share" label={t('warn.shareNow')} onPress={share} />
+            <Text testID="warn-gate-note" style={styles.body}>{contactAccess === 'unavailable' ? t('gate.unavailable') : t('gate.body')}</Text>
+            {contactAccess === 'signIn' ? (
+              <Button testID="warn-sign-in" label={t('gate.signInToSave')} variant="secondary" onPress={() => { close(); openSignIn(); }} />
+            ) : null}
+          </>
         ) : (
-          contacts.map(c => (
-            <Button
-              key={c.id}
-              testID={`warn-${c.id}`}
-              label={t('warn.text', { name: c.name })}
-              onPress={() => {
-                textContact(c, message).catch(() => undefined);
-                onClose();
-              }}
-            />
-          ))
+          <>
+            {contacts.length === 0 ? (
+              <Button testID="warn-add" label={t('warn.addContact')} onPress={() => { close(); onAddContact(); }} />
+            ) : (
+              contacts.map(c => (
+                <Button
+                  key={c.id}
+                  testID={`warn-${c.id}`}
+                  label={t('warn.text', { name: c.name })}
+                  onPress={() => {
+                    textContact(c, message).catch(() => undefined);
+                    close();
+                  }}
+                />
+              ))
+            )}
+            {contacts.length > 0 && contactAccess === 'signIn' ? <Text testID="warn-legacy" style={styles.body}>{t('gate.legacy')}</Text> : null}
+            <Button testID="warn-share" label={t('warn.share')} variant="secondary" onPress={share} />
+          </>
         )}
-        <Button testID="warn-share" label={t('warn.share')} variant="secondary" onPress={() => { shareText(message).catch(() => undefined); onClose(); }} />
-        <Button label={t('common:actions.cancel')} variant="secondary" onPress={onClose} />
+        <Button label={t('common:actions.cancel')} variant="secondary" onPress={close} />
       </View>
       </View>
     </Modal>

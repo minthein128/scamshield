@@ -12,6 +12,7 @@ import { createExtractor } from './extract-stream.js';
 import { createFeedbackFromConfig } from './feedback/factory.js';
 import { createGrounder } from './ground.js';
 import { createIntelFromConfig } from './intel/factory.js';
+import { createJobExtractor } from './job/extract.js';
 import { attachLive, type LiveConnect } from './live.js';
 import { createMockLiveConnect } from './live-mock.js';
 import { log } from './log.js';
@@ -26,10 +27,12 @@ const rawClient = cfg.mock ? undefined : createClient(cfg);
 const client = rawClient ? instrumentClient(rawClient) : undefined;
 const intel = await createIntelFromConfig(cfg);
 const feedback = createFeedbackFromConfig(cfg, intel);
+const grounder = client ? createGrounder(cfg, client) : createMockGrounder();
+const jobExtractor = createJobExtractor(cfg, client);
 const pipeline = createPipeline({
   extractor: client ? createExtractor(cfg, client) : createMockExtractor(),
   correlator: cfg.mock ? createMockCorrelator() : createCorrelator(cfg),
-  grounder: client ? createGrounder(cfg, client) : createMockGrounder(),
+  grounder,
   ...pipelineOptions(cfg),
   intel,
   feedback,
@@ -62,6 +65,8 @@ const server = serve(
       limits,
       admin,
       published,
+      jobExtractor,
+      grounder,
     ).fetch,
     port: cfg.port,
     hostname: '0.0.0.0',

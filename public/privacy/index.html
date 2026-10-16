@@ -5,16 +5,16 @@
 <p>SafeRoute is for people aged 18 and older.</p>
 
 <h2>Using SafeRoute without an account</h2>
-<p>Each install gets an anonymous Firebase ID (a random uid). We use it only to limit how many checks one install can run per hour. Your check history, trusted contacts and settings stay on your device.</p>
+<p>Each install gets an anonymous Firebase ID (a random uid). We use it only to limit how many checks one install can run per hour. Your check history and settings stay on your device. You cannot save new trusted contacts without an account. Contacts you saved on your device before this change stay there and you can still use them to warn someone.</p>
 
 <h2>If you create an account</h2>
 <p>You can sign up with an email and password, or with Google or Facebook. We then store your email address and sign-in provider (in Firebase Authentication), and we sync three things to our database (Firebase Firestore, region asia-southeast1):</p>
 <ul>
 <li>a short record of each check: the verdict, a score range, the scam type, the report title and summary that SafeRoute wrote, the language, the kind of check and the date. We do not sync your message, the screenshot, links, quotes from your message or source pages. Records synced by older versions of the app held the full report; the app rewrites them in this short form the next time you sign in;</li>
-<li>your trusted contacts (name and phone number you typed or picked);</li>
+<li>your trusted contacts (name and phone number you typed or picked). Saving a trusted contact needs a signed-in account, and contacts you saved on your device earlier are synced to your account when you sign in;</li>
 <li>your profile (language, home country, destination country).</li>
 </ul>
-<p>Only you can read this data. It is protected by security rules that allow each signed-in user to access only their own documents.</p>
+<p>Only you can read this data. It is protected by security rules that allow each signed-in user to access only their own documents. Anonymous installs cannot read or write any of it.</p>
 
 <h2>What happens to what you check</h2>
 <p>To check something, the app sends the text, link or screenshot to our check service. The service uses Google Gemini models, Google Search grounding, Google Web Risk and public domain records (RDAP) to assess it. We do not log the content of your checks. Screenshots are processed in memory and are not saved.</p>

@@ -5,7 +5,8 @@
   "title": "Kontak tepercaya",
   "intro": "Orang yang Anda percaya. Saat hasil pemeriksaan terlihat berisiko, beri tahu mereka dengan satu ketukan, atau telepon dulu.",
   "emptyTitle": "Belum ada kontak tepercaya",
-  "emptyBody": "Tambahkan keluarga atau teman di bawah. Nomor mereka hanya disimpan di perangkat Anda, kecuali Anda masuk.",
+  "emptyBody": "Tambahkan keluarga atau teman di bawah. Nomor mereka disimpan bersama akun Anda.",
+  "emptyBodyGated": "Menyimpan kontak tepercaya perlu masuk ke akun. Anda tetap bisa membagikan peringatan tanpa akun.",
   "call": "Telepon",
   "remove": "Hapus",
   "add": {
@@ -17,8 +18,7 @@
     "pick": "Pilih dari kontak saya"
   },
   "footnote": {
-    "synced": "Kontak Anda disinkronkan dengan akun Anda.",
-    "local": "Kontak Anda disimpan di perangkat ini. Masuk agar tetap tersimpan jika Anda ganti ponsel."
+    "synced": "Kontak Anda disinkronkan dengan akun Anda."
   },
   "errors": {
     "permission": "Izinkan akses ke kontak untuk memilih seseorang, atau ketik nomornya di bawah.",
@@ -34,6 +34,15 @@
     "body": "Ini akan membuka pesan teks berisi peringatan. Anda yang menentukan untuk mengirimnya atau tidak.",
     "addContact": "Tambah kontak tepercaya",
     "text": "Kirim SMS ke {{name}}",
-    "share": "Bagikan lewat cara lain"
+    "share": "Bagikan lewat cara lain",
+    "shareNow": "Bagikan peringatan ini"
+  },
+  "gate": {
+    "body": "Masuk untuk menyimpan kontak tepercaya, agar kontak tersimpan dengan aman bersama akun Anda.",
+    "signIn": "Masuk",
+    "notNow": "Nanti saja",
+    "unavailable": "Menyimpan kontak perlu akun, yang belum tersedia di versi ini.",
+    "legacy": "Masuk agar kontak ini tetap tersimpan bersama akun Anda.",
+    "signInToSave": "Masuk untuk menyimpan kontak"
   }
 }

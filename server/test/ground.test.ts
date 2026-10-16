@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { loadConfig } from '../src/config.js';
-import { buildGroundingRequest, createGrounder, groundingQuery, needsGrounding, parseFindings } from '../src/ground.js';
+import { buildGroundingRequest, createGrounder, groundingQuery, needsGrounding, parseCompanyFound, parseFindings } from '../src/ground.js';
 import type { Extraction } from '../src/types.js';
 
 const cfg = loadConfig({ GEMINI_API_KEY: 'g' });
@@ -93,6 +93,27 @@ describe('grounding', () => {
     expect((await off.ground(req, base, 5000)).flags).toEqual([]);
     expect((await createGrounder(cfg, { models: { generateContent } } as never).ground(req, base, 200)).flags).toEqual([]);
     expect(generateContent).not.toHaveBeenCalled();
+  });
+
+  it('answers companyFound only when the company check is asked for', async () => {
+    const generateContent = vi.fn(async () =>
+      reply('Found it. {"findings":[],"companyFound":true}', [{ web: { title: 'DBD', uri: 'https://dbd.go.th/x' } }]),
+    );
+    const g = createGrounder(cfg, { models: { generateContent } } as never);
+    expect(await g.ground(req, base, 5000, { companyCheck: true })).toMatchObject({ flags: [], companyFound: true });
+    expect(await g.ground(req, base, 5000)).toEqual({ flags: [], sources: [{ title: 'DBD', url: 'https://dbd.go.th/x' }] });
+    const system = (generateContent.mock.calls as unknown as Array<[{ config: { systemInstruction: string } }]>).map(
+      (c) => c[0].config.systemInstruction,
+    );
+    expect(system[0]).toContain('"companyFound"');
+    expect(system[1]).not.toContain('companyFound');
+  });
+
+  it('parseCompanyFound reads a boolean or nothing', () => {
+    expect(parseCompanyFound('{"findings":[],"companyFound":false}')).toBe(false);
+    expect(parseCompanyFound('{"findings":[]}')).toBeUndefined();
+    expect(parseCompanyFound('{"companyFound":"yes"}')).toBeUndefined();
+    expect(parseCompanyFound(undefined)).toBeUndefined();
   });
 
   it('parseFindings rejects bad families and junk', () => {

@@ -47,6 +47,16 @@ describe('firestore rules', () => {
     await assertFails(getDoc(doc(anonymous('anon'), 'users/anon')));
   });
 
+  it('keeps trusted contacts to the signed-in owner', async () => {
+    await assertSucceeds(setDoc(doc(account('alice'), 'users/alice/contacts/c_1'), contact));
+    await assertFails(setDoc(doc(anonymous('anon'), 'users/anon/contacts/c_1'), contact));
+    await assertFails(getDoc(doc(anonymous('anon'), 'users/anon/contacts/c_1')));
+    await assertFails(setDoc(doc(guest(), 'users/alice/contacts/c_2'), contact));
+    await assertFails(getDoc(doc(account('bob'), 'users/alice/contacts/c_1')));
+    await assertFails(setDoc(doc(account('bob'), 'users/alice/contacts/c_2'), contact));
+    await assertFails(deleteDoc(doc(account('bob'), 'users/alice/contacts/c_1')));
+  });
+
   it('rejects unknown fields, missing fields and oversize values', async () => {
     const db = account('alice');
     await assertFails(setDoc(doc(db, 'users/alice/history/x1'), { ...history, imageBase64: 'AAAA' }));

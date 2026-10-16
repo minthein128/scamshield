@@ -5,7 +5,8 @@
   "title": "Mga pinagkakatiwalaang contact",
   "intro": "Mga taong pinagkakatiwalaan mo. Kapag mukhang may panganib ang pagsusuri, balaan sila sa isang pindot, o tawagan muna sila.",
   "emptyTitle": "Wala pang pinagkakatiwalaang contact",
-  "emptyBody": "Magdagdag ng kapamilya o kaibigan sa ibaba. Naka-save lang ang numero nila sa device mo maliban kung mag-sign in ka.",
+  "emptyBody": "Magdagdag ng kapamilya o kaibigan sa ibaba. Naka-save ang numero nila sa iyong account.",
+  "emptyBodyGated": "Kailangan mong mag-sign in para mag-save ng pinagkakatiwalaang contact. Maibabahagi mo pa rin ang babala nang walang account.",
   "call": "Tawagan",
   "remove": "Alisin",
   "add": {
@@ -17,8 +18,7 @@
     "pick": "Pumili mula sa aking contacts"
   },
   "footnote": {
-    "synced": "Naka-sync ang iyong contacts sa iyong account.",
-    "local": "Naka-save ang iyong contacts sa device na ito. Mag-sign in para mapanatili ang mga ito kung magpalit ka ng telepono."
+    "synced": "Naka-sync ang iyong contacts sa iyong account."
   },
   "errors": {
     "permission": "Pahintulutan ang access sa contacts para pumili ng tao, o i-type ang kanilang numero sa ibaba.",
@@ -34,6 +34,15 @@
     "body": "Bubuksan nito ang text message na may babala. Ikaw ang pipili kung ipapadala ito.",
     "addContact": "Magdagdag ng pinagkakatiwalaang contact",
     "text": "I-text si {{name}}",
-    "share": "Ibahagi sa ibang paraan"
+    "share": "Ibahagi sa ibang paraan",
+    "shareNow": "Ibahagi ang babalang ito"
+  },
+  "gate": {
+    "body": "Mag-sign in para mag-save ng mga pinagkakatiwalaang contact, para ligtas na maitago ang mga ito sa iyong account.",
+    "signIn": "Mag-sign in",
+    "notNow": "Huwag muna",
+    "unavailable": "Kailangan ng account para mag-save ng contact, na hindi pa available sa bersyong ito.",
+    "legacy": "Mag-sign in para manatili ang mga contact na ito sa iyong account.",
+    "signInToSave": "Mag-sign in para mag-save ng contact"
   }
 }

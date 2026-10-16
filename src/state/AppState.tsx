@@ -30,6 +30,7 @@ import {
 import { historyMissingRemotely, mergeHistory } from '../lib/sync';
 import * as cloud from '../services/cloud';
 import { useAuth } from './AuthState';
+import { contactAccess, type ContactAccess } from '../lib/contactAccess';
 
 export type SyncState = 'off' | 'syncing' | 'done' | 'error';
 
@@ -46,6 +47,7 @@ interface AppStateValue {
   /** Off deletes saved checks here and in the account, and stops saving and syncing them. */
   setKeepHistory: (keep: boolean) => Promise<void>;
   contacts: TrustedContact[];
+  contactAccess: ContactAccess;
   addContact: (input: { name: string; phone: string }) => string | null;
   removeContact: (id: string) => void;
   syncState: SyncState;
@@ -58,14 +60,15 @@ const AppStateContext = createContext<AppStateValue | null>(null);
 export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { status } = useAuth();
   const uid = status.kind === 'account' ? status.uid : null;
+  const access = contactAccess(status);
   const [ready, setReady] = useState(false);
   const [profile, setProfile] = useState<Profile>(DEFAULT_PROFILE);
   const { uiLanguage: language } = useUiLanguage();
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [contacts, setContacts] = useState<TrustedContact[]>([]);
   const [syncState, setSyncState] = useState<SyncState>('off');
-  const latest = useRef({ profile, history, contacts, uid, language });
-  latest.current = { profile, history, contacts, uid, language };
+  const latest = useRef({ profile, history, contacts, uid, language, access });
+  latest.current = { profile, history, contacts, uid, language, access };
 
   useEffect(() => {
     Promise.all([loadProfile(), loadHistory(), loadContacts()]).then(([p, h, c]) => {
@@ -160,6 +163,8 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   );
 
   const addContact = useCallback((input: { name: string; phone: string }) => {
+    if (latest.current.access === 'unavailable') return t('contacts:gate.unavailable');
+    if (latest.current.access !== 'allowed') return t('contacts:gate.body');
     const problem = validateContact(input);
     if (problem) return problem;
     const contact = makeContact(input);
@@ -210,13 +215,14 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       saveCheck,
       setKeepHistory,
       contacts,
+      contactAccess: access,
       addContact,
       removeContact,
       syncState,
       clearSyncedCopies,
       deleteLocalData,
     }),
-    [ready, profile, language, setLanguage, updateProfile, finishOnboarding, history, saveCheck, setKeepHistory, contacts, addContact, removeContact, syncState, clearSyncedCopies, deleteLocalData],
+    [ready, profile, language, setLanguage, updateProfile, finishOnboarding, history, saveCheck, setKeepHistory, contacts, access, addContact, removeContact, syncState, clearSyncedCopies, deleteLocalData],
   );
   return <AppStateContext.Provider value={value}>{children}</AppStateContext.Provider>;
 };

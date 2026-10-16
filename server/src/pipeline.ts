@@ -153,7 +153,7 @@ export function createPipeline(deps: PipelineDeps): Pipeline {
         groundStartedAt = Date.now();
         return tm
           .span('ground', () =>
-            settle(deps.grounder.ground(req, { entities } as Extraction, ms()), ms() + 50, {
+            settle(deps.grounder.ground(req, { entities }, ms()), ms() + 50, {
               flags: [] as Flag[],
               sources: [] as Source[],
             }),
