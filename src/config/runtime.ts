@@ -226,17 +226,17 @@ let stableTimer: ReturnType<typeof setTimeout> | null = null;
 const listeners = new Set<(url: string) => void>();
 
 /** While the app runs on another host, retries the stable URL and moves back once it is healthy. */
-export function scheduleStableRecheck(url: string, stableUrl: string = STABLE_API_URL, fetchImpl: typeof fetch = fetch): void {
+function scheduleStableRecheck(url: string): void {
   if (stableTimer) clearTimeout(stableTimer);
   stableTimer = null;
-  const stable = validApiUrl(stableUrl);
+  const stable = validApiUrl(STABLE_API_URL);
   if (!stable || !url || url === stable || OFFLINE_MOCK) return;
   stableTimer = setTimeout(() => {
     stableTimer = null;
-    void checkHealth(stable, fetchImpl)
+    void checkHealth(stable)
       .then(ok => {
         if (ok) return refreshApiUrl();
-        scheduleStableRecheck(url, stableUrl, fetchImpl);
+        scheduleStableRecheck(url);
         return url;
       })
       .catch(() => undefined);
