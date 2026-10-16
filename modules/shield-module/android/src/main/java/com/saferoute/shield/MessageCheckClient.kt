@@ -10,12 +10,13 @@ object MessageCheckClient {
     private const val CONNECT_TIMEOUT_MS = 10_000
     private const val READ_TIMEOUT_MS = 30_000
 
+    /** shareSignals is sent only after the user opted in; the server reads a missing value as false. */
     internal fun body(text: String, language: String, shareSignals: Boolean): ByteArray =
         JSONObject()
             .put("kind", "message")
             .put("text", text)
             .put("language", language)
-            .put("shareSignals", shareSignals)
+            .apply { if (shareSignals) put("shareSignals", true) }
             .toString()
             .toByteArray(Charsets.UTF_8)
 

@@ -25,23 +25,74 @@
   },
   "messageGuard": {
     "title": "Message Guard: warns you about risky messages as they arrive",
-    "privacy": "Only messages that look risky are checked. Codes and personal numbers are removed first.",
+    "privacy": "Off unless you turn it on. Only messages that look risky leave your phone, with names, numbers and codes removed first.",
     "a11y": "Message Guard",
     "status": {
       "web": "Works in the SafeRoute Android app.",
       "unavailable": "Not available in this build.",
-      "on": "On. Risky messages from your chat and SMS apps get a warning.",
+      "on": "On. Messages from the apps you chose that look risky get a quiet notice.",
       "off": "Off.",
-      "needsAccess": "Off. Turning it on opens Android notification access."
+      "needsAccess": "Off. Turning it on first explains what it reads.",
+      "paused": "Paused. It reached 60 checks in one day, the most it allows. Turn it on again to resume."
     },
     "apps": {
       "show": "Choose apps ({{count}} on)",
       "hide": "Hide apps ({{count}} on)",
-      "a11y": "Apps Message Guard watches, {{count}} on"
+      "a11y": "Apps Message Guard watches, {{count}} on",
+      "recommended": "Recommended"
     },
     "errors": {
       "accessOff": "Notification access is still off. If the switch is greyed out, open SafeRoute in App info, tap the three dots and choose \"Allow restricted settings\".",
       "cannotOpen": "Could not open the notification access settings."
+    },
+    "consent": {
+      "title": "Before you turn on Message Guard",
+      "reads": {
+        "title": "What it reads",
+        "body": "New notifications from the apps you choose below. It does not read any other app."
+      },
+      "leaves": {
+        "title": "What leaves your phone",
+        "body": "Only messages that look risky. Numbers, emails, codes, names and the parts of links after the website name are removed first."
+      },
+      "never": {
+        "title": "What never leaves your phone",
+        "body": "One-time codes (OTP), who sent the message, and every message that does not look risky."
+      },
+      "who": {
+        "title": "Who checks it",
+        "body": "SafeRoute's server and Google's AI check the message and send back a result."
+      },
+      "control": {
+        "title": "You stay in control",
+        "body": "You can turn it off at any time. \"What Message Guard sent\" shows every message it sent."
+      },
+      "phone": {
+        "title": "Others may see notices",
+        "body": "Anyone who holds your phone may see SafeRoute notices and results."
+      },
+      "apps": "Choose the apps",
+      "chooseOne": "Choose at least one app.",
+      "turnOn": "Turn on",
+      "notNow": "Not now",
+      "addTitle": "Let Message Guard read {{app}}?",
+      "addBody": "Message Guard will also read new notifications from {{app}}. Everything below stays the same."
+    },
+    "log": {
+      "title": "What Message Guard sent",
+      "body": "The exact text that left your phone. It is kept only on this phone, for 7 days.",
+      "empty": "Nothing sent yet.",
+      "deleteAll": "Delete all",
+      "pending": "Waiting for result",
+      "failed": "Not checked"
+    },
+    "kill": {
+      "label": "Turn off and remove access",
+      "hint": "Turns Message Guard off and opens Android settings, where you can remove SafeRoute's notification access."
+    },
+    "notice": {
+      "body": "A message may need a second look. Open to see why.",
+      "open": "Open"
     }
   }
 }

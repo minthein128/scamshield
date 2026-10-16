@@ -28,23 +28,74 @@
   },
   "messageGuard": {
     "title": "Message Guard: binababalaan ka tungkol sa mga mensaheng mukhang mapanganib pagdating ng mga ito",
-    "privacy": "Mga mensaheng mukhang mapanganib lamang ang sinusuri. Inaalis muna ang mga code at personal na numero.",
+    "privacy": "Naka-off maliban kung bubuksan mo. Ang mga mensaheng mukhang delikado lang ang lumalabas sa phone mo, at inaalis muna ang mga pangalan, numero at code.",
     "a11y": "Message Guard",
     "status": {
       "web": "Gumagana sa SafeRoute Android app.",
       "unavailable": "Hindi available sa build na ito.",
-      "on": "Naka-on. Makatatanggap ng babala ang mga mensaheng mukhang mapanganib mula sa iyong mga chat at SMS app.",
+      "on": "Naka-on. May tahimik na abiso ang mga mensaheng mukhang delikado mula sa mga app na pinili mo.",
       "off": "Naka-off",
-      "needsAccess": "Naka-off. Ang pag-on nito ay magbubukas ng Android notification access."
+      "needsAccess": "Naka-off. Bago ito buksan, ipapaliwanag muna kung ano ang binabasa nito.",
+      "paused": "Naka-pause. Umabot na ito sa 60 check sa isang araw, ang pinakamarami. Buksan ulit para ituloy."
     },
     "apps": {
       "show": "Pumili ng mga app ({{count}} naka-on)",
       "hide": "Itago ang mga app ({{count}} naka-on)",
-      "a11y": "Mga app na binabantayan ng Message Guard, {{count}} naka-on"
+      "a11y": "Mga app na binabantayan ng Message Guard, {{count}} naka-on",
+      "recommended": "Inirerekomenda"
     },
     "errors": {
       "accessOff": "Naka-off pa rin ang notification access. Kung kulay abo ang switch, buksan ang SafeRoute sa App info, pindutin ang tatlong tuldok at piliin ang \"Allow restricted settings\".",
       "cannotOpen": "Hindi mabuksan ang mga setting ng notification access."
+    },
+    "consent": {
+      "title": "Bago mo buksan ang Message Guard",
+      "reads": {
+        "title": "Ano ang binabasa nito",
+        "body": "Mga bagong notification mula sa mga app na pipiliin mo sa ibaba. Walang ibang app na binabasa."
+      },
+      "leaves": {
+        "title": "Ano ang lumalabas sa phone mo",
+        "body": "Mga mensaheng mukhang delikado lang. Inaalis muna ang mga numero, email, code, pangalan at ang bahagi ng link pagkatapos ng pangalan ng website."
+      },
+      "never": {
+        "title": "Ano ang hindi kailanman lumalabas",
+        "body": "Mga one-time code (OTP), kung sino ang nagpadala, at bawat mensaheng hindi mukhang delikado."
+      },
+      "who": {
+        "title": "Sino ang nagche-check",
+        "body": "Ang server ng SafeRoute at ang AI ng Google ang nagche-check ng mensahe at nagbabalik ng resulta."
+      },
+      "control": {
+        "title": "Ikaw pa rin ang may kontrol",
+        "body": "Puwede mo itong i-off kahit kailan. Makikita sa \"Ipinadala ng Message Guard\" ang bawat mensaheng ipinadala nito."
+      },
+      "phone": {
+        "title": "Maaaring makita ng iba ang mga abiso",
+        "body": "Maaaring makita ng sinumang may hawak ng phone mo ang mga abiso at resulta ng SafeRoute."
+      },
+      "apps": "Piliin ang mga app",
+      "chooseOne": "Pumili ng kahit isang app.",
+      "turnOn": "Buksan",
+      "notNow": "Hindi muna",
+      "addTitle": "Hayaan ang Message Guard na basahin ang {{app}}?",
+      "addBody": "Babasahin din ng Message Guard ang mga bagong notification mula sa {{app}}. Pareho pa rin ang lahat ng nasa ibaba."
+    },
+    "log": {
+      "title": "Ipinadala ng Message Guard",
+      "body": "Ang eksaktong text na lumabas sa phone mo. Sa phone na ito lang ito nakatago, nang 7 araw.",
+      "empty": "Wala pang naipadala.",
+      "deleteAll": "Burahin lahat",
+      "pending": "Hinihintay ang resulta",
+      "failed": "Hindi na-check"
+    },
+    "kill": {
+      "label": "I-off at alisin ang access",
+      "hint": "Ino-off ang Message Guard at binubuksan ang Android settings, kung saan maaalis mo ang notification access ng SafeRoute."
+    },
+    "notice": {
+      "body": "Maaaring kailangang tingnan ulit ang isang mensahe. Buksan para makita kung bakit.",
+      "open": "Buksan"
     }
   }
 }
