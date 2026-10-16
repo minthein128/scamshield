@@ -26,6 +26,7 @@ const REDACTED = '[redacted]';
 const KEY_RE = /^[a-z][A-Za-z0-9]{0,23}$/;
 const SAFE_CHARS_RE = /^[A-Za-z0-9_.:\- ()]+$/;
 const AUTH_CODE_RE = /^auth\/[a-z0-9-]{1,30}$/;
+const SNAKE_CODE_RE = /^[a-z]{1,12}(?:[_:][a-z0-9]{1,12}){1,6}$/;
 
 /** Keeps short codes only. Anything long, free-form or identifying becomes "[redacted]". */
 export function sanitizeValue(value: unknown): DiagValue | null {
@@ -41,7 +42,8 @@ export function sanitizeValue(value: unknown): DiagValue | null {
   if (AUTH_CODE_RE.test(s)) return s;
   if (s.length > MAX_VALUE_LEN) return REDACTED;
   if (!SAFE_CHARS_RE.test(s)) return REDACTED;
-  if (/\d{6,}/.test(s) || /http|www\./i.test(s) || /[A-Za-z0-9_-]{20,}/.test(s)) return REDACTED;
+  if (/\d{6,}/.test(s) || /http|www\./i.test(s)) return REDACTED;
+  if (/[A-Za-z0-9_-]{20,}/.test(s) && !SNAKE_CODE_RE.test(s)) return REDACTED;
   return s;
 }
 
@@ -105,11 +107,12 @@ function notify(): void {
   });
 }
 
-function record(level: DiagLevel, area: DiagArea, event: string, details?: DiagDetails): void {
+function record(level: DiagLevel, area: DiagArea, event: string, details?: DiagDetails, at?: number): void {
   try {
     const clean = sanitizeValue(event);
+    const now = Date.now();
     const entry: DiagEntry = {
-      t: Date.now(),
+      t: at !== undefined && Number.isFinite(at) && at <= now ? at : now,
       v: String(Constants.expoConfig?.version ?? ''),
       p: Platform.OS,
       level,
@@ -119,7 +122,9 @@ function record(level: DiagLevel, area: DiagArea, event: string, details?: DiagD
     };
     void enqueue(async () => {
       const list = await load();
-      cache = pruneEntries([...list, entry], entry.t);
+      const merged = [...list, entry];
+      if (list.length > 0 && list[list.length - 1].t > entry.t) merged.sort((a, b) => a.t - b.t);
+      cache = pruneEntries(merged, now);
       await AsyncStorage.setItem(DIAG_KEY, JSON.stringify(cache)).catch(() => undefined);
       notify();
     });
@@ -132,6 +137,8 @@ export const diag = {
   info: (area: DiagArea, event: string, details?: DiagDetails) => record('info', area, event, details),
   warn: (area: DiagArea, event: string, details?: DiagDetails) => record('warn', area, event, details),
   error: (area: DiagArea, event: string, details?: DiagDetails) => record('error', area, event, details),
+  /** Records an event that happened earlier, for example one read from native code. */
+  at: (t: number, level: DiagLevel, area: DiagArea, event: string, details?: DiagDetails) => record(level, area, event, details, t),
 };
 
 /** Entries from oldest to newest, with expired ones dropped. */

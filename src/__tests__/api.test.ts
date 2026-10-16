@@ -39,6 +39,20 @@ describe('http client', () => {
     await expect(client.check(request)).rejects.toMatchObject({ code: 'rate_limited', status: 429 });
   });
 
+  it('probes /health and falls back to /healthz on 404 only', async () => {
+    const ok = { ok: true, status: 200, json: async () => ({ ok: true, model: 'm', mock: false }) };
+    const gone = { ok: false, status: 404, json: async () => null };
+    const old = jest.fn(async (url: string) => (url.endsWith('/health') ? gone : ok));
+    await expect(createHttpClient({ baseUrl: 'https://api.test', fetchImpl: old as unknown as typeof fetch }).health()).resolves.toMatchObject({ ok: true });
+    expect(old.mock.calls.map(c => c[0])).toEqual(['https://api.test/health', 'https://api.test/healthz']);
+    const current = jest.fn().mockResolvedValue(ok);
+    await createHttpClient({ baseUrl: 'https://api.test', fetchImpl: current }).health();
+    expect(current).toHaveBeenCalledTimes(1);
+    const broken = jest.fn().mockResolvedValue({ ok: false, status: 503, json: async () => null });
+    await expect(createHttpClient({ baseUrl: 'https://api.test', fetchImpl: broken }).health()).rejects.toMatchObject({ code: 'upstream' });
+    expect(broken).toHaveBeenCalledTimes(1);
+  });
+
   it('maps bare HTTP statuses', async () => {
     const client = createHttpClient({ baseUrl: 'https://api.test', fetchImpl: reply(503, null) });
     await expect(client.check(request)).rejects.toMatchObject({ code: 'upstream' });

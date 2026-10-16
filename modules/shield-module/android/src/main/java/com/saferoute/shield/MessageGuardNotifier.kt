@@ -64,17 +64,31 @@ internal object MessageGuardNotifier {
             .build()
     }
 
-    fun post(context: Context, result: JSONObject, body: String? = null, open: String? = null) {
+    /** Returns false when Android would not show the notice: notifications or the channel are off. */
+    fun post(context: Context, result: JSONObject, body: String? = null, open: String? = null): Boolean {
         val manager = NotificationManagerCompat.from(context)
-        if (!manager.areNotificationsEnabled()) return
+        if (!manager.areNotificationsEnabled()) return false
         createChannel(context)
-        val notification = build(context, result, body, open) ?: return
+        if (!channelEnabled(context)) return false
+        val notification = build(context, result, body, open) ?: return false
         try {
             manager.notify(TAG, result.optString("id").hashCode(), notification)
         } catch (_: SecurityException) {
-            return
+            return false
         }
         ShieldHaptics.careful(context)
+        return true
+    }
+
+    /** True when a notice posted now would be shown. */
+    fun canNotify(context: Context): Boolean =
+        NotificationManagerCompat.from(context).areNotificationsEnabled() && channelEnabled(context)
+
+    private fun channelEnabled(context: Context): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return true
+        val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val channel = manager.getNotificationChannel(CHANNEL) ?: return true
+        return channel.importance != NotificationManager.IMPORTANCE_NONE
     }
 
     private fun createChannel(context: Context) {

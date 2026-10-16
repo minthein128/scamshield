@@ -7,7 +7,7 @@ const B = 'https://b.config/config.json';
 const OLD = 'https://old.example';
 const NEW = 'https://new.example';
 
-type Route = 'down' | 'hang' | { apiUrl: string } | 'ok';
+type Route = 'down' | 'hang' | 'notfound' | { apiUrl: string } | 'ok';
 
 function fakeFetch(routes: Record<string, Route>) {
   const calls: string[] = [];
@@ -15,24 +15,25 @@ function fakeFetch(routes: Record<string, Route>) {
     calls.push(url);
     const route = routes[url] ?? 'down';
     if (route === 'down') return Promise.reject(new TypeError('Failed to fetch'));
+    if (route === 'notfound') return Promise.resolve({ ok: false, status: 404, json: async () => ({}) });
     if (route === 'hang') return new Promise((_r, rej) => init?.signal?.addEventListener('abort', () => rej(new Error('abort'))));
     return Promise.resolve({ ok: true, json: async () => (route === 'ok' ? {} : route) });
   });
   return { fetchImpl: impl as unknown as typeof fetch, calls };
 }
 
-const base = { configUrls: [A, B], staggerMs: 0, envUrl: OLD, stableUrl: '' };
+const base = { configUrls: [A, B], staggerMs: 0, envUrl: OLD, stableUrl: '', fallbackUrl: '' };
 
 beforeEach(() => AsyncStorage.clear());
 
 describe('config sources', () => {
   it('parses a comma list and defaults to the two Hosting domains', () => {
     expect(parseConfigUrls(' https://x.example/c.json, junk ,http://y.example/c.json ')).toEqual(['https://x.example/c.json', 'http://y.example/c.json']);
-    expect(parseConfigUrls(undefined)).toEqual(['https://saferoute-api.akkhayar.com/config.json', 'https://saferoute-aibc.web.app/config.json', 'https://saferoute-aibc.firebaseapp.com/config.json']);
+    expect(parseConfigUrls(undefined)).toEqual(['https://saferoute-aibc.web.app/config.json', 'https://saferoute-aibc.firebaseapp.com/config.json']);
   });
 
   it('takes the second source when the first is blocked', async () => {
-    const { fetchImpl } = fakeFetch({ [A]: 'down', [B]: { apiUrl: NEW }, [`${NEW}/healthz`]: 'ok' });
+    const { fetchImpl } = fakeFetch({ [A]: 'down', [B]: { apiUrl: NEW }, [`${NEW}/health`]: 'ok' });
     expect(await resolveApiUrl({ ...base, fetchImpl })).toBe(NEW);
     expect(await AsyncStorage.getItem(API_URL_CACHE_KEY)).toBe(NEW);
   });
@@ -54,33 +55,33 @@ describe('config sources', () => {
 
   it('picks the new url when the cached one is dead', async () => {
     await AsyncStorage.setItem(API_URL_CACHE_KEY, OLD);
-    const { fetchImpl } = fakeFetch({ [A]: { apiUrl: NEW }, [`${NEW}/healthz`]: 'ok' });
+    const { fetchImpl } = fakeFetch({ [A]: { apiUrl: NEW }, [`${NEW}/health`]: 'ok' });
     expect(await resolveApiUrl({ ...base, envUrl: '', fetchImpl })).toBe(NEW);
   });
 
   it('never switches to a source url that fails health while the current one passes', async () => {
     await AsyncStorage.setItem(API_URL_CACHE_KEY, OLD);
-    const { fetchImpl } = fakeFetch({ [A]: { apiUrl: NEW }, [`${OLD}/healthz`]: 'ok' });
+    const { fetchImpl } = fakeFetch({ [A]: { apiUrl: NEW }, [`${OLD}/health`]: 'ok' });
     expect(await resolveApiUrl({ ...base, envUrl: '', fetchImpl })).toBe(OLD);
     expect(await AsyncStorage.getItem(API_URL_CACHE_KEY)).toBe(OLD);
   });
 
   it('replaces a dead cache with a healthy baked url when sources are blocked', async () => {
     await AsyncStorage.setItem(API_URL_CACHE_KEY, 'https://dead.example');
-    const { fetchImpl } = fakeFetch({ [`${OLD}/healthz`]: 'ok' });
+    const { fetchImpl } = fakeFetch({ [`${OLD}/health`]: 'ok' });
     expect(await resolveApiUrl({ ...base, fetchImpl })).toBe(OLD);
   });
 
   it('falls through a stable domain that does not resolve yet and keeps working', async () => {
     const stable = 'https://api.stable.test';
-    const { fetchImpl } = fakeFetch({ [B]: { apiUrl: NEW }, [`${NEW}/healthz`]: 'ok' });
+    const { fetchImpl } = fakeFetch({ [B]: { apiUrl: NEW }, [`${NEW}/health`]: 'ok' });
     expect(await resolveApiUrl({ ...base, configUrls: [`${stable}/config.json`, A, B], stableUrl: stable, fetchImpl })).toBe(NEW);
   });
 
   it('uses the stable domain when it is healthy and every config source is blocked', async () => {
     const stable = 'https://api.stable.test';
     await AsyncStorage.setItem(API_URL_CACHE_KEY, OLD);
-    const { fetchImpl } = fakeFetch({ [`${stable}/healthz`]: 'ok' });
+    const { fetchImpl } = fakeFetch({ [`${stable}/health`]: 'ok' });
     expect(await resolveApiUrl({ ...base, stableUrl: stable, fetchImpl })).toBe(stable);
   });
 
@@ -94,9 +95,29 @@ describe('config sources', () => {
   it('ignores a dead cached tunnel left by an older build without waiting for it', async () => {
     const stable = 'https://api.stable.test';
     await AsyncStorage.setItem(API_URL_CACHE_KEY, 'https://dead-tunnel.example');
-    const { fetchImpl, calls } = fakeFetch({ [`${stable}/healthz`]: 'ok', [A]: 'hang', [B]: 'hang' });
+    const { fetchImpl, calls } = fakeFetch({ [`${stable}/health`]: 'ok', [A]: 'hang', [B]: 'hang' });
     expect(await resolveApiUrl({ ...base, stableUrl: stable, graceMs: 10, fetchImpl })).toBe(stable);
-    expect(calls).toContain(`${stable}/healthz`);
+    expect(calls).toContain(`${stable}/health`);
+  });
+
+  it('orders candidates: stable run.app first, then the legacy host, then the cache', async () => {
+    const stable = 'https://api.stable.test';
+    const legacy = 'https://api.legacy.test';
+    await AsyncStorage.setItem(API_URL_CACHE_KEY, 'https://cached.example');
+    const { fetchImpl, calls } = fakeFetch({ [`${stable}/health`]: 'ok', [`${legacy}/health`]: 'ok' });
+    expect(await resolveApiUrl({ ...base, stableUrl: stable, fallbackUrl: legacy, envUrl: '', graceMs: 10, fetchImpl })).toBe(stable);
+    expect(calls.slice(0, 3)).toEqual([`${stable}/health`, `${legacy}/health`, 'https://cached.example/health']);
+  });
+
+  it('uses the legacy host when the stable one is down', async () => {
+    const stable = 'https://api.stable.test';
+    const legacy = 'https://api.legacy.test';
+    const { fetchImpl } = fakeFetch({ [`${legacy}/health`]: 'ok' });
+    expect(await resolveApiUrl({ ...base, stableUrl: stable, fallbackUrl: legacy, fetchImpl })).toBe(legacy);
+  });
+
+  it('never fetches config.json from the legacy host by default', () => {
+    expect(parseConfigUrls(undefined).some(u => u.includes('akkhayar'))).toBe(false);
   });
 
   it('builds a report with hosts and no user content', async () => {
@@ -107,8 +128,16 @@ describe('config sources', () => {
     expect(report).toContain('online true');
   });
 
+  it('falls back to /healthz only when /health is 404', async () => {
+    const { fetchImpl, calls } = fakeFetch({ [`${OLD}/health`]: 'notfound', [`${OLD}/healthz`]: 'ok', [`${NEW}/health`]: 'down', [`${NEW}/healthz`]: 'ok' });
+    expect(await checkHealth(OLD, fetchImpl)).toBe(true);
+    expect(calls).toEqual([`${OLD}/health`, `${OLD}/healthz`]);
+    expect(await checkHealth(NEW, fetchImpl)).toBe(false);
+    expect(calls).not.toContain(`${NEW}/healthz`);
+  });
+
   it('checks health and host helpers', async () => {
-    const { fetchImpl } = fakeFetch({ [`${NEW}/healthz`]: 'ok' });
+    const { fetchImpl } = fakeFetch({ [`${NEW}/health`]: 'ok' });
     expect(await checkHealth(NEW, fetchImpl)).toBe(true);
     expect(await checkHealth(OLD, fetchImpl)).toBe(false);
     expect(apiHost('https://a-b.trycloudflare.com/v1?x=1')).toBe('a-b.trycloudflare.com');
