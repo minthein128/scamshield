@@ -9,15 +9,17 @@ import { Text } from '../components/Text';
 import { Button, Card, EmptyState, Field, LinkButton, Notice, ScreenHeader } from '../components/ui';
 import { callNumber } from '../lib/warn';
 import { useAppState } from '../state/AppState';
-import { useAuth } from '../state/AuthState';
+import { ContactsGate } from '../components/ContactsGate';
+import { useOpenSignIn } from '../hooks/useOpenSignIn';
 import theme from '../theme/theme';
 
 const { colors, fonts } = theme;
 
 export const ContactsScreen: React.FC = () => {
   const { t } = useTranslation('contacts');
-  const { contacts, addContact, removeContact } = useAppState();
-  const { status } = useAuth();
+  const { contacts, contactAccess, addContact, removeContact } = useAppState();
+  const openSignIn = useOpenSignIn();
+  const [gateOpen, setGateOpen] = useState(false);
   const layout = useLayout();
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -56,7 +58,7 @@ export const ContactsScreen: React.FC = () => {
 
   const list =
     contacts.length === 0 ? (
-      <EmptyState testID="contacts-empty" icon="people" title={t('emptyTitle')} body={t('emptyBody')} />
+      <EmptyState testID="contacts-empty" icon="people" title={t('emptyTitle')} body={contactAccess === 'allowed' ? t('emptyBody') : t('emptyBodyGated')} />
     ) : (
       <Grid columns={layout.isExpanded ? 1 : layout.columns} gap={16}>
         {contacts.map(c => (
@@ -72,6 +74,17 @@ export const ContactsScreen: React.FC = () => {
       </Grid>
     );
 
+  const gated = (
+    <Card style={{ gap: 12 }} testID="contacts-gated">
+      <Text style={styles.name}>{t('add.title')}</Text>
+      {gateOpen && contactAccess !== 'allowed' ? (
+        <ContactsGate access={contactAccess} onSignIn={openSignIn} onDismiss={() => setGateOpen(false)} />
+      ) : (
+        <Button testID="contact-add-gated" label={t('add.submit')} onPress={() => setGateOpen(true)} />
+      )}
+    </Card>
+  );
+
   const form = (
     <Card style={{ gap: 12 }}>
       <Text style={styles.name}>{t('add.title')}</Text>
@@ -83,6 +96,12 @@ export const ContactsScreen: React.FC = () => {
     </Card>
   );
 
+  let footnote: string | null = null;
+  if (contactAccess === 'allowed') footnote = t('footnote.synced');
+  else if (contactAccess === 'signIn' && contacts.length > 0) footnote = t('gate.legacy');
+
+  const addPane = contactAccess === 'allowed' ? form : gated;
+
   return (
     <Screen wide header={<ScreenHeader title={t('title')} />}>
       <Text style={styles.body}>{t('intro')}</Text>
@@ -90,18 +109,16 @@ export const ContactsScreen: React.FC = () => {
       {layout.isExpanded ? (
         <View style={styles.panes}>
           <View style={styles.listPane}>{list}</View>
-          <View style={styles.formPane}>{form}</View>
+          <View style={styles.formPane}>{addPane}</View>
         </View>
       ) : (
         <>
           {list}
-          <View style={layout.isTablet ? styles.formCentered : undefined}>{form}</View>
+          <View style={layout.isTablet ? styles.formCentered : undefined}>{addPane}</View>
         </>
       )}
 
-      <Text style={styles.footnote}>
-        {status.kind === 'account' ? t('footnote.synced') : t('footnote.local')}
-      </Text>
+      {footnote ? <Text testID="contacts-footnote" style={styles.footnote}>{footnote}</Text> : null}
     </Screen>
   );
 };

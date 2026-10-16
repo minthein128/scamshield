@@ -2,7 +2,8 @@
   "title": "Trusted contacts",
   "intro": "People you trust. When a check looks risky, warn them with one tap, or call them first.",
   "emptyTitle": "No trusted contacts yet",
-  "emptyBody": "Add a family member or friend below. Their number is saved only on your device unless you sign in.",
+  "emptyBody": "Add a family member or friend below. Their number is saved with your account.",
+  "emptyBodyGated": "Saving a trusted contact needs you to sign in. You can still share a warning without an account.",
   "call": "Call",
   "remove": "Remove",
   "add": {
@@ -14,8 +15,7 @@
     "pick": "Pick from my contacts"
   },
   "footnote": {
-    "synced": "Your contacts are synced to your account.",
-    "local": "Your contacts are saved on this device. Sign in to keep them if you change phone."
+    "synced": "Your contacts are synced to your account."
   },
   "errors": {
     "permission": "Allow access to contacts to pick someone, or type their number below.",
@@ -31,6 +31,15 @@
     "body": "This opens a text message with the warning. You choose whether to send it.",
     "addContact": "Add a trusted contact",
     "text": "Text {{name}}",
-    "share": "Share another way"
+    "share": "Share another way",
+    "shareNow": "Share this warning"
+  },
+  "gate": {
+    "body": "Sign in to save trusted contacts, so they are kept safely with your account.",
+    "signIn": "Sign in",
+    "notNow": "Not now",
+    "unavailable": "Saving contacts needs an account, which is not available in this version.",
+    "legacy": "Sign in to keep these contacts with your account.",
+    "signInToSave": "Sign in to save contacts"
   }
 }
