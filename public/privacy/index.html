@@ -27,7 +27,10 @@
 
 <h2>Message Guard (optional, off by default)</h2>
 <ul>
-<li>If you turn on Message Guard and grant notification access, SafeRoute reads the notifications of your SMS app and a short list of chat apps (Google Messages, WhatsApp, Viber, Telegram, LINE, Messenger, Zalo, Signal) and no other apps. Each message is scored on your phone first. Only a message that looks risky is sent to our check service, after phone numbers, email addresses and long numbers are replaced with placeholders. Messages that look like one-time codes are never sent. We send at most 20 messages an hour. You can turn it off, or choose the apps, in the Message Guard card, and you can remove notification access in Android settings at any time.</li>
+<li>If you turn it on, SafeRoute first shows what it reads and asks you to choose the apps: your SMS app and the chat apps Google Messages, WhatsApp, Viber, Telegram, LINE, Messenger, Zalo and Signal. It never reads email or banking apps.</li>
+<li>Each message is scored on your phone. Only a message that looks risky is sent to our check service and Google's AI. Phone numbers, email addresses, account and card numbers, codes, likely names, the sender's name and the parts of links after the website name are removed first, and the text is shortened to 600 characters. One-time codes and messages that do not look risky never leave your phone.</li>
+<li>We send at most 20 messages an hour and 60 a day. Your phone keeps a list of what was sent for 7 days, which you can view and delete in the app. It is never synced.</li>
+<li>You can turn Message Guard off at any time, and the app takes you to Android settings to remove notification access.</li>
 </ul>
 
 <h2>Anonymous scam signals (optional, off by default)</h2>
