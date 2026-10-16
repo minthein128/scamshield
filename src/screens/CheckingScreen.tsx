@@ -67,7 +67,7 @@ export const CheckingScreen: React.FC<RootScreenProps<'Checking'>> = ({ navigati
             <Text accessibilityRole="header" style={styles.errorTitle}>{error.title}</Text>
             <Text testID="checking-error" style={styles.errorText}>{error.message}</Text>
             {error.code === 'rate_limited' && status.kind === 'anonymous' ? (
-              <LinkButton label={t('createAccount')} color={colors.brandBlueLight} onPress={() => navigation.replace('Account', { mode: 'signUp' })} />
+              <LinkButton label={t('createAccount')} color={colors.brandGold} onPress={() => navigation.replace('Account', { mode: 'signUp' })} />
             ) : null}
           </View>
         ) : (

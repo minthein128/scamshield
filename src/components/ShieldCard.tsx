@@ -2,7 +2,7 @@ import React from 'react';
 import { Linking, StyleProp, StyleSheet, Switch, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Text } from './Text';
-import { Icon } from './Icon';
+import { BrandMark } from './BrandMark';
 import { stepText, useShieldControl, type ShieldControl } from '../hooks/useShieldControl';
 import theme from '../theme/theme';
 
@@ -34,8 +34,8 @@ export const ShieldCardView: React.FC<{ control: ShieldControl; onDetails?: () =
   return (
     <View testID="shield-card" style={[styles.card, unavailable && styles.cardOff, style]}>
       <View style={styles.row}>
-        <View style={[styles.icon, running && styles.iconOn]}>
-          <Icon name="shieldCheck" size={28} color={colors.white} />
+        <View style={styles.icon}>
+          <BrandMark size={56} medallion={running ? colors.brandGold : colors.textLight} />
         </View>
         <View style={styles.text}>
           <Text style={styles.title}>{t('title')}</Text>
@@ -47,7 +47,7 @@ export const ShieldCardView: React.FC<{ control: ShieldControl; onDetails?: () =
           value={running || working}
           disabled={unavailable || working}
           onValueChange={setEnabled}
-          trackColor={{ false: colors.borderDark, true: colors.accent }}
+          trackColor={{ false: colors.borderDark, true: colors.brandGold }}
           thumbColor={colors.white}
         />}
       </View>
@@ -71,15 +71,14 @@ const styles = StyleSheet.create({
   card: { backgroundColor: colors.darkBackground, borderRadius: 24, padding: 20, gap: 12 },
   cardOff: {},
   row: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  icon: { width: 56, height: 56, borderRadius: 28, backgroundColor: colors.slateDark, alignItems: 'center', justifyContent: 'center' },
-  iconOn: { backgroundColor: colors.accent },
+  icon: { width: 56, height: 56, alignItems: 'center', justifyContent: 'center' },
   text: { flex: 1, gap: 2 },
   title: { color: colors.white, fontSize: 20, lineHeight: 28, fontFamily: fonts.bold, includeFontPadding: false },
   status: { color: colors.textLighter, fontSize: 14, lineHeight: 20, fontFamily: fonts.medium, includeFontPadding: false },
   body: { color: colors.textLight, fontSize: 14, lineHeight: 20, fontFamily: fonts.regular },
   error: { color: colors.warningBadge, fontSize: 14, lineHeight: 20, fontFamily: fonts.semiBold },
   link: { minHeight: 48, justifyContent: 'center' },
-  linkText: { color: colors.brandBlueLight, fontSize: 15, lineHeight: 20, fontFamily: fonts.bold, textDecorationLine: 'underline' },
+  linkText: { color: colors.brandGold, fontSize: 15, lineHeight: 20, fontFamily: fonts.bold, textDecorationLine: 'underline' },
 });
 
 export default ShieldCard;

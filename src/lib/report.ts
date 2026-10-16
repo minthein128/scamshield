@@ -15,9 +15,9 @@ export interface VerdictStyle {
 const { colors } = theme;
 
 export const VERDICT_STYLES: Record<Verdict, VerdictStyle> = {
-  danger: { background: colors.danger, foreground: colors.white, subtle: '#FFEDD5', track: colors.dangerBarTrack, chipBackground: theme.verdictRoles.danger.chipBg, chipForeground: theme.verdictRoles.danger.chipText },
+  danger: { background: colors.danger, foreground: colors.white, subtle: '#FFE4E9', track: colors.dangerBarTrack, chipBackground: theme.verdictRoles.danger.chipBg, chipForeground: theme.verdictRoles.danger.chipText },
   careful: { background: colors.warningText, foreground: colors.white, subtle: colors.amberLight, track: colors.warningBadge, chipBackground: theme.verdictRoles.careful.chipBg, chipForeground: theme.verdictRoles.careful.chipText },
-  safe: { background: colors.brandBlue, foreground: colors.white, subtle: colors.brandBlueLight, track: '#93B4FF', chipBackground: theme.verdictRoles.safe.chipBg, chipForeground: theme.verdictRoles.safe.chipText },
+  safe: { background: colors.safe, foreground: colors.white, subtle: colors.safeBg, track: colors.safeTrack, chipBackground: theme.verdictRoles.safe.chipBg, chipForeground: theme.verdictRoles.safe.chipText },
 };
 
 export const FAMILY_ORDER: FlagFamily[] = ['trafficking', 'known_bad', 'payment_route', 'link_risk', 'identity', 'pressure', 'too_good'];

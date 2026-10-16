@@ -110,7 +110,7 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
     <>
       <View style={[styles.banner, narrow && styles.bannerNarrow, { backgroundColor: style.background }]} testID={`verdict-${result.verdict}`} accessible accessibilityLabel={t('a11yVerdict', { verdict: verdictLabel(result.verdict), score: result.score })}>
         <View style={styles.bannerIcon}>
-          <Icon name={result.verdict === 'safe' ? 'shieldCheck' : result.verdict === 'danger' ? 'octagon' : 'alert'} size={36} color={colors.white} />
+          <Icon name={result.verdict === 'safe' ? 'checkCircle' : result.verdict === 'danger' ? 'octagon' : 'alert'} size={36} color={colors.white} />
         </View>
         {narrow ? score : null}
         <View style={narrow ? styles.bannerTextNarrow : styles.bannerText}>

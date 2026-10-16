@@ -127,7 +127,7 @@ export const ShieldLoader: React.FC<{ step: number; verdict?: Verdict | null }> 
       </Animated.View>
       {STAGE_ICONS.map((icon, i) => (
         <Animated.View key={icon.at} style={[styles.badge, { left: icon.x, top: icon.y, opacity: pops[i], transform: [{ scale: pops[i] }] }]}>
-          <Svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke={colors.brandBlueLight} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+          <Svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke={colors.brandGold} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
             {icon.paths.map(d => (
               <Path key={d} d={d} />
             ))}

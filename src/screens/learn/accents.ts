@@ -8,5 +8,5 @@ export const ACCENTS: Record<ScamTypeId, { accent: string; soft: string }> = {
   romance: { accent: colors.indigoMedium, soft: '#E0E7FF' },
   parcel: { accent: colors.cyanDark, soft: '#DDF3F7' },
   agency: { accent: colors.tealDark, soft: '#DDF4F0' },
-  shop: { accent: colors.roseDark, soft: '#FCE7F3' },
+  shop: { accent: colors.purpleDark, soft: '#F3E8FF' },
 };

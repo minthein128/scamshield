@@ -23,7 +23,7 @@ const HotlineCard: React.FC<{ h: Hotline; style?: StyleProp<ViewStyle> }> = ({ h
       <View style={styles.rowBetween}>
         <Text style={styles.name}>{h.name}</Text>
       </View>
-      <Pill label={categoryLabel(h.category)} background={colors.brandBlueLight} color={colors.safeText} />
+      <Pill label={categoryLabel(h.category)} background={colors.accentSoft} color={colors.textPrimary} />
       {h.number ? <Text style={styles.number}>{h.number}</Text> : null}
       {h.domesticOnly ? <Text style={styles.meta}>{t('dialInside', { country: countryLabel(h.country) })}</Text> : null}
       {h.hours ? <Text style={styles.meta}>{h.hours}</Text> : null}
