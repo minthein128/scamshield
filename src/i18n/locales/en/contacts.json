@@ -2,7 +2,8 @@
   "title": "Trusted contacts",
   "intro": "People you trust. When a check looks risky, warn them with one tap, or call them first.",
   "emptyTitle": "No trusted contacts yet",
-  "emptyBody": "Add a family member or friend below. Their number is saved only on your device unless you sign in.",
+  "emptyBody": "Add a family member or friend below. When a check looks risky, you can warn them with one tap, or call them first.",
+  "emptyBodySignedOut": "Sign in to add a family member or friend. When a check looks risky, you can warn them with one tap.",
   "call": "Call",
   "remove": "Remove",
   "add": {
@@ -13,9 +14,16 @@
     "submit": "Add contact",
     "pick": "Pick from my contacts"
   },
+  "authRequired": {
+    "title": "Sign in to save contacts",
+    "body": "Sign in to your account to add and save trusted family contacts.",
+    "signIn": "Sign in",
+    "createAccount": "Create account"
+  },
   "footnote": {
     "synced": "Your contacts are synced to your account.",
-    "local": "Your contacts are saved on this device. Sign in to keep them if you change phone."
+    "local": "Your contacts are saved on this device. Sign in to keep them if you change phone.",
+    "required": "You must be signed in to save family contacts."
   },
   "errors": {
     "permission": "Allow access to contacts to pick someone, or type their number below.",
@@ -24,7 +32,8 @@
     "nameRequired": "Enter a name.",
     "nameTooLong": "That name is too long.",
     "phoneInvalid": "Enter a phone number with 6 to 15 digits.",
-    "duplicate": "That number is already in your list."
+    "duplicate": "That number is already in your list.",
+    "signInRequired": "You must be signed in to save family contacts."
   },
   "warn": {
     "title": "Warn someone you trust",

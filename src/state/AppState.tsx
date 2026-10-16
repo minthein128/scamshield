@@ -137,6 +137,9 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   }, []);
 
   const addContact = useCallback((input: { name: string; phone: string }) => {
+    if (!latest.current.uid) {
+      return t('contacts:errors.signInRequired');
+    }
     const problem = validateContact(input);
     if (problem) return problem;
     const contact = makeContact(input);

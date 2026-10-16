@@ -10,11 +10,12 @@ import { Button, Card, EmptyState, Field, LinkButton, Notice, ScreenHeader } fro
 import { callNumber } from '../lib/warn';
 import { useAppState } from '../state/AppState';
 import { useAuth } from '../state/AuthState';
+import type { TabScreenProps } from '../navigation/types';
 import theme from '../theme/theme';
 
 const { colors, fonts } = theme;
 
-export const ContactsScreen: React.FC = () => {
+export const ContactsScreen: React.FC<Partial<TabScreenProps<'Contacts'>>> = ({ navigation }) => {
   const { t } = useTranslation('contacts');
   const { contacts, addContact, removeContact } = useAppState();
   const { status } = useAuth();
@@ -22,6 +23,8 @@ export const ContactsScreen: React.FC = () => {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [error, setError] = useState<string | null>(null);
+
+  const isSignedIn = status.kind === 'account';
 
   const save = (n: string, p: string) => {
     const problem = addContact({ name: n, phone: p });
@@ -56,7 +59,12 @@ export const ContactsScreen: React.FC = () => {
 
   const list =
     contacts.length === 0 ? (
-      <EmptyState testID="contacts-empty" icon="people" title={t('emptyTitle')} body={t('emptyBody')} />
+      <EmptyState
+        testID="contacts-empty"
+        icon="people"
+        title={t('emptyTitle')}
+        body={isSignedIn ? t('emptyBody') : t('emptyBodySignedOut')}
+      />
     ) : (
       <Grid columns={layout.isExpanded ? 1 : layout.columns} gap={16}>
         {contacts.map(c => (
@@ -72,6 +80,24 @@ export const ContactsScreen: React.FC = () => {
       </Grid>
     );
 
+  const authPrompt = (
+    <Card style={{ gap: 12 }} testID="contacts-auth-prompt">
+      <Text style={styles.name}>{t('authRequired.title')}</Text>
+      <Text style={styles.body}>{t('authRequired.body')}</Text>
+      <Button
+        testID="contacts-sign-in"
+        label={t('authRequired.signIn')}
+        onPress={() => navigation?.navigate('Account', { mode: 'signIn' })}
+      />
+      <Button
+        testID="contacts-create-account"
+        label={t('authRequired.createAccount')}
+        variant="secondary"
+        onPress={() => navigation?.navigate('Account', { mode: 'signUp' })}
+      />
+    </Card>
+  );
+
   const form = (
     <Card style={{ gap: 12 }}>
       <Text style={styles.name}>{t('add.title')}</Text>
@@ -83,6 +109,8 @@ export const ContactsScreen: React.FC = () => {
     </Card>
   );
 
+  const rightPane = isSignedIn ? form : authPrompt;
+
   return (
     <Screen wide>
       <ScreenHeader title={t('title')} />
@@ -91,17 +119,17 @@ export const ContactsScreen: React.FC = () => {
       {layout.isExpanded ? (
         <View style={styles.panes}>
           <View style={styles.listPane}>{list}</View>
-          <View style={styles.formPane}>{form}</View>
+          <View style={styles.formPane}>{rightPane}</View>
         </View>
       ) : (
         <>
           {list}
-          <View style={layout.isTablet ? styles.formCentered : undefined}>{form}</View>
+          <View style={layout.isTablet ? styles.formCentered : undefined}>{rightPane}</View>
         </>
       )}
 
       <Text style={styles.footnote}>
-        {status.kind === 'account' ? t('footnote.synced') : t('footnote.local')}
+        {isSignedIn ? t('footnote.synced') : t('footnote.required')}
       </Text>
     </Screen>
   );
