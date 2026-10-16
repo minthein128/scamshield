@@ -2,8 +2,9 @@
   "_meta": {
     "reviewed": false
   },
-  "button": "Pyit Taing Htaung",
-  "a11yButton": "Pyit Taing Htaung: คุยกับ SafeRoute เกี่ยวกับรายงานนี้",
+  "button": "คุยกับ Pyit Taing Htaung",
+  "buttonSub": "คุยด้วยเสียงเกี่ยวกับรายงานนี้",
+  "a11yButton": "คุยกับ Pyit Taing Htaung คุยด้วยเสียงเกี่ยวกับรายงานนี้",
   "title": "Pyit Taing Htaung",
   "subtitle": "คุยกับ SafeRoute เกี่ยวกับรายงานนี้",
   "privacy": "เสียงของคุณจะถูกส่งไปยัง Google เพื่อตอบกลับ ไม่มีการบันทึกหรือเก็บไว้",

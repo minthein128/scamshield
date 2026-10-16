@@ -1,6 +1,7 @@
 {
-  "button": "Pyit Taing Htaung",
-  "a11yButton": "Pyit Taing Htaung: talk to SafeRoute about this report",
+  "button": "Talk to Pyit Taing Htaung",
+  "buttonSub": "Voice chat about this report",
+  "a11yButton": "Talk to Pyit Taing Htaung. Voice chat about this report.",
   "title": "Pyit Taing Htaung",
   "subtitle": "Talk to SafeRoute about this report",
   "privacy": "Your voice is sent to Google to answer. Nothing is recorded or saved.",

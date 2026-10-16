@@ -138,6 +138,8 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
           testID="report-talk"
           leading={<Avatar state="idle" size={30} decorative />}
           label={talkLabel}
+          subLabel={t('live:buttonSub')}
+          trailing={<Icon name="mic" size={24} color={colors.white} />}
           accessibilityLabel={t('live:a11yButton')}
           onPress={() => {
             stopSpeaking();

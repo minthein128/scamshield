@@ -2,8 +2,9 @@
   "_meta": {
     "reviewed": false
   },
-  "button": "Pyit Taing Htaung",
-  "a11yButton": "Pyit Taing Htaung: kausapin ang SafeRoute tungkol sa ulat na ito",
+  "button": "Kausapin si Pyit Taing Htaung",
+  "buttonSub": "Voice chat tungkol sa ulat na ito",
+  "a11yButton": "Kausapin si Pyit Taing Htaung. Voice chat tungkol sa ulat na ito.",
   "title": "Pyit Taing Htaung",
   "subtitle": "Kausapin ang SafeRoute tungkol sa ulat na ito",
   "privacy": "Ipinapadala ang boses mo sa Google para masagot. Walang nire-record o sine-save.",

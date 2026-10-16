@@ -39,6 +39,8 @@ interface ButtonProps {
   icon?: IconName;
   /** Drawn before the label in place of an icon, such as the voice avatar. */
   leading?: React.ReactNode;
+  /** Drawn after the label, such as a mic icon. */
+  trailing?: React.ReactNode;
   /** Screen reader label when the visible label is too short to explain the action. */
   accessibilityLabel?: string;
   /** Label lines before it is ellipsized. */
@@ -47,7 +49,7 @@ interface ButtonProps {
 
 const LABEL_LINE = 20;
 
-export const Button: React.FC<ButtonProps> = ({ label, subLabel, onPress, variant = 'primary', disabled, style, testID, icon, leading, accessibilityLabel, maxLines = 2 }) => {
+export const Button: React.FC<ButtonProps> = ({ label, subLabel, onPress, variant = 'primary', disabled, style, testID, icon, leading, trailing, accessibilityLabel, maxLines = 2 }) => {
   const v = BUTTON_VARIANTS[variant];
   const firstLine = Math.round((scriptStyle(label, 'bold', LABEL_LINE).lineHeight ?? LABEL_LINE) * PixelRatio.getFontScale());
   return (
@@ -61,7 +63,7 @@ export const Button: React.FC<ButtonProps> = ({ label, subLabel, onPress, varian
       onPress={onPress}
       style={[styles.button, v.container, disabled && { opacity: 0.45 }, style]}
     >
-      <View style={[styles.buttonRow, leading ? styles.buttonRowCentered : null]}>
+      <View style={[styles.buttonRow, leading ? styles.buttonRowCentered : null, trailing ? styles.buttonRowFull : null]}>
         {leading ? (
           <View style={styles.buttonIcon}>{leading}</View>
         ) : icon ? (
@@ -69,10 +71,11 @@ export const Button: React.FC<ButtonProps> = ({ label, subLabel, onPress, varian
             <Icon name={icon} size={22} color={v.color} />
           </View>
         ) : null}
-        <View style={styles.buttonBody}>
+        <View style={[styles.buttonBody, trailing ? styles.buttonBodyFill : null]}>
           <Text numberOfLines={maxLines} ellipsizeMode="tail" style={[styles.buttonText, { color: v.color }]}>{label}</Text>
-          {subLabel ? <Text numberOfLines={1} ellipsizeMode="tail" style={[styles.buttonSub, { color: v.color }]}>{subLabel}</Text> : null}
+          {subLabel ? <Text numberOfLines={2} ellipsizeMode="tail" style={[styles.buttonSub, { color: v.color }]}>{subLabel}</Text> : null}
         </View>
+        {trailing ? <View style={styles.buttonIcon}>{trailing}</View> : null}
       </View>
     </TouchableOpacity>
   );
@@ -186,6 +189,8 @@ const styles = StyleSheet.create({
   button: { minHeight: 48, maxWidth: '100%', borderRadius: 16, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 16, paddingVertical: 14 },
   buttonRow: { flexDirection: 'row', gap: 8, alignItems: 'flex-start', maxWidth: '100%' },
   buttonRowCentered: { alignItems: 'center', gap: 10 },
+  buttonRowFull: { alignSelf: 'stretch' },
+  buttonBodyFill: { flex: 1 },
   buttonIcon: { justifyContent: 'center', flexShrink: 0 },
   buttonBody: { flexShrink: 1, minWidth: 0, alignItems: 'center', gap: 2 },
   buttonText: { fontSize: 16, lineHeight: 20, textAlign: 'center', fontFamily: fonts.bold, flexShrink: 1, includeFontPadding: false },
