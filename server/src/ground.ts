@@ -114,7 +114,15 @@ export function parseFindings(text: string | undefined): Flag[] {
 
 interface GroundedResponse {
   text?: string;
-  candidates?: Array<{ groundingMetadata?: { groundingChunks?: Array<{ web?: { title?: string; uri?: string } }> } }>;
+  candidates?: Array<{
+    groundingMetadata?: { groundingChunks?: Array<{ web?: { title?: string; uri?: string } }>; webSearchQueries?: string[] };
+  }>;
+}
+
+/** True when the model actually ran a search. Without one, findings come from memory. */
+export function searched(res: GroundedResponse): boolean {
+  const g = res.candidates?.[0]?.groundingMetadata;
+  return (g?.groundingChunks?.length ?? 0) > 0 || (g?.webSearchQueries?.length ?? 0) > 0;
 }
 
 export function extractSources(res: GroundedResponse): Source[] {
@@ -148,7 +156,12 @@ export function createGrounder(cfg: Config, client: Pick<GoogleGenAI, 'models'>)
             abortSignal: AbortSignal.timeout(timeoutMs),
           },
         });
-        return { flags: parseFindings(res.text), sources: extractSources(res as GroundedResponse) };
+        const flags = parseFindings(res.text);
+        if (!searched(res as GroundedResponse)) {
+          log('INFO', 'grounding_unsearched', { dropped: flags.length });
+          return { flags: [], sources: [] };
+        }
+        return { flags, sources: extractSources(res as GroundedResponse) };
       } catch (err) {
         log('WARNING', 'grounding_failed', { error: (err as Error).message });
         return { flags: [], sources: [] };
