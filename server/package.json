@@ -26,6 +26,13 @@
     "bench": "tsx ../bench/run.ts",
     "bench:labels": "tsx ../bench/labels.ts",
     "bench:report": "tsx ../bench/report.ts",
+    "bench:v2": "tsx ../bench/v2/run.ts",
+    "bench:v2:report": "tsx ../bench/v2/report.ts",
+    "bench:ab": "tsx ../bench/v2/ab.ts",
+    "bench:gate": "tsx ../bench/v2/gate.ts",
+    "bench:validate": "tsx ../bench/v2/validate.ts",
+    "bench:render": "tsx ../bench/v2/render.ts",
+    "bench:draft": "tsx ../bench/v2/draft.ts",
     "config:seed-hotlines": "tsx src/admin/seed-hotlines.ts",
     "admin:grant": "tsx src/admin/grant.ts",
     "live:smoke": "tsx eval/live-smoke.ts"
