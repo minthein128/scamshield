@@ -5,6 +5,7 @@ import { Text } from './Text';
 import { BrandMark } from './BrandMark';
 import { stepText, useShieldControl, type ShieldControl } from '../hooks/useShieldControl';
 import theme from '../theme/theme';
+import { APK_URL } from '../config/env';
 
 const { colors, fonts } = theme;
 
@@ -13,7 +14,7 @@ export const ShieldCard: React.FC<{ onDetails?: () => void; style?: StyleProp<Vi
 export const ShieldCardView: React.FC<{ control: ShieldControl; onDetails?: () => void; style?: StyleProp<ViewStyle> }> = ({ control, onDetails, style }) => {
   const { t } = useTranslation('shield');
   const { support, running, step, error, setEnabled } = control;
-  const apkUrl = process.env.EXPO_PUBLIC_APK_URL?.trim();
+  const apkUrl = APK_URL;
 
   if (support === 'unsupported') return null;
 

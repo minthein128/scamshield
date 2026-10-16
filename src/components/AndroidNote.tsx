@@ -4,13 +4,14 @@ import { useTranslation } from 'react-i18next';
 import { Text } from './Text';
 import { Card } from './ui';
 import theme from '../theme/theme';
+import { APK_URL } from '../config/env';
 
 const { colors, fonts } = theme;
 
 export const AndroidNote: React.FC<{ text: string }> = ({ text }) => {
   const { t } = useTranslation('shield');
   if (Platform.OS !== 'web') return null;
-  const apkUrl = process.env.EXPO_PUBLIC_APK_URL?.trim();
+  const apkUrl = APK_URL;
   return (
     <Card style={styles.card}>
       <Text style={styles.text}>{text}</Text>
