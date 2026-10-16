@@ -258,8 +258,10 @@ class CaptureTest {
 
     @Test
     fun talkBackNamesTheDollAndTheVerdict() {
-        assertEquals("Pyit Taing Htaung, SafeRoute shield. Result: high risk. Double tap to show details.", bubbleDescription(ShieldOverlay.State.DANGER, "Pyit Taing Htaung"))
-        assertTrue(bubbleDescription(ShieldOverlay.State.CHECKING, "ပစ်တိုင်းထောင်").startsWith("ပစ်တိုင်းထောင်, SafeRoute shield. Checking"))
+        assertEquals("Pyit Taing Htaung, SafeRoute shield. High risk. Double tap to show details.", bubbleDescription(ShieldOverlay.State.DANGER, ShieldStrings.DEFAULT))
+        val my = ShieldStrings.from(mapOf("name" to "ပစ်တိုင်းထောင်", "verdictSafe" to "အန္တရာယ်နည်း"))
+        assertTrue(bubbleDescription(ShieldOverlay.State.CHECKING, my).startsWith("ပစ်တိုင်းထောင်, SafeRoute shield. Checking"))
+        assertTrue(bubbleDescription(ShieldOverlay.State.SAFE, my).contains("အန္တရာယ်နည်း"))
         overlay.setChecking()
         assertTrue(overlay.bubbleViewForTest.contentDescription.contains("Checking the screen"))
     }

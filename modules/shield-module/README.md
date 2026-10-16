@@ -112,11 +112,11 @@ Gestures:
 - Expanded (tap, 220 ms): width grows to min(344dp, screen - 48dp), radius goes to 20dp, a detail area opens. It holds a summary (14sp, up to 4 lines), up to 3 flag rows (18dp severity icon, 13sp, up to 2 lines) and two text buttons, "Dismiss" and "Full report" (48dp tall, at least 48dp wide).
 - Surface: theme surface color, 1dp border, 10dp elevation. Font is Plus Jakarta Sans (Regular, SemiBold, Bold) from `assets/fonts` in the APK, system sans if the load fails.
 - Swipe left or right to dismiss. Past 40% of the width, or a fast fling, it flies off. Otherwise it springs back.
-- Error pill: neutral chip (Offline, Rate limited, Service busy or Not checked) and "Tap to retry". It does not expand. Tapping it, or the bubble, retries.
+- Error pill: neutral chip (Offline, Too many checks, Service busy or Not checked, localized) and "Tap to retry". It does not expand. Tapping it, or the bubble, retries.
 
 | Verdict chip | Light (bg / text) | Dark (bg / text) |
 | --- | --- | --- |
-| Safe | `#DBE5FF` / `#1E3A8A` | `#1E3A8A` / `#DBE5FF` |
+| Low risk | `#DBE5FF` / `#1E3A8A` | `#1E3A8A` / `#DBE5FF` |
 | Be careful | `#FEF3C7` / `#854D0E` | `#78350F` / `#FDE68A` |
 | High risk | `#9F1239` / `#FFFFFF` | `#9F1239` / `#FFFFFF` |
 | Error | `#F1EBE3` / `#3D3631` | `#4A403A` / `#EFE8DF` |
@@ -304,5 +304,5 @@ Scam-pattern sharing is opt-in. `startShield({ shareSignals })` and `setShieldSh
 
 - Android 14 allows one `createVirtualDisplay` per MediaProjection and one `getMediaProjection` per consent result. The capturer keeps one display for the session. Do not create one per tap.
 - On Android 14 `startForeground` with type `mediaProjection` throws before consent. The service starts as `specialUse` and switches type after consent.
-- Check UI labels are English. Voice companion labels come from the app in the user's language. Result text comes from the server in the requested language.
+- Overlay labels (verdict and error chips, "Tap to retry", Dismiss, Full report, TalkBack actions and the voice companion) come from the app in the user's language through `startShield({ strings })`. Verdict chips reuse the app's `common:verdict` words (Low risk, Be careful, High risk), never "Safe"; English fallbacks live in `ShieldStrings.DEFAULTS`. Result text comes from the server in the requested language. `pitch/e2e/bubble-doll-states-my.png` shows the Burmese labels.
 - `startShield` options also carry `home` and `destination` country codes for the companion's verified hotlines.

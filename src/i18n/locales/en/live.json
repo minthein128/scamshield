@@ -71,6 +71,14 @@
     "permissionStep": "Optional: allow the microphone so you can talk to SafeRoute from the bubble.",
     "allowMic": "Allow microphone",
     "micOn": "The microphone is allowed.",
-    "micBlocked": "The microphone is blocked. Allow it for SafeRoute in Android Settings."
+    "micBlocked": "The microphone is blocked. Allow it for SafeRoute in Android Settings.",
+    "chipOffline": "Offline",
+    "chipRateLimited": "Too many checks",
+    "chipBusy": "Service busy",
+    "chipNotChecked": "Not checked",
+    "tapToRetry": "Tap to retry",
+    "fullReport": "Full report",
+    "showDetails": "Show details",
+    "closeShield": "Close shield"
   }
 }

@@ -7,6 +7,34 @@ class ShieldStrings private constructor(private val values: Map<String, String>)
 
     val name get() = this["name"]
     val ask get() = this["ask"]
+    val tapToRetry get() = this["tapToRetry"]
+    val dismiss get() = this["dismiss"]
+    val fullReport get() = this["fullReport"]
+    val showDetails get() = this["showDetails"]
+    val closeShield get() = this["closeShield"]
+
+    /** Verdict chip, the same words as the app (common:verdict): Low risk, Be careful, High risk. */
+    fun chip(state: ShieldOverlay.State): String = when (state) {
+        ShieldOverlay.State.SAFE -> this["verdictSafe"]
+        ShieldOverlay.State.CAREFUL -> this["verdictCareful"]
+        ShieldOverlay.State.DANGER -> this["verdictDanger"]
+        else -> this["chipNotChecked"]
+    }
+
+    /** Short chip for a failed check. */
+    fun errorChip(message: String): String = when (ShieldPalette.errorKind(message)) {
+        "offline" -> this["chipOffline"]
+        "rate" -> this["chipRateLimited"]
+        "busy" -> this["chipBusy"]
+        else -> this["chipNotChecked"]
+    }
+
+    /** Severity word for a flag, read by TalkBack; reuses the verdict words. */
+    fun severity(severity: String): String = when (severity) {
+        "high" -> this["verdictDanger"]
+        "medium" -> this["verdictCareful"]
+        else -> this["verdictSafe"]
+    }
     val whatWeChecked get() = this["whatWeChecked"]
     val previewClose get() = this["previewClose"]
     val askA11y get() = this["askA11y"]
@@ -46,6 +74,18 @@ class ShieldStrings private constructor(private val values: Map<String, String>)
         val DEFAULTS: Map<String, String> = linkedMapOf(
             "name" to "Pyit Taing Htaung",
             "ask" to "Ask",
+            "verdictSafe" to "Low risk",
+            "verdictCareful" to "Be careful",
+            "verdictDanger" to "High risk",
+            "chipOffline" to "Offline",
+            "chipRateLimited" to "Too many checks",
+            "chipBusy" to "Service busy",
+            "chipNotChecked" to "Not checked",
+            "tapToRetry" to "Tap to retry",
+            "dismiss" to "Dismiss",
+            "fullReport" to "Full report",
+            "showDetails" to "Show details",
+            "closeShield" to "Close shield",
             "whatWeChecked" to "This is what we checked",
             "previewClose" to "Tap to close. This picture is not saved.",
             "askA11y" to "Ask Pyit Taing Htaung about this result",

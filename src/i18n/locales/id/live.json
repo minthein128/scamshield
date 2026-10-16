@@ -74,6 +74,14 @@
     "permissionStep": "Boleh dilewati: izinkan mikrofon agar bisa bicara dengan SafeRoute dari gelembung.",
     "allowMic": "Izinkan mikrofon",
     "micOn": "Mikrofon sudah diizinkan.",
-    "micBlocked": "Mikrofon diblokir. Beri izin untuk SafeRoute di Pengaturan Android."
+    "micBlocked": "Mikrofon diblokir. Beri izin untuk SafeRoute di Pengaturan Android.",
+    "chipOffline": "Offline",
+    "chipRateLimited": "Terlalu sering memeriksa",
+    "chipBusy": "Layanan sibuk",
+    "chipNotChecked": "Belum diperiksa",
+    "tapToRetry": "Ketuk untuk coba lagi",
+    "fullReport": "Laporan lengkap",
+    "showDetails": "Lihat rincian",
+    "closeShield": "Tutup shield"
   }
 }

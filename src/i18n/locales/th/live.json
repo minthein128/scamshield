@@ -74,6 +74,14 @@
     "permissionStep": "ไม่บังคับ: อนุญาตให้ใช้ไมโครโฟน เพื่อให้คุณคุยกับ SafeRoute จากปุ่มลอยได้ค่ะ",
     "allowMic": "อนุญาตให้ใช้ไมโครโฟน",
     "micOn": "เปิดอนุญาตไมโครโฟนแล้วค่ะ",
-    "micBlocked": "ไมโครโฟนถูกปิดกั้นอยู่ค่ะ เข้าไปอนุญาตให้ SafeRoute ได้ในการตั้งค่า Android นะคะ"
+    "micBlocked": "ไมโครโฟนถูกปิดกั้นอยู่ค่ะ เข้าไปอนุญาตให้ SafeRoute ได้ในการตั้งค่า Android นะคะ",
+    "chipOffline": "ออฟไลน์",
+    "chipRateLimited": "ตรวจสอบบ่อยเกินไป",
+    "chipBusy": "ระบบกำลังยุ่ง",
+    "chipNotChecked": "ยังไม่ได้ตรวจสอบ",
+    "tapToRetry": "แตะเพื่อลองใหม่",
+    "fullReport": "รายงานฉบับเต็ม",
+    "showDetails": "ดูรายละเอียด",
+    "closeShield": "ปิด Screen shield"
   }
 }

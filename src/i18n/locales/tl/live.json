@@ -74,6 +74,14 @@
     "permissionStep": "Opsyonal: payagan ang mikropono para makausap mo ang SafeRoute mula sa bubble.",
     "allowMic": "Payagan ang mikropono",
     "micOn": "Pinapayagan ang mikropono.",
-    "micBlocked": "Naka-block ang mikropono. Payagan ito para sa SafeRoute sa Android Settings."
+    "micBlocked": "Naka-block ang mikropono. Payagan ito para sa SafeRoute sa Android Settings.",
+    "chipOffline": "Offline",
+    "chipRateLimited": "Masyadong maraming pagsusuri",
+    "chipBusy": "Abala ang serbisyo",
+    "chipNotChecked": "Hindi nasuri",
+    "tapToRetry": "I-tap para subukan muli",
+    "fullReport": "Buong ulat",
+    "showDetails": "Ipakita ang mga detalye",
+    "closeShield": "Isara ang shield"
   }
 }

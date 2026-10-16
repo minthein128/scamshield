@@ -169,7 +169,7 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
             if (!listener.onLongPressBubble()) closeBubble()
             true
         }
-        ViewCompat.addAccessibilityAction(bubble, "Close shield") { _, _ ->
+        ViewCompat.addAccessibilityAction(bubble, strings.closeShield) { _, _ ->
             closeBubble()
             true
         }
@@ -273,9 +273,9 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
         setState(next)
         untuck()
         showBubbleNow()
-        val title = json.optString("title").ifBlank { ShieldPalette.chipLabel(next) }
+        val title = json.optString("title").ifBlank { strings.chip(next) }
         val summary = json.optString("summary")
-        val chip = ShieldPalette.chipLabel(next)
+        val chip = strings.chip(next)
         val model = CardModel(
             state = next,
             chip = chip,
@@ -323,9 +323,9 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
         setState(State.ERROR)
         untuck()
         showBubbleNow()
-        val chip = ShieldPalette.errorLabel(message)
+        val chip = strings.errorChip(message)
         presentCard(
-            CardModel(State.ERROR, chip, "Tap to retry", message, emptyList(), false, "$chip. $message. Double tap to retry.")
+            CardModel(State.ERROR, chip, strings.tapToRetry, message, emptyList(), false, "$chip. ${strings.tapToRetry}.")
         )
     }
 
@@ -520,7 +520,7 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
             bubble.contentDescription = "${strings.name}. $label. " + if (voice.muted || voice.paused) strings.unmuteA11y else strings.muteA11y
             return
         }
-        bubble.contentDescription = bubbleDescription(state, strings.name)
+        bubble.contentDescription = bubbleDescription(state, strings)
     }
 
     private fun showBubbleNow() {
@@ -572,7 +572,7 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
             override fun onFullReport() = listener.onOpenReport()
             override fun onDismissClicked() = if (model.notice) closeNotice() else listener.onDismiss()
             override fun onSwipedAway() = if (model.notice) closeNotice() else listener.onDismiss()
-        })
+        }, strings)
         view.onExpandChanged = { expanded -> if (expanded) main.removeCallbacks(autoCollapse) }
         view.prepare(screenW() - dp(48))
         val root = FrameLayout(context).apply {
@@ -1133,11 +1133,13 @@ internal class DragMachine(private val slop: Int) {
 internal data class ResumeCard(val model: CardModel, val expanded: Boolean)
 
 /** TalkBack text for the bubble outside a voice session. The doll is the shield, so the name leads. */
-internal fun bubbleDescription(state: ShieldOverlay.State, name: String): String = when (state) {
-    ShieldOverlay.State.IDLE -> "$name, SafeRoute shield. Double tap to check the screen."
-    ShieldOverlay.State.CHECKING -> "$name, SafeRoute shield. Checking the screen."
-    ShieldOverlay.State.SAFE -> "$name, SafeRoute shield. Result: safe. Double tap to show details."
-    ShieldOverlay.State.CAREFUL -> "$name, SafeRoute shield. Result: be careful. Double tap to show details."
-    ShieldOverlay.State.DANGER -> "$name, SafeRoute shield. Result: high risk. Double tap to show details."
-    ShieldOverlay.State.ERROR -> "$name, SafeRoute shield. The check failed. Double tap to retry."
+internal fun bubbleDescription(state: ShieldOverlay.State, strings: ShieldStrings): String {
+    val name = strings.name
+    return when (state) {
+        ShieldOverlay.State.IDLE -> "$name, SafeRoute shield. Double tap to check the screen."
+        ShieldOverlay.State.CHECKING -> "$name, SafeRoute shield. Checking the screen."
+        ShieldOverlay.State.SAFE, ShieldOverlay.State.CAREFUL, ShieldOverlay.State.DANGER ->
+            "$name, SafeRoute shield. ${strings.chip(state)}. Double tap to show details."
+        ShieldOverlay.State.ERROR -> "$name, SafeRoute shield. ${strings.chip(state)}. ${strings.tapToRetry}."
+    }
 }
