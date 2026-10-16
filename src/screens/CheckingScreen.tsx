@@ -7,6 +7,7 @@ import DollLoader from '../components/DollLoader';
 import { useReduceMotion } from '../hooks/useReduceMotion';
 import type { CheckResponse, Verdict } from '../api/types';
 import { forHistory, resultWord } from '../lib/attention';
+import { diag, errorCode } from '../lib/diagLog';
 import { Button, LinkButton } from '../components/ui';
 import { useAuth } from '../state/AuthState';
 import { errorCopy, getApiClient } from '../api';
@@ -74,6 +75,7 @@ export const CheckingScreen: React.FC<RootScreenProps<'Checking'>> = ({ navigati
       if (e instanceof ApiError && e.code === 'cancelled') return;
       const code = e instanceof ApiError ? e.code : undefined;
       const unreadable = job?.phase === 'extract' && (code === 'upstream' || code === 'invalid_response');
+      if (job) diag.error('jobShield', job.phase === 'extract' ? 'extract_failed' : 'assess_failed', { code: code ?? errorCode(e), unreadable });
       setError({ ...(unreadable ? { title: t('errors:job.unreadable.title'), message: t('errors:job.unreadable.message') } : errorCopy(e)), code });
     }
   }, [openReport, request, job, language, navigation, saveCheck, source, reduceMotion, t]);

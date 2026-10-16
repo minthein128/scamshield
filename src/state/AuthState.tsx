@@ -7,9 +7,11 @@ import {
   signInWithEmail,
   signOutToAnonymous,
   signUpWithEmail,
+  withAuthLog,
   statusFromUser,
   type AuthStatus,
 } from '../services/accounts';
+import { diag, shortHash } from '../lib/diagLog';
 import { getAuthInstance } from '../services/authInstance';
 import { signInWithFacebook, signInWithGoogle } from '../services/social';
 import { setTokenProvider } from '../services/token';
@@ -40,6 +42,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return (auth.currentUser as User | null)?.getIdToken() ?? null;
     });
     const offState = onAuthStateChanged(auth, user => {
+      diag.info('auth', 'state', { kind: user ? (user.isAnonymous ? 'anonymous' : 'account') : 'signedOut', ...(user ? { uid: shortHash(user.uid) } : {}) });
       setStatus(statusFromUser(user));
       if (!user) ensureAnonymous(auth).catch(() => undefined);
     });
@@ -52,6 +55,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, [auth]);
 
+  const uid = useCallback(() => auth?.currentUser?.uid, [auth]);
+
   const need = useCallback(() => {
     if (!auth) throw new Error('Accounts are not available in this build.');
     return auth;
@@ -61,26 +66,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     () => ({
       status,
       signUp: async (email, password) => {
-        await signUpWithEmail(need(), email, password);
+        await withAuthLog('emailSignUp', () => signUpWithEmail(need(), email, password), uid);
         setStatus(statusFromUser(need().currentUser));
       },
-      signIn: (email, password) => signInWithEmail(need(), email, password),
+      signIn: (email, password) => withAuthLog('emailSignIn', () => signInWithEmail(need(), email, password), uid),
       google: async () => {
-        await signInWithGoogle(need());
+        await withAuthLog('google', () => signInWithGoogle(need()), uid);
         setStatus(statusFromUser(need().currentUser));
       },
       facebook: async () => {
-        await signInWithFacebook(need());
+        await withAuthLog('facebook', () => signInWithFacebook(need()), uid);
         setStatus(statusFromUser(need().currentUser));
       },
-      sendReset: email => resetPassword(need(), email),
-      signOut: () => signOutToAnonymous(need()),
-      deleteAccount: async () => {
-        const user = need().currentUser;
-        if (user) await removeAccount(user);
-      },
+      sendReset: email => withAuthLog('reset', () => resetPassword(need(), email)),
+      signOut: () => withAuthLog('signOut', () => signOutToAnonymous(need())),
+      deleteAccount: () =>
+        withAuthLog('deleteAccount', async () => {
+          const user = need().currentUser;
+          if (user) await removeAccount(user);
+        }),
     }),
-    [status, need],
+    [status, need, uid],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

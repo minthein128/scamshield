@@ -13,8 +13,12 @@ import { AuthProvider } from './state/AuthState';
 import { FOREGROUND_REFRESH_MS, refreshApiUrl, useApiUrl } from './config/runtime';
 import { useLayout, APP_MAX_WIDTH } from './hooks/useLayout';
 import { useOrientationPolicy } from './hooks/useOrientationPolicy';
+import { installGlobalErrorLog } from './lib/diagGlobal';
+import { diag } from './lib/diagLog';
 import { startRuntimeConfig } from './lib/runtimeConfig';
 import theme from './theme/theme';
+
+installGlobalErrorLog();
 
 export default function App() {
   const { t } = useTranslation();
@@ -24,6 +28,9 @@ export default function App() {
   const [languageReady, setLanguageReady] = useState(false);
   useEffect(() => {
     restoreUiLanguage().finally(() => setLanguageReady(true));
+  }, []);
+  useEffect(() => {
+    diag.info('app', 'start');
   }, []);
   useEffect(() => (languageReady ? startRuntimeConfig() : undefined), [languageReady]);
   useEffect(() => {

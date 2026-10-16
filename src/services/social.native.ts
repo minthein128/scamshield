@@ -3,7 +3,8 @@ import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
 import { FacebookAuthProvider, GoogleAuthProvider, type Auth } from 'firebase/auth';
 import { FACEBOOK_APP_ID, GOOGLE_SIGNIN, GOOGLE_WEB_CLIENT_ID } from '../config/env';
-import { linkOrSignIn } from './accounts';
+import { diag } from '../lib/diagLog';
+import { authErrorCode, linkOrSignIn } from './accounts';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -14,15 +15,22 @@ const cancelled = () => Object.assign(new Error('cancelled'), { code: 'auth/popu
 
 export async function signInWithGoogle(auth: Auth): Promise<void> {
   GoogleSignin.configure({ webClientId: GOOGLE_WEB_CLIENT_ID });
+  let stage: 'playServices' | 'googleSignIn' | 'firebase' = 'playServices';
   try {
     await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+    stage = 'googleSignIn';
     const result = await GoogleSignin.signIn();
     const idToken = result.type === 'success' ? result.data.idToken : null;
-    if (!idToken) throw cancelled();
+    if (!idToken) {
+      diag.warn('auth', 'google_no_token', { result: result.type });
+      throw cancelled();
+    }
+    stage = 'firebase';
     await linkOrSignIn(auth, GoogleAuthProvider.credential(idToken));
   } catch (e) {
     if (isErrorWithCode(e) && e.code === statusCodes.SIGN_IN_CANCELLED) throw cancelled();
-    console.warn('Google sign-in failed', (e as { code?: unknown })?.code, (e as Error)?.message);
+    if ((e as { code?: unknown })?.code === 'auth/popup-closed-by-user') throw e;
+    diag.error('auth', 'google_native_error', { stage, code: authErrorCode(e) ?? 'unknown' });
     throw e;
   }
 }

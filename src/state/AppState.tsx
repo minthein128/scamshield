@@ -5,6 +5,7 @@ import { t, setUiLanguage } from '../i18n';
 import { useUiLanguage } from '../i18n/useUiLanguage';
 import { clearUiLanguage } from '../i18n/storage';
 import { useShieldSync } from '../hooks/useShieldSync';
+import { diag, errorCode } from '../lib/diagLog';
 import {
   CONTACTS_KEY,
   loadContacts,
@@ -56,6 +57,11 @@ interface AppStateValue {
 }
 
 const AppStateContext = createContext<AppStateValue | null>(null);
+
+const syncFailed = (op: string, set: (s: SyncState) => void) => (e: unknown) => {
+  diag.error('sync', op, { code: errorCode(e) });
+  set('error');
+};
 
 export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { status } = useAuth();
@@ -116,8 +122,12 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         await saveContacts(mergedContacts);
         const remoteStamp = new Map(snap.contacts.map(c => [c.id, c.updatedAt]));
         await Promise.all(mergedContacts.filter(c => (remoteStamp.get(c.id) ?? '') < c.updatedAt).map(c => cloud.pushContact(uid, c)));
-        if (!cancelled) setSyncState('done');
-      } catch {
+        if (!cancelled) {
+          diag.info('sync', 'done', { history: latest.current.history.length, contacts: mergedContacts.length });
+          setSyncState('done');
+        }
+      } catch (e) {
+        diag.error('sync', 'pull_failed', { code: errorCode(e) });
         if (!cancelled) setSyncState('error');
       }
     })();
@@ -130,7 +140,7 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setProfile(next);
     saveProfile(next).catch(() => undefined);
     const id = latest.current.uid;
-    if (id && next.onboarded) cloud.pushProfile(id, next, latest.current.language).catch(() => setSyncState('error'));
+    if (id && next.onboarded) cloud.pushProfile(id, next, latest.current.language).catch(syncFailed('push_profile', setSyncState));
   }, []);
 
   const updateProfile = useCallback((choices: ProfileChoices) => persistProfile(applyChoices(latest.current.profile, choices)), [persistProfile]);
@@ -138,7 +148,7 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     latest.current.language = code;
     setUiLanguage(code).catch(() => undefined);
     const { uid: id, profile: current } = latest.current;
-    if (id && current.onboarded) cloud.pushProfile(id, current, code).catch(() => setSyncState('error'));
+    if (id && current.onboarded) cloud.pushProfile(id, current, code).catch(syncFailed('push_language', setSyncState));
   }, []);
   const finishOnboarding = useCallback((choices?: ProfileChoices) => persistProfile(finishProfile(latest.current.profile, choices)), [persistProfile]);
 
@@ -147,7 +157,7 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const entry: HistoryEntry = { id: result.id, createdAt: result.createdAt, language: lang, source, result };
     setHistory(await addHistory(entry));
     const id = latest.current.uid;
-    if (id) cloud.pushHistory(id, [entry]).catch(() => setSyncState('error'));
+    if (id) cloud.pushHistory(id, [entry]).catch(syncFailed('push_history', setSyncState));
   }, []);
 
   const setKeepHistory = useCallback(
@@ -157,7 +167,7 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setHistory([]);
       await clearHistory();
       const id = latest.current.uid;
-      if (id) await cloud.deleteRemoteHistory(id).catch(() => setSyncState('error'));
+      if (id) await cloud.deleteRemoteHistory(id).catch(syncFailed('delete_history', setSyncState));
     },
     [persistProfile],
   );
@@ -173,7 +183,7 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setContacts(next);
     saveContacts(next).catch(() => undefined);
     const id = latest.current.uid;
-    if (id) cloud.pushContact(id, contact).catch(() => setSyncState('error'));
+    if (id) cloud.pushContact(id, contact).catch(syncFailed('push_contact', setSyncState));
     return null;
   }, []);
 
@@ -182,7 +192,7 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setContacts(next);
     saveContacts(next).catch(() => undefined);
     const id = latest.current.uid;
-    if (id) cloud.deleteContactRemote(id, contactId).catch(() => setSyncState('error'));
+    if (id) cloud.deleteContactRemote(id, contactId).catch(syncFailed('delete_contact', setSyncState));
   }, []);
 
   const clearSyncedCopies = useCallback(async () => {

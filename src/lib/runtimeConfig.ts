@@ -4,6 +4,7 @@ import { ensureApiUrl } from '../config/runtime';
 import { COUNTRIES, type CountryCode } from '../data/countries';
 import type { Hotline, HotlineCategory } from '../data/hotlines';
 import i18n from '../i18n';
+import { diag } from './diagLog';
 
 export const CONFIG_KEYS = {
   hotlines: 'saferoute.config.hotlines.v1',
@@ -181,13 +182,16 @@ export async function loadCachedConfig(): Promise<void> {
   bump();
 }
 
-async function getJson(fetchImpl: typeof fetch, url: string): Promise<unknown> {
+async function getJson(fetchImpl: typeof fetch, url: string, name: string): Promise<unknown> {
+  const started = Date.now();
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
   try {
     const res = await fetchImpl(url, { signal: controller.signal, headers: { Accept: 'application/json' } });
+    if (!res.ok) diag.warn('api', 'config_failed', { endpoint: name, status: res.status, ms: Date.now() - started });
     return res.ok ? await res.json() : null;
   } catch {
+    diag.warn('api', 'config_failed', { endpoint: name, kind: 'network', ms: Date.now() - started });
     return null;
   } finally {
     clearTimeout(timer);
@@ -199,9 +203,9 @@ export async function refreshConfig(fetchImpl: typeof fetch = fetch, baseUrl?: s
   const base = (baseUrl ?? (await ensureApiUrl().catch(() => ''))).replace(/\/+$/, '');
   if (!base) return false;
   const [hBody, nBody, cBody] = await Promise.all([
-    getJson(fetchImpl, `${base}/v1/config/hotlines`),
-    getJson(fetchImpl, `${base}/v1/config/notices`),
-    getJson(fetchImpl, `${base}/v1/config/content`),
+    getJson(fetchImpl, `${base}/v1/config/hotlines`, 'configHotlines'),
+    getJson(fetchImpl, `${base}/v1/config/notices`, 'configNotices'),
+    getJson(fetchImpl, `${base}/v1/config/content`, 'configContent'),
   ]);
   let changed = false;
   const h = parseHotlines(hBody);

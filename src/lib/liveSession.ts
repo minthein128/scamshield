@@ -1,4 +1,5 @@
 import type { CheckResponse, LanguageCode } from '../api/types';
+import { diag } from './diagLog';
 import type { LiveAudio } from './liveAudio.types';
 
 export type LiveState = 'idle' | 'connecting' | 'listening' | 'speaking' | 'ended' | 'error';
@@ -85,6 +86,7 @@ export function createLiveSession(options: LiveSessionOptions, deps: LiveSession
   let speakTimer: ReturnType<typeof setTimeout> | undefined;
   let playUntil = 0;
   let deadline = 0;
+  const openedAt = Date.now();
 
   const set = (patch: Partial<LiveView>) => {
     view = { ...view, ...patch };
@@ -120,6 +122,8 @@ export function createLiveSession(options: LiveSessionOptions, deps: LiveSession
   const finish = (next: Pick<LiveView, 'state'> & Partial<LiveView>) => {
     if (finished) return;
     finished = true;
+    if (next.state === 'error') diag.error('live', 'error', { code: next.error ?? 'unknown', fallback: Boolean(next.fallback), ms: Date.now() - openedAt });
+    else diag.info('live', 'end', { by: next.endedBy ?? 'unknown', ms: Date.now() - openedAt });
     teardown();
     set(next);
   };
@@ -236,6 +240,7 @@ export function createLiveSession(options: LiveSessionOptions, deps: LiveSession
     },
     async start(opts: { skipWarning?: boolean } = {}) {
       if (view.state !== 'idle') return;
+      diag.info('live', 'start', { mode: options.mode, skipWarning: Boolean(opts.skipWarning) });
       set({ state: 'connecting', caption: opts.skipWarning ? '' : options.result.spokenWarning });
       try {
         audio = deps.createAudio();

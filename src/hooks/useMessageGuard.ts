@@ -3,6 +3,7 @@ import { AppState, PermissionsAndroid, Platform } from 'react-native';
 import * as ShieldModule from 'shield-module';
 import type { MessageGuardApp, MessageGuardLogEntry } from 'shield-module';
 import { t } from '../i18n';
+import { diag, errorCode } from '../lib/diagLog';
 import { useApiUrl } from '../config/runtime';
 import { useAppState } from '../state/AppState';
 import { shieldSupport, type ShieldSupport } from './useShieldControl';
@@ -39,7 +40,7 @@ export function useMessageGuardConfigSync(): void {
       ...(ready ? { shareSignals } : {}),
       noticeBody: t('shield:messageGuard.notice.body'),
       noticeOpen: t('shield:messageGuard.notice.open'),
-    }).catch(() => undefined);
+    }).catch(e => diag.error('messageGuard', 'configure_failed', { code: errorCode(e) }));
   }, [apiUrl, language, ready, shareSignals]);
 }
 
@@ -53,6 +54,7 @@ export function useMessageGuard(): MessageGuardControl {
   const [pausedReason, setPausedReason] = useState<string | null>(null);
   const [consent, setConsent] = useState<MessageGuardConsentRequest | null>(null);
   const awaitingAccess = useRef(false);
+  const lastPaused = useRef<string | null>(null);
 
   const refresh = useCallback(async () => {
     if (support !== 'ready') return;
@@ -62,6 +64,10 @@ export function useMessageGuard(): MessageGuardControl {
       ShieldModule.getMessageGuardApps(),
     ]);
     setOn(status.enabled);
+    if (status.pausedReason !== lastPaused.current) {
+      lastPaused.current = status.pausedReason;
+      if (status.pausedReason) diag.warn('messageGuard', 'paused', { reason: status.pausedReason });
+    }
     setPausedReason(status.pausedReason);
     setAccess(granted);
     setApps(list);
@@ -72,6 +78,7 @@ export function useMessageGuard(): MessageGuardControl {
       await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
     }
     await ShieldModule.setMessageGuardEnabled(true);
+    diag.info('messageGuard', 'enabled');
     setError(null);
     await refresh();
   }, [refresh]);
@@ -89,6 +96,7 @@ export function useMessageGuard(): MessageGuardControl {
       } else {
         await ShieldModule.setMessageGuardEnabled(false);
         await refresh().catch(() => undefined);
+        diag.warn('messageGuard', 'access_off');
         setError(t('shield:messageGuard.errors.accessOff'));
       }
     });
@@ -98,6 +106,7 @@ export function useMessageGuard(): MessageGuardControl {
   const turnOff = useCallback(async () => {
     awaitingAccess.current = false;
     await ShieldModule.setMessageGuardEnabled(false);
+    diag.info('messageGuard', 'disabled');
     await refresh();
   }, [refresh]);
 
@@ -136,6 +145,7 @@ export function useMessageGuard(): MessageGuardControl {
         if (!(await ShieldModule.openNotificationAccessSettings())) {
           awaitingAccess.current = false;
           await ShieldModule.setMessageGuardEnabled(false);
+          diag.error('messageGuard', 'cannot_open_access_settings');
           setError(t('shield:messageGuard.errors.cannotOpen'));
         }
         return;
@@ -212,7 +222,7 @@ export function useMessageGuardLog(active: boolean): MessageGuardLogControl {
   }, []);
 
   useEffect(() => {
-    if (active) reload().catch(() => undefined);
+    if (active) reload().catch(e => diag.error('messageGuard', 'log_load_failed', { code: errorCode(e) }));
   }, [active, reload]);
 
   return { entries, loading, reload, deleteAll };
