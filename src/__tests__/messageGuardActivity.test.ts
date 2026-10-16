@@ -100,6 +100,36 @@ describe('syncMessageGuardActivity', () => {
     expect(log[log.length - 1].event).toBe('later');
   });
 
+  it('starts over when the native store restarted its numbers below the saved cursor', async () => {
+    await AsyncStorage.setItem(ACTIVITY_CURSOR_KEY, '57');
+    getActivity.mockImplementation(async after => {
+      const all = [event(0, 'skipped_otp'), event(1, 'skipped_not_risky')];
+      return { events: all.filter(e => e.seq > (after ?? -1)), counts: {}, nextSeq: 2 };
+    });
+    await syncMessageGuardActivity();
+    expect(getActivity.mock.calls.map(c => c[0])).toEqual([57, -1]);
+    expect(await AsyncStorage.getItem(ACTIVITY_CURSOR_KEY)).toBe('1');
+    const guard = (await readLog()).filter(e => e.area === 'messageGuard');
+    expect(guard.map(e => e.event).sort()).toEqual(['cursor_reset', 'skipped_not_risky', 'skipped_otp']);
+
+    await syncMessageGuardActivity();
+    expect(getActivity).toHaveBeenLastCalledWith(1);
+    expect(getActivity).toHaveBeenCalledTimes(3);
+  });
+
+  it('resets to -1 when the native file is empty after a restore, and keeps a cursor when nextSeq is missing', async () => {
+    await AsyncStorage.setItem(ACTIVITY_CURSOR_KEY, '4');
+    getActivity.mockResolvedValue({ events: [], counts: {}, nextSeq: 0 });
+    await syncMessageGuardActivity();
+    expect(await AsyncStorage.getItem(ACTIVITY_CURSOR_KEY)).toBe('-1');
+
+    await AsyncStorage.setItem(ACTIVITY_CURSOR_KEY, '4');
+    getActivity.mockReset().mockResolvedValue({ events: [], counts: {} });
+    await syncMessageGuardActivity();
+    expect(getActivity.mock.calls).toEqual([[4]]);
+    expect(await AsyncStorage.getItem(ACTIVITY_CURSOR_KEY)).toBe('4');
+  });
+
   it('logs the problem list when it changes', async () => {
     getActivity.mockResolvedValue({ events: [], counts: {} });
     await syncMessageGuardActivity({ ...on, batteryOptimized: true, listenerConnected: false }, true);

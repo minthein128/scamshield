@@ -163,6 +163,8 @@ export interface MessageGuardActivity {
   events: MessageGuardEvent[];
   /** Totals per outcome, including skipped_summary and skipped_ongoing, which add no event. */
   counts: Record<string, number>;
+  /** The seq the next event gets. Older native builds leave it out. */
+  nextSeq?: number;
 }
 
 /** One check Message Guard sent, kept on the phone only. */

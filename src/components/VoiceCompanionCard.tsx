@@ -35,7 +35,7 @@ export const VoiceCompanionCard: React.FC = () => {
     }
     const r = await ensureMicrophone();
     if (r === 'granted') setMic('granted');
-    else if (r !== 'declined') setMic('blocked');
+    else if (r === 'blocked') setMic('blocked');
   };
 
   if (Platform.OS !== 'android' || mic === 'unknown') return null;

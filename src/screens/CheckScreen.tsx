@@ -14,7 +14,7 @@ import { UI_LANGUAGES } from '../i18n/languages';
 import { appName } from '../config/brand';
 import { countryName } from '../lib/countries';
 import { hasInput } from '../api';
-import { PreparedImage, pickScreenshot, prepareImage } from '../lib/image';
+import { PreparedImage, pickScreenshot, prepareSharedImage } from '../lib/image';
 import { CHECK_MODES, CheckMode, buildJobRequest, buildRequest, jobSourceLabel, kindForMode, looksLikeUrl, modeForKind, sourceLabel } from '../lib/request';
 import { useClipboardHasText } from '../hooks/useClipboardText';
 import type { TabScreenProps } from '../navigation/types';
@@ -39,6 +39,14 @@ interface SourceProps {
   onClip: () => void;
   onPick: () => void;
   onRemove: () => void;
+}
+
+async function readClipboard(): Promise<string> {
+  try {
+    return (await Clipboard.getStringAsync()).trim();
+  } catch {
+    return '';
+  }
 }
 
 /** One card: a text box with an OR line and the upload box, or the picture and text once added. */
@@ -84,9 +92,7 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
   const [focusKey, setFocusKey] = useState(0);
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
-  const clipHasText = useClipboardHasText();
-  const [clipUsed, setClipUsed] = useState(false);
-  const hasClip = clipHasText && !clipUsed;
+  const hasClip = useClipboardHasText();
 
   const attachImage = useCallback(async (loader: () => Promise<PreparedImage | null>, target: (image: PreparedImage) => void = setImage) => {
     setBusy(true);
@@ -102,32 +108,36 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
   }, [t]);
 
   const pasteInto = useCallback(async (target: (value: string) => void) => {
-    const value = (await Clipboard.getStringAsync()).trim();
+    const value = await readClipboard();
     if (!value) {
       setNotice(t('errors.clipboardEmpty'));
       return;
     }
     setNotice(null);
-    setClipUsed(true);
     target(value);
   }, [t]);
 
-  useEffect(() => {
-    if (!clipHasText) setClipUsed(false);
-  }, [clipHasText]);
+  const clearDraft = () => {
+    setText('');
+    setImage(null);
+    setChatText('');
+    setChatImage(null);
+    setNotice(null);
+  };
 
   const nonce = route.params?.nonce;
   useEffect(() => {
     const params = route.params;
     if (!params || !params.nonce) return;
     const { draft, intent } = params;
+    clearDraft();
     if (draft) {
       if (draft.kind) setMode(modeForKind(draft.kind));
       const shared = [draft.text, draft.url].filter(Boolean).join(' ');
       if (shared) setText(shared);
       if (draft.imageUri) {
         const uri = draft.imageUri;
-        attachImage(() => prepareImage(uri));
+        attachImage(() => prepareSharedImage(uri));
       }
     } else if (intent === 'text') {
       setMode('message');
@@ -137,7 +147,7 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
     } else if (intent === 'link') {
       setMode('message');
       setFocusKey(k => k + 1);
-      pasteInto(setText).catch(() => undefined);
+      void pasteInto(setText);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nonce]);

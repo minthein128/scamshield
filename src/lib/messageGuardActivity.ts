@@ -70,14 +70,18 @@ let lastProblems = '';
 
 async function syncOnce(): Promise<void> {
   const raw = await AsyncStorage.getItem(ACTIVITY_CURSOR_KEY).catch(() => null);
-  const cursor = raw !== null && Number.isFinite(Number(raw)) ? Number(raw) : -1;
-  const { events } = await ShieldModule.getMessageGuardActivity(cursor);
-  let next = cursor;
+  const saved = raw !== null && Number.isFinite(Number(raw)) ? Number(raw) : -1;
+  const first = await ShieldModule.getMessageGuardActivity(saved);
+  // A restored or reset native file starts its numbers again below the saved cursor.
+  const stale = typeof first.nextSeq === 'number' && saved >= first.nextSeq;
+  if (stale) diag.info('messageGuard', 'cursor_reset', { cursor: saved, nextSeq: first.nextSeq ?? 0 });
+  const { events } = stale ? await ShieldModule.getMessageGuardActivity(-1) : first;
+  let next = stale ? -1 : saved;
   for (const e of events) {
     diag.at(e.at, levelFor(e.outcome), 'messageGuard', e.outcome, { app: e.app });
     next = Math.max(next, e.seq);
   }
-  if (next !== cursor) await AsyncStorage.setItem(ACTIVITY_CURSOR_KEY, String(next)).catch(() => undefined);
+  if (next !== saved) await AsyncStorage.setItem(ACTIVITY_CURSOR_KEY, String(next)).catch(() => undefined);
 }
 
 /** Copies new native decisions into the Diagnostics log and notes changes in the problem list. */

@@ -1,5 +1,6 @@
 import { PermissionsAndroid } from 'react-native';
-import { ensureContacts, ensureMicrophone, ensureNotifications, explainOnce, registerPermissionHost, resetPermissionSession, type AndroidPermissionApi } from '../lib/permissions';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { EXPLAINED_KEY, ensureContacts, ensureMicrophone, ensureNotifications, explainOnce, explainOnceEver, registerPermissionHost, resetPermissionSession, type AndroidPermissionApi } from '../lib/permissions';
 
 const { GRANTED, DENIED, NEVER_ASK_AGAIN } = PermissionsAndroid.RESULTS;
 
@@ -85,6 +86,30 @@ describe('just-in-time permissions', () => {
     expect(await explainOnce('screen')).toBe(false);
     expect(await explainOnce('screen')).toBe(false);
     expect(explain).toHaveBeenCalledTimes(2);
+    off();
+  });
+});
+
+describe('explainOnceEver', () => {
+  beforeEach(() => AsyncStorage.clear());
+
+  it('shows the reason once per install, across launches, whatever the answer', async () => {
+    const explain = jest.fn(async () => false);
+    const off = registerPermissionHost({ explain, help: jest.fn() });
+    expect(await explainOnceEver('notifications')).toBe(false);
+    resetPermissionSession();
+    expect(await explainOnceEver('notifications')).toBe(false);
+    expect(explain).toHaveBeenCalledTimes(1);
+    expect(JSON.parse((await AsyncStorage.getItem(EXPLAINED_KEY)) as string)).toEqual(['notifications']);
+    off();
+  });
+
+  it('skips the system dialog after the reason was shown once', async () => {
+    const a = api({ explain: explainOnceEver });
+    const off = registerPermissionHost({ explain: jest.fn(async () => true), help: jest.fn() });
+    expect(await ensureNotifications('notifications', a)).toBe('granted');
+    expect(await ensureNotifications('notifications', a)).toBe('declined');
+    expect(a.request).toHaveBeenCalledTimes(1);
     off();
   });
 });

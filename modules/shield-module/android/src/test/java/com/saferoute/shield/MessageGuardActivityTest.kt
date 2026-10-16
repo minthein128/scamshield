@@ -145,6 +145,19 @@ class MessageGuardActivityTest {
     }
 
     @Test
+    fun activity_reports_the_next_seq_so_a_reader_can_spot_a_lost_file() {
+        val activity = MessageGuardStore(context).activity
+        activity.record("sms", MessageGuardActivity.SENT)
+        activity.record("sms", MessageGuardActivity.SKIPPED_OTP)
+        assertEquals(2.0, MessageGuardBridge.activity(context, -1)["nextSeq"])
+
+        File(context.noBackupFilesDir, "message_guard/activity.json").writeText("{not json")
+        val fresh = MessageGuardBridge.activity(context, 1)
+        assertEquals(0.0, fresh["nextSeq"])
+        assertTrue((fresh["events"] as List<*>).isEmpty())
+    }
+
+    @Test
     fun listener_records_nothing_while_off() {
         val listener = Robolectric.buildService(MessageGuardListener::class.java).create().get()
         listener.onNotificationPosted(sbn("com.whatsapp", "Your parcel is held, pay the fee at http://pay-x.top/x"))

@@ -12,6 +12,7 @@
   "close": "Close",
   "getHelp": "Get help",
   "retry": "Try again",
+  "declined": "You chose not to use the microphone. Tap Try again when you want to talk, or close this and read the report.",
   "countdown": "{{seconds}} s left",
   "a11yCountdown": "{{seconds}} seconds left",
   "placeholder": "The answer will show here",
@@ -30,6 +31,7 @@
   },
   "errors": {
     "mic_denied": "The microphone is off. Allow it in your phone settings to talk, or close this and read the report.",
+    "mic_denied_web": "The microphone is blocked. Allow it for this site in your browser settings, or close this and read the report.",
     "unavailable": "Live voice is not available right now. Try again later, or close this and read the report.",
     "rate_limited": "You have used many checks this hour. Try again later.",
     "busy": "Another voice conversation is open. Close it and try again.",

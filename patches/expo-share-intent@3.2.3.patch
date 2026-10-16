@@ -1,0 +1,24 @@
+diff --git a/build/ExpoShareIntentModule.types.d.ts b/build/ExpoShareIntentModule.types.d.ts
+index f2ebd1aa21f4d6a83348dd9a6059b487b42dce87..b1bdb6a00ecf1696139736d5333fa4ce2df83d6a 100644
+--- a/build/ExpoShareIntentModule.types.d.ts
++++ b/build/ExpoShareIntentModule.types.d.ts
+@@ -79,6 +79,7 @@ export type ShareIntentFile = {
+     fileName: string;
+     mimeType: string;
+     path: string;
++    contentUri?: string | null;
+     size: number | null;
+     width: number | null;
+     height: number | null;
+diff --git a/build/utils.js b/build/utils.js
+index 3d343c633b4bb267a1ee994352516997f8e058b3..c80148be3d559e28625f10704d8666daeea3190e 100644
+--- a/build/utils.js
++++ b/build/utils.js
+@@ -101,6 +101,7 @@ export const parseShareIntent = (value, options) => {
+                                 (file.filePath ? `file://${file.filePath}` : null) ||
+                                 file.contentUri ||
+                                 null,
++                            contentUri: file.contentUri || null,
+                             mimeType: file.mimeType || null,
+                             fileName: file.fileName || null,
+                             width: file.width ? Number(file.width) : null,

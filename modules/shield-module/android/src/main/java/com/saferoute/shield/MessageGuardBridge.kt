@@ -60,6 +60,7 @@ internal object MessageGuardBridge {
         return mapOf(
             "events" to store.activity.events(afterSeq).map { it.toMap(MessageApps.labelForId(context, it.app)) },
             "counts" to store.activity.counts().mapValues { it.value.toDouble() },
+            "nextSeq" to store.activity.nextSeq().toDouble(),
         )
     }
 

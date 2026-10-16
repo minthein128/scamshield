@@ -6,7 +6,7 @@ import { t } from '../i18n';
 import { useApiUrl } from '../config/runtime';
 import { companionStrings } from '../lib/companionStrings';
 import { diag, errorCode } from '../lib/diagLog';
-import { ensureNotifications, explainOnce, explainPermission, showPermissionHelp } from '../lib/permissions';
+import { ensureNotifications, explainOnce, explainOnceEver, explainPermission, permissionApi, showPermissionHelp } from '../lib/permissions';
 import { isCleartext } from '../lib/shield';
 import { getAuthToken } from '../services/token';
 import { useAppState } from '../state/AppState';
@@ -52,7 +52,9 @@ export function useShieldControl(): ShieldControl {
 
   const refresh = useCallback(async () => {
     if (support !== 'ready') return;
-    setRunning(await ShieldModule.isShieldRunning());
+    const on = await ShieldModule.isShieldRunning();
+    setRunning(on);
+    if (on) setError(null);
   }, [support]);
 
   useFocusEffect(
@@ -74,12 +76,18 @@ export function useShieldControl(): ShieldControl {
         diag.info('shield', 'overlay_permission_requested');
         setStep('overlay');
         awaitingOverlay.current = true;
-        await ShieldModule.requestOverlayPermission();
-        return;
+        if (await ShieldModule.requestOverlayPermission()) return;
+        awaitingOverlay.current = false;
+        if (!(await ShieldModule.hasOverlayPermission())) {
+          diag.warn('shield', 'overlay_settings_unavailable');
+          setStep('idle');
+          showPermissionHelp('overlay');
+          return;
+        }
       }
       awaitingOverlay.current = false;
       setStep('notifications');
-      const notified = await ensureNotifications('notifications');
+      const notified = await ensureNotifications('notifications', permissionApi({ explain: explainOnceEver }));
       if (notified !== 'granted') diag.info('shield', 'notifications_not_granted', { result: notified });
       setStep('capture');
       if (!(await explainOnce('screen'))) {

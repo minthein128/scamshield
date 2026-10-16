@@ -42,6 +42,9 @@ internal class MessageGuardActivity(private val file: File, private val now: () 
 
     fun last(): Event? = synchronized(LOCK) { prune(load().events).lastOrNull() }
 
+    /** The number the next event gets. A reader whose cursor is at or above it lost the file. */
+    fun nextSeq(): Long = synchronized(LOCK) { load().nextSeq }
+
     fun counts(): Map<String, Int> = synchronized(LOCK) { load().counts }
 
     /** Drops events and counts but keeps the sequence, so a reader's cursor stays valid. */

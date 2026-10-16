@@ -8,7 +8,7 @@ import { MarkShapes } from './BrandMark';
 import { MARK_COLORS, MARK_VIEW, markShapes, type MarkShape } from './dollMark';
 import { stepText, type ShieldControl } from '../hooks/useShieldControl';
 import { useHomeShield } from '../hooks/useHomeShield';
-import { STABLE_API_URL } from '../config/env';
+import { SITE_URL } from '../config/env';
 import theme from '../theme/theme';
 
 const { colors, fonts } = theme;
@@ -41,7 +41,7 @@ const Doll: React.FC<{ on: boolean }> = ({ on }) => (
 
 export const BigShieldButton: React.FC = () => <BigShieldButtonView control={useHomeShield()} />;
 
-export const downloadUrl = (): string => process.env.EXPO_PUBLIC_APK_URL?.trim() || `${STABLE_API_URL}/download`;
+export const downloadUrl = (): string => process.env.EXPO_PUBLIC_APK_URL?.trim() || `${SITE_URL}/saferoute.apk`;
 
 /** Status line, the round on/off button and one hint line. */
 export const BigShieldButtonView: React.FC<{ control: ShieldControl }> = ({ control }) => {

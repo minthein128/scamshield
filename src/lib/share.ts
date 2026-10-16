@@ -10,7 +10,7 @@ export interface Draft {
 export interface SharedPayload {
   text?: string | null;
   webUrl?: string | null;
-  files?: { path: string; mimeType: string }[] | null;
+  files?: { path: string; mimeType: string; contentUri?: string | null }[] | null;
 }
 
 const URL_ONLY = /^https?:\/\/\S+$/i;
@@ -19,7 +19,8 @@ export function draftFromShare(shared: SharedPayload): Draft | null {
   const image = shared.files?.find(f => f.mimeType.startsWith('image/'));
   const raw = shared.webUrl?.trim() || shared.text?.trim() || '';
   const draft: Draft = {};
-  if (image) draft.imageUri = image.path.startsWith('/') ? `file://${image.path}` : image.path;
+  // The path can be a raw /storage file this app may not read; the content URI carries the grant.
+  if (image) draft.imageUri = image.contentUri || (image.path.startsWith('/') ? `file://${image.path}` : image.path);
   if (raw) {
     if (URL_ONLY.test(raw)) draft.url = raw;
     else draft.text = raw;

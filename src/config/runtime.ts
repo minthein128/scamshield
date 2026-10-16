@@ -29,6 +29,7 @@ export const INTERNET_PROBE_URLS = [
 ];
 const RECENT_REACH_MS = 30_000;
 export const FOREGROUND_REFRESH_MS = 5 * 60 * 1000;
+export const STABLE_RECHECK_MS = 5 * 60 * 1000;
 
 export function validApiUrl(value: unknown): string | null {
   if (typeof value !== 'string') return null;
@@ -74,7 +75,7 @@ async function timedFetch(fetchImpl: typeof fetch, url: string, timeoutMs: numbe
   const ok = kind === 'probe' ? res !== null : Boolean(res?.ok);
   const ms = Date.now() - started;
   trace.push({ kind, target: traceTarget(url), ok, ms, ...(res ? { status: res.status } : {}) });
-  if (kind !== 'probe') diag[ok ? 'info' : 'warn']('connection', kind, { host: apiHost(url), ok, ms, ...(res ? { status: res.status } : {}) });
+  if (kind === 'config') diag[ok ? 'info' : 'warn']('connection', kind, { host: apiHost(url), ok, ms, ...(res ? { status: res.status } : {}) });
   return res;
 }
 
@@ -129,11 +130,22 @@ export function fetchFirstApiUrl(
   });
 }
 
+/** Probes /health, then /healthz on a 404, and logs one line with the outcome. */
 export async function checkHealth(url: string, fetchImpl: typeof fetch = fetch, timeoutMs = HEALTH_TIMEOUT_MS): Promise<boolean> {
   const root = url.replace(/\/+$/, '');
-  const res = await timedFetch(fetchImpl, `${root}/health`, timeoutMs, 'health');
-  if (res?.status !== 404) return Boolean(res?.ok);
-  return Boolean((await timedFetch(fetchImpl, `${root}/healthz`, timeoutMs, 'health'))?.ok);
+  const started = Date.now();
+  let res = await timedFetch(fetchImpl, `${root}/health`, timeoutMs, 'health');
+  const viaHealthz = res?.status === 404;
+  if (viaHealthz) res = await timedFetch(fetchImpl, `${root}/healthz`, timeoutMs, 'health');
+  const ok = Boolean(res?.ok);
+  diag[ok ? 'info' : 'warn']('connection', 'health', {
+    host: apiHost(url),
+    ok,
+    ms: Date.now() - started,
+    ...(res ? { status: res.status } : {}),
+    ...(viaHealthz ? { via: 'healthz' } : {}),
+  });
+  return ok;
 }
 
 /** True when any reliable public endpoint answers, whatever the status. */
@@ -182,7 +194,14 @@ async function resolveUrlInner(deps: ResolveDeps): Promise<string> {
     for (const u of known) if (await healthy(u)) return u;
     return null;
   };
+  const remember = (u: string) => AsyncStorage.setItem(API_URL_CACHE_KEY, u).catch(() => undefined);
   known.forEach(healthy);
+
+  // A healthy stable URL wins over config.json, which may still name an older host.
+  if (stable && (await healthy(stable))) {
+    if (cached !== stable) await remember(stable);
+    return stable;
+  }
 
   const remoteP = fetchFirstApiUrl(fetchImpl, deps.configUrls ?? CONFIG_URLS, { staggerMs: deps.staggerMs });
   const grace = firstAlive().then(u => (u ? new Promise<null>(r => setTimeout(() => r(null), deps.graceMs ?? CONFIG_GRACE_MS)) : new Promise<null>(() => undefined)));
@@ -190,12 +209,12 @@ async function resolveUrlInner(deps: ResolveDeps): Promise<string> {
 
   if (remote) {
     if (await healthy(remote)) {
-      await AsyncStorage.setItem(API_URL_CACHE_KEY, remote).catch(() => undefined);
+      await remember(remote);
       return remote;
     }
     const alive = await firstAlive();
     if (alive) return alive;
-    await AsyncStorage.setItem(API_URL_CACHE_KEY, remote).catch(() => undefined);
+    await remember(remote);
     return remote;
   }
   return (await firstAlive()) ?? known[0] ?? '';
@@ -204,12 +223,32 @@ async function resolveUrlInner(deps: ResolveDeps): Promise<string> {
 let pending: Promise<string> | null = null;
 let current: string | null = null;
 let refreshing: Promise<string> | null = null;
+let stableTimer: ReturnType<typeof setTimeout> | null = null;
 const listeners = new Set<(url: string) => void>();
 
+/** While the app runs on another host, retries the stable URL and moves back once it is healthy. */
+function scheduleStableRecheck(url: string): void {
+  if (stableTimer) clearTimeout(stableTimer);
+  stableTimer = null;
+  const stable = validApiUrl(STABLE_API_URL);
+  if (!stable || !url || url === stable || OFFLINE_MOCK) return;
+  stableTimer = setTimeout(() => {
+    stableTimer = null;
+    void checkHealth(stable)
+      .then(ok => {
+        if (ok) return refreshApiUrl();
+        scheduleStableRecheck(url);
+        return url;
+      })
+      .catch(() => undefined);
+  }, STABLE_RECHECK_MS);
+}
+
 function publish(url: string): string {
-    const changed = url !== current;
+  const changed = url !== current;
   current = url;
   if (changed) listeners.forEach(l => l(url));
+  scheduleStableRecheck(url);
   return url;
 }
 
@@ -252,6 +291,8 @@ export function useApiUrl(): string | null {
 
 /** Test helper. */
 export function resetRuntimeUrl(): void {
+  if (stableTimer) clearTimeout(stableTimer);
+  stableTimer = null;
   pending = null;
   current = null;
   refreshing = null;
