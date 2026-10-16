@@ -8,6 +8,8 @@ Kakwe (ကာကွယ်) is the product name; the app build, package and URLs 
 | `deck/dolls.mts` | Writes the doll medallion and the three mood dolls to `deck/img/` from `src/components/dollMark.ts` and `avatarArt.ts` |
 | `deck/build.sh` | Renders `deck.pdf` with headless Chrome and page previews to `/tmp/kakwe-pages` |
 | `deck.pdf` | Rendered deck |
+| `Kakwe-AIBuilderCup-submission.pptx`, `.pdf` | The submission in the contest template |
+| `submission/` | Template, `assets.py` (images), `build_pptx.py` (fills the template) and `build.sh` |
 | `video-script.md` | Shot list and voice-over for the video under 3 minutes |
 | `demo-inputs.md` | Fictional test inputs for the demo flows |
 | `e2e/` | Screenshots from the end-to-end scripts; the deck uses some of them |
@@ -19,6 +21,14 @@ pitch/deck/build.sh
 ```
 
 The script uses Chromium from the Playwright or Puppeteer cache (set `CHROME` to override) and `pdftoppm` for previews. Node 22.6 or later runs `dolls.mts` directly.
+
+## Re-render the submission
+
+```
+pitch/submission/build.sh
+```
+
+Needs uv, headless Chromium, LibreOffice Impress and Google Sans Flex in `~/.local/share/fonts`. The mockups for the wireframe slide come from `~/work/home-check-v2-handoff` (set `MOCK_DIR` to override).
 
 ## Screens in the deck
 

@@ -1,0 +1,71 @@
+<svg width="1680" height="560" viewBox="0 0 1680 560" xmlns="http://www.w3.org/2000/svg" font-family="Google Sans Flex, sans-serif">
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#1F1A17"/></marker>
+  </defs>
+  <g fill="none" stroke="#1F1A17" stroke-width="3" marker-end="url(#ar)">
+    <path d="M200 250 L246 250"/>
+    <path d="M496 250 L520 250 L520 90 L556 90"/>
+    <path d="M496 250 L556 250"/>
+    <path d="M496 250 L520 250 L520 410 L556 410"/>
+    <path d="M836 90 L880 90 L880 200 L906 200"/>
+    <path d="M836 250 L880 250 L880 330 L1156 330"/>
+    <path d="M836 410 L880 410 L880 360 L1156 360"/>
+    <path d="M1146 200 L1176 200 L1176 276"/>
+    <path d="M1376 320 L1416 320"/>
+    <path d="M1546 400 L1546 446"/>
+    <path d="M371 160 L371 10 L1026 10 L1026 130"/>
+  </g>
+  
+  <g font-size="25" fill="#1F1A17">
+    <rect x="0" y="180" width="200" height="140" rx="22" fill="#EFE8DF"/>
+    <text x="100" y="236" text-anchor="middle" font-weight="800" font-size="26">Message,</text>
+    <text x="100" y="268" text-anchor="middle" font-weight="800" font-size="26">link or</text>
+    <text x="100" y="300" text-anchor="middle" font-weight="800" font-size="26">screenshot</text>
+
+    <rect x="246" y="160" width="250" height="180" rx="22" fill="#1F1A17"/>
+    <text x="371" y="212" text-anchor="middle" font-weight="800" fill="#fff" font-size="27">Gemini</text>
+    <text x="371" y="246" text-anchor="middle" font-weight="800" fill="#fff" font-size="27">extraction</text>
+    <text x="371" y="284" text-anchor="middle" fill="#CFC5B9" font-size="21">multimodal, JSON</text>
+    <text x="371" y="312" text-anchor="middle" fill="#CFC5B9" font-size="21">schema, 7 flag families</text>
+
+    <rect x="556" y="30" width="280" height="120" rx="22" fill="#fff" stroke="#E6DED3" stroke-width="2"/>
+    <text x="696" y="76" text-anchor="middle" font-weight="800" font-size="24">Google Search</text>
+    <text x="696" y="104" text-anchor="middle" font-weight="800" font-size="24">grounding</text>
+    <text x="696" y="134" text-anchor="middle" fill="#57504A" font-size="20">does the company exist?</text>
+
+    <rect x="556" y="190" width="280" height="120" rx="22" fill="#fff" stroke="#E6DED3" stroke-width="2"/>
+    <text x="696" y="236" text-anchor="middle" font-weight="800" font-size="24">Web Risk and</text>
+    <text x="696" y="264" text-anchor="middle" font-weight="800" font-size="24">Safe Browsing</text>
+    <text x="696" y="294" text-anchor="middle" fill="#57504A" font-size="20">links, plus RDAP domain age</text>
+
+    <rect x="556" y="350" width="280" height="120" rx="22" fill="#fff" stroke="#E6DED3" stroke-width="2"/>
+    <text x="696" y="396" text-anchor="middle" font-weight="800" font-size="24">Scam network</text>
+    <text x="696" y="424" text-anchor="middle" fill="#57504A" font-size="20">hashed numbers and</text>
+    <text x="696" y="450" text-anchor="middle" fill="#57504A" font-size="20">handles, in Firestore</text>
+
+    <rect x="906" y="130" width="240" height="140" rx="22" fill="#fff" stroke="#E6DED3" stroke-width="2"/>
+    <text x="1026" y="182" text-anchor="middle" font-weight="800" font-size="24">Likelihood</text>
+    <text x="1026" y="210" text-anchor="middle" font-weight="800" font-size="24">language guard</text>
+    <text x="1026" y="242" text-anchor="middle" fill="#57504A" font-size="20">"is" becomes "looks like"</text>
+
+    <rect x="1156" y="276" width="220" height="124" rx="22" fill="#1F1A17"/>
+    <text x="1266" y="324" text-anchor="middle" font-weight="800" fill="#fff" font-size="25">Deterministic</text>
+    <text x="1266" y="354" text-anchor="middle" font-weight="800" fill="#fff" font-size="25">score</text>
+    <text x="1266" y="384" text-anchor="middle" fill="#CFC5B9" font-size="20">rules, no model</text>
+
+    <rect x="1416" y="240" width="264" height="160" rx="22" fill="#fff" stroke="#E6DED3" stroke-width="2"/>
+    <text x="1548" y="290" text-anchor="middle" font-weight="800" font-size="24">Explanation</text>
+    <text x="1548" y="322" text-anchor="middle" fill="#57504A" font-size="20">verdict, quoted reasons,</text>
+    <text x="1548" y="348" text-anchor="middle" fill="#57504A" font-size="20">verified hotline,</text>
+    <text x="1548" y="374" text-anchor="middle" fill="#57504A" font-size="20">in 5 languages</text>
+
+    <rect x="1416" y="446" width="126" height="100" rx="20" fill="#EFE8DF"/>
+    <text x="1479" y="488" text-anchor="middle" font-weight="800" font-size="22">Gemini</text>
+    <text x="1479" y="516" text-anchor="middle" font-weight="800" font-size="22">TTS</text>
+    <rect x="1554" y="446" width="126" height="100" rx="20" fill="#EFE8DF"/>
+    <text x="1617" y="488" text-anchor="middle" font-weight="800" font-size="22">Gemini</text>
+    <text x="1617" y="516" text-anchor="middle" font-weight="800" font-size="22">Live</text>
+  </g>
+  <text x="246" y="380" font-size="20" fill="#6B635C">gemini-3.5-flash-lite</text>
+  <text x="1416" y="226" font-size="20" fill="#6B635C">15 s budget per check</text>
+</svg>
