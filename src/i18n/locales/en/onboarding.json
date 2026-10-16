@@ -3,7 +3,8 @@
   "skipA11y": "Skip setup",
   "language": {
     "title": "Choose your language",
-    "body": "SafeRoute shows the app and writes its reports and spoken warnings in this language. You can change it later."
+    "body": "SafeRoute shows the app and writes its reports and spoken warnings in this language. You can change it later.",
+    "age": "SafeRoute is for people aged 18 and older."
   },
   "countries": {
     "fromTitle": "Where are you from?",
@@ -30,6 +31,17 @@
   "shield": {
     "title": "Turn on the screen shield",
     "body": "Optional. You can also do this later from the home screen."
+  },
+  "sharing": {
+    "title": "Help others: share anonymous scam patterns",
+    "body": "When a check looks risky, SafeRoute can share its pattern so other people may get a warning sooner. This is optional.",
+    "p1": "No screenshots and no message text. Only a short pattern is kept.",
+    "p2": "Names and other personal details are removed first.",
+    "p3": "Phone numbers and accounts are kept only as one-way codes that cannot be turned back into the number.",
+    "p4": "Shared patterns are deleted after 90 days.",
+    "note": "You can change this at any time in Settings.",
+    "yes": "Yes, share",
+    "no": "No thanks"
   },
   "account": {
     "title": "Use SafeRoute your way",

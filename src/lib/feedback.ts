@@ -84,6 +84,7 @@ export function buildReportRequest(form: ReportForm): CheckRequest | null {
     ...(form.imageBase64 ? { imageBase64: form.imageBase64, imageMimeType: form.imageMimeType ?? 'image/jpeg' } : {}),
     ...(Object.keys(context).length ? { context } : {}),
     reported: true,
+    shareSignals: true,
     reportedType: form.scamType,
     ...(form.lostMoney === null ? {} : { lostMoney: form.lostMoney }),
   };

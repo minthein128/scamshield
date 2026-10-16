@@ -45,7 +45,7 @@ describe('buildReportRequest', () => {
   const base = { text: '  Pay the fee now  ', scamType: 'parcel_phishing' as const, lostMoney: null, language: 'en' as const };
 
   it('keeps the normal kinds and adds the report fields', () => {
-    expect(buildReportRequest(base)).toEqual({ kind: 'message', language: 'en', text: 'Pay the fee now', reported: true, reportedType: 'parcel_phishing' });
+    expect(buildReportRequest(base)).toEqual({ kind: 'message', language: 'en', text: 'Pay the fee now', reported: true, shareSignals: true, reportedType: 'parcel_phishing' });
     expect(buildReportRequest({ ...base, scamType: 'job_trafficking' })?.kind).toBe('job');
     expect(buildReportRequest({ ...base, scamType: 'marketplace_fraud' })?.kind).toBe('shop');
     expect(buildReportRequest({ ...base, text: 'https://pay-fee.example/x' })).toMatchObject({ kind: 'link', url: 'https://pay-fee.example/x' });

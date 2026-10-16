@@ -28,7 +28,7 @@ export function buildRequest(form: CheckForm): CheckRequest {
     ...(url ? { url } : {}),
     ...(form.imageBase64 ? { imageBase64: form.imageBase64, imageMimeType: form.imageMimeType ?? 'image/jpeg' } : {}),
     ...(Object.keys(context).length ? { context } : {}),
-    ...(form.shareSignals === false ? { shareSignals: false } : {}),
+    shareSignals: form.shareSignals === true,
   };
 }
 

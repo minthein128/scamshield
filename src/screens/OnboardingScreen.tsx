@@ -12,7 +12,7 @@ import { shieldSupport } from '../hooks/useShieldControl';
 import { COUNTRIES, countryLabel, type CountryCode } from '../lib/countries';
 import { UI_LANGUAGES, type UiLanguage } from '../i18n/languages';
 import { useUiLanguage } from '../i18n/useUiLanguage';
-import { HELP_POINTS, onboardingSteps, type AfterOnboarding } from '../lib/onboarding';
+import { HELP_POINTS, SHARING_POINTS, onboardingSteps, type AfterOnboarding, type StepId } from '../lib/onboarding';
 import { useAppState } from '../state/AppState';
 import { useLayout } from '../hooks/useLayout';
 import theme, { readable } from '../theme/theme';
@@ -24,8 +24,10 @@ export const OnboardingScreen: React.FC<{ onDone: (next?: AfterOnboarding) => vo
   const tablet = useLayout().isTablet;
   const { uiLanguage, setUiLanguage } = useUiLanguage();
   const { profile, finishOnboarding } = useAppState();
-  const steps = onboardingSteps(shieldSupport(Platform.OS, useApiUrl()) === 'ready');
+  const shieldReady = shieldSupport(Platform.OS, useApiUrl()) === 'ready';
+  const steps: StepId[] = profile.onboarded ? ['sharing'] : onboardingSteps(shieldReady);
   const [index, setIndex] = useState(0);
+  const [share, setShare] = useState(false);
   const [home, setHome] = useState<CountryCode | undefined>(profile.homeCountry);
   const [destination, setDestination] = useState<CountryCode | undefined>(profile.destinationCountry);
   const step = steps[index];
@@ -34,9 +36,15 @@ export const OnboardingScreen: React.FC<{ onDone: (next?: AfterOnboarding) => vo
     setUiLanguage(code).catch(() => undefined);
   };
 
-  const finish = (next?: AfterOnboarding) => {
-    finishOnboarding({ homeCountry: home, destinationCountry: destination });
+  const finish = (next?: AfterOnboarding, shareSignals = share) => {
+    finishOnboarding({ homeCountry: home, destinationCountry: destination, shareSignals, sharingAsked: true });
     onDone(next);
+  };
+
+  const answerSharing = (yes: boolean) => {
+    setShare(yes);
+    if (index + 1 < steps.length) setIndex(index + 1);
+    else finish(undefined, yes);
   };
 
   return (
@@ -48,6 +56,11 @@ export const OnboardingScreen: React.FC<{ onDone: (next?: AfterOnboarding) => vo
             <Button testID="onboarding-signup" label={t('account.signUp')} variant="secondary" onPress={() => finish('signUp')} />
             <LinkButton testID="onboarding-signin" label={t('account.signIn')} onPress={() => finish('signIn')} />
           </>
+) : step === 'sharing' ? (
+          <View style={styles.choiceRow}>
+            <Button testID="onboarding-share-yes" label={t('sharing.yes')} variant="secondary" style={styles.choice} onPress={() => answerSharing(true)} />
+            <Button testID="onboarding-share-no" label={t('sharing.no')} variant="secondary" style={styles.choice} onPress={() => answerSharing(false)} />
+          </View>
         ) : (
           <Button testID="onboarding-next" label={step === 'shield' ? t('common:actions.continue') : t('common:actions.next')} onPress={() => setIndex(index + 1)} />
         )
@@ -59,7 +72,7 @@ export const OnboardingScreen: React.FC<{ onDone: (next?: AfterOnboarding) => vo
             <View key={s} style={[styles.dot, i <= index && styles.dotOn]} />
           ))}
         </View>
-        {step !== 'account' ? (
+        {step !== 'account' && step !== 'sharing' ? (
           <TouchableOpacity testID="onboarding-skip" accessibilityRole="button" accessibilityLabel={t('skipA11y')} onPress={() => finish()} style={styles.skip}>
             <Text style={styles.skipText}>{t('common:actions.skip')}</Text>
           </TouchableOpacity>
@@ -70,6 +83,7 @@ export const OnboardingScreen: React.FC<{ onDone: (next?: AfterOnboarding) => vo
         <>
           <BrandLockup size={40} />
           <Heading title={t('language.title')} body={t('language.body')} />
+          <Text testID="onboarding-age" style={styles.body}>{t('language.age')}</Text>
           <View style={styles.wrap}>
             {UI_LANGUAGES.map(l => (
               <Chip key={l.code} testID={`onboarding-language-${l.code}`} label={l.label} selected={uiLanguage === l.code} onPress={() => chooseLanguage(l.code)} />
@@ -120,6 +134,18 @@ export const OnboardingScreen: React.FC<{ onDone: (next?: AfterOnboarding) => vo
         </>
       ) : null}
 
+      {step === 'sharing' ? (
+        <>
+          <Heading title={t('sharing.title')} body={t('sharing.body')} />
+          <View style={[styles.accountNote, { gap: 8 }]}>
+            {SHARING_POINTS.map(p => (
+              <Text key={p} style={styles.pointBody}>{`\u2022 ${t(`sharing.${p}`)}`}</Text>
+            ))}
+          </View>
+          <Text style={styles.body}>{t('sharing.note')}</Text>
+        </>
+      ) : null}
+
       {step === 'account' ? (
         <>
           <Heading title={t('account.title')} body={t('account.body')} />
@@ -158,6 +184,8 @@ const styles = StyleSheet.create({
   pointNumberText: { color: colors.safeText, fontSize: 15, fontFamily: fonts.bold },
   pointTitle: { color: colors.textPrimary, fontSize: 15, lineHeight: 21, fontFamily: fonts.bold },
   pointBody: { color: colors.textSecondary, fontSize: 14, lineHeight: 20, fontFamily: fonts.regular },
+  choiceRow: { flexDirection: 'row', gap: 8 },
+  choice: { flex: 1, flexBasis: 0, minWidth: 0 },
   accountNote: { backgroundColor: colors.white, borderRadius: 16, borderWidth: 1, borderColor: colors.border, padding: 16 },
 });
 

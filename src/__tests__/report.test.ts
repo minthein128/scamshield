@@ -36,16 +36,17 @@ describe('report mapping', () => {
 });
 
 describe('request building', () => {
-  it('sends home country and opts out of signals only when asked', () => {
+  it('sends home country and shares signals only when opted in', () => {
     const base = { kind: 'job' as const, text: 'x', url: '', destination: '', language: 'en' as const };
     expect(buildRequest({ ...base, home: 'Myanmar' })).toMatchObject({ context: { home: 'Myanmar' } });
-    expect(buildRequest({ ...base, shareSignals: true })).not.toHaveProperty('shareSignals');
+    expect(buildRequest({ ...base, shareSignals: true })).toMatchObject({ shareSignals: true });
+    expect(buildRequest(base)).toMatchObject({ shareSignals: false });
     expect(buildRequest({ ...base, shareSignals: false })).toMatchObject({ shareSignals: false });
   });
 
   it('omits empty fields and adds context', () => {
     const r = buildRequest({ kind: 'job', text: ' hi ', url: '', destination: 'Bangkok', language: 'tl' });
-    expect(r).toEqual({ kind: 'job', language: 'tl', text: 'hi', context: { destination: 'Bangkok' } });
+    expect(r).toEqual({ kind: 'job', language: 'tl', text: 'hi', context: { destination: 'Bangkok' }, shareSignals: false });
   });
 });
 

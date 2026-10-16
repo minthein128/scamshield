@@ -6,37 +6,47 @@ describe('onboarding state', () => {
   beforeEach(() => AsyncStorage.clear());
 
   it('starts not onboarded with no countries and no language of its own', async () => {
-    expect(await loadProfile()).toEqual({ onboarded: false, shareSignals: true });
+    expect(await loadProfile()).toEqual({ onboarded: false, shareSignals: false, sharingAsked: false, keepHistory: true });
   });
 
   it('finishing with choices stores the countries', async () => {
     const done = finishOnboarding(DEFAULT_PROFILE, { homeCountry: 'MM', destinationCountry: 'TH' });
-    expect(done).toEqual({ onboarded: true, shareSignals: true, homeCountry: 'MM', destinationCountry: 'TH' });
+    expect(done).toEqual({ onboarded: true, shareSignals: false, sharingAsked: false, keepHistory: true, homeCountry: 'MM', destinationCountry: 'TH' });
     await saveProfile(done);
     expect(await loadProfile()).toEqual(done);
   });
 
   it('skipping keeps the defaults and marks onboarding done', () => {
-    expect(finishOnboarding(DEFAULT_PROFILE)).toEqual({ onboarded: true, shareSignals: true });
+    expect(finishOnboarding(DEFAULT_PROFILE)).toEqual({ onboarded: true, shareSignals: false, sharingAsked: false, keepHistory: true });
   });
 
   it('the destination is optional and can be cleared later in settings', () => {
     const profile = finishOnboarding(DEFAULT_PROFILE, { homeCountry: 'PH', destinationCountry: 'MY' });
-    expect(applyChoices(profile, { destinationCountry: undefined })).toEqual({ onboarded: true, shareSignals: true, homeCountry: 'PH' });
+    expect(applyChoices(profile, { destinationCountry: undefined })).toEqual({ onboarded: true, shareSignals: false, sharingAsked: false, keepHistory: true, homeCountry: 'PH' });
     expect(applyChoices(profile, { homeCountry: 'MM' }).destinationCountry).toBe('MY');
   });
 
-  it('keeps the share-signals choice, on by default', () => {
-    const off = applyChoices(finishOnboarding(DEFAULT_PROFILE), { shareSignals: false });
-    expect(off.shareSignals).toBe(false);
-    expect(parseProfile(off).shareSignals).toBe(false);
-    expect(parseProfile({ onboarded: true }).shareSignals).toBe(true);
+  it('shares scam patterns only after the user says yes', () => {
+    expect(DEFAULT_PROFILE.shareSignals).toBe(false);
+    const on = applyChoices(finishOnboarding(DEFAULT_PROFILE), { shareSignals: true, sharingAsked: true });
+    expect(parseProfile(on)).toMatchObject({ shareSignals: true, sharingAsked: true });
+    expect(parseProfile(applyChoices(on, { shareSignals: false })).shareSignals).toBe(false);
+  });
+
+  it('turns sharing off for existing users and asks them once', () => {
+    expect(parseProfile({ onboarded: true, shareSignals: true })).toMatchObject({ onboarded: true, shareSignals: false, sharingAsked: false });
+    expect(parseProfile({ onboarded: true })).toMatchObject({ shareSignals: false, sharingAsked: false });
+  });
+
+  it('keeps check history by default and remembers turning it off', () => {
+    expect(parseProfile({ onboarded: true }).keepHistory).toBe(true);
+    expect(parseProfile(applyChoices(DEFAULT_PROFILE, { keepHistory: false })).keepHistory).toBe(false);
   });
 
   it('drops the old separate report language and keeps the rest', async () => {
     await AsyncStorage.setItem(PROFILE_KEY, JSON.stringify({ onboarded: true, language: 'tl', shareSignals: false, homeCountry: 'PH' }));
-    expect(await loadProfile()).toEqual({ onboarded: true, shareSignals: false, homeCountry: 'PH' });
-    expect(JSON.parse((await AsyncStorage.getItem(PROFILE_KEY)) ?? '{}')).toEqual({ onboarded: true, shareSignals: false, homeCountry: 'PH' });
+    expect(await loadProfile()).toEqual({ onboarded: true, shareSignals: false, sharingAsked: false, keepHistory: true, homeCountry: 'PH' });
+    expect(JSON.parse((await AsyncStorage.getItem(PROFILE_KEY)) ?? '{}')).toEqual({ onboarded: true, shareSignals: false, sharingAsked: false, keepHistory: true, homeCountry: 'PH' });
   });
 
   it('forgets the legacy report language key', async () => {
@@ -46,7 +56,7 @@ describe('onboarding state', () => {
   });
 
   it('ignores corrupt or unknown stored values', async () => {
-    expect(parseProfile({ onboarded: 'yes', language: 'xx', homeCountry: 'ZZ' })).toEqual({ onboarded: false, shareSignals: true });
+    expect(parseProfile({ onboarded: 'yes', language: 'xx', homeCountry: 'ZZ' })).toEqual({ onboarded: false, shareSignals: false, sharingAsked: false, keepHistory: true });
     await AsyncStorage.setItem(PROFILE_KEY, '{oops');
     expect(await loadProfile()).toEqual(DEFAULT_PROFILE);
   });
@@ -56,7 +66,7 @@ describe('onboarding state', () => {
   });
 
   it('offers the shield step only when the shield can run', () => {
-    expect(onboardingSteps(false)).toEqual(['language', 'countries', 'how', 'account']);
+    expect(onboardingSteps(false)).toEqual(['language', 'countries', 'how', 'sharing', 'account']);
     expect(onboardingSteps(true)).toContain('shield');
   });
 });
