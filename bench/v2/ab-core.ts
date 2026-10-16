@@ -1,6 +1,6 @@
 import type { BenchResultV2 } from './bench.js';
 import type { MetricKey } from './metrics.js';
-import { WEIGHTS } from './metrics.js';
+import { allCritical, allInvented, WEIGHTS } from './metrics.js';
 
 export interface AbMetric {
   label: string;
@@ -63,19 +63,21 @@ export function compareRuns(a: BenchResultV2 & { file?: string }, b: BenchResult
     const x = a.cases.find((c) => c.id === id);
     const y = b.cases.find((c) => c.id === id);
     if (!x || !y) continue;
-    const diff = y.composite - x.composite;
+    const xs = x.meanComposite ?? x.composite;
+    const ys = y.meanComposite ?? y.composite;
+    const diff = ys - xs;
     if (Math.abs(diff) < tieBand) ties++;
     else if (diff > 0) wins++;
     else losses++;
-    if (Math.abs(diff) >= tieBand || x.verdict !== y.verdict || x.critical.join() !== y.critical.join()) {
+    if (Math.abs(diff) >= tieBand || x.verdict !== y.verdict || allCritical(x).join() !== allCritical(y).join() || allInvented(y).length) {
       changes.push({
         id,
         aVerdict: x.verdict,
         bVerdict: y.verdict,
-        aScore: x.composite,
-        bScore: y.composite,
-        aCritical: x.critical,
-        bCritical: y.critical,
+        aScore: xs,
+        bScore: ys,
+        aCritical: [...allCritical(x), ...allInvented(x).map((n) => `number ${n}`)],
+        bCritical: [...allCritical(y), ...allInvented(y).map((n) => `number ${n}`)],
       });
     }
   }
@@ -90,7 +92,27 @@ export function compareRuns(a: BenchResultV2 & { file?: string }, b: BenchResult
   const sa = a.summary;
   const sb = b.summary;
   const metrics: AbMetric[] = [
-    { label: 'Protection Score', a: sa.composite, b: sb.composite, delta: d(sa.composite, sb.composite), scale: 1 },
+    {
+      label: `Protection Score (mean of ${sb.runsPerCase ?? 1} runs)`,
+      a: sa.meanOverRuns ?? sa.composite,
+      b: sb.meanOverRuns ?? sb.composite,
+      delta: d(sa.meanOverRuns ?? sa.composite, sb.meanOverRuns ?? sb.composite),
+      scale: 1,
+    },
+    {
+      label: 'Cases with a critical failure in any run',
+      a: sa.casesWithCriticalAnyRun ?? sa.casesWithCritical,
+      b: sb.casesWithCriticalAnyRun ?? sb.casesWithCritical,
+      delta: (sb.casesWithCriticalAnyRun ?? sb.casesWithCritical) - (sa.casesWithCriticalAnyRun ?? sa.casesWithCritical),
+      scale: 1,
+    },
+    {
+      label: 'Numbers not in the message, any run',
+      a: sa.inventedNumbersAnyRun ?? 0,
+      b: sb.inventedNumbersAnyRun ?? 0,
+      delta: (sb.inventedNumbersAnyRun ?? 0) - (sa.inventedNumbersAnyRun ?? 0),
+      scale: 1,
+    },
     ...(Object.keys(WEIGHTS) as MetricKey[]).map((k) => ({
       label: LABELS[k],
       a: sa.metrics[k],

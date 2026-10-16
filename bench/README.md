@@ -54,7 +54,7 @@ Calibration value = 0.8 x (1 - cost / 10) + 0.2 x band score. The band score is 
 ### How the matchers work
 
 - **Normalisation.** Unicode NFC, lower case, zero-width characters removed, Burmese and Thai digits folded to ASCII, thousands separators joined (`1,800`, `၁,၈၀၀`, `Rp 1.500.000`), punctuation and symbols folded to spaces. Burmese and Thai are compared without spaces, because spacing in those scripts is unreliable.
-- **Evidence.** A quote is split at sentences and ellipses; each part must be found in the screenshot text, exactly, stitched from at most three source fragments of 6 or more characters (a reordered quote), or with an edit-distance similarity of at least 0.8 to some substring (this absorbs small OCR slips such as `เเ` for `แ`). Only flags from the extraction stage are checked; flags from Search grounding quote web sources and are counted separately.
+- **Evidence.** A quote is split at sentences and ellipses; each part must be found in the screenshot text, exactly, stitched from at most three source fragments of 6 or more characters (a reordered quote), or with an edit-distance similarity of at least 0.8 to some substring (this absorbs small OCR slips such as `เเ` for `แ`). Every number in a quote must match a number in the source exactly, so a misread digit (`၂၀၀,၀၀၀` for `၃၀၀,၀၀၀`) fails. Only flags from the extraction stage are checked; flags from Search grounding quote web sources and are counted separately.
 - **Facts and advice.** A fact matches when any variant appears. Latin variants match at a word start; numbers match as whole numbers in any script. Advice ids have phrase lists in five languages in `bench/v2/lexicon.ts`; a case can add its own variants.
 - **Phone numbers.** Runs of 7 or more digits, and 3-5 digit codes after a call word (call, โทร, ဖုန်း, hubungi, tawagan). Money amounts are skipped. A number is allowed when it is in the message or in `src/data/hotlines.ts`.
 - **Comprehension budgets** (characters): summary en 320, id/tl 360, my 380, th 280; longest sentence en 150, id/tl 170, my 190, th 140; spoken warning at most 9 seconds at 15 (en, id), 14 (tl), 12 (th) and 11 (my) characters per second. These are heuristics; read them as soft scores.
@@ -139,14 +139,14 @@ Copy `bench/cases/_template.yaml`. The schema is `bench/cases/case.schema.json` 
    ```
 
    A `replace.from` that is not in the prompt is an error, so a variant cannot silently do nothing.
-3. `npm run bench:ab -- --b ../bench/prompts/name-the-facts.yaml` runs the production prompt (A, usually from cache) and the variant (B) on the same cases and prints per-metric deltas and paired wins and losses with a two-sided sign test. Add `--variants all` to compare robustness too, `--model` to try another model, `--a FILE` to compare two variants.
+3. `npm run bench:ab -- --b ../bench/prompts/name-the-facts.yaml` runs the production prompt (A, usually from cache) and the variant (B) on the same cases and prints per-metric deltas and paired wins and losses with a two-sided sign test. With `--repeats 3` every run is scored on its own: the pairs use each case's mean over its runs, and critical failures and wrong numbers count from any run. Add `--variants all` to compare robustness too, `--model` to try another model, `--a FILE` to compare two variants.
 4. `npm run bench:gate -- --prompt-variant ../bench/prompts/name-the-facts.yaml` checks the candidate against the baseline before it ships.
 
 The variant only swaps the extraction system prompt (the only model prompt in `/v1/check`); titles and action buttons come from `server/src/explain.ts` and stay fixed. The swap wraps the SDK client, so no server code changes for an experiment.
 
 ## Regression gate
 
-`npm run bench:v2 -- --save-baseline` saves the run as `bench/baseline-v2.json`. `npm run bench:gate` re-runs the same cases, variants and model (free from cache unless the prompt or model changed) and exits 1 when the mean Protection Score drops by more than `--max-drop` points (default 3), a critical failure appears that the baseline did not have, or a baseline case is missing. `--results FILE` gates an existing result file.
+`npm run bench:v2 -- --save-baseline` saves the run as `bench/baseline-v2.json`. `npm run bench:gate` re-runs the same cases, variants and model (free from cache unless the prompt or model changed) and exits 1 when the mean Protection Score drops by more than `--max-drop` points (default 3), a critical failure or a wrong number (a number of 100 or more that is not in the message, in the base run or any repeat) appears that the baseline did not have, or a baseline case is missing. `--results FILE` gates an existing result file.
 
 ## Reading the report
 
@@ -165,7 +165,7 @@ With 12 seed cases a few points of difference is noise. Trust a difference when 
 
 ## Seed set
 
-`bench/cases/*.yaml` holds 12 fictional, publishable cases rendered to `bench/public/v2/` by `npm run bench:render`: job trafficking (en, my), pig butchering (en, th), parcel SMS (id, tl), fake agency (my), marketplace (th), three legitimate messages and one hard negative (a real employer warning about fees and passports). Four have translations. No real people, numbers or companies.
+`bench/cases/*.yaml` holds 24 fictional, publishable cases rendered to `bench/public/v2/` by `npm run bench:render`. 14 are risky: job trafficking (en, my, th), fake agency (my x2), pig butchering (en, th, my), parcel SMS (id, tl, th), a task scam (id) and two marketplace scams (th, en). 10 are safe, and 7 of those are hard negatives: real-looking employer, agency, bank, payslip and advisory messages that use the scam words (fee, passport, OTP, recruiter). There are 6 Burmese and 5 Thai cases, and four cases have translations. No real people, numbers or companies.
 
 ## Screenshot bench v1
 

@@ -1,0 +1,26 @@
+id: th-hardneg-bank
+file: ../public/v2/th-hardneg-bank.png
+language: th
+home: TH
+app: sms
+scam_type: none
+expected_verdict: safe
+score_range: [0, 40]
+families: []
+source_text: |
+  ธนาคารสายรุ้ง
+  ข้อความ
+  ธนาคารสายรุ้ง: แจ้งเตือน ธนาคารไม่มีนโยบายส่งลิงก์ให้กรอกข้อมูล และจะไม่ขอรหัส OTP ทางโทรศัพท์หรือ SMS หากมีผู้แอบอ้าง โปรดติดต่อเบอร์หลังบัตรของท่าน
+must_mention: []
+must_advise: [verify_official]
+must_not:
+  accuse: [ธนาคารสายรุ้ง]
+synthetic:
+  layout: sms
+  sender: ธนาคารสายรุ้ง
+  subtitle: ข้อความ
+  messages:
+    - { from: time, text: "วันนี้ 09:12" }
+    - { from: them, text: "ธนาคารสายรุ้ง: แจ้งเตือน ธนาคารไม่มีนโยบายส่งลิงก์ให้กรอกข้อมูล และจะไม่ขอรหัส OTP ทางโทรศัพท์หรือ SMS หากมีผู้แอบอ้าง โปรดติดต่อเบอร์หลังบัตรของท่าน" }
+notes: Hard negative. A fictional bank's anti-scam reminder with no link and no request.
+public: true

@@ -353,6 +353,11 @@ const mean = (xs: (number | null | undefined)[]) => {
 };
 const ratio = (num: number, den: number) => (den ? num / den : null);
 
+/** Critical failures in the base run, its variants and every repeat. */
+export const allCritical = (s: CaseScore) => [...new Set([...s.critical, ...(s.runs ?? []).flatMap((r) => r.critical)])];
+/** Numbers not in the message, in the base run or any repeat. */
+export const allInvented = (s: CaseScore) => [...new Set([...s.facts.invented, ...(s.runs ?? []).flatMap((r) => r.invented)])];
+
 export function groupBy(scores: CaseScore[], key: (s: CaseScore) => string) {
   const out: Record<string, { n: number; composite: number | null; exact: number | null; critical: number }> = {};
   for (const k of [...new Set(scores.map(key))].sort()) {
@@ -417,6 +422,10 @@ export function summarizeV2(scores: CaseScore[]) {
       50,
     ),
     casesWithCritical: scores.filter((s) => s.critical.length).length,
+    meanOverRuns: mean(scores.map((s) => s.meanComposite ?? s.composite)),
+    runsPerCase: Math.max(1, ...scores.map((s) => s.runs?.length ?? 1)),
+    casesWithCriticalAnyRun: scores.filter((s) => allCritical(s).length).length,
+    inventedNumbersAnyRun: scores.reduce((a, s) => a + allInvented(s).length, 0),
     criticalByType,
     metrics: {
       calibration: mean(ok.map((s) => s.calibration.value)),

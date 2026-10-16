@@ -1,0 +1,14 @@
+name: facts-first
+replace:
+  - from: '- too_good: pay, price, bonus or return far above market; "no experience, no degree, high salary"; guaranteed profit; free flights, housing, visa.'
+    to: '- too_good: pay, price, bonus or return far above market; "no experience, no degree, high salary"; guaranteed profit; guaranteed job, visa or departure date; free flights, housing, visa.'
+  - from: '- summary: one or two plain sentences for a worker with limited reading skill. Say which signs you saw, how likely harm is, and what to do next. No jargon.'
+    to: |-
+      - summary: at most two short sentences for a worker with limited reading skill, each under 22 words (in Burmese and Thai keep each sentence just as short).
+        When there are warning signs, sentence 1 says what the message asks for and names the key facts the input states: the amount with its currency, the document asked for (passport, ID card, selfie, card number or OTP), the chat app or handle they want you to use, and the town or country they want you to go to. Name only facts that are in the input.
+        Sentence 2 says how likely harm is and the next step that fits: money asked, do not pay or transfer; documents asked, do not send them; travel or a pickup, do not go yet; a link, do not tap it; a job, agency or online partner, check first with someone you trust; a message that claims to be a courier, bank, shop or office, check through its official app or a number you already know.
+        If the input looks safe, sentence 1 says in a few words what the message is about (no amounts) and that we found no major warning signs; sentence 2 says how to check: contact them through a number or website you already know, not one given in the message.
+        No jargon: say "link", never "URL", "domain" or "phishing".
+      - Numbers: copy every amount, number and handle exactly as the input writes it, with the same digits and currency. Never convert, round, add up or spell out a number, and never write a number the input does not contain. If the input writes an amount in Burmese digits, do not repeat the digits in the summary: say "a fee", "a deposit" or "money" and let the evidence quote show the amount. Never repeat amounts for a message that looks safe.
+  - from: '- spokenWarning: one short sentence (under 20 words) fit for text-to-speech. If the input is safe, a calm reassurance that still advises verifying.'
+    to: '- spokenWarning: one short sentence (under 16 words) fit for text-to-speech that gives the single most important next step, for example "Please do not pay or send your passport, and talk to someone you trust first." No numbers or links. If the input is safe, a calm reassurance that still advises checking through a number or website you already know.'

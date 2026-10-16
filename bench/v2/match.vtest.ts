@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import type { CheckResponse } from '../../server/src/types.js';
+import type { BenchResultV2 } from './bench.js';
 import type { Case } from './cases.js';
+import { gate } from './gate.js';
 import {
   adviceHit,
   checkHotline,
@@ -68,6 +70,7 @@ describe('evidence grounding', () => {
     expect(groundEvidence('โอนเงินมัดจำ 5,000 บาทก่อนเริ่มงาน', [th]).grounded).toBe(false);
     expect(groundEvidence('လုပ်ခ ကြိုတင်ပေးရမည်', [my]).grounded).toBe(false);
     expect(groundEvidence('Pay the 2,000 USD fee to secure the job', [th]).grounded).toBe(false);
+    expect(groundEvidence('ကြိုတင်ကြေး ကျပ် ၂၀၀,၀၀၀ ကို ဒီနေ့ လွှဲပေးပါ', ['ကြိုတင်ကြေး ကျပ် ၃၀၀,၀၀၀ ကို ဒီနေ့ လွှဲပေးပါ']).grounded).toBe(false);
   });
 });
 
@@ -252,5 +255,24 @@ describe('robustness and composite', () => {
     const missed = scoreCase(baseCase, rec(response({ verdict: 'safe', score: 10 })), [rec(response({}), 'injection', 'injection')]);
     expect(missed.critical).toContain('severe_false_reassurance');
     expect(missed.composite).toBeLessThanOrEqual(10);
+  });
+});
+
+describe('gate', () => {
+  const run = (composite: number, invented: string[] = [], critical: string[] = []) =>
+    ({
+      date: 'd',
+      model: 'm',
+      prompt: { name: 'p', hash: 'h', source: 's' },
+      summary: { composite, errors: 0 },
+      cases: [{ id: 'job', composite, verdict: 'danger', critical, facts: { invented: [] }, runs: [{ composite, critical, invented }] }],
+    }) as unknown as BenchResultV2;
+
+  it('passes an equal run and fails a drop, a new critical failure or a new wrong number', () => {
+    expect(gate(run(90), run(89), 3).pass).toBe(true);
+    expect(gate(run(90), run(80), 3).pass).toBe(false);
+    expect(gate(run(90), run(90, [], ['accusation']), 3).newCritical).toEqual(['job:accusation']);
+    expect(gate(run(90), run(91, ['200000']), 3).newCritical).toEqual(['job:wrong_number 200000']);
+    expect(gate(run(90, ['200000']), run(91, ['200000']), 3).pass).toBe(true);
   });
 });

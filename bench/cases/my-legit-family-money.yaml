@@ -1,0 +1,26 @@
+id: my-legit-family-money
+file: ../public/v2/my-legit-family-money.png
+language: my
+home: MM
+destination: Thailand
+app: chat
+scam_type: none
+expected_verdict: safe
+families: []
+source_text: |
+  အမေ
+  online
+  အမေ၊ ဒီလ ပို့တဲ့ ငွေ ကျပ် ၃၀၀,၀၀၀ ရောက်ပြီလား
+  ရောက်ပြီ သမီး။ ဆိုင်က ဖုန်းဆက်ပြီး ပေးတယ်။ ညီလေး ကျောင်းစရိတ် ပေးလိုက်ပြီ။
+  သမီး ကျန်းမာရေး ဂရုစိုက်နော်။ စနေနေ့ ဖုန်းဆက်မယ်။
+must_mention: []
+must_advise: []
+synthetic:
+  layout: chat
+  sender: အမေ
+  messages:
+    - { from: me, text: "အမေ၊ ဒီလ ပို့တဲ့ ငွေ ကျပ် ၃၀၀,၀၀၀ ရောက်ပြီလား" }
+    - { from: them, text: "ရောက်ပြီ သမီး။ ဆိုင်က ဖုန်းဆက်ပြီး ပေးတယ်။ ညီလေး ကျောင်းစရိတ် ပေးလိုက်ပြီ။" }
+    - { from: them, text: "သမီး ကျန်းမာရေး ဂရုစိုက်နော်။ စနေနေ့ ဖုန်းဆက်မယ်။" }
+notes: Hard negative. Ordinary family chat that mentions sending money home.
+public: true

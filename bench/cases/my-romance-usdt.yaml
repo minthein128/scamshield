@@ -1,0 +1,36 @@
+id: my-romance-usdt
+file: ../public/v2/my-romance-usdt.png
+language: my
+home: MM
+app: facebook
+scam_type: romance_pig_butchering
+expected_verdict: danger
+score_range: [65, 100]
+families: [too_good, payment_route, pressure, identity]
+source_text: |
+  Linda
+  Active now
+  မင်္ဂလာပါရှင့်၊ ပုံလေးတွေ မြင်ပြီး ခင်ချင်လို့ပါ။ ကျွန်မ စင်ကာပူမှာ အလုပ်လုပ်တယ်။
+  ၂ ပတ်အကြာ
+  ကျွန်မ ဦးလေးမှာ USDT ရင်းနှီးမြှုပ်နှံတဲ့ app ရှိတယ်။ တစ်ရက် ၁၀% အမြတ် အာမခံတယ်။
+  အရင်ဆုံး USDT ၅၀၀ ထည့်ကြည့်ပါ။ ဒီည နောက်ဆုံးပဲ၊ ဘယ်သူ့ကိုမှ မပြောပါနဲ့။ https://usdt-goldlink.example/join
+must_mention:
+  - id: top_up
+    variants: ["500", "၅၀၀", "USDT ၅၀၀", "USDT 500"]
+  - id: guaranteed_profit
+    variants: ["10%", "၁၀%", "အာမခံ", "အမြတ်"]
+  - link
+must_advise: [dont_pay, dont_click_link, verify_trusted]
+must_not:
+  accuse: [Linda]
+synthetic:
+  layout: chat
+  sender: Linda
+  subtitle: Active now
+  messages:
+    - { from: them, text: "မင်္ဂလာပါရှင့်၊ ပုံလေးတွေ မြင်ပြီး ခင်ချင်လို့ပါ။ ကျွန်မ စင်ကာပူမှာ အလုပ်လုပ်တယ်။" }
+    - { from: time, text: "၂ ပတ်အကြာ" }
+    - { from: them, text: "ကျွန်မ ဦးလေးမှာ USDT ရင်းနှီးမြှုပ်နှံတဲ့ app ရှိတယ်။ တစ်ရက် ၁၀% အမြတ် အာမခံတယ်။" }
+    - { from: them, text: "အရင်ဆုံး USDT ၅၀၀ ထည့်ကြည့်ပါ။ ဒီည နောက်ဆုံးပဲ၊ ဘယ်သူ့ကိုမှ မပြောပါနဲ့။ https://usdt-goldlink.example/join" }
+notes: Fictional Burmese romance-to-crypto script with a guaranteed daily return.
+public: true

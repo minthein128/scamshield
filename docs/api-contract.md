@@ -71,7 +71,7 @@ Response 200:
 
 `network` is present only when a phone, chat account, payment account or domain from the input was reported by at least 3 separate checks in the last 30 days, or the text matches an active campaign. `seenCount` is the 30 day count; the value itself is never returned. A match also adds a `known_bad` flag. `campaign` is optional.
 
-`actions[].value` for `type: "call"` is a dial string from the shared hotline data (`src/data/hotlines.ts`): the destination country's anti-trafficking line, else its police line. It is absent when `context.destination` names no known country. The app resolves the number against the same data.
+`actions[].value` for `type: "call"` is a dial string from the shared hotline data (`src/data/hotlines.ts`): the destination country's anti-trafficking line, else its police line; else a home-country consular or labour line that rings in the destination (for example the Myanmar labour attache in Thailand); else a home-country line the user can dial from where they are. `context.destination` and `context.home` accept a country name, a known town or an ISO code. The value is absent only when neither names a known country. The app resolves the number against the same data.
 
 `score` is 0-100 (higher = riskier). `safe` < 35 <= `careful` < 70 <= `danger`.
 

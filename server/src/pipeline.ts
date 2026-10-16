@@ -253,7 +253,7 @@ export function createPipeline(deps: PipelineDeps): Pipeline {
           flags: s.flags,
           linkChecks,
           sources,
-          actions: buildActions(s.verdict, scamType, req.language, req.context?.destination),
+          actions: buildActions(s.verdict, scamType, req.language, req.context?.destination, req.context?.home),
           model: deps.model,
           ...(network.network ? { network: network.network } : {}),
         };
