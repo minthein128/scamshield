@@ -94,6 +94,67 @@ const TH: Rule[] = [
 
 const RULES: Record<Lang, Rule[]> = { en: EN, id: ID, tl: TL, my: MY, th: TH };
 
+// Job Shield never reassures: "safe", "verified job", "scam confirmed", "no risk", "detected".
+const JOB_BANNED: Record<Lang, Rule[]> = {
+  en: [
+    { re: /\bverified (?:jobs?|offers?|employers?|recruiters?|agenc(?:y|ies))\b/gi, sub: 'job offer' },
+    { re: /\b(?:scams? confirmed|confirmed scams?)\b/gi, sub: 'possible scam' },
+    { re: /\bno risks? (?:detected|found)\b|\brisk[- ]free\b/gi, sub: 'few warning signs found' },
+    { re: /(?<!\bnot )\bsafe\b/gi, sub: 'lower-risk' },
+    { re: /\bdetected\b/gi, sub: 'found' },
+  ],
+  id: [
+    { re: /\bpekerjaan terverifikasi\b/gi, sub: 'tawaran pekerjaan' },
+    { re: /\b(?:penipuan terkonfirmasi|terkonfirmasi penipuan)\b/gi, sub: 'kemungkinan penipuan' },
+    { re: /\btidak ada risiko(?: terdeteksi| ditemukan)?\b/gi, sub: 'sedikit tanda bahaya' },
+    { re: /(?<!\b(?:tidak|kurang|belum) )\baman\b/gi, sub: 'berisiko lebih rendah' },
+    { re: /\bterdeteksi\b/gi, sub: 'ditemukan' },
+  ],
+  tl: [
+    { re: /\bberipikadong trabaho\b/gi, sub: 'alok na trabaho' },
+    { re: /\bkumpirmadong scam\b/gi, sub: 'posibleng scam' },
+    { re: /\bwalang (?:natukoy na |nakitang )?panganib\b/gi, sub: 'kaunting babala' },
+    { re: /(?<!\bhindi )\bligtas\b/gi, sub: 'mas mababa ang panganib' },
+    { re: /\bnatukoy\b/gi, sub: 'nakita' },
+  ],
+  my: [
+    { re: /အတည်ပြုပြီး(?:သော|သည့်)?\s*အလုပ်/g, sub: 'ဖော်ပြထားသောအလုပ်' },
+    { re: /လိမ်လည်မှု\s*(?:ဖြစ်ကြောင်း\s*)?အတည်ပြု(?:ပြီး|ထားသည်)?/g, sub: 'လိမ်လည်မှု ဖြစ်နိုင်' },
+    { re: /အန္တရာယ်\s*(?:မရှိ|မတွေ့)(?:ပါ)?/g, sub: 'သတိပေးလက္ခဏာ နည်း' },
+    { re: /(?<!မ)(?:လုံခြုံ|ဘေးကင်း)/g, sub: 'သတိပေးလက္ခဏာနည်း' },
+    { re: /(?:ထောက်လှမ်း|စစ်ဆေး)\s*တွေ့ရှိ/g, sub: 'တွေ့ရ' },
+  ],
+  th: [
+    { re: /งาน(?:ที่)?(?:ตรวจสอบแล้ว|ผ่านการตรวจสอบ)/g, sub: 'ข้อเสนองาน' },
+    { re: /ยืนยัน(?:ว่าเป็น)?การหลอกลวง/g, sub: 'อาจเป็นการหลอกลวง' },
+    { re: /ไม่พบความเสี่ยง|ไร้ความเสี่ยง/g, sub: 'พบสัญญาณเตือนน้อย' },
+    { re: new RegExp(`${TH_NOT}ปลอดภัย`, 'g'), sub: 'มีสัญญาณเตือนน้อย' },
+    { re: /ตรวจพบ/g, sub: 'พบ' },
+  ],
+};
+
+/** Certainty phrases plus the Job Shield banned phrases, in this language. */
+export function findJobBanned(text: string, lang: Lang): string[] {
+  const out = findCertainty(text, lang);
+  for (const r of JOB_BANNED[lang]) {
+    for (const m of text.matchAll(new RegExp(r.re.source, r.re.flags))) out.push(m[0]);
+  }
+  return out;
+}
+
+/** Rewrites certainty phrases, then the Job Shield banned phrases. */
+export function guardJobText(text: string, lang: Lang): { text: string; hits: number } {
+  const first = rewriteCertainty(text, lang);
+  let hits = first.hits;
+  let out = first.text;
+  for (const r of JOB_BANNED[lang]) {
+    const n = [...out.matchAll(new RegExp(r.re.source, r.re.flags))].length;
+    hits += n;
+    if (n && r.sub !== undefined) out = out.replace(new RegExp(r.re.source, r.re.flags), r.sub as never);
+  }
+  return { text: out, hits };
+}
+
 export function findCertainty(text: string, lang: Lang): string[] {
   const out: string[] = [];
   for (const r of RULES[lang]) {

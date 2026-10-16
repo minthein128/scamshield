@@ -1,0 +1,492 @@
+{
+  "legit-typo-my": {
+    "ad": {
+      "employer": {
+        "value": "Shwe Linyaung Garment Co., Ltd.",
+        "quote": "Shwe Linyaung Garment Co., Ltd.",
+        "confidence": 1
+      },
+      "jobTitle": {
+        "value": "စက်ချုပ်သမများ",
+        "quote": "စက်ချုပ်သမများ ခေါ်ယူသည်။",
+        "confidence": 1
+      },
+      "workplace": {
+        "value": "ဗန်ဘွန် စက်ရုံ၊ ဘန်ကောက်မြို့",
+        "quote": "ဘန်ကောက်မြို့ ဗန်ဘွန် စက်ရုံ",
+        "confidence": 1
+      },
+      "destinationCountry": {
+        "value": "Thailand",
+        "quote": "ဘန်ကောက်မြို့",
+        "confidence": 0.9
+      },
+      "salary": {
+        "value": {
+          "amount": 12500,
+          "currency": "THB",
+          "period": "monthly"
+        },
+        "quote": "လစာ တစ်လ ၁၂,၅၀၀ ဘတ်။",
+        "confidence": 1
+      },
+      "workerFee": {
+        "value": "none",
+        "quote": "အလုပ်သမားထံမှ ကြေးငွေ မယူပါ။",
+        "confidence": 1
+      },
+      "contract": {
+        "value": "official",
+        "quote": "တရားဝင်စာချုပ် ပေးပါသည်။",
+        "confidence": 1
+      },
+      "visaOrPermit": {
+        "value": "work_visa",
+        "quote": "MOU အလုပ်ပါမစ်။",
+        "confidence": 1
+      },
+      "travelArrangedBy": null,
+      "route": null,
+      "meetingPoint": null,
+      "documentRequest": null,
+      "paymentRequest": {
+        "value": "none",
+        "quote": "အလုပ်သမားထံမှ ကြေးငွေ မယူပါ။",
+        "confidence": 0.9
+      },
+      "urgency": null,
+      "contactChannel": null,
+      "secrecyRequest": null
+    },
+    "chat": {
+      "employer": {
+        "value": "Shwe Linyaung Garmant",
+        "quote": "Shwe Linyaung Garmant",
+        "confidence": 1
+      },
+      "jobTitle": null,
+      "workplace": {
+        "value": "ရန်ကုန် ရုံး",
+        "quote": "ရန်ကုန် ရုံး",
+        "confidence": 0.9
+      },
+      "destinationCountry": null,
+      "salary": {
+        "value": {
+          "amount": 12500,
+          "currency": "THB",
+          "period": "monthly"
+        },
+        "quote": "လစာ တစ်လ ၁၂,၅၀၀ ဘတ်ပါ။",
+        "confidence": 1
+      },
+      "workerFee": null,
+      "contract": {
+        "value": "official",
+        "quote": "စာချုပ်ကို အင်တာဗျူးမှာ ဖတ်ခိုင်းပါမယ်။",
+        "confidence": 0.9
+      },
+      "visaOrPermit": null,
+      "travelArrangedBy": null,
+      "route": null,
+      "meetingPoint": {
+        "value": "workplace",
+        "quote": "ရန်ကုန် ရုံး",
+        "confidence": 0.8
+      },
+      "documentRequest": null,
+      "paymentRequest": null,
+      "urgency": {
+        "value": "စနေနေ့ မနက် ၉ နာရီ",
+        "quote": "စနေနေ့ မနက် ၉ နာရီ လာပါ။",
+        "confidence": 1
+      },
+      "contactChannel": {
+        "value": "personal_chat_app",
+        "quote": "Shwe Linyaung Garmant HR ကပါ။",
+        "confidence": 0.6
+      },
+      "secrecyRequest": null
+    }
+  },
+  "legit-recruiter-tl": {
+    "ad": {
+      "employer": {
+        "value": "Pacific Lantern Care Agency",
+        "quote": "Pacific Lantern Care Agency",
+        "confidence": 1
+      },
+      "jobTitle": {
+        "value": "caregiver",
+        "quote": "caregiver",
+        "confidence": 1
+      },
+      "workplace": null,
+      "destinationCountry": {
+        "value": "Taiwan",
+        "quote": "Taiwan",
+        "confidence": 1
+      },
+      "salary": {
+        "value": {
+          "amount": 20000,
+          "currency": "NTD",
+          "period": "monthly"
+        },
+        "quote": "Sahod NT$ 20,000 kada buwan.",
+        "confidence": 1
+      },
+      "workerFee": {
+        "value": "none",
+        "quote": "Walang placement fee.",
+        "confidence": 1
+      },
+      "contract": {
+        "value": "official",
+        "quote": "May kontrata",
+        "confidence": 1
+      },
+      "visaOrPermit": {
+        "value": "work_visa",
+        "quote": "work visa bago umalis",
+        "confidence": 1
+      },
+      "travelArrangedBy": null,
+      "route": null,
+      "meetingPoint": null,
+      "documentRequest": null,
+      "paymentRequest": null,
+      "urgency": null,
+      "contactChannel": null,
+      "secrecyRequest": null
+    },
+    "chat": {
+      "employer": {
+        "value": "Pacific Lantern Care Agency",
+        "quote": "Pacific Lantern Care Agency",
+        "confidence": 1
+      },
+      "jobTitle": null,
+      "workplace": {
+        "value": "Ermita, Manila",
+        "quote": "opisina namin sa Ermita, Manila",
+        "confidence": 1
+      },
+      "destinationCountry": null,
+      "salary": null,
+      "workerFee": null,
+      "contract": null,
+      "visaOrPermit": null,
+      "travelArrangedBy": null,
+      "route": null,
+      "meetingPoint": {
+        "value": "workplace",
+        "quote": "Interview sa opisina namin sa Ermita, Manila",
+        "confidence": 1
+      },
+      "documentRequest": null,
+      "paymentRequest": null,
+      "urgency": null,
+      "contactChannel": {
+        "value": "personal_chat_app",
+        "quote": "Hi po, ako si Maria Santos",
+        "confidence": 0.8
+      },
+      "secrecyRequest": null
+    }
+  },
+  "legit-salary-en": {
+    "ad": {
+      "employer": {
+        "value": "Northwind Orchard Packers Ltd.",
+        "quote": "Northwind Orchard Packers Ltd.",
+        "confidence": 1
+      },
+      "jobTitle": {
+        "value": "fruit packers",
+        "quote": "fruit packers",
+        "confidence": 1
+      },
+      "workplace": {
+        "value": "Hastings",
+        "quote": "Hastings",
+        "confidence": 1
+      },
+      "destinationCountry": {
+        "value": "New Zealand",
+        "quote": "New Zealand",
+        "confidence": 1
+      },
+      "salary": {
+        "value": {
+          "amount": 48000,
+          "currency": "NZD",
+          "period": "yearly"
+        },
+        "quote": "Salary NZD 48,000 per year",
+        "confidence": 1
+      },
+      "workerFee": {
+        "value": "none",
+        "quote": "The employer pays all recruitment costs.",
+        "confidence": 1
+      },
+      "contract": {
+        "value": "official",
+        "quote": "contract signed before travel",
+        "confidence": 1
+      },
+      "visaOrPermit": {
+        "value": "work_visa",
+        "quote": "Work visa sponsored",
+        "confidence": 1
+      },
+      "travelArrangedBy": null,
+      "route": null,
+      "meetingPoint": null,
+      "documentRequest": null,
+      "paymentRequest": null,
+      "urgency": null,
+      "contactChannel": null,
+      "secrecyRequest": null
+    },
+    "chat": {
+      "employer": {
+        "value": "Northwind Orchard Packers",
+        "quote": "Northwind Orchard Packers HR",
+        "confidence": 1
+      },
+      "jobTitle": null,
+      "workplace": null,
+      "destinationCountry": null,
+      "salary": {
+        "value": {
+          "amount": 4000,
+          "currency": "NZD",
+          "period": "monthly"
+        },
+        "quote": "NZD 4,000 per month",
+        "confidence": 1
+      },
+      "workerFee": null,
+      "contract": {
+        "value": "official",
+        "quote": "We will email you the contract",
+        "confidence": 1
+      },
+      "visaOrPermit": {
+        "value": "work_visa",
+        "quote": "visa documents",
+        "confidence": 0.8
+      },
+      "travelArrangedBy": null,
+      "route": null,
+      "meetingPoint": null,
+      "documentRequest": null,
+      "paymentRequest": null,
+      "urgency": null,
+      "contactChannel": {
+        "value": "personal_chat_app",
+        "quote": "Hi, this is Dan",
+        "confidence": 0.7
+      },
+      "secrecyRequest": null
+    }
+  },
+  "legit-interview-th": {
+    "ad": {
+      "employer": {
+        "value": "บริษัท แสงอรุณรุ่ง อาหารทะเล จำกัด",
+        "quote": "บริษัท แสงอรุณรุ่ง อาหารทะเล จำกัด",
+        "confidence": 1
+      },
+      "jobTitle": {
+        "value": "พนักงานแพ็คสินค้า",
+        "quote": "รับพนักงานแพ็คสินค้า",
+        "confidence": 1
+      },
+      "workplace": {
+        "value": "สมุทรสาคร",
+        "quote": "โรงงานสมุทรสาคร",
+        "confidence": 1
+      },
+      "destinationCountry": {
+        "value": "Thailand",
+        "quote": "โรงงานสมุทรสาคร",
+        "confidence": 0.8
+      },
+      "salary": {
+        "value": {
+          "amount": 12000,
+          "currency": "THB",
+          "period": "monthly"
+        },
+        "quote": "เงินเดือน 12,000 บาท",
+        "confidence": 1
+      },
+      "workerFee": {
+        "value": "none",
+        "quote": "ไม่มีค่าใช้จ่ายสำหรับผู้สมัคร",
+        "confidence": 1
+      },
+      "contract": {
+        "value": "official",
+        "quote": "มีสัญญาจ้าง",
+        "confidence": 1
+      },
+      "visaOrPermit": {
+        "value": "work_visa",
+        "quote": "ใบอนุญาตทำงาน",
+        "confidence": 1
+      },
+      "travelArrangedBy": null,
+      "route": null,
+      "meetingPoint": null,
+      "documentRequest": null,
+      "paymentRequest": {
+        "value": "none",
+        "quote": "ไม่มีค่าใช้จ่ายสำหรับผู้สมัคร",
+        "confidence": 1
+      },
+      "urgency": {
+        "value": "สัมภาษณ์วันที่ 5 พฤศจิกายน",
+        "quote": "สัมภาษณ์วันที่ 5 พฤศจิกายน",
+        "confidence": 1
+      },
+      "contactChannel": null,
+      "secrecyRequest": null
+    },
+    "chat": {
+      "employer": {
+        "value": "แสงอรุณรุ่ง อาหารทะเล",
+        "quote": "ฝ่ายบุคคล แสงอรุณรุ่ง อาหารทะเล",
+        "confidence": 1
+      },
+      "jobTitle": null,
+      "workplace": {
+        "value": "สำนักงานโรงงานสมุทรสาคร",
+        "quote": "ที่สำนักงานโรงงานสมุทรสาคร",
+        "confidence": 1
+      },
+      "destinationCountry": {
+        "value": "Thailand",
+        "quote": "สำนักงานโรงงานสมุทรสาคร",
+        "confidence": 0.8
+      },
+      "salary": null,
+      "workerFee": null,
+      "contract": {
+        "value": "official",
+        "quote": "จะให้อ่านสัญญาจ้างก่อนเซ็นค่ะ",
+        "confidence": 1
+      },
+      "visaOrPermit": null,
+      "travelArrangedBy": null,
+      "route": null,
+      "meetingPoint": {
+        "value": "workplace",
+        "quote": "สำนักงานโรงงานสมุทรสาคร",
+        "confidence": 1
+      },
+      "documentRequest": null,
+      "paymentRequest": null,
+      "urgency": {
+        "value": "ขอเลื่อนสัมภาษณ์เป็นวันที่ 12 พฤศจิกายน",
+        "quote": "ขอเลื่อนสัมภาษณ์เป็นวันที่ 12 พฤศจิกายน",
+        "confidence": 1
+      },
+      "contactChannel": {
+        "value": "personal_chat_app",
+        "quote": "สวัสดีค่ะ",
+        "confidence": 0.7
+      },
+      "secrecyRequest": null
+    }
+  },
+  "legit-agency-id": {
+    "ad": {
+      "employer": {
+        "value": "PT Harapan Bahari Sentosa",
+        "quote": "PT Harapan Bahari Sentosa",
+        "confidence": 1
+      },
+      "jobTitle": {
+        "value": "perawat lansia",
+        "quote": "perawat lansia",
+        "confidence": 1
+      },
+      "workplace": null,
+      "destinationCountry": {
+        "value": "Japan",
+        "quote": "Jepang",
+        "confidence": 1
+      },
+      "salary": {
+        "value": {
+          "amount": 180000,
+          "currency": "JPY",
+          "period": "monthly"
+        },
+        "quote": "Gaji ¥180.000 per bulan.",
+        "confidence": 1
+      },
+      "workerFee": {
+        "value": "none",
+        "quote": "Biaya penempatan ditanggung pemberi kerja.",
+        "confidence": 1
+      },
+      "contract": null,
+      "visaOrPermit": {
+        "value": "work_visa",
+        "quote": "Visa kerja Specified Skilled Worker.",
+        "confidence": 1
+      },
+      "travelArrangedBy": null,
+      "route": null,
+      "meetingPoint": null,
+      "documentRequest": null,
+      "paymentRequest": null,
+      "urgency": null,
+      "contactChannel": null,
+      "secrecyRequest": null
+    },
+    "chat": {
+      "employer": {
+        "value": "PT Harapan Bahari Sentosa",
+        "quote": "PT Harapan Bahari Sentosa",
+        "confidence": 1
+      },
+      "jobTitle": null,
+      "workplace": {
+        "value": "kantor kami di Bekasi",
+        "quote": "kantor kami di Bekasi",
+        "confidence": 1
+      },
+      "destinationCountry": null,
+      "salary": {
+        "value": {
+          "amount": 180000,
+          "currency": "JPY",
+          "period": "monthly"
+        },
+        "quote": "Gaji pokok ¥180.000 per bulan",
+        "confidence": 1
+      },
+      "workerFee": null,
+      "contract": null,
+      "visaOrPermit": null,
+      "travelArrangedBy": null,
+      "route": null,
+      "meetingPoint": null,
+      "documentRequest": null,
+      "paymentRequest": null,
+      "urgency": null,
+      "contactChannel": {
+        "value": "company_channel",
+        "quote": "hrd@harapanbahari.example.co.id",
+        "confidence": 1
+      },
+      "secrecyRequest": null
+    }
+  }
+}
