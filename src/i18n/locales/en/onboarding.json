@@ -10,29 +10,26 @@
   },
   "countries": {
     "fromTitle": "Where are you from?",
-    "fromBody": "This shows the right hotlines first.",
-    "toTitle": "Where will you work or travel?",
-    "toBody": "Optional. Skip it if you do not know yet."
+    "fromBody": "This shows the right hotlines first."
   },
   "how": {
-    "title": "How SafeRoute helps",
-    "body": "Three things, nothing to set up.",
+    "title": "What SafeRoute does",
     "check": {
-      "title": "Check before you say yes",
-      "body": "Paste a job offer, chat or link, or share a screenshot. SafeRoute looks for trafficking and scam warning signs."
+      "title": "Check before you go",
+      "body": "Show us a job ad, a message or a link."
     },
-    "explain": {
-      "title": "See why, in your language",
-      "body": "You get a clear verdict, the evidence behind it and a spoken warning in the language you choose."
+    "doll": {
+      "title": "Tap the doll",
+      "body": "It checks your screen in any app."
+    },
+    "call": {
+      "title": "Call for help",
+      "body": "Hotlines for your country."
     },
     "warn": {
-      "title": "Warn family and get help",
-      "body": "Send a warning to people you trust and find official hotlines for the countries you care about."
+      "title": "Warn your family",
+      "body": "Send a warning to people you trust."
     }
-  },
-  "shield": {
-    "title": "Turn on the screen shield",
-    "body": "Optional. You can also do this later from the home screen."
   },
   "sharing": {
     "title": "Help others: share anonymous scam patterns",
@@ -46,9 +43,23 @@
     "no": "No thanks"
   },
   "account": {
-    "title": "Use SafeRoute your way",
-    "body": "Everything works without an account. Your checks stay on this device.",
-    "note": "An account is optional. It saves your history and trusted contacts so you can get them back on a new phone, and it raises your hourly check limit.",
+    "title": "Do you want an account?",
+    "without": {
+      "heading": "Without an account, you can:",
+      "check": "Check job offers, messages, links and pictures",
+      "voice": "Talk with the doll by voice",
+      "doll": "Use the doll on your screen (Android)",
+      "call": "Call hotlines and share a warning",
+      "limit": "Up to {{n}} checks an hour"
+    },
+    "with": {
+      "heading": "With an account, you also get:",
+      "contacts": "Save emergency contacts",
+      "warn": "Send them a ready-made warning in one tap",
+      "restore": "Get your checks and contacts back on a new phone",
+      "limit": "Up to {{n}} checks an hour"
+    },
+    "free": "Free",
     "anonymous": "Continue without an account",
     "signUp": "Create account",
     "signIn": "I already have an account"

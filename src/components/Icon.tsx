@@ -5,7 +5,7 @@ import theme from '../theme/theme';
 export type IconName =
   | 'doll' | 'checkCircle' | 'alert' | 'chevron' | 'settings' | 'link' | 'image' | 'chat' | 'speaker' | 'stop'
   | 'gift' | 'clock' | 'card' | 'user' | 'flag' | 'octagon' | 'radar' | 'phone' | 'people' | 'info'
-  | 'thumbUp' | 'thumbDown' | 'check' | 'mic' | 'micOff';
+  | 'thumbUp' | 'thumbDown' | 'check' | 'mic' | 'micOff' | 'search' | 'plus';
 
 const SHAPES: Record<IconName, React.ReactNode> = {
   doll: (
@@ -110,6 +110,13 @@ const SHAPES: Record<IconName, React.ReactNode> = {
   thumbUp: <Path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.3a2 2 0 0 0 2-1.7l1.4-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" />,
   thumbDown: <Path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.7a2 2 0 0 0-2 1.7l-1.4 9a2 2 0 0 0 2 2.3zM17 2h2.7A2.3 2.3 0 0 1 22 4v7a2.3 2.3 0 0 1-2.3 2H17" />,
   check: <Path d="M5 12.5l4.5 4.5L19 7.5" />,
+  plus: <Path d="M12 5v14M5 12h14" />,
+  search: (
+    <>
+      <Circle cx={11} cy={11} r={6.5} />
+      <Path d="M16 16l4.5 4.5M8.5 11l1.8 1.8 3.4-3.6" />
+    </>
+  ),
   mic: (
     <>
       <Rect x={9} y={3} width={6} height={11} rx={3} />

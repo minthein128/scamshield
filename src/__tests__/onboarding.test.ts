@@ -1,6 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { DEFAULT_PROFILE, LEGACY_LANGUAGE_KEY, PROFILE_KEY, applyChoices, finishOnboarding, loadProfile, parseProfile, saveProfile } from '../lib/profile';
-import { HELP_POINTS, onboardingSteps } from '../lib/onboarding';
+import { readFileSync } from 'fs';
+import { join } from 'path';
+import { CHECKS_PER_HOUR, HELP_POINTS, helpPoints, localNumber, onboardingSteps } from '../lib/onboarding';
 
 describe('onboarding state', () => {
   beforeEach(() => AsyncStorage.clear());
@@ -61,12 +63,25 @@ describe('onboarding state', () => {
     expect(await loadProfile()).toEqual(DEFAULT_PROFILE);
   });
 
-  it('explains the product in exactly three points', () => {
-    expect(HELP_POINTS).toHaveLength(3);
+  it('runs the same five steps in order on every platform', () => {
+    expect(onboardingSteps()).toEqual(['language', 'account', 'countries', 'how', 'sharing']);
   });
 
-  it('offers the shield step only when the shield can run', () => {
-    expect(onboardingSteps(false)).toEqual(['language', 'countries', 'how', 'sharing', 'account']);
-    expect(onboardingSteps(true)).toContain('shield');
+  it('explains the product in four points and hides the doll where the shield cannot run', () => {
+    expect(HELP_POINTS).toHaveLength(4);
+    expect(helpPoints(true)).toEqual(['check', 'doll', 'call', 'warn']);
+    expect(helpPoints(false)).toEqual(['check', 'call', 'warn']);
+  });
+
+  it('keeps the hourly limits in step with the server', () => {
+    const server = readFileSync(join(__dirname, '../../server/src/config.ts'), 'utf8');
+    expect(server).toContain(`ANON_LIMIT_PER_HOUR ?? ${CHECKS_PER_HOUR.anonymous}`);
+    expect(server).toContain(`USER_LIMIT_PER_HOUR ?? ${CHECKS_PER_HOUR.account}`);
+  });
+
+  it('writes the limits in Burmese digits for Burmese', () => {
+    expect(localNumber(20, 'my')).toBe('၂၀');
+    expect(localNumber(60, 'my')).toBe('၆၀');
+    expect(localNumber(60, 'en')).toBe('60');
   });
 });
