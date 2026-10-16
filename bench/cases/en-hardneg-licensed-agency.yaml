@@ -1,0 +1,31 @@
+id: en-hardneg-licensed-agency
+file: ../public/v2/en-hardneg-licensed-agency.png
+language: en
+home: MM
+destination: Malaysia
+app: facebook
+scam_type: none
+expected_verdict: safe
+score_range: [0, 40]
+families: []
+source_text: |
+  Brightpath Recruitment
+  Sponsored
+  Brightpath Recruitment (licence on the public government register). Factory jobs in Malaysia.
+  Workers pay no recruitment fee: the employer pays all costs. We never hold your passport.
+  Apply only at our office or at the labour office job fair. We never ask for money by chat.
+must_mention:
+  - id: no_fee
+    variants: ["no recruitment fee", "no fee", "no fees", "employer pays", "not ask for money", "does not ask for money", "free"]
+must_advise: [verify_official]
+must_not:
+  accuse: [Brightpath]
+synthetic:
+  layout: post
+  sender: Brightpath Recruitment
+  messages:
+    - { from: them, text: "Brightpath Recruitment (licence on the public government register). Factory jobs in Malaysia." }
+    - { from: them, text: "Workers pay no recruitment fee: the employer pays all costs. We never hold your passport." }
+    - { from: them, text: "Apply only at our office or at the labour office job fair. We never ask for money by chat." }
+notes: Hard negative. A fictional licensed agency ad that uses the same words as fake agencies (fee, passport, Malaysia).
+public: true

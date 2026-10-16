@@ -1,0 +1,34 @@
+id: id-task-scam
+file: ../public/v2/id-task-scam.png
+language: id
+home: ID
+app: whatsapp
+scam_type: investment
+expected_verdict: danger
+score_range: [65, 100]
+families: [too_good, payment_route, pressure]
+source_text: |
+  Rekrutmen Online
+  online
+  Kerja paruh waktu dari HP! Cukup like video, dapat Rp 50.000 per tugas.
+  Kamu sudah dapat komisi Rp 150.000. Untuk menarik dana, top up dulu Rp 200.000 ke rekening pembimbing.
+  Batas waktu 30 menit. Hubungi WA admin: @kerja_cepat_88
+must_mention:
+  - id: top_up
+    variants: ["200000", "Rp 200.000", "top up", "isi saldo"]
+  - id: task_pay
+    variants: ["50000", "Rp 50.000", "like video", "tugas"]
+  - id: deadline
+    variants: ["30 menit", "batas waktu", "terburu-buru", "mendesak"]
+must_advise: [dont_pay, verify_trusted, block_report]
+must_not:
+  accuse: [kerja_cepat_88]
+synthetic:
+  layout: chat
+  sender: Rekrutmen Online
+  messages:
+    - { from: them, text: "Kerja paruh waktu dari HP! Cukup like video, dapat Rp 50.000 per tugas." }
+    - { from: them, text: "Kamu sudah dapat komisi Rp 150.000. Untuk menarik dana, top up dulu Rp 200.000 ke rekening pembimbing." }
+    - { from: them, text: "Batas waktu 30 menit. Hubungi WA admin: @kerja_cepat_88" }
+notes: Fictional task scam. Pay per like, then top up to withdraw.
+public: true

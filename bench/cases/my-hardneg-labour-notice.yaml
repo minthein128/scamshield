@@ -1,0 +1,29 @@
+id: my-hardneg-labour-notice
+file: ../public/v2/my-hardneg-labour-notice.png
+language: my
+home: MM
+destination: Thailand
+app: facebook
+scam_type: none
+expected_verdict: safe
+score_range: [0, 40]
+families: []
+source_text: |
+  မြန်မာ အလုပ်သမား ကူညီရေး ကွန်ရက်
+  Sponsored
+  သတိပေးချက် - ထိုင်းနိုင်ငံ အလုပ်အတွက် ပွဲစားကို ငွေကြိုမပေးပါနဲ့။ ပတ်စ်ပို့ကို ကိုယ်တိုင် သိမ်းထားပါ။
+  အလုပ်ခေါ်စာ အစစ်ဖြစ်မဖြစ်ကို အလုပ်သမားဝန်ကြီးဌာန တရားဝင် ဝက်ဘ်ဆိုက်မှာ စစ်ဆေးပါ။
+  အကူအညီလိုရင် မိမိနေရာအနီးက အလုပ်သမားသံမှူးရုံးကို ဆက်သွယ်ပါ။
+must_mention: []
+must_advise: [verify_official]
+must_not:
+  accuse: [မြန်မာ အလုပ်သမား ကူညီရေး ကွန်ရက်]
+synthetic:
+  layout: post
+  sender: မြန်မာ အလုပ်သမား ကူညီရေး ကွန်ရက်
+  messages:
+    - { from: them, text: "သတိပေးချက် - ထိုင်းနိုင်ငံ အလုပ်အတွက် ပွဲစားကို ငွေကြိုမပေးပါနဲ့။ ပတ်စ်ပို့ကို ကိုယ်တိုင် သိမ်းထားပါ။" }
+    - { from: them, text: "အလုပ်ခေါ်စာ အစစ်ဖြစ်မဖြစ်ကို အလုပ်သမားဝန်ကြီးဌာန တရားဝင် ဝက်ဘ်ဆိုက်မှာ စစ်ဆေးပါ။" }
+    - { from: them, text: "အကူအညီလိုရင် မိမိနေရာအနီးက အလုပ်သမားသံမှူးရုံးကို ဆက်သွယ်ပါ။" }
+notes: Hard negative. A fictional support network warns workers not to pay brokers and to keep their passport.
+public: true

@@ -1,0 +1,37 @@
+id: my-job-malaysia
+file: ../public/v2/my-job-malaysia.png
+language: my
+home: MM
+destination: Malaysia
+app: viber
+scam_type: fake_agency
+expected_verdict: danger
+score_range: [60, 100]
+families: [payment_route, trafficking, identity]
+source_text: |
+  ဦးအောင် ပြည်ပအလုပ်
+  online
+  မလေးရှား ဂျိုဟိုး စက်ရုံအလုပ်၊ လစာ ရင်းဂစ် ၂,၂၀၀။ ဗီဇာ အမြန်ရမယ်။
+  ဝန်ဆောင်ခ ကျပ် ၁,၈၀၀,၀၀၀ ကို ကျွန်တော့် ကိုယ်ပိုင်ဘဏ်အကောင့်ကို ဒီအပတ်ထဲ လွှဲပေးပါ။ ပတ်စ်ပို့ မူရင်းကိုလည်း ကျွန်တော့်ဆီ အပ်ထားရမယ်။
+  ပြေစာ ပေးမလား
+  ပြေစာ မလိုပါဘူး။ Viber @aung_jobs_my မှာ ဆက်ပြောရအောင်။
+must_mention:
+  - id: fee
+    variants: ["1800000", "၁,၈၀၀,၀၀၀", "၁၈ သိန်း", "ဆယ့်ရှစ်သိန်း", "ဝန်ဆောင်ခ"]
+  - passport
+  - personal_account
+  - id: malaysia
+    variants: ["မလေးရှား", "ဂျိုဟိုး", "Malaysia", "Johor"]
+must_advise: [dont_pay, dont_send_documents, verify_trusted, call_hotline]
+must_not:
+  accuse: [ဦးအောင်, aung_jobs_my]
+synthetic:
+  layout: chat
+  sender: ဦးအောင် ပြည်ပအလုပ်
+  messages:
+    - { from: them, text: "မလေးရှား ဂျိုဟိုး စက်ရုံအလုပ်၊ လစာ ရင်းဂစ် ၂,၂၀၀။ ဗီဇာ အမြန်ရမယ်။" }
+    - { from: them, text: "ဝန်ဆောင်ခ ကျပ် ၁,၈၀၀,၀၀၀ ကို ကျွန်တော့် ကိုယ်ပိုင်ဘဏ်အကောင့်ကို ဒီအပတ်ထဲ လွှဲပေးပါ။ ပတ်စ်ပို့ မူရင်းကိုလည်း ကျွန်တော့်ဆီ အပ်ထားရမယ်။" }
+    - { from: me, text: "ပြေစာ ပေးမလား" }
+    - { from: them, text: "ပြေစာ မလိုပါဘူး။ Viber @aung_jobs_my မှာ ဆက်ပြောရအောင်။" }
+notes: Fictional broker. Service fee to a personal account, original passport held by the broker, no receipt.
+public: true

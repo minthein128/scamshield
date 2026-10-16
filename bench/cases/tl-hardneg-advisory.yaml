@@ -1,0 +1,26 @@
+id: tl-hardneg-advisory
+file: ../public/v2/tl-hardneg-advisory.png
+language: tl
+home: PH
+app: chat
+scam_type: none
+expected_verdict: safe
+score_range: [0, 40]
+families: []
+source_text: |
+  Pinsan Joy
+  online
+  Insan, nakita ko itong paalala mula sa ahensya ng gobyerno para sa migrant workers: walang placement fee para sa domestic workers, at huwag ibigay ang pasaporte sa recruiter.
+  I-check muna sa opisyal na website ng gobyerno ang lisensya ng agency bago mag-apply.
+  Salamat, Joy! Titingnan ko bukas.
+must_mention: []
+must_advise: [verify_official]
+synthetic:
+  layout: chat
+  sender: Pinsan Joy
+  messages:
+    - { from: them, text: "Insan, nakita ko itong paalala mula sa ahensya ng gobyerno para sa migrant workers: walang placement fee para sa domestic workers, at huwag ibigay ang pasaporte sa recruiter." }
+    - { from: them, text: "I-check muna sa opisyal na website ng gobyerno ang lisensya ng agency bago mag-apply." }
+    - { from: me, text: "Salamat, Joy! Titingnan ko bukas." }
+notes: Hard negative. A cousin shares a government advisory that uses the trigger words fee, passport and recruiter.
+public: true

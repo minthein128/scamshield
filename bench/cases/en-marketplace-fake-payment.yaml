@@ -1,0 +1,33 @@
+id: en-marketplace-fake-payment
+file: ../public/v2/en-marketplace-fake-payment.png
+language: en
+home: PH
+app: marketplace
+scam_type: marketplace_fraud
+expected_verdict: danger
+score_range: [55, 100]
+families: [link_risk, pressure, payment_route, identity]
+source_text: |
+  Buyer - Kim
+  online
+  I'll buy your sewing machine for 6,500 pesos. I already paid, see the screenshot.
+  Your payment is on hold. To release it, click this link and enter your card number and OTP: https://payhold-release.example/claim
+  Ship the item today or I will report you.
+must_mention:
+  - link
+  - id: card_otp
+    variants: ["OTP", "card number", "card details", "one-time"]
+  - id: fake_payment
+    variants: ["on hold", "already paid", "payment", "screenshot"]
+must_advise: [dont_click_link, verify_official, block_report]
+must_not:
+  accuse: [Kim]
+synthetic:
+  layout: chat
+  sender: Buyer - Kim
+  messages:
+    - { from: them, text: "I'll buy your sewing machine for 6,500 pesos. I already paid, see the screenshot." }
+    - { from: them, text: "Your payment is on hold. To release it, click this link and enter your card number and OTP: https://payhold-release.example/claim" }
+    - { from: them, text: "Ship the item today or I will report you." }
+notes: Fictional buyer. Fake payment-on-hold link asking a seller for card and OTP.
+public: true
