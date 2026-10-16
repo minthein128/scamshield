@@ -181,11 +181,16 @@ Off by default. Turning it on is a three-step opt-in: the in-app consent screen 
 
 Flow for each notification:
 
-1. Drop it unless the package belongs to an app the user picked: the default SMS app (`Telephony.Sms.getDefaultSmsPackage`), Google Messages, WhatsApp (and Business), Viber, Telegram, LINE, Messenger, Zalo or Signal. No app is on by default. Email and banking apps are never in the list. Group summaries and ongoing notifications are dropped too.
-2. Score it on the device. Signals and weights are in `message_guard_keywords.json` (link 2, shortener +1, payment 2, OTP 2, account 2, urgency 1, parcel 2, bank 2, job 2, chat-app move 1, unknown sender 1). A score of 3 or more passes. English, Bahasa, Tagalog and Burmese lists are scanned for every message, whatever the app language.
-3. A short message with a code word, a 4 to 8 digit code, no link and no phone number is a genuine OTP. It is skipped before scoring and never leaves the device.
-4. Redact (below), log the redacted text on the device, then send `{ kind: "message", text, language, shareSignals }` with the Firebase token if the app set one.
-5. `careful` or `danger`: post a discreet notice (below). `safe` shows nothing. The result also goes through `ShieldBridge.publishResult`, so it reaches `onShieldResult` and `takeUnsyncedResults` with `kind: "message"`, and is stored in the no-backup directory so the deep link still works after the process was killed.
+1. Drop it unless the package belongs to an app the user picked: the SMS app, Google Messages, WhatsApp (and Business), Viber, Telegram (and Telegram X), LINE, Messenger, Zalo or Signal. "SMS" covers the default SMS app (`Telephony.Sms.getDefaultSmsPackage`) when it is not in the list above, plus phone makers' SMS apps (`MessageApps.oemSms`: Samsung, AOSP/Xiaomi/Huawei `com.android.mms`, OnePlus, Sony, Motorola, HTC). No app is on by default. Email and banking apps are never in the list. Ongoing and foreground-service notifications are dropped. A group summary is dropped when the app also posted a child; otherwise it is read.
+2. Read the newest message: the last MessagingStyle message (skipped when it is the user's own reply: no sender, or the `EXTRA_MESSAGING_PERSON` / self display name), then `EXTRA_BIG_TEXT`, then the last `EXTRA_TEXT_LINES` line, then `EXTRA_TEXT`. Placeholders an app shows when its preview is off ("New message", "3 new messages", "Pesan baru", "ข้อความใหม่" and others in `MessageGuardExtractor`) are skipped as hidden previews.
+3. Score it on the device. Signals and weights are in `message_guard_keywords.json` (link 2, shortener +1, payment 2, OTP 2, account 2, urgency 1, parcel 2, bank 2, job 2, chat-app move 1, unknown sender 1). A score of 3 or more passes. English, Bahasa, Tagalog and Burmese lists are scanned for every message, whatever the app language.
+4. A short message with a code word, a 4 to 8 digit code, no link and no phone number is a genuine OTP. It is skipped before scoring and never leaves the device.
+5. Redact (below), log the redacted text on the device, then send `{ kind: "message", text, language, shareSignals }` with the Firebase token if the app set one.
+6. `careful` or `danger`: post a discreet notice (below). `safe` shows nothing. The result also goes through `ShieldBridge.publishResult`, so it reaches `onShieldResult` and `takeUnsyncedResults` with `kind: "message"`, and is stored in the no-backup directory so the deep link still works after the process was killed.
+
+### Decision record
+
+Every notification from a messaging app gets one outcome code while Message Guard is on or paused (`MessageGuardActivity.kt`, `activity.json` in the no-backup directory, last 100 events, 7 days): `skipped_app_not_chosen`, `skipped_paused`, `skipped_self`, `skipped_no_text`, `skipped_hidden_preview`, `skipped_too_short`, `skipped_otp`, `skipped_not_risky`, `skipped_duplicate`, `skipped_rate_limited`, `sent`, then `check_failed:<kind>` (`no_server`, `bad_url`, `timeout`, `no_connection`, `network`, `server_<status>`, `unreadable`, `unknown`) or `result:<verdict>`, with `:notice_blocked` when Android would not show the notice. Group summaries and ongoing notifications only add to the counts. An event holds the time, the app id (`viber`, `sms`) and the code; never text, sender or title. Turning Message Guard off clears it. `getMessageGuardActivity(afterSeq)` returns new events and the counts; the app copies them into the Diagnostics log (area `messageGuard`). `getMessageGuardStatus()` also returns `listenerConnected`, `notificationsEnabled`, `batteryOptimized`, `missingApps` and `last`, which the card shows. `openBatteryOptimizationSettings()` opens the battery optimisation list (no `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` permission). A safe result posts no notice by design; the card's "Last activity" line shows that a message was seen.
 
 The Burmese lists are Unicode text. Zawgyi-encoded messages do not match. Tune the JSON, then run `./gradlew :shield-module:testDebugUnitTest`.
 
@@ -204,7 +209,7 @@ The Burmese lists are Unicode text. Zawgyi-encoded messages do not match. Tune t
 | Kill switch | "Turn off and remove access" on the card turns Message Guard off and opens Android's notification access screen, so the user can revoke access at the system level. |
 | Auth | The auth token is held in memory only, so a check after the app process died goes out without it and the server limits by IP. |
 
-Tests: `MessageRedactionTest` (multilingual fixtures; asserts that no fixture name, number or email survives), `MessageGuardPrivacyTest` (consent gating, empty default app list, log retention, neutral notice, caps) and `MessageGuardTest` (prefilter, OTP, extractor, request body).
+Tests: `MessageRedactionTest` (multilingual fixtures; asserts that no fixture name, number or email survives), `MessageGuardPrivacyTest` (consent gating, empty default app list, log retention, neutral notice, caps), `MessageGuardTest` (prefilter, OTP, extractor, SMS packages, request body) and `MessageGuardActivityTest` (decision codes, listener paths, status).
 
 ### Google Play declaration
 
