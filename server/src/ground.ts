@@ -8,10 +8,22 @@ import type { CheckRequest, Extraction, Flag, Lang, Source } from './types.js';
 export interface GroundResult {
   flags: Flag[];
   sources: Source[];
+  /** Set only with `companyCheck`: whether search found a company or agency with the name. */
+  companyFound?: boolean;
+}
+
+export interface GroundOptions {
+  /** Also ask whether a company with this name exists (Job Shield). */
+  companyCheck?: boolean;
 }
 
 export interface Grounder {
-  ground(req: CheckRequest, extraction: Extraction, timeoutMs: number): Promise<GroundResult>;
+  ground(
+    req: Pick<CheckRequest, 'language'>,
+    extraction: Pick<Extraction, 'entities'>,
+    timeoutMs: number,
+    opts?: GroundOptions,
+  ): Promise<GroundResult>;
 }
 
 const LANG_NAMES: Record<Lang, string> = { en: 'English', id: 'Bahasa Indonesia', tl: 'Tagalog', my: 'Burmese', th: 'Thai' };
@@ -79,7 +91,7 @@ export interface GroundingRequest {
   question: string;
 }
 
-export function buildGroundingRequest(x: Pick<Extraction, 'entities'>, lang: Lang): GroundingRequest {
+export function buildGroundingRequest(x: Pick<Extraction, 'entities'>, lang: Lang, opts: GroundOptions = {}): GroundingRequest {
   const q = groundingQuery(x);
   const where = q.country ? ` in ${q.country}` : '';
   const names = [...q.companies, ...q.domains];
@@ -96,6 +108,11 @@ export function buildGroundingRequest(x: Pick<Extraction, 'entities'>, lang: Lan
     '- Add a finding only when search results support it. If everything checks out, return {"findings":[]}.',
     '- Use likelihood language. Say "We could not find a licence record for X", never "X is unlicensed" or "X is a scammer". Say "Reports online describe similar messages as scams", never "X is a scam". Never call a named company or website a criminal. Never use "definitely", "confirmed" or "100%". In Thai, write "เราไม่พบข้อมูลใบอนุญาตของ X" or "มีรายงานออนไลน์ว่าข้อความคล้ายกันถูกใช้หลอกลวง", never "เป็นการหลอกลวง", "เป็นมิจฉาชีพ", "แน่นอน", "ชัวร์" or "ยืนยันแล้ว".',
     `- Write label in ${LANG_NAMES[lang]}. Keep evidence to one short sentence naming the source.`,
+    ...(opts.companyCheck
+      ? [
+          '- Also add "companyFound" to the JSON object: true only if the search results show a real company or agency with this exact name (in the stated country, if one is given), otherwise false. A company existing says nothing about whether a recruiter works for it.',
+        ]
+      : []),
   ].join('\n');
   return { system, question };
 }
@@ -109,6 +126,21 @@ export function parseFindings(text: string | undefined): Flag[] {
     return r.success ? r.data.findings : [];
   } catch {
     return [];
+  }
+}
+
+const companyFoundSchema = z.object({ companyFound: z.boolean() });
+
+/** The `companyFound` answer, or undefined when the reply has none. */
+export function parseCompanyFound(text: string | undefined): boolean | undefined {
+  const start = text?.indexOf('{') ?? -1;
+  const end = text?.lastIndexOf('}') ?? -1;
+  if (!text || start < 0 || end <= start) return undefined;
+  try {
+    const r = companyFoundSchema.safeParse(JSON.parse(text.slice(start, end + 1)));
+    return r.success ? r.data.companyFound : undefined;
+  } catch {
+    return undefined;
   }
 }
 
@@ -140,9 +172,9 @@ export function extractSources(res: GroundedResponse): Source[] {
 
 export function createGrounder(cfg: Config, client: Pick<GoogleGenAI, 'models'>): Grounder {
   return {
-    async ground(req, extraction, timeoutMs) {
+    async ground(req, extraction, timeoutMs, opts = {}) {
       if (!cfg.grounding || !needsGrounding(extraction) || timeoutMs < 1000) return { flags: [], sources: [] };
-      const request = buildGroundingRequest(extraction, req.language);
+      const request = buildGroundingRequest(extraction, req.language, opts);
       try {
         const res = await client.models.generateContent({
           model: cfg.model,
@@ -161,7 +193,10 @@ export function createGrounder(cfg: Config, client: Pick<GoogleGenAI, 'models'>)
           log('INFO', 'grounding_unsearched', { dropped: flags.length });
           return { flags: [], sources: [] };
         }
-        return { flags, sources: extractSources(res as GroundedResponse) };
+        const sources = extractSources(res as GroundedResponse);
+        if (!opts.companyCheck) return { flags, sources };
+        const companyFound = parseCompanyFound(res.text);
+        return companyFound === undefined ? { flags, sources } : { flags, sources, companyFound };
       } catch (err) {
         log('WARNING', 'grounding_failed', { error: (err as Error).message });
         return { flags: [], sources: [] };
