@@ -30,6 +30,12 @@ describe('app', () => {
     expect(await res.json()).toEqual({ apiUrl: 'https://saferoute-api.akkhayar.com' });
   });
 
+  it('serves the same health body at /health', async () => {
+    const res = await make().request('/health');
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual(await (await make().request('/healthz')).json());
+  });
+
   it('healthz reports mock mode', async () => {
     const res = await make().request('/healthz');
     expect(await res.json()).toEqual({ ok: true, model: 'gemini-3.5-flash-lite', mock: true });
