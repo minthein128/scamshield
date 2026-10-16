@@ -33,7 +33,6 @@
     "placeholder": "Halimbawa: Bangkok, Thailand"
   },
   "optional": {
-    "title": "Opsyonal",
     "language": "Wika ng ulat"
   },
   "submit": "Suriin ngayon",
@@ -45,5 +44,9 @@
     "screenshot": "Screenshot",
     "screenshotAt": "Screenshot, {{place}}",
     "fallback": "Pagsusuri"
-  }
+  },
+  "more": {
+    "title": "Dagdag na detalye (opsyonal)"
+  },
+  "submitHint": "Maglagay muna ng mensahe, link, o screenshot"
 }

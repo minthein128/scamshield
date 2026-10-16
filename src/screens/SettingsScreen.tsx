@@ -7,7 +7,8 @@ import { ConnectionCard } from '../components/ConnectionCard';
 import { Screen } from '../components/Screen';
 import { Text } from '../components/Text';
 import { Button, Card, Chip, LinkButton, Notice, ScreenHeader, SectionTitle } from '../components/ui';
-import { COUNTRIES, countryLabel } from '../lib/countries';
+import { COUNTRIES, countryLabel, type CountryCode } from '../lib/countries';
+import { Select } from '../components/Select';
 import { UI_LANGUAGES } from '../i18n/languages';
 import { confirmAction, notify } from '../lib/notify';
 import type { RootScreenProps } from '../navigation/types';
@@ -26,12 +27,15 @@ const SYNC_KEYS: Record<SyncState, 'sync.syncing' | 'sync.done' | 'sync.error' |
   error: 'sync.error',
 };
 
+const NONE = 'none';
+
 export const PRIVACY_POINTS = ['privacy.p1', 'privacy.p2', 'privacy.p3', 'privacy.p4'] as const;
 
 export const SettingsScreen: React.FC<RootScreenProps<'Settings'>> = ({ navigation }) => {
   const { t } = useTranslation(['settings', 'common']);
   const { status, signOut, deleteAccount } = useAuth();
   const { profile, language, setLanguage, updateProfile, setKeepHistory, syncState, clearSyncedCopies, deleteLocalData } = useAppState();
+  const countryOptions: { value: CountryCode | typeof NONE; label: string }[] = [{ value: NONE, label: t('notSet') }, ...COUNTRIES.map(c => ({ value: c.code, label: countryLabel(c.code) }))];
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -118,32 +122,21 @@ export const SettingsScreen: React.FC<RootScreenProps<'Settings'>> = ({ navigati
         </View>
       </View>
 
-      <View style={{ gap: 8 }}>
-        <SectionTitle>{t('myCountry')}</SectionTitle>
-        <View style={styles.wrap}>
-          {COUNTRIES.map(c => (
-            <Chip
-              key={c.code}
-              label={countryLabel(c.code)}
-              selected={profile.homeCountry === c.code}
-              onPress={() => updateProfile({ homeCountry: profile.homeCountry === c.code ? undefined : c.code })}
-            />
-          ))}
-        </View>
-      </View>
-
-      <View style={{ gap: 8 }}>
-        <SectionTitle>{t('destination')}</SectionTitle>
-        <View style={styles.wrap}>
-          {COUNTRIES.map(c => (
-            <Chip
-              key={c.code}
-              label={countryLabel(c.code)}
-              selected={profile.destinationCountry === c.code}
-              onPress={() => updateProfile({ destinationCountry: profile.destinationCountry === c.code ? undefined : c.code })}
-            />
-          ))}
-        </View>
+      <View style={{ gap: 14 }}>
+        <Select
+          testID="settings-home-country"
+          label={t('myCountry')}
+          value={profile.homeCountry ?? NONE}
+          options={countryOptions}
+          onChange={v => updateProfile({ homeCountry: v === NONE ? undefined : v })}
+        />
+        <Select
+          testID="settings-destination-country"
+          label={t('destination')}
+          value={profile.destinationCountry ?? NONE}
+          options={countryOptions}
+          onChange={v => updateProfile({ destinationCountry: v === NONE ? undefined : v })}
+        />
       </View>
 
       <View style={{ gap: 8 }}>

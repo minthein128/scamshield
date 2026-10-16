@@ -7,7 +7,7 @@
     "title": "Account",
     "signOut": "Mag-sign out",
     "deleteAccount": "Burahin ang account",
-    "unavailable": "Ginagamit mo ang SafeRoute nang walang account. Hindi pa available ang mga account sa bersyong ito.",
+    "unavailable": "Hindi kailangan ng account. Mananatili sa teleponong ito ang iyong mga pagsusuri.",
     "none": "Walang account",
     "noneBody": "Gumagana ang lahat kahit walang account. Gumawa ng account para maitabi ang iyong mga pagsusuri at contact kung magpapalit ka ng telepono, at para makakuha ng mas mataas na limit sa pagsusuri bawat oras.",
     "create": "Gumawa ng account",
@@ -76,5 +76,6 @@
   "deleted": {
     "title": "Nabura na ang account",
     "message": "Wala na ang iyong account at mga naka-sync na data."
-  }
+  },
+  "notSet": "Hindi nakatakda"
 }

@@ -6,12 +6,13 @@
   "check": {
     "title": "Periksa tawaran kerja, pesan, atau tautan",
     "body": "Tempel teks atau bagikan tangkapan layar. Kami memeriksa tanda bahaya perdagangan orang dan rekening perantara.",
-    "start": "Mulai periksa"
+    "start": "Periksa sesuatu"
   },
   "quick": {
-    "link": "Tempel tautan",
+    "lead": "Atau mulai dengan",
+    "link": "Tautan",
     "image": "Tangkapan layar",
-    "chat": "Obrolan"
+    "message": "Pesan"
   },
   "recent": {
     "title": "Pemeriksaan terbaru",
