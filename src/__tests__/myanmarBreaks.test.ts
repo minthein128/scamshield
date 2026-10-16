@@ -1,4 +1,4 @@
-import { breakMyanmar } from '../theme/myanmarBreaks';
+import { breakMyanmar, syllableRuns } from '../theme/myanmarBreaks';
 import home from '../i18n/locales/my/home.json';
 import check from '../i18n/locales/my/check.json';
 
@@ -6,6 +6,27 @@ const ZW = '​';
 const parts = (s: string) => breakMyanmar(s).split(ZW);
 
 describe('breakMyanmar', () => {
+  it('splits only at syllable boundaries for the reviewed words', () => {
+    expect(parts('မြန့်')).toEqual(['မြန့်']);
+    expect(parts('သင့်')).toEqual(['သင့်']);
+    expect(parts('ပြင်ဆင့်')).toEqual(['ပြင်', 'ဆင့်']);
+    expect(parts('အင်္ဂလိပ်')).toEqual(['အင်္ဂ', 'လိပ်']);
+  });
+
+  it('keeps လင့်ခ် whole inside the hero string', () => {
+    const hero = home.check.title;
+    const pieces = breakMyanmar(hero).split(/[\u200B ]/);
+    expect(pieces).toContain('လင့်ခ်');
+    expect(pieces.every(p => !/^[\u1036\u1037\u103A\u1039]/.test(p))).toBe(true);
+    expect(breakMyanmar(hero).split('\u200B').join('')).toBe(hero);
+  });
+
+  it('syllableRuns keeps each run whole and rebuilds the text', () => {
+    const runs = syllableRuns('လင့်ခ်ကို စစ်ဆေး');
+    expect(runs).toEqual(['လင့်ခ်', '\u200B', 'ကို', ' ', 'စစ်', '\u200B', 'ဆေး']);
+    expect(runs.join('').replace(/\u200B/g, '')).toBe('လင့်ခ်ကို စစ်ဆေး');
+  });
+
   it('keeps the link word whole, with dot-below and asat codas', () => {
     expect(parts('လင့်ခ်ကို')).toEqual(['လင့်ခ်', 'ကို']);
     expect(parts('လင်ခ်ကို')).toEqual(['လင်ခ်', 'ကို']);
