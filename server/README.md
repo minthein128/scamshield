@@ -16,7 +16,7 @@ Run `npm run eval` to repeat the measurement. `/v1/speak` uses `gemini-3.8-flash
 ## Pipeline
 
 1. Extract: one Gemini call (text plus optional image) with a JSON response schema. It returns flags in 7 families, scam type, a draft verdict, summary, spoken warning and URLs, in `en`, `id`, `tl` or `my`.
-2. Detect: when the input names a company, agency, phone number or domain, a second Gemini call with the Google Search grounding tool checks that the entity exists and is licensed, whether scam reports exist, and whether the salary is plausible. Findings join the flags (capped at medium severity) and the source pages are returned as `sources`. Skipped when nothing is named.
+2. Detect: when the input names a company, agency or website, a second Gemini call with the Google Search grounding tool checks that the entity exists and is licensed and whether scam reports exist. The call carries only organisation names, website hosts and the country (`groundingQuery` in `src/ground.ts`); phone numbers, chat ids, account numbers and person names never leave for search. Findings join the flags (capped at medium severity) and the source pages are returned as `sources`. Skipped when nothing is named.
 3. Correlate (runs in parallel with Detect): each URL goes to Google Web Risk (`uris.search`: MALWARE, SOCIAL_ENGINEERING, UNWANTED_SOFTWARE) and to RDAP (`rdap.org`) for domain age. Both have short timeouts and return `unknown` on failure.
 4. Score: a deterministic rules engine (`src/score.ts`).
 5. Explain: title, summary, spoken warning, actions in the requested language.
