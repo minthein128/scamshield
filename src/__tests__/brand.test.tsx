@@ -1,5 +1,5 @@
 import React from 'react';
-import { cleanup, render, screen } from '@testing-library/react-native';
+import { act, cleanup, render, screen } from '@testing-library/react-native';
 import { DollLoader, VERDICT_MARK } from '../components/DollLoader';
 import { MARK_COLORS } from '../components/dollMark';
 import theme from '../theme/theme';
@@ -16,15 +16,21 @@ const channels = (hex: string) => [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2
 const distance = (a: string, b: string) => Math.hypot(...channels(a).map((v, i) => v - channels(b)[i]));
 
 describe('DollLoader', () => {
+  beforeEach(() => jest.useFakeTimers());
+  afterEach(() => {
+    act(() => jest.runOnlyPendingTimers());
+    jest.useRealTimers();
+  });
+
   it('shows the doll and no verdict mark while the check runs', () => {
-    render(<DollLoader step={1} label="Checking" />);
+    render(<DollLoader floor={0.4} ceiling={0.55} label="Checking" />);
     expect(screen.getByTestId('loader-doll')).toBeTruthy();
     expect(screen.queryByTestId(/loader-verdict-/)).toBeNull();
     expect(screen.getByLabelText('Checking')).toBeTruthy();
   });
 
   it('shows the verdict mark once the verdict lands', () => {
-    render(<DollLoader step={5} verdict="danger" label="Checking" />);
+    render(<DollLoader floor={1} ceiling={1} verdict="danger" label="Checking" />);
     expect(screen.getByTestId('loader-verdict-danger', { includeHiddenElements: true })).toBeTruthy();
   });
 

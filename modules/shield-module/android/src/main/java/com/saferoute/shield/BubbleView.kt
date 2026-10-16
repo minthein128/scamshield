@@ -1,16 +1,14 @@
 package com.saferoute.shield
 
+import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.LinearGradient
 import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.RectF
-import android.graphics.Shader
-import android.provider.Settings
-import android.view.animation.OvershootInterpolator
+import android.os.SystemClock
 import android.view.View
 import android.view.animation.LinearInterpolator
 
@@ -39,21 +37,29 @@ internal class BubbleView(context: Context, palette: ShieldPalette) : View(conte
             invalidate()
         }
 
-    /** 0..1 input level while listening, output level while speaking. */
+    /** 0..1 input level while listening, output level while speaking. Set it on every tick; the halo eases toward it. */
     var level: Float = 0f
         set(value) {
             val v = value.coerceIn(0f, 1f)
-            if (kotlin.math.abs(v - field) < 0.01f) return
             field = v
-            if (voice == Voice.LISTENING || voice == Voice.SPEAKING) invalidate()
+            val next = if (v == 0f && !voiceMoves()) 0f else shownLevel + (v - shownLevel) * (if (v > shownLevel) LEVEL_ATTACK else LEVEL_RELEASE)
+            if (kotlin.math.abs(next - shownLevel) < 0.004f) return
+            shownLevel = next
+            if (voiceMoves()) invalidate()
         }
+    private var shownLevel = 0f
+
+    private fun voiceMoves() = voice == Voice.LISTENING || voice == Voice.SPEAKING
 
     var shieldState: ShieldOverlay.State = ShieldOverlay.State.IDLE
         set(value) {
             val before = field
+            if (before == value) return
+            val wasChecking = before == ShieldOverlay.State.CHECKING
+            val leaving = if (wasChecking) checkingPose() else null
             field = value
-            if (value == ShieldOverlay.State.CHECKING) startScan() else stopScan()
-            if (before == ShieldOverlay.State.CHECKING && value in VERDICTS) pop() else popScale = 1f
+            if (value == ShieldOverlay.State.CHECKING) startCheck() else stopCheck()
+            if (wasChecking && value != ShieldOverlay.State.IDLE && leaving != null) reveal(leaving) else endReveal()
             invalidate()
         }
 
@@ -75,11 +81,13 @@ internal class BubbleView(context: Context, palette: ShieldPalette) : View(conte
     private val shieldPath = Path()
     private val markPath = Path()
     private val dotPath = Path()
-    private var phase = 0f
-    private var scanner: ValueAnimator? = null
-    private var popScale = 1f
-    private var markAlpha = 1f
-    private val scanPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private var checker: ValueAnimator? = null
+    private var checkStart = 0L
+    private var revealer: ValueAnimator? = null
+    private var revealMs = REVEAL_TOTAL_MS.toFloat()
+    private var fromProgress = 1f
+    private var fromTilt = 0f
+    private val argb = ArgbEvaluator()
     private val levelRing = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE }
     private val avatarPaint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
     private val badgePath = Path()
@@ -111,10 +119,7 @@ internal class BubbleView(context: Context, palette: ShieldPalette) : View(conte
         fill.setShadowLayer(8f * d, 0f, 3f * d, palette.shadow)
         canvas.drawCircle(cx, cy, radius, fill)
 
-        val inset = ring.strokeWidth / 2f + 1.5f * d
-        arcBounds.set(cx - radius + inset, cy - radius + inset, cx + radius - inset, cy + radius - inset)
-        ring.color = if (shieldState == ShieldOverlay.State.CHECKING) (palette.accent and 0x00FFFFFF) or 0x33000000 else accent
-        canvas.drawArc(arcBounds, 0f, 360f, false, ring)
+        drawRing(canvas, cx, cy, radius, accent)
 
         if (voice != Voice.NONE) {
             drawVoice(canvas, cx, cy, radius, accent)
@@ -126,20 +131,19 @@ internal class BubbleView(context: Context, palette: ShieldPalette) : View(conte
             return
         }
 
-        val checking = shieldState == ShieldOverlay.State.CHECKING
-        val pulse = if (checking && scanner != null) 1f + 0.05f * Math.sin(phase * 2 * Math.PI).toFloat() else 1f
         val box = 26f * d
+        val pop = 0.85f + 0.15f * badgeScale()
         canvas.save()
-        canvas.scale(popScale * pulse, popScale * pulse, cx, cy)
+        canvas.scale(pop, pop, cx, cy)
+        canvas.rotate(tilt(), cx, cy + box / 2f)
         matrix.setScale(box, box)
         matrix.postTranslate(cx - box / 2f, cy - box / 2f)
         buildShield(shieldPath)
         shieldPath.transform(matrix)
         glyph.color = palette.glyph(shieldState)
         canvas.drawPath(shieldPath, glyph)
-        if (checking && scanner != null) drawScanLine(canvas, cx, cy, box)
 
-        val markColor = (palette.surface and 0x00FFFFFF) or ((markAlpha * 255).toInt() shl 24)
+        val markColor = (palette.surface and 0x00FFFFFF) or ((badgeAlpha() * 255).toInt() shl 24)
         mark.color = markColor
         mark.strokeWidth = 0.1f * box
         markPath.reset()
@@ -179,12 +183,70 @@ internal class BubbleView(context: Context, palette: ShieldPalette) : View(conte
         canvas.restore()
     }
 
+    private fun now() = SystemClock.uptimeMillis()
+
+    private fun checking() = shieldState == ShieldOverlay.State.CHECKING
+
+    /** Ring share and doll tilt while checking; null when motion is off. */
+    private fun checkingPose(): Pair<Float, Float>? {
+        if (checker == null) return null
+        val ms = now() - checkStart
+        return Pair(ShieldMotion.creep(ms), ShieldMotion.swayAngle(ms))
+    }
+
+    private fun revealT(delay: Long, length: Long): Float =
+        ((revealMs - delay) / length).coerceIn(0f, 1f)
+
+    private fun ringFill(): Float = ShieldMotion.OUT.getInterpolation(revealT(0, ShieldMotion.REVEAL_MS))
+
+    private fun badgeScale(): Float = 0.6f + 0.4f * ShieldMotion.POP.getInterpolation(revealT(BADGE_DELAY_MS, ShieldMotion.STEP_MS))
+
+    private fun badgeAlpha(): Float = revealT(BADGE_DELAY_MS, ShieldMotion.EXIT_MS)
+
+    private fun tilt(): Float = when {
+        checking() -> checkingPose()?.second ?: 0f
+        revealer != null -> fromTilt * (1f - ShieldMotion.POP.getInterpolation(revealT(0, ShieldMotion.REVEAL_MS)))
+        else -> 0f
+    }
+
+    /** Thin ring: a track and an arc that fills while checking, then fills in the verdict colour in one move. */
+    private fun drawRing(canvas: Canvas, cx: Float, cy: Float, radius: Float, accent: Int) {
+        val inset = ring.strokeWidth / 2f + 1.5f * d
+        arcBounds.set(cx - radius + inset, cy - radius + inset, cx + radius - inset, cy + radius - inset)
+        val track = (palette.accent and 0x00FFFFFF) or 0x24000000
+        when {
+            checking() -> {
+                ring.color = track
+                canvas.drawArc(arcBounds, 0f, 360f, false, ring)
+                val share = checkingPose()?.first ?: return
+                ring.color = palette.accent
+                canvas.drawArc(arcBounds, -90f, 360f * share, false, ring)
+            }
+            revealer != null && voice == Voice.NONE -> {
+                val t = ringFill()
+                ring.color = track
+                canvas.drawArc(arcBounds, 0f, 360f, false, ring)
+                ring.color = argb.evaluate(t, palette.accent, accent) as Int
+                canvas.drawArc(arcBounds, -90f, 360f * (fromProgress + (1f - fromProgress) * t), false, ring)
+            }
+            else -> {
+                ring.color = accent
+                canvas.drawArc(arcBounds, 0f, 360f, false, ring)
+            }
+        }
+    }
+
+    /** 0..1 height of thinking dot [i]: a slow travelling wave, so the three dots breathe in turn. */
+    private fun dotWave(i: Int): Float =
+        0.5f - 0.5f * kotlin.math.cos(2.0 * Math.PI * (thinkPhase - i / 3f)).toFloat()
+
     private fun drawVoice(canvas: Canvas, cx: Float, cy: Float, radius: Float, accent: Int) {
-        if ((voice == Voice.LISTENING || voice == Voice.SPEAKING) && level > 0.02f) {
+        val lvl = shownLevel
+        if (voiceMoves() && lvl > 0.02f) {
             val halo = if (voice == Voice.LISTENING) palette.brandRed else palette.brandGold
-            levelRing.color = (halo and 0x00FFFFFF) or ((0x40 + (0x80 * level).toInt()) shl 24)
-            levelRing.strokeWidth = (2f + 3f * level) * d
-            canvas.drawCircle(cx, cy, radius + (1.5f + 7f * level) * d, levelRing)
+            levelRing.color = (halo and 0x00FFFFFF) or (((0.25f + 0.45f * lvl) * 255).toInt() shl 24)
+            levelRing.strokeWidth = 2.5f * d
+            canvas.drawCircle(cx, cy, radius + (1.5f + 6f * lvl) * d, levelRing)
         }
         val box = 26f * d
         matrix.setScale(box, box)
@@ -218,7 +280,7 @@ internal class BubbleView(context: Context, palette: ShieldPalette) : View(conte
                 canvas.drawPath(markPath, mark)
             }
             Voice.THINKING, Voice.SPEAKING -> {
-                val scale = if (voice == Voice.SPEAKING) 1f + 0.14f * level else 1f
+                val scale = if (voice == Voice.SPEAKING) 1f + 0.08f * shownLevel else 1f
                 canvas.save()
                 canvas.scale(scale, scale, cx, cy)
                 buildShield(shieldPath)
@@ -227,12 +289,7 @@ internal class BubbleView(context: Context, palette: ShieldPalette) : View(conte
                 canvas.drawPath(shieldPath, glyph)
                 val dot = palette.surface and 0x00FFFFFF
                 for (i in 0 until 3) {
-                    val wave = if (voice == Voice.THINKING) {
-                        val t = ((thinkPhase * 3f - i) % 3f + 3f) % 3f
-                        if (t < 1f) 1f - kotlin.math.abs(t - 0.5f) * 2f else 0f
-                    } else {
-                        level
-                    }
+                    val wave = if (voice == Voice.THINKING) dotWave(i) else shownLevel
                     glyph.color = dot or ((0x80 + (0x7F * wave).toInt()) shl 24)
                     val bx = cx + (i - 1) * 0.2f * box
                     val by = cy - (if (voice == Voice.THINKING) 0.06f * box * wave else 0f)
@@ -257,32 +314,10 @@ internal class BubbleView(context: Context, palette: ShieldPalette) : View(conte
         canvas.restore()
     }
 
-    /** Idle, checking and result states with the doll: rocking scan while checking, a verdict badge after. */
+    /** Idle, checking and result states with the doll: a damped sway while checking, upright with a verdict badge after. */
     private fun drawDollState(canvas: Canvas, face: android.graphics.Bitmap, cx: Float, cy: Float, radius: Float) {
         val inner = radius - 4.5f * d
-        val checking = shieldState == ShieldOverlay.State.CHECKING && scanner != null
-        val tilt = if (checking) 9f * kotlin.math.sin(phase * 2 * Math.PI).toFloat() else 0f
-        drawDollFace(canvas, face, cx, cy, inner, popScale, tilt)
-        if (checking) {
-            canvas.save()
-            clip.reset()
-            clip.addCircle(cx, cy, inner, Path.Direction.CW)
-            canvas.clipPath(clip)
-            val top = cy - inner
-            val y = top + 2f * inner * phase
-            val band = 0.35f * inner
-            scanPaint.shader = LinearGradient(
-                0f, y - band, 0f, y,
-                palette.accent and 0x00FFFFFF, (palette.accent and 0x00FFFFFF) or 0x55000000,
-                Shader.TileMode.CLAMP
-            )
-            canvas.drawRect(cx - inner, y - band, cx + inner, y, scanPaint)
-            scanPaint.shader = null
-            scanPaint.color = palette.accent
-            scanPaint.strokeWidth = 2f * d
-            canvas.drawLine(cx - inner, y, cx + inner, y, scanPaint)
-            canvas.restore()
-        }
+        drawDollFace(canvas, face, cx, cy, inner, 1f, tilt())
         drawVerdictBadge(canvas, cx + inner * 0.72f, cy + inner * 0.72f)
     }
 
@@ -290,7 +325,9 @@ internal class BubbleView(context: Context, palette: ShieldPalette) : View(conte
     private fun drawVerdictBadge(canvas: Canvas, bx: Float, by: Float) {
         val state = shieldState
         if (state == ShieldOverlay.State.IDLE || state == ShieldOverlay.State.CHECKING) return
-        val r = 9f * d
+        val alpha = badgeAlpha()
+        if (alpha <= 0f) return
+        val r = 9f * d * badgeScale()
         val m = 2f * r
         matrix.setScale(m, m)
         matrix.postTranslate(bx - r, by - r)
@@ -317,12 +354,15 @@ internal class BubbleView(context: Context, palette: ShieldPalette) : View(conte
             else -> badgePath.addCircle(0.5f, 0.5f, 0.5f, Path.Direction.CW)
         }
         badgePath.transform(matrix)
+        val a = (alpha * 255).toInt()
         badgeOutline.color = palette.surface
+        badgeOutline.alpha = a
         badgeOutline.strokeWidth = 3f * d
         canvas.drawPath(badgePath, badgeOutline)
         glyph.color = palette.ring(state)
+        glyph.alpha = a
         canvas.drawPath(badgePath, glyph)
-        val white = 0x00FFFFFF or ((markAlpha * 255).toInt() shl 24)
+        val white = 0x00FFFFFF or (a shl 24)
         mark.color = white
         mark.strokeWidth = 0.12f * m
         markPath.reset()
@@ -357,13 +397,12 @@ internal class BubbleView(context: Context, palette: ShieldPalette) : View(conte
     private fun drawDoll(canvas: Canvas, face: android.graphics.Bitmap, cx: Float, cy: Float, radius: Float, box: Float) {
         val inner = radius - 4.5f * d
         val speaking = voice == Voice.SPEAKING
-        val scale = if (speaking) 1f + 0.06f * level else 1f
-        val tilt = if (speaking) 7f * level * kotlin.math.sin(System.nanoTime() / 1.6e8).toFloat() else 0f
+        val scale = if (speaking) 1f + 0.04f * shownLevel else 1f
+        val tilt = if (speaking) 6f * shownLevel * kotlin.math.sin(2.0 * Math.PI * now() / SPEAK_SWAY_MS).toFloat() else 0f
         drawDollFace(canvas, face, cx, cy, inner, scale, tilt)
         if (voice == Voice.THINKING) {
             for (i in 0 until 3) {
-                val t = ((thinkPhase * 3f - i) % 3f + 3f) % 3f
-                val wave = if (t < 1f) 1f - kotlin.math.abs(t - 0.5f) * 2f else 0f
+                val wave = dotWave(i)
                 val dx = cx + (i - 1) * 0.22f * box
                 val dy = cy + inner - 5f * d - 2f * d * wave
                 glyph.color = palette.accent
@@ -399,9 +438,9 @@ internal class BubbleView(context: Context, palette: ShieldPalette) : View(conte
     }
 
     private fun startThink() {
-        if (thinker != null || !animationsEnabled()) return
+        if (thinker != null || !ShieldMotion.enabled(context) || !isShown) return
         thinker = ValueAnimator.ofFloat(0f, 1f).apply {
-            duration = 1200
+            duration = THINK_MS
             repeatCount = ValueAnimator.INFINITE
             interpolator = LinearInterpolator()
             addUpdateListener {
@@ -417,49 +456,35 @@ internal class BubbleView(context: Context, palette: ShieldPalette) : View(conte
         thinker = null
     }
 
-    private fun drawScanLine(canvas: Canvas, cx: Float, cy: Float, box: Float) {
-        val top = cy - box / 2f
-        val y = top + box * (0.08f + 0.84f * phase)
-        canvas.save()
-        clip.set(shieldPath)
-        canvas.clipPath(clip)
-        val band = 0.22f * box
-        scanPaint.shader = LinearGradient(
-            0f, y - band, 0f, y,
-            palette.surface and 0x00FFFFFF, (palette.surface and 0x00FFFFFF) or 0x66000000,
-            Shader.TileMode.CLAMP
-        )
-        canvas.drawRect(cx - box / 2f, y - band, cx + box / 2f, y, scanPaint)
-        scanPaint.shader = null
-        scanPaint.color = (palette.surface and 0x00FFFFFF) or 0xCC000000.toInt()
-        scanPaint.strokeWidth = 1.5f * d
-        canvas.drawLine(cx - box / 2f, y, cx + box / 2f, y, scanPaint)
-        canvas.restore()
-    }
-
-    private fun pop() {
-        if (!animationsEnabled()) {
-            popScale = 1f
-            markAlpha = 1f
-            return
-        }
-        popScale = 0.8f
-        markAlpha = 0f
-        ValueAnimator.ofFloat(0f, 1f).apply {
-            duration = 340
-            interpolator = OvershootInterpolator(2.4f)
+    /** The verdict lands: the ring fills in its colour, the doll rights itself, the badge scales in. */
+    private fun reveal(from: Pair<Float, Float>) {
+        revealer?.cancel()
+        fromProgress = from.first
+        fromTilt = from.second
+        revealMs = 0f
+        revealer = ValueAnimator.ofFloat(0f, REVEAL_TOTAL_MS.toFloat()).apply {
+            duration = REVEAL_TOTAL_MS
+            interpolator = LinearInterpolator()
             addUpdateListener {
-                val t = it.animatedValue as Float
-                popScale = 0.8f + 0.2f * t
-                markAlpha = (t * 2f).coerceIn(0f, 1f)
+                revealMs = it.animatedValue as Float
                 invalidate()
             }
+            addListener(object : android.animation.AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: android.animation.Animator) {
+                    if (revealer === animation) revealer = null
+                    revealMs = REVEAL_TOTAL_MS.toFloat()
+                    invalidate()
+                }
+            })
             start()
         }
     }
 
-    private fun animationsEnabled(): Boolean =
-        Settings.Global.getFloat(context.contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f) > 0f
+    private fun endReveal() {
+        revealer?.cancel()
+        revealer = null
+        revealMs = REVEAL_TOTAL_MS.toFloat()
+    }
 
     private fun buildShield(path: Path) {
         path.reset()
@@ -472,35 +497,47 @@ internal class BubbleView(context: Context, palette: ShieldPalette) : View(conte
         path.close()
     }
 
-    private fun startScan() {
-        if (scanner != null || !animationsEnabled()) return
-        scanner = ValueAnimator.ofFloat(0f, 1f).apply {
-            duration = 1400
+    private fun startCheck() {
+        if (checker == null) checkStart = now()
+        if (checker != null || !ShieldMotion.enabled(context) || !isShown) return
+        checker = ValueAnimator.ofFloat(0f, 1f).apply {
+            duration = ShieldMotion.SWAY_MS
             repeatCount = ValueAnimator.INFINITE
             interpolator = LinearInterpolator()
-            addUpdateListener {
-                phase = it.animatedValue as Float
-                invalidate()
-            }
+            addUpdateListener { invalidate() }
             start()
         }
     }
 
-    private fun stopScan() {
-        scanner?.cancel()
-        scanner = null
+    private fun stopCheck() {
+        checker?.cancel()
+        checker = null
     }
 
     override fun onDetachedFromWindow() {
-        stopScan()
+        stopCheck()
         stopThink()
+        endReveal()
         super.onDetachedFromWindow()
     }
 
-    override fun onAttachedToWindow() {
-        super.onAttachedToWindow()
-        if (shieldState == ShieldOverlay.State.CHECKING) startScan()
+    /** Loops run only while the bubble can be seen. */
+    override fun onVisibilityAggregated(isVisible: Boolean) {
+        super.onVisibilityAggregated(isVisible)
+        if (!isVisible) {
+            checker?.cancel()
+            checker = null
+            stopThink()
+            return
+        }
+        if (checking()) resumeCheck()
         if (voice == Voice.THINKING) startThink()
+    }
+
+    private fun resumeCheck() {
+        val started = checkStart
+        startCheck()
+        if (started != 0L) checkStart = started
     }
 
     enum class Voice { NONE, LISTENING, MUTED, THINKING, SPEAKING }
@@ -508,7 +545,12 @@ internal class BubbleView(context: Context, palette: ShieldPalette) : View(conte
     companion object {
         const val CIRCLE_DP = 56
         const val PAD_DP = 12
-        private val VERDICTS = setOf(ShieldOverlay.State.SAFE, ShieldOverlay.State.CAREFUL, ShieldOverlay.State.DANGER)
+        private const val BADGE_DELAY_MS = 120L
+        private val REVEAL_TOTAL_MS = BADGE_DELAY_MS + ShieldMotion.STEP_MS
+        private const val THINK_MS = 1400L
+        private const val SPEAK_SWAY_MS = 1400.0
+        private const val LEVEL_ATTACK = 0.55f
+        private const val LEVEL_RELEASE = 0.18f
     }
 }
 

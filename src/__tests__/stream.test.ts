@@ -110,6 +110,7 @@ describe('streamed check', () => {
   it('mock client emits a provisional verdict before the final result', async () => {
     const updates: string[] = [];
     await createMockClient({ delayMs: 10 }).check(request, { onUpdate: u => updates.push(u.type) });
-    expect(updates).toEqual(['verdict', 'final']);
+    expect(updates.filter(u => u !== 'stage')).toEqual(['verdict', 'final']);
+    expect(updates.filter(u => u === 'stage')).toHaveLength(8);
   });
 });

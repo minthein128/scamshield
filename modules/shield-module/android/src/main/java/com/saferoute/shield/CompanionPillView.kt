@@ -84,8 +84,16 @@ internal class CompanionPillView(
         chip.maxWidth = maxOf(dp(48), maxPx - paddingLeft - paddingRight - dp(4) - dp(48) - dp(48))
     }
 
+    /** Grows out of the bubble like the result card. Set the pivot first. */
+    fun enterAnimator(): android.animation.Animator = ResultCardView.popIn(this, ENTER_SCALE)
+
     fun render(view: CompanionView, verdict: ShieldOverlay.State) {
         val label = labelFor(view, strings)
+        if (label != chipText && chipText.isNotEmpty()) {
+            chip.animate().cancel()
+            chip.alpha = CHIP_FADE_FROM
+            chip.animate().alpha(1f).setDuration(ShieldMotion.FADE_MS).setInterpolator(ShieldMotion.OUT).start()
+        }
         chipText = label
         chip.text = label
         chip.contentDescription = "${strings.name}. $label"
@@ -154,6 +162,9 @@ internal class CompanionPillView(
     }
 
     companion object {
+        private const val ENTER_SCALE = 0.9f
+        private const val CHIP_FADE_FROM = 0.3f
+
         fun labelFor(view: CompanionView, strings: ShieldStrings): String = when {
             view.paused -> strings.paused
             view.muted && view.live -> strings.muted
