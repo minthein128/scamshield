@@ -1,36 +1,56 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import Svg, { Circle, Defs, G, Mask, Path, Rect } from 'react-native-svg';
+import Svg, { Circle, G, Path } from 'react-native-svg';
 import { Text } from './Text';
+import { MARK_VIEW, markShapes, type MarkShape } from './dollMark';
 import theme from '../theme/theme';
 
 const { colors, fonts } = theme;
 
-export const BrandMark: React.FC<{ size?: number }> = ({ size = 32 }) => (
-  <Svg width={size * (76 / 98)} height={size} viewBox="12 0 76 98" accessibilityElementsHidden importantForAccessibility="no">
-    <Defs>
-      <Mask id="saferoute-mark-cut" maskUnits="userSpaceOnUse" x="0" y="0" width="100" height="100">
-        <Rect width="100" height="100" fill="#fff" />
-        <Path d="M50 19 L67 25 L67 40 Q67 53 50 60 Q33 53 33 40 L33 25 Z" fill="#000" stroke="#000" strokeWidth={1.5} strokeLinejoin="round" />
-      </Mask>
-    </Defs>
-    <G mask="url(#saferoute-mark-cut)">
-      <Path d="M50 95 C40 82 16 60 16 38 A34 34 0 0 1 84 38 C84 60 60 82 50 95 Z" fill={colors.accent} stroke={colors.accent} strokeWidth={1.5} strokeLinejoin="round" />
-    </G>
-    <Circle cx={50} cy={38} r={7} fill="#B45309" />
+export const MarkShapes: React.FC<{ shapes: MarkShape[] }> = ({ shapes }) => (
+  <>
+    {shapes.map((s, i) => {
+      const paint = { fill: s.fill ?? 'none', stroke: s.stroke, strokeWidth: s.width, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, opacity: s.opacity };
+      return s.circle ? <Circle key={i} cx={s.circle[0]} cy={s.circle[1]} r={s.circle[2]} {...paint} /> : <Path key={i} d={s.d} {...paint} />;
+    })}
+  </>
+);
+
+const [VX, VY, VS] = MARK_VIEW;
+
+/** The pyit taing htaung doll mark. medallion sets it on a disc of that colour, as in the app icon, for dark grounds. */
+export const BrandMark: React.FC<{ size?: number; medallion?: string }> = ({ size = 32, medallion }) => (
+  <Svg width={size} height={size} viewBox={`${VX} ${VY} ${VS} ${VS}`} accessibilityElementsHidden importantForAccessibility="no">
+    {medallion ? (
+      <>
+        <Circle cx={VX + VS / 2} cy={VY + VS / 2} r={VS / 2} fill={medallion} />
+        <G transform={`translate(${VX + VS / 2} ${VY + VS / 2 + 1}) scale(0.78) translate(${-(VX + VS / 2)} ${-(VY + VS / 2)})`}>
+          <MarkShapes shapes={markShapes()} />
+        </G>
+      </>
+    ) : (
+      <MarkShapes shapes={markShapes()} />
+    )}
   </Svg>
 );
 
-export const BrandLockup: React.FC<{ size?: number; color?: string; header?: boolean }> = ({ size = 32, color = colors.textPrimary, header }) => (
+/** "Safe" in ink and "Route" in lacquer red; white and gold on dark grounds. */
+export const Wordmark: React.FC<{ size?: number; dark?: boolean; header?: boolean }> = ({ size = 32, dark, header }) => (
+  <Text accessibilityRole={header ? 'header' : undefined} style={[styles.word, { color: dark ? colors.white : colors.textPrimary, fontSize: Math.round(size * 0.62), lineHeight: Math.round(size * 0.8) }]}>
+    Safe<Text style={{ color: dark ? colors.brandGold : colors.brandRed }}>Route</Text>
+  </Text>
+);
+
+export const BrandLockup: React.FC<{ size?: number; dark?: boolean; header?: boolean }> = ({ size = 32, dark, header }) => (
   <View style={styles.row}>
-    <BrandMark size={size} />
-    <Text accessibilityRole={header ? 'header' : undefined} style={[styles.word, { color, fontSize: Math.round(size * 0.62), lineHeight: Math.round(size * 0.8) }]}>SafeRoute</Text>
+    <BrandMark size={Math.round(size * 1.2)} medallion={dark ? colors.brandGold : undefined} />
+    <Wordmark size={size} dark={dark} header={header} />
   </View>
 );
 
 const styles = StyleSheet.create({
-  row: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  word: { fontFamily: fonts.bold, letterSpacing: -0.2, includeFontPadding: false },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  word: { fontFamily: fonts.extraBold, letterSpacing: -0.2, includeFontPadding: false },
 });
 
 export default BrandLockup;

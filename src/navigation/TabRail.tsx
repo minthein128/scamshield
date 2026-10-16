@@ -57,6 +57,6 @@ const styles = StyleSheet.create({
   brand: { height: 56, alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
   item: { width: RAIL_WIDTH - 12, minHeight: 72, alignItems: 'center', justifyContent: 'center', gap: 4, paddingVertical: 4 },
   pill: { width: 56, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
-  pillOn: { backgroundColor: colors.brandBlueLight },
+  pillOn: { backgroundColor: colors.brandGoldSoft },
   label: { fontSize: 12, lineHeight: 18, fontFamily: fonts.semiBold, textAlign: 'center' },
 });

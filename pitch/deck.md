@@ -9,11 +9,13 @@ title: SafeRoute - Google Cloud AI Builder Cup 2026
 <!-- _class: dark -->
 <!-- _paginate: false -->
 
-# SafeRoute
+<h1><img class="logo" src="../assets/brand/logo-horizontal-dark.png" alt="SafeRoute"></h1>
 
 ## A shield for migrant job seekers, built on Gemini and Cloud Run
 
 Check any job offer, chat, link or screenshot in seconds. Get a colour verdict and a spoken warning in English, Bahasa, Tagalog or Burmese.
+
+Our mascot is the Pyit Taing Htaung, the Myanmar roly-poly doll that always gets back up.
 
 <br>
 
@@ -134,11 +136,11 @@ Marketplace listings and sellers. Flags prices that are too low and payment rout
 </div>
 </div>
 <div class="side shots">
-<figure><img class="phone sm" src="img/shield.png"><figcaption>Floating Shield</figcaption></figure>
+<figure><img class="phone sm" src="img/shield.png"><figcaption>Floating doll</figcaption></figure>
 </div>
 <div style="flex:1">
 
-**Ways in:** paste text, share a link, upload a screenshot, or tap the floating Shield bubble over any app.
+**Ways in:** paste text, share a link, upload a screenshot, or tap the floating Pyit Taing Htaung doll over any app.
 
 **Ways out:** a verdict in three colours (safe, careful, danger), the evidence, and a spoken warning.
 
@@ -165,7 +167,7 @@ Marketplace listings and sellers. Flags prices that are too low and payment rout
 </div>
 
 <!--
-Speaker notes. Show the web demo or the Android app. Run these flows: a pasted Burmese job post, a pig-butchering chat screenshot, a legitimate school message, and the floating Shield over a social feed. Inputs are in pitch/demo-inputs.md.
+Speaker notes. Show the web demo or the Android app. Run these flows: a pasted Burmese job post, a pig-butchering chat screenshot, a legitimate school message, and the floating doll over a social feed. Inputs are in pitch/demo-inputs.md.
 -->
 
 ---
@@ -308,12 +310,14 @@ Speaker notes. Arithmetic: extract 3,000 x 0.30/1M = 0.0009 plus 800 x 2.50/1M =
 
 <!-- _class: dark -->
 
+<img class="mark" src="../assets/brand/logo-horizontal-dark.png" alt="SafeRoute">
+
 # Team
 
 <div class="cols">
-<div class="card" style="color:#0F1B2D"><h3>[NAME]</h3><p>[Role]</p></div>
-<div class="card" style="color:#0F1B2D"><h3>[NAME]</h3><p>[Role]</p></div>
-<div class="card" style="color:#0F1B2D"><h3>[NAME]</h3><p>[Role]</p></div>
+<div class="card" style="color:#1F1A17"><h3>[NAME]</h3><p>[Role]</p></div>
+<div class="card" style="color:#1F1A17"><h3>[NAME]</h3><p>[Role]</p></div>
+<div class="card" style="color:#1F1A17"><h3>[NAME]</h3><p>[Role]</p></div>
 </div>
 
 <br>

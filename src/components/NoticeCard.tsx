@@ -41,7 +41,7 @@ export const NoticeCard: React.FC = () => {
 const styles = StyleSheet.create({
   card: { gap: 8, padding: 16, borderRadius: 16, borderWidth: 1 },
   warning: { backgroundColor: colors.amberLight, borderColor: colors.amberBadge },
-  info: { backgroundColor: colors.brandBlueLight, borderColor: colors.border },
+  info: { backgroundColor: colors.accentSoft, borderColor: colors.border },
   row: { flexDirection: 'row', gap: 12, alignItems: 'flex-start' },
   text: { flex: 1, gap: 2 },
   title: { color: colors.textPrimary, fontSize: 16, lineHeight: 22, fontFamily: fonts.bold },

@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { Animated, Easing, StyleSheet, View } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { AVATAR_ART, avatarPose, type AvatarArt, type AvatarConcept, type AvatarState, type Shape } from './avatarArt';
-import { useReduceMotion } from './ShieldLoader';
+import { useReduceMotion } from '../hooks/useReduceMotion';
 
 export type { AvatarConcept, AvatarState } from './avatarArt';
 

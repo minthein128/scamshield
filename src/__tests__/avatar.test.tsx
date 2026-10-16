@@ -6,7 +6,7 @@ import { avatarPose, type AvatarState } from '../components/avatarArt';
 import { sheetAvatarState, useSampledLevel } from '../components/LiveVoiceSheet';
 
 let mockReduce = false;
-jest.mock('../components/ShieldLoader', () => ({ useReduceMotion: () => mockReduce }));
+jest.mock('../hooks/useReduceMotion', () => ({ useReduceMotion: () => mockReduce }));
 
 const STATES: AvatarState[] = ['idle', 'listening', 'speaking', 'thinking'];
 

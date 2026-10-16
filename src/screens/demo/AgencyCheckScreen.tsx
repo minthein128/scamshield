@@ -32,7 +32,7 @@ export const AgencyCheckScreen: React.FC<AgencyCheckScreenProps> = ({ onNavigate
         <View style={{ flexDirection: 'column', gap: 4 }}>
           <Text style={{ paddingBottom: 6, color: '#0F1B2D', fontSize: 15, fontFamily: theme.fonts.extraBold, lineHeight: 20, includeFontPadding: false }}>What we checked</Text>
           <View style={{ alignItems: 'center', gap: 12, paddingVertical: 10, paddingHorizontal: 0, borderBottomWidth: 1, borderBottomColor: '#EEF2F6', flexDirection: 'row' }}>
-            <View style={{ width: 30, height: 30, borderRadius: 15, backgroundColor: '#C2410C', alignItems: 'center', justifyContent: 'center', flexShrink: 0, flexDirection: 'row' }}>
+            <View style={{ width: 30, height: 30, borderRadius: 15, backgroundColor: '#9F1239', alignItems: 'center', justifyContent: 'center', flexShrink: 0, flexDirection: 'row' }}>
               <Svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth={3.2} strokeLinecap="round">
                 <Path d="M6 6l12 12" />
                 <Path d="M18 6L6 18" />
@@ -44,7 +44,7 @@ export const AgencyCheckScreen: React.FC<AgencyCheckScreenProps> = ({ onNavigate
             </View>
           </View>
           <View style={{ alignItems: 'center', gap: 12, paddingVertical: 10, paddingHorizontal: 0, borderBottomWidth: 1, borderBottomColor: '#EEF2F6', flexDirection: 'row' }}>
-            <View style={{ width: 30, height: 30, borderRadius: 15, backgroundColor: '#C2410C', alignItems: 'center', justifyContent: 'center', flexShrink: 0, flexDirection: 'row' }}>
+            <View style={{ width: 30, height: 30, borderRadius: 15, backgroundColor: '#9F1239', alignItems: 'center', justifyContent: 'center', flexShrink: 0, flexDirection: 'row' }}>
               <Svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth={3.2} strokeLinecap="round">
                 <Path d="M6 6l12 12" />
                 <Path d="M18 6L6 18" />
@@ -77,7 +77,7 @@ export const AgencyCheckScreen: React.FC<AgencyCheckScreenProps> = ({ onNavigate
           </View>
         </View>
         <Text style={{ flex: 1, color: '#0F1B2D', includeFontPadding: false, fontSize: 14, lineHeight: 19, fontFamily: theme.fonts.regular }}></Text>
-        <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('noop')} style={{ height: 58, borderRadius: 16, borderWidth: 0, backgroundColor: '#1D4ED8' }}>
+        <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('noop')} style={{ height: 58, borderRadius: 16, borderWidth: 0, backgroundColor: '#1F1A17' }}>
           <Text style={{ color: '#FFFFFF', fontSize: 18, fontFamily: theme.fonts.extraBold, lineHeight: 24, includeFontPadding: false }}>{"Find licensed agencies"}</Text>
         </TouchableOpacity>
         <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('exit')} style={{ height: 54, borderRadius: 16, borderWidth: 1, borderColor: '#CBD5E1', alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>

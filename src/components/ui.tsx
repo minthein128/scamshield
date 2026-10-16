@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import theme from '../theme/theme';
 import { Text, TextInput } from './Text';
 import { Icon, type IconName } from './Icon';
+import { BrandMark } from './BrandMark';
 import { scriptStyle } from '../theme/script';
 
 const { colors, fonts } = theme;
@@ -134,10 +135,10 @@ export const Field: React.FC<TextInputProps & { label: string; hint?: string }> 
   </View>
 );
 
-export const EmptyState: React.FC<{ title: string; body: string; actionLabel?: string; onAction?: () => void; testID?: string; icon?: IconName }> = ({ title, body, actionLabel, onAction, testID, icon = 'shield' }) => (
+export const EmptyState: React.FC<{ title: string; body: string; actionLabel?: string; onAction?: () => void; testID?: string; icon?: IconName }> = ({ title, body, actionLabel, onAction, testID, icon }) => (
   <View testID={testID} style={styles.empty}>
     <View style={styles.emptyIcon}>
-      <Icon name={icon} size={24} color={colors.accent} />
+      {icon ? <Icon name={icon} size={24} color={colors.accent} /> : <BrandMark size={44} />}
     </View>
     <Text style={styles.emptyTitle}>{title}</Text>
     <Text style={styles.emptyBody}>{body}</Text>
@@ -154,8 +155,8 @@ export const Notice: React.FC<{ title?: string; message: string; tone?: 'error' 
   testID,
 }) => (
   <View testID={testID} accessibilityRole="alert" style={[styles.notice, tone === 'error' ? styles.noticeError : styles.noticeInfo]}>
-    {title ? <Text style={[styles.noticeTitle, { color: tone === 'error' ? colors.dangerSoftText : colors.safeText }]}>{title}</Text> : null}
-    <Text style={[styles.noticeText, { color: tone === 'error' ? colors.dangerDark : colors.safeText }]}>{message}</Text>
+    {title ? <Text style={[styles.noticeTitle, { color: tone === 'error' ? colors.dangerSoftText : colors.textPrimary }]}>{title}</Text> : null}
+    <Text style={[styles.noticeText, { color: tone === 'error' ? colors.dangerDark : colors.textPrimary }]}>{message}</Text>
     {actionLabel && onAction ? <LinkButton label={actionLabel} onPress={onAction} color={tone === 'error' ? colors.dangerDark : colors.accent} /> : null}
   </View>
 );
@@ -170,13 +171,13 @@ const styles = StyleSheet.create({
   fieldLabel: { color: colors.textPrimary, fontSize: 14, lineHeight: 20, fontFamily: fonts.semiBold, includeFontPadding: false },
   input: { minHeight: 48, borderRadius: 12, borderWidth: 1, borderColor: colors.borderLight, backgroundColor: colors.white, paddingHorizontal: 16, paddingVertical: 12, color: colors.textPrimary, fontSize: 16, lineHeight: 22, fontFamily: fonts.regular },
   hint: { color: colors.textSecondary, fontSize: 13, lineHeight: 18, fontFamily: fonts.regular },
-  emptyIcon: { width: 48, height: 48, borderRadius: 24, backgroundColor: colors.brandBlueLight, alignItems: 'center', justifyContent: 'center' },
+  emptyIcon: { width: 56, height: 56, borderRadius: 28, backgroundColor: colors.brandGoldSoft, alignItems: 'center', justifyContent: 'center' },
   empty: { alignItems: 'center', gap: 8, paddingVertical: 24, paddingHorizontal: 16, borderRadius: 16, borderWidth: 1, borderColor: colors.border, borderStyle: 'dashed', backgroundColor: colors.white },
   emptyTitle: { color: colors.textPrimary, fontSize: 18, lineHeight: 24, fontFamily: fonts.bold, textAlign: 'center' },
   emptyBody: { color: colors.textSecondary, fontSize: 15, lineHeight: 22, fontFamily: fonts.regular, textAlign: 'center' },
   notice: { borderRadius: 16, borderWidth: 1, padding: 16, gap: 4 },
   noticeError: { backgroundColor: colors.dangerSoftBg, borderColor: colors.danger },
-  noticeInfo: { backgroundColor: colors.brandBlueLight, borderColor: colors.brandBlueLight },
+  noticeInfo: { backgroundColor: colors.accentSoft, borderColor: colors.border },
   noticeTitle: { fontSize: 15, lineHeight: 21, fontFamily: fonts.bold },
   noticeText: { fontSize: 14, lineHeight: 20, fontFamily: fonts.regular },
   back: { width: 48, height: 48, borderRadius: 24, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.border, alignItems: 'center', justifyContent: 'center' },

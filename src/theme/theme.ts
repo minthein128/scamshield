@@ -1,47 +1,55 @@
 import { Platform, TextStyle } from 'react-native';
 
 export const colors = {
-  // Brand & Accent
-  accent: '#1D4ED8',
-  accentHover: '#1E3A8A',
-  brandBlue: '#1D4ED8',
-  brandBlueDark: '#1E3A8A',
-  brandBlueLight: '#DBE5FF',
+  // Brand: the pyit taing htaung doll. Red and gold mark the brand only, never a verdict, button or band.
+  brandRed: '#B8321C',
+  brandRedDeep: '#8E2614',
+  brandGold: '#F2B01E',
+  brandGoldSoft: '#FCEFD2',
+  brandCream: '#FFF6EA',
+  brandInk: '#1F1A17',
 
-  // Neutrals / Page Backgrounds
-  background: '#F4F6F8',
+  // Interactive: lacquer black for buttons, links, switches and selection
+  accent: '#1F1A17',
+  accentHover: '#3D3631',
+  accentSoft: '#F3ECE2',
+
+  // Neutrals / Page Backgrounds (warm, from the doll's cream and lacquer black)
+  background: '#F7F3EE',
   cardBackground: '#FFFFFF',
-  darkBackground: '#0F1B2D',
-  deepDarkBackground: '#0B1220',
-  charcoalBackground: '#3A3F47',
-  slateDark: '#1E293B',
+  darkBackground: '#1F1A17',
+  deepDarkBackground: '#15110F',
+  charcoalBackground: '#3D3631',
+  slateDark: '#2E2723',
 
   // Typography Neutrals
-  textPrimary: '#0F1B2D',
-  textSecondary: '#475569',
-  textMuted: '#5B6B80',
-  textLight: '#CBD5E1',
-  textLighter: '#E2E8F0',
+  textPrimary: '#1F1A17',
+  textSecondary: '#57504A',
+  textMuted: '#6B635C',
+  textLight: '#DDD3C7',
+  textLighter: '#EFE8DF',
   textWhite: '#FFFFFF',
 
   // Borders & Dividers
-  border: '#DCE3EC',
-  borderLight: '#CBD5E1',
-  borderDark: '#334155',
-  borderSubtle: '#E2E8F0',
-  borderMuted: '#E5E7EB',
+  border: '#E6DED3',
+  borderLight: '#D7CDC0',
+  borderDark: '#4A403A',
+  borderSubtle: '#EFE8DF',
+  borderMuted: '#E8E1D7',
 
-  // Status & Verdicts: Safe / Low Risk (Brand Blue Chip)
+  // Status & Verdicts: Safe / Low Risk (blue, used for nothing else)
+  safe: '#1D4ED8',
   safeBg: '#DBE5FF',
   safeText: '#1E3A8A',
+  safeTrack: '#93B4FF',
 
-  // Status & Verdicts: Danger / High Risk (Orange-Red, NOT crimson)
-  danger: '#C2410C',
-  dangerDark: '#9A3412',
-  dangerSoftBg: '#FFF1E8',
-  dangerSoftText: '#7C2D12',
-  dangerBarTrack: '#FDBA8C',
-  dangerPillBg: '#C2410C',
+  // Status & Verdicts: Danger / High Risk (deep crimson, kept apart from the brand red; always with the octagon)
+  danger: '#9F1239',
+  dangerDark: '#881337',
+  dangerSoftBg: '#FFF0F2',
+  dangerSoftText: '#6F0F2C',
+  dangerBarTrack: '#F9B5C4',
+  dangerPillBg: '#9F1239',
 
   // Warning & Accents
   warningText: '#B45309',
@@ -50,8 +58,8 @@ export const colors = {
   avatarPinkText: '#9A3412',
 
   // Utility badge / code pill
-  codeBg: '#EEF2F6',
-  codeText: '#334155',
+  codeBg: '#F1EBE3',
+  codeText: '#3D3631',
 
   // Other Design Palette Colors
   white: '#FFFFFF',
@@ -65,6 +73,7 @@ export const colors = {
   amberDark: '#854D0E',
   roseLight: '#FBCFE8',
   roseDark: '#831843',
+  purpleDark: '#7E22CE',
 } as const;
 
 export const fonts = {
@@ -119,7 +128,7 @@ export const readable = (tablet: boolean, fontSize: number, lineHeight: number):
 
 // Verdict roles, matching the overlay in ShieldPalette.kt (ring, chip background, chip text).
 export const verdictRoles = {
-  safe: { ring: colors.accent, chipBg: colors.safeBg, chipText: colors.safeText },
+  safe: { ring: colors.safe, chipBg: colors.safeBg, chipText: colors.safeText },
   careful: { ring: colors.warningText, chipBg: colors.amberLight, chipText: colors.amberDark },
   danger: { ring: colors.danger, chipBg: colors.danger, chipText: colors.white },
 } as const;

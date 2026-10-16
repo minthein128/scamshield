@@ -26,7 +26,7 @@ export const ChatVerdictScreen: React.FC<ChatVerdictScreenProps> = ({ onNavigate
         </View>
         <View style={{ alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row' }}>
           <View style={{ alignItems: 'center', gap: 14, flexDirection: 'row' }}>
-            <View style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: '#C2410C', alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
+            <View style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: '#9F1239', alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
               <Svg width={34} height={34} viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
                 <Path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" />
                 <Path d="M12 9v4" />
@@ -34,8 +34,8 @@ export const ChatVerdictScreen: React.FC<ChatVerdictScreenProps> = ({ onNavigate
               </Svg>
             </View>
             <View style={{ flexDirection: 'column' }}>
-              <Text style={{ color: '#9A3412', fontSize: 32, fontFamily: theme.fonts.extraBold, letterSpacing: -0.5, lineHeight: 35, includeFontPadding: false }}>Danger</Text>
-              <Text style={{ color: '#9A3412', fontSize: 15, fontFamily: theme.fonts.semiBold, lineHeight: 20, includeFontPadding: false }}>Looks like a love and money trap</Text>
+              <Text style={{ color: '#881337', fontSize: 32, fontFamily: theme.fonts.extraBold, letterSpacing: -0.5, lineHeight: 35, includeFontPadding: false }}>Danger</Text>
+              <Text style={{ color: '#881337', fontSize: 15, fontFamily: theme.fonts.semiBold, lineHeight: 20, includeFontPadding: false }}>Looks like a love and money trap</Text>
             </View>
           </View>
           <Text style={{ backgroundColor: '#EEF2F6', paddingVertical: 6, paddingHorizontal: 10, borderRadius: 999, color: '#334155', fontSize: 13, fontFamily: theme.fonts.bold, lineHeight: 18, includeFontPadding: false }}>2 screens</Text>
@@ -84,14 +84,14 @@ export const ChatVerdictScreen: React.FC<ChatVerdictScreenProps> = ({ onNavigate
             <Text style={{ color: '#475569', fontSize: 12, lineHeight: 16, fontFamily: theme.fonts.regular, includeFontPadding: false }}>1 wk</Text>
           </View>
           <View style={{ alignItems: 'center', gap: 12, height: 38, flexDirection: 'row' }}>
-            <View style={{ width: 14, height: 14, borderRadius: 7, backgroundColor: '#C2410C', flexShrink: 0 }}>
+            <View style={{ width: 14, height: 14, borderRadius: 7, backgroundColor: '#9F1239', flexShrink: 0 }}>
             </View>
-            <Text style={{ flex: 1, color: '#9A3412', fontSize: 15, fontFamily: theme.fonts.extraBold, lineHeight: 20, includeFontPadding: false }}>Asks you to send money</Text>
-            <Text style={{ color: '#9A3412', fontSize: 12, fontFamily: theme.fonts.bold, lineHeight: 16, includeFontPadding: false }}>Today</Text>
+            <Text style={{ flex: 1, color: '#881337', fontSize: 15, fontFamily: theme.fonts.extraBold, lineHeight: 20, includeFontPadding: false }}>Asks you to send money</Text>
+            <Text style={{ color: '#881337', fontSize: 12, fontFamily: theme.fonts.bold, lineHeight: 16, includeFontPadding: false }}>Today</Text>
           </View>
         </View>
         <Text style={{ flex: 1, color: '#0F1B2D', includeFontPadding: false, fontSize: 14, lineHeight: 19, fontFamily: theme.fonts.regular }}></Text>
-        <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('exit')} style={{ height: 58, borderRadius: 16, backgroundColor: '#1D4ED8', alignItems: 'center', justifyContent: 'center', gap: 10, flexDirection: 'row' }}>
+        <TouchableOpacity activeOpacity={0.7} onPress={() => onNavigate?.('exit')} style={{ height: 58, borderRadius: 16, backgroundColor: '#1F1A17', alignItems: 'center', justifyContent: 'center', gap: 10, flexDirection: 'row' }}>
           <Svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
             <Circle cx={9} cy={8} r={3.5} />
             <Path d="M2.5 20a6.5 6.5 0 0 1 13 0" />

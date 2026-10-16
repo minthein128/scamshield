@@ -8,10 +8,12 @@
 An Android app and web demo that checks a job offer, message, link or screenshot for scams and human trafficking, and explains the result in the user's language. Built for the Google Cloud AI Builder Cup 2026.
 
 <p align="center">
-  <img src="pitch/e2e/prod-16-history-after-signin.png" width="230" alt="Home">
-  <img src="pitch/e2e/prod-08-check-form.png" width="230" alt="Check form">
-  <img src="pitch/e2e/prod-20-loader-verdict.png" width="230" alt="Risk report">
+  <img src="pitch/e2e/rebrand-06-home-history-phone-en.png" width="230" alt="Home">
+  <img src="pitch/e2e/rebrand-04-checking-verdict-phone-en.png" width="230" alt="Checking, with the verdict mark">
+  <img src="pitch/e2e/rebrand-05-report-danger-phone-en.png" width="230" alt="Risk report">
 </p>
+
+The mascot and mark is the Pyit Taing Htaung, the Myanmar roly-poly doll that always gets back up. See [docs/brand.md](docs/brand.md).
 
 Team: TBD
 

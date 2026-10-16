@@ -106,7 +106,7 @@ export const CaseStudyArchitectureScreen: React.FC<CaseStudyArchitectureScreenPr
             </View>
             <View style={{ flexDirection: 'column', gap: 2 }}>
               <Text style={{ color: '#0F1B2D', fontSize: 14, fontFamily: theme.fonts.bold, lineHeight: 19, includeFontPadding: false }}>.vip → risky domain list</Text>
-              <Text style={{ color: '#9A3412', fontFamily: theme.fonts.medium, fontSize: 12, lineHeight: 16, includeFontPadding: false }}>match</Text>
+              <Text style={{ color: '#881337', fontFamily: theme.fonts.medium, fontSize: 12, lineHeight: 16, includeFontPadding: false }}>match</Text>
             </View>
             <View style={{ flexDirection: 'column', gap: 2 }}>
               <Text style={{ color: '#0F1B2D', fontSize: 14, fontFamily: theme.fonts.bold, lineHeight: 19, includeFontPadding: false }}>Number → report graph</Text>
@@ -151,7 +151,7 @@ export const CaseStudyArchitectureScreen: React.FC<CaseStudyArchitectureScreenPr
               <Text style={{ color: '#0F1B2D', fontSize: 14, lineHeight: 19, fontFamily: theme.fonts.extraBold, includeFontPadding: false }}>Total</Text>
               <Text style={{ color: '#0F1B2D', fontSize: 14, lineHeight: 19, fontFamily: theme.fonts.mono, includeFontPadding: false }}>3.2</Text>
             </View>
-            <Text style={{ backgroundColor: '#FFF1E8', borderRadius: 10, padding: 10, color: '#7C2D12', fontSize: 13, lineHeight: 19, fontFamily: theme.fonts.regular, includeFontPadding: false }}><Text>Danger:</Text> over the 3.0 line and 4 families agree. A Web Risk hit would set Danger by itself.</Text>
+            <Text style={{ backgroundColor: '#FFF0F2', borderRadius: 10, padding: 10, color: '#6F0F2C', fontSize: 13, lineHeight: 19, fontFamily: theme.fonts.regular, includeFontPadding: false }}><Text>Danger:</Text> over the 3.0 line and 4 families agree. A Web Risk hit would set Danger by itself.</Text>
             <Text style={{ color: '#475569', fontSize: 12, lineHeight: 16, fontFamily: theme.fonts.regular, includeFontPadding: false }}>Illustrative weights, to be tuned on labelled cases.</Text>
           </View>
         </View>
@@ -165,7 +165,7 @@ export const CaseStudyArchitectureScreen: React.FC<CaseStudyArchitectureScreenPr
           </View>
           <View style={{ backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#DCE3EC', borderRadius: 16, padding: 14, flexDirection: 'column', gap: 12 }}>
             <View style={{ alignItems: 'center', gap: 10, flexDirection: 'row' }}>
-              <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: '#C2410C', alignItems: 'center', justifyContent: 'center', flexShrink: 0, flexDirection: 'row' }}>
+              <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: '#9F1239', alignItems: 'center', justifyContent: 'center', flexShrink: 0, flexDirection: 'row' }}>
                 <Svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
                   <Path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" />
                   <Path d="M12 9v4" />
@@ -173,8 +173,8 @@ export const CaseStudyArchitectureScreen: React.FC<CaseStudyArchitectureScreenPr
                 </Svg>
               </View>
               <View style={{ flexDirection: 'column' }}>
-                <Text style={{ color: '#9A3412', fontSize: 22, fontFamily: theme.fonts.extraBold, lineHeight: 24, includeFontPadding: false }}>Danger</Text>
-                <Text style={{ color: '#9A3412', fontSize: 13, fontFamily: theme.fonts.semiBold, lineHeight: 18, includeFontPadding: false }}>Gambling trap</Text>
+                <Text style={{ color: '#881337', fontSize: 22, fontFamily: theme.fonts.extraBold, lineHeight: 24, includeFontPadding: false }}>Danger</Text>
+                <Text style={{ color: '#881337', fontSize: 13, fontFamily: theme.fonts.semiBold, lineHeight: 18, includeFontPadding: false }}>Gambling trap</Text>
               </View>
             </View>
             <Text style={{ color: '#0F1B2D', fontSize: 15, fontFamily: theme.fonts.bold, lineHeight: 22, includeFontPadding: false }}>Do not open the link or top up. The bonus is a trick to take your money.</Text>
@@ -183,7 +183,7 @@ export const CaseStudyArchitectureScreen: React.FC<CaseStudyArchitectureScreenPr
               <Text style={{ backgroundColor: '#EEF2F6', paddingVertical: 4, paddingHorizontal: 8, borderRadius: 6, color: '#334155', fontSize: 12, fontFamily: theme.fonts.bold, lineHeight: 16, includeFontPadding: false }}>Listen</Text>
             </View>
             <View style={{ flexDirection: 'column', gap: 6 }}>
-              <View style={{ height: 40, borderRadius: 10, backgroundColor: '#1D4ED8', alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
+              <View style={{ height: 40, borderRadius: 10, backgroundColor: '#1F1A17', alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
                 <Text style={{ color: '#FFFFFF', fontSize: 14, fontFamily: theme.fonts.bold, lineHeight: 19, includeFontPadding: false }}>{"Block this number"}</Text>
               </View>
               <View style={{ height: 40, borderRadius: 10, borderWidth: 1, borderColor: '#CBD5E1', alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
