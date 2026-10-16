@@ -96,6 +96,35 @@
     "notice": {
       "body": "Maaaring kailangang tingnan ulit ang isang mensahe. Buksan para makita kung bakit.",
       "open": "Buksan"
+    },
+    "activity": {
+      "waiting": "Naghihintay ng mga mensahe mula sa mga app na pinili mo.",
+      "last": "Huling mensahe mula sa {{app}}, {{time}}: {{outcome}}",
+      "outcome": {
+        "notChosen": "hindi binasa, wala ang app na ito sa listahan mo",
+        "paused": "hindi na-check, naka-pause ang Message Guard",
+        "self": "sarili mong mensahe, hindi na-check",
+        "noText": "walang text na ma-check",
+        "hiddenPreview": "itinago ng app ang text kaya hindi ito na-check. I-on ang message preview sa app na iyon.",
+        "tooShort": "masyadong maikli para i-check, hindi ipinadala",
+        "otp": "one-time code, nanatili sa phone mo",
+        "notRisky": "mukhang normal, hindi ipinadala",
+        "duplicate": "kapareho ng naunang mensahe, hindi na ipinadala ulit",
+        "rateLimited": "hindi ipinadala, naabot na ang limit kada oras o kada araw",
+        "sent": "ipinadala para i-check, hinihintay ang resulta",
+        "checkFailed": "hindi natapos ang check. Tingnan ang internet connection mo.",
+        "resultSafe": "na-check, mababa ang panganib",
+        "resultWarned": "na-check, nagpadala ng abiso ang SafeRoute",
+        "noticeBlocked": "na-check, pero naka-off ang notifications ng SafeRoute kaya hindi lumabas ang abiso"
+      }
+    },
+    "health": {
+      "accessOff": "Naka-off ang notification access, kaya hindi mabasa ng Message Guard ang mga bagong mensahe.",
+      "notConnected": "Hindi pa sinisimulan ng Android ang Message Guard. I-off at i-on ulit, o i-restart ang phone.",
+      "notificationsOff": "Naka-off ang notifications ng SafeRoute, kaya hindi mo makikita ang mga babala.",
+      "missingApps": "Hindi naka-install sa phone na ito: {{apps}}.",
+      "battery": "Maaaring ihinto ng Android ang Message Guard para makatipid ng baterya.",
+      "batteryAction": "Payagang tumakbo sa background"
     }
   }
 }

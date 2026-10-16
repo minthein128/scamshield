@@ -6,13 +6,20 @@ import { Text } from './Text';
 import { MessageGuardConsent } from './MessageGuardConsent';
 import { MessageGuardLog } from './MessageGuardLog';
 import { useMessageGuard, type MessageGuardControl } from '../hooks/useMessageGuard';
+import { useMessageGuardHealth, type MessageGuardHealth } from '../hooks/useMessageGuardHealth';
+import { lastActivityLine } from '../lib/messageGuardActivity';
 import theme from '../theme/theme';
 
 const { colors, fonts } = theme;
 
-export const MessageGuardCard: React.FC = () => <MessageGuardCardView control={useMessageGuard()} />;
+export const MessageGuardCard: React.FC = () => {
+  const control = useMessageGuard();
+  const chosen = control.apps.filter(a => a.enabled).map(a => a.id).join(',');
+  const health = useMessageGuardHealth(control.support, `${control.enabled}:${control.access}:${control.pausedReason}:${chosen}`);
+  return <MessageGuardCardView control={control} health={health} />;
+};
 
-export const MessageGuardCardView: React.FC<{ control: MessageGuardControl }> = ({ control }) => {
+export const MessageGuardCardView: React.FC<{ control: MessageGuardControl; health?: MessageGuardHealth }> = ({ control, health }) => {
   const { t } = useTranslation('shield');
   const { support, enabled, access, apps, error, pausedReason, consent, setEnabled, toggleApp, confirmConsent, cancelConsent, turnOffAndRevoke } = control;
   const [open, setOpen] = useState(false);
@@ -49,6 +56,28 @@ export const MessageGuardCardView: React.FC<{ control: MessageGuardControl }> = 
         )}
       </View>
       <Text testID="message-guard-status" style={[styles.body, pausedReason && !enabled ? styles.paused : null]}>{status}</Text>
+      {!unavailable && health?.watching ? (
+        <View testID="message-guard-health" style={styles.health}>
+          {health.problems.map(p => (
+            <Text key={p} testID={`message-guard-problem-${p}`} style={styles.problem}>
+              {t(`messageGuard.health.${p}`, { apps: health.missingApps.join(', ') })}
+            </Text>
+          ))}
+          {health.problems.includes('battery') ? (
+            <TouchableOpacity
+              testID="message-guard-battery"
+              accessibilityRole="button"
+              onPress={() => {
+                health.openBatterySettings().catch(() => undefined);
+              }}
+              style={styles.link}
+            >
+              <Text style={styles.linkText}>{t('messageGuard.health.batteryAction')}</Text>
+            </TouchableOpacity>
+          ) : null}
+          <Text testID="message-guard-last" style={styles.body}>{lastActivityLine(health.last)}</Text>
+        </View>
+      ) : null}
       <Text style={styles.privacy}>{t('messageGuard.privacy')}</Text>
       {error ? <Text style={styles.error}>{error}</Text> : null}
       {!unavailable && enabled && apps.length > 0 ? (
@@ -127,6 +156,8 @@ const styles = StyleSheet.create({
   title: { flex: 1, color: colors.textPrimary, fontSize: 16, lineHeight: 22, fontFamily: fonts.bold },
   body: { color: colors.textSecondary, fontSize: 14, lineHeight: 20, fontFamily: fonts.regular },
   paused: { color: colors.warningText, fontFamily: fonts.semiBold },
+  health: { gap: 6 },
+  problem: { color: colors.warningText, fontSize: 14, lineHeight: 20, fontFamily: fonts.semiBold },
   privacy: { color: colors.textSecondary, fontSize: 14, lineHeight: 20, fontFamily: fonts.semiBold },
   error: { color: colors.dangerDark, fontSize: 14, lineHeight: 20, fontFamily: fonts.semiBold },
   link: { minHeight: 48, justifyContent: 'center' },
