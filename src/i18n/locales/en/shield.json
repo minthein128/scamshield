@@ -98,7 +98,6 @@
       "waiting": "Waiting for messages from the apps you chose.",
       "last": "Last message from {{app}}, {{time}}: {{outcome}}",
       "outcome": {
-        "notChosen": "not read, this app is not on your list",
         "paused": "not checked, Message Guard is paused",
         "self": "your own message, not checked",
         "noText": "no text to check",

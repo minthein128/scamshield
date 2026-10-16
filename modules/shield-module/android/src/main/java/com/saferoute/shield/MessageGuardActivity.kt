@@ -5,7 +5,7 @@ import org.json.JSONObject
 import java.io.File
 
 /**
- * What Message Guard decided for each notification from a messaging app: the time, the app id and
+ * What Message Guard decided for each notification from a chosen app: the time, the app id and
  * one outcome code. It never holds message text, the sender or the title.
  */
 internal class MessageGuardActivity(private val file: File, private val now: () -> Long = System::currentTimeMillis) {
@@ -69,9 +69,10 @@ internal class MessageGuardActivity(private val file: File, private val now: () 
             val events = (0 until arr.length()).map { i ->
                 val o = arr.getJSONObject(i)
                 Event(o.getLong("seq"), o.getLong("at"), o.optString("app"), o.optString("outcome"))
-            }
+            }.filter { it.outcome != LEGACY_NOT_CHOSEN }
             val counts = HashMap<String, Int>()
             root.optJSONObject("counts")?.let { c -> c.keys().forEach { counts[it] = c.optInt(it) } }
+            counts.remove(LEGACY_NOT_CHOSEN)
             State(root.optLong("nextSeq", (events.maxOfOrNull { it.seq } ?: -1) + 1), events, counts)
         } catch (_: Exception) {
             State(0, emptyList(), emptyMap())
@@ -100,7 +101,8 @@ internal class MessageGuardActivity(private val file: File, private val now: () 
         const val MAX_EVENTS = 100
         const val MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000L
 
-        const val SKIPPED_APP_NOT_CHOSEN = "skipped_app_not_chosen"
+        /** Earlier builds wrote this for apps the user did not choose; it is dropped on read. */
+        private const val LEGACY_NOT_CHOSEN = "skipped_app_not_chosen"
         const val SKIPPED_PAUSED = "skipped_paused"
         const val SKIPPED_SUMMARY = "skipped_summary"
         const val SKIPPED_ONGOING = "skipped_ongoing"

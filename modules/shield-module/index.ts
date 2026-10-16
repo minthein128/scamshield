@@ -149,7 +149,7 @@ export interface MessageGuardEvent {
   /** App name for display. */
   label: string | null;
   /**
-   * skipped_app_not_chosen, skipped_paused, skipped_self, skipped_no_text, skipped_hidden_preview,
+   * skipped_paused, skipped_self, skipped_no_text, skipped_hidden_preview,
    * skipped_too_short, skipped_otp, skipped_not_risky, skipped_duplicate, skipped_rate_limited, sent,
    * check_failed:<kind>, result:<verdict> or result:<verdict>:notice_blocked.
    */

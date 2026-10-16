@@ -38,6 +38,9 @@ class MessageGuardTest {
         Fixture("my parcel", "+95 9 4455 1122", "သင့်ပါဆယ်ကို ပို့မရပါ။ အကောက်ခွန် ၅၀၀၀ ကျပ် ယနေ့အတွင်း ပေးချေပါ။ http://post-mm.top/pay"),
         Fixture("my bank", "KBZPay", "KBZPay အကောင့်ကို ပိတ်ထားပါသည်။ ချက်ချင်း အတည်ပြုရန် http://kbz-verify.xyz"),
         Fixture("my job", "+66 90 111 2222", "ထိုင်းနိုင်ငံတွင် အလုပ်ခေါ်ပါသည်။ လစာ တစ်ရက်လျှင် ၁၅၀၀ ဘတ်၊ အတွေ့အကြုံမလို။ စာရင်းသွင်းကြေး ၂၀၀၀၀ ကျပ်။ Telegram ကို ဆက်သွယ်ပါ"),
+        Fixture("th parcel", "Kerry Express", "พัสดุของคุณตกค้างที่ศุลกากร กรุณาโอนเงินค่าธรรมเนียม 50 บาท ภายในวันนี้"),
+        Fixture("th bank", "KBank", "แจ้งเตือนจากธนาคาร: บัญชีของคุณถูกระงับ กรุณายืนยันตัวตนภายใน 24 ชั่วโมง"),
+        Fixture("th job", "Nok", "รับสมัครงานออนไลน์ รายได้ต่อวัน 1,500 บาท ไม่ต้องมีประสบการณ์ ต้องใช้พาสปอร์ต แอดไลน์มาได้เลย"),
         Fixture("unknown sender link", "+95 9 123 456 789", "Hi, is this still available? Check my listing www.deals-mm.com"),
         Fixture("otp with link", "SHOP", "Your code is 482913. Confirm your login at http://shop-secure.top/confirm"),
         Fixture("vishing otp", "+1 555 010 9999", "Bank alert: transfer of \$450 pending. If not you, call 0917 123 4567 and read out the OTP 482913"),
@@ -48,6 +51,7 @@ class MessageGuardTest {
         Fixture("google otp", "22000", "G-482913 is your Google verification code"),
         Fixture("id otp", "BCA", "Kode OTP Anda 739215. Jangan berikan kode ini kepada siapa pun termasuk pihak bank."),
         Fixture("tl otp", "GCash", "Ang iyong OTP ay 561203. Huwag ibahagi ang code na ito sa kahit sino."),
+        Fixture("th otp", "KBank", "รหัส OTP ของคุณคือ 482913 ใช้ภายใน 5 นาที ห้ามบอกรหัสนี้แก่ผู้อื่น"),
         Fixture("my otp", "KBZPay", "သင့် OTP ကုဒ်နံပါတ်မှာ 305918 ဖြစ်ပါသည်။ မည်သူ့ကိုမျှ မပေးပါနှင့်။"),
     )
 
@@ -58,6 +62,8 @@ class MessageGuardTest {
         Fixture("friend link", "Ko Zaw", "Check this out www.youtube.com/watch?v=abc123"),
         Fixture("greeting unknown", "+95 9 777 888 999", "Hello, how are you doing today my friend?"),
         Fixture("short", "Dad", "ok see you"),
+        Fixture("th dinner", "แม่", "พรุ่งนี้กินข้าวเย็นด้วยกันไหม เจอกันหกโมงที่ร้านเดิมนะ"),
+        Fixture("th friend transfer", "พี่ต้น", "โอนเงินให้แล้วนะ ขอบคุณมากที่ช่วยเรื่องเมื่อวาน"),
     )
 
     @Test
@@ -75,6 +81,17 @@ class MessageGuardTest {
             assertFalse("${f.name} must not be sent", r.send)
             assertEquals(f.name, MessagePrefilter.SKIP_OTP, r.skip)
         }
+    }
+
+    @Test
+    fun thai_scam_scores_from_thai_words_and_thai_chat_does_not() {
+        val scam = prefilter.evaluate("พัสดุของคุณตกค้างที่ศุลกากร กรุณาโอนเงินค่าธรรมเนียม 50 บาท ภายในวันนี้", "Kerry Express")
+        assertTrue("score=${scam.score} signals=${scam.signals}", scam.score >= 3)
+        assertTrue(scam.signals.containsAll(listOf("parcel", "payment", "urgency")))
+        assertFalse(scam.signals.contains("link"))
+        val chat = prefilter.evaluate("พรุ่งนี้กินข้าวเย็นด้วยกันไหม เจอกันหกโมงที่ร้านเดิมนะ", "แม่")
+        assertTrue("score=${chat.score} signals=${chat.signals}", chat.score < 3)
+        assertFalse(chat.send)
     }
 
     @Test
@@ -109,13 +126,13 @@ class MessageGuardTest {
     }
 
     @Test
-    fun keyword_file_covers_four_languages_per_category() {
+    fun keyword_file_covers_five_languages_per_category() {
         val raw = context.resources.openRawResource(R.raw.message_guard_keywords).bufferedReader(Charsets.UTF_8).use { it.readText() }
         val cats = JSONObject(raw).getJSONObject("categories")
         val names = cats.keys().asSequence().toList()
         assertTrue(names.containsAll(listOf("payment", "otp", "account", "urgency", "parcel", "bank", "job")))
         for (name in names) {
-            for (lang in listOf("en", "id", "tl", "my")) {
+            for (lang in listOf("en", "id", "tl", "my", "th")) {
                 assertTrue("$name/$lang", cats.getJSONObject(name).getJSONArray(lang).length() > 0)
             }
         }

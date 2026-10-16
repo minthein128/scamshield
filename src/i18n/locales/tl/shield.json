@@ -101,7 +101,6 @@
       "waiting": "Naghihintay ng mga mensahe mula sa mga app na pinili mo.",
       "last": "Huling mensahe mula sa {{app}}, {{time}}: {{outcome}}",
       "outcome": {
-        "notChosen": "hindi binasa, wala ang app na ito sa listahan mo",
         "paused": "hindi na-check, naka-pause ang Message Guard",
         "self": "sarili mong mensahe, hindi na-check",
         "noText": "walang text na ma-check",
