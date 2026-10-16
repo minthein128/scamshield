@@ -1,354 +1,273 @@
-import type { Flag } from '../types.js';
-import type { AttentionTier, FactField, JobConflict, JobFacts } from './types.js';
+import { score } from '../score.js';
+import type { Family, Flag, Lang, Severity, Verdict } from '../types.js';
+import { mentionsBorderTown, readFee, salaryDiffers, sameEmployer } from './parse.js';
+import {
+  CONFLICT_TEXT,
+  FIELD_LABEL,
+  SIGNAL_LABEL,
+  type SignalCode,
+  SOURCE_NAME,
+  TIER_HEADLINE,
+  UNCLEAR_FIELDS,
+  UNCLEAR_TEXT,
+} from './text.js';
+import type { AttentionTier, ConflictCode, FactField, FactKey, JobConflict, JobFacts, SalaryValue } from './types.js';
 
-const BORDER_TOWNS = [
-  'mae sot',
-  'maesot',
-  'myawaddy',
-  'tachileik',
-  'poipet',
-  'shwe kokko',
-  'shwe kokko',
-  'kk park',
-  'laukkaing',
-  'golden triangle',
-  'မဲဆောက်',
-  'မြဝတီ',
-  'တာချီလိတ်',
-  'แม่สอด',
-  'เมียวดี',
-  'ท่าขี้เหล็ก',
-  'ปอยเปต',
-];
-
-export function isBorderLocation(text?: string | null): boolean {
-  if (!text) return false;
-  const lower = text.toLowerCase();
-  return BORDER_TOWNS.some((town) => lower.includes(town));
+/** A fact the source actually states: not null, not withheld, not empty, not not_mentioned. */
+export function stated<T>(f: FactField<T> | null | undefined): f is FactField<T> {
+  if (!f || f.refused) return false;
+  const v = f.value as unknown;
+  if (v === null || v === undefined || v === 'not_mentioned') return false;
+  return typeof v !== 'string' || v.trim() !== '';
 }
 
-export function detectConflicts(ad: JobFacts | null, chat: JobFacts | null): JobConflict[] {
+const withheld = (f: FactField<unknown> | null | undefined) => Boolean(f?.refused);
+
+function display(field: FactKey, f: FactField<unknown>): string {
+  if (field === 'salary') {
+    const s = f.value as SalaryValue;
+    return [s.amount ?? '?', s.currency, s.period].filter((x) => x !== '').join(' ');
+  }
+  return String(f.value ?? '');
+}
+
+function conflict(
+  field: FactKey,
+  code: ConflictCode,
+  ad: FactField<unknown>,
+  chat: FactField<unknown>,
+  family: Family,
+  severity: Severity,
+  lang: Lang,
+): JobConflict {
+  const chatValue = display(field, chat);
+  return {
+    field,
+    code,
+    fieldLabel: FIELD_LABEL[field]?.[lang] ?? field,
+    adValue: display(field, ad),
+    adQuote: ad.quote,
+    chatValue,
+    chatQuote: chat.quote,
+    description: CONFLICT_TEXT[code][lang].replace('{chat}', chatValue),
+    family,
+    severity,
+  };
+}
+
+/** Compares the same field across ad and chat. A conflict needs both sources to state the field. */
+export function detectConflicts(ad: JobFacts | null, chat: JobFacts | null, lang: Lang = 'en'): JobConflict[] {
   if (!ad || !chat) return [];
-  const conflicts: JobConflict[] = [];
+  const out: JobConflict[] = [];
 
-  // 1. Fee conflict (Ad: no fee vs Chat: fee/deposit)
-  if (ad.workerFee && chat.workerFee) {
-    const adFeeLower = ad.workerFee.value.toLowerCase();
-    const chatFeeLower = chat.workerFee.value.toLowerCase();
-    const adSaysNoFee =
-      adFeeLower.includes('no fee') ||
-      adFeeLower.includes('none') ||
-      adFeeLower.includes('free') ||
-      adFeeLower.includes('0') ||
-      adFeeLower.includes('အခမဲ့') ||
-      adFeeLower.includes('gratis') ||
-      adFeeLower.includes('libre') ||
-      adFeeLower.includes('ฟรี');
-    const chatAsksFee =
-      chatFeeLower.includes('deposit') ||
-      chatFeeLower.includes('fee') ||
-      chatFeeLower.includes('pay') ||
-      chatFeeLower.includes('cost') ||
-      /\d+/.test(chatFeeLower) ||
-      chat.paymentRequest?.value === 'before_contract' ||
-      chat.paymentRequest?.value === 'personal_account';
-
-    if (adSaysNoFee && chatAsksFee) {
-      conflicts.push({
-        field: 'workerFee',
-        fieldLabel: 'Worker Fee',
-        adValue: ad.workerFee.value,
-        adQuote: ad.workerFee.quote,
-        chatValue: chat.workerFee.value,
-        chatQuote: chat.workerFee.quote,
-        description: 'The ad advertised no fee or free placement, but the recruiter asks for payment or a deposit.',
-        family: 'payment_route',
-        severity: 'high',
-      });
+  if (stated(ad.workerFee) && stated(chat.workerFee)) {
+    if (readFee(ad.workerFee.value) === 'none' && readFee(chat.workerFee.value) === 'positive') {
+      out.push(conflict('workerFee', 'fee_vs_no_fee', ad.workerFee, chat.workerFee, 'payment_route', 'high', lang));
     }
   }
 
-  // 2. Documents conflict (Ad: normal or not mentioned vs Chat: passport photo now or passport held)
-  if (ad.documentRequest && chat.documentRequest) {
-    const adDoc = ad.documentRequest.value;
-    const chatDoc = chat.documentRequest.value;
-    const adNormal = adDoc === 'none' || adDoc === 'id_copy' || adDoc === 'not_mentioned';
-    const chatDemanding = chatDoc === 'passport_photo' || chatDoc === 'passport_hold';
-
-    if (adNormal && chatDemanding) {
-      conflicts.push({
-        field: 'documentRequest',
-        fieldLabel: 'Identity Documents',
-        adValue: ad.documentRequest.value,
-        adQuote: ad.documentRequest.quote,
-        chatValue: chat.documentRequest.value,
-        chatQuote: chat.documentRequest.quote,
-        description:
-          chatDoc === 'passport_hold'
-            ? 'The ad did not require surrender of documents, but the recruiter demands holding your physical passport.'
-            : 'The ad had normal requirements, but the recruiter immediately demands a passport photo before formal screening.',
-        family: 'trafficking',
-        severity: 'high',
-      });
+  if (stated(ad.documentRequest) && stated(chat.documentRequest)) {
+    const adNormal = ad.documentRequest.value === 'none' || ad.documentRequest.value === 'id_copy';
+    const c = chat.documentRequest.value;
+    if (adNormal && c === 'passport_hold') {
+      out.push(
+        conflict('documentRequest', 'documents_passport_hold', ad.documentRequest, chat.documentRequest, 'trafficking', 'high', lang),
+      );
+    } else if (adNormal && c === 'passport_photo') {
+      out.push(
+        conflict('documentRequest', 'documents_passport_photo', ad.documentRequest, chat.documentRequest, 'trafficking', 'high', lang),
+      );
+    } else if (ad.documentRequest.value === 'none' && c === 'id_copy') {
+      out.push(conflict('documentRequest', 'documents_id_copy', ad.documentRequest, chat.documentRequest, 'trafficking', 'medium', lang));
     }
   }
 
-  // 3. Contract conflict (Ad: official contract vs Chat: contract later or pay before contract)
-  if (ad.contract && chat.contract) {
-    const adContract = ad.contract.value;
-    const chatContract = chat.contract.value;
-    const adOfficial = adContract === 'official';
-    const chatLaterOrNone =
-      chatContract === 'later' || chatContract === 'none' || chat.paymentRequest?.value === 'before_contract';
-
-    if (adOfficial && chatLaterOrNone) {
-      conflicts.push({
-        field: 'contract',
-        fieldLabel: 'Employment Contract',
-        adValue: ad.contract.value,
-        adQuote: ad.contract.quote,
-        chatValue: chat.contract.value,
-        chatQuote: chat.contract.quote,
-        description: 'The ad promised an official employment contract, but the recruiter says it will be signed later or demands prior payment.',
-        family: 'payment_route',
-        severity: 'high',
-      });
+  if (stated(ad.contract) && ad.contract.value === 'official') {
+    if (stated(chat.contract) && (chat.contract.value === 'later' || chat.contract.value === 'none')) {
+      out.push(conflict('contract', 'contract_later', ad.contract, chat.contract, 'payment_route', 'high', lang));
+    } else if (stated(chat.paymentRequest) && chat.paymentRequest.value === 'before_contract') {
+      out.push(conflict('contract', 'contract_pay_first', ad.contract, chat.paymentRequest, 'payment_route', 'high', lang));
     }
   }
 
-  // 4. Visa conflict (Ad: work visa vs Chat: tourist or none)
-  if (ad.visaOrPermit && chat.visaOrPermit) {
-    const adVisa = ad.visaOrPermit.value;
-    const chatVisa = chat.visaOrPermit.value;
-    const adWorkVisa = adVisa === 'work_visa';
-    const chatTourist = chatVisa === 'tourist' || chatVisa === 'none';
-
-    if (adWorkVisa && chatTourist) {
-      conflicts.push({
-        field: 'visaOrPermit',
-        fieldLabel: 'Visa and Work Permit',
-        adValue: ad.visaOrPermit.value,
-        adQuote: ad.visaOrPermit.quote,
-        chatValue: chat.visaOrPermit.value,
-        chatQuote: chat.visaOrPermit.quote,
-        description: 'The ad promised an official work visa, but the recruiter instructs entering on a tourist visa or without permits.',
-        family: 'trafficking',
-        severity: 'high',
-      });
+  if (stated(ad.visaOrPermit) && stated(chat.visaOrPermit) && ad.visaOrPermit.value === 'work_visa') {
+    if (chat.visaOrPermit.value === 'tourist') {
+      out.push(conflict('visaOrPermit', 'visa_tourist', ad.visaOrPermit, chat.visaOrPermit, 'trafficking', 'high', lang));
+    } else if (chat.visaOrPermit.value === 'none') {
+      out.push(conflict('visaOrPermit', 'visa_none', ad.visaOrPermit, chat.visaOrPermit, 'trafficking', 'high', lang));
     }
   }
 
-  // 5. Meeting point conflict (Ad: workplace address vs Chat: driver, border or unnamed place)
-  if (ad.meetingPoint && chat.meetingPoint) {
-    const adMeet = ad.meetingPoint.value;
-    const chatMeet = chat.meetingPoint.value;
-    const adFormal = adMeet === 'workplace' || adMeet === 'airport';
-    const chatInformal = chatMeet === 'driver_pickup' || chatMeet === 'border' || chatMeet === 'unnamed';
-
+  if (stated(ad.meetingPoint) && stated(chat.meetingPoint)) {
+    const adFormal = ad.meetingPoint.value === 'workplace' || ad.meetingPoint.value === 'airport';
+    const chatInformal = ['driver_pickup', 'border', 'unnamed'].includes(chat.meetingPoint.value);
     if (adFormal && chatInformal) {
-      conflicts.push({
-        field: 'meetingPoint',
-        fieldLabel: 'Meeting Point',
-        adValue: ad.meetingPoint.value,
-        adQuote: ad.meetingPoint.quote,
-        chatValue: chat.meetingPoint.value,
-        chatQuote: chat.meetingPoint.quote,
-        description: 'The ad stated a formal office or workplace address, but the chat arranges an informal driver pickup or border crossing.',
-        family: 'trafficking',
-        severity: 'medium',
-      });
+      out.push(conflict('meetingPoint', 'meeting_informal', ad.meetingPoint, chat.meetingPoint, 'trafficking', 'medium', lang));
     }
   }
 
-  // 6. Employer conflict (Ad: named company vs Chat: different name or workplace address refused)
-  if (ad.employer && chat.employer) {
-    const adEmp = ad.employer.value.trim().toLowerCase();
-    const chatEmp = chat.employer.value.trim().toLowerCase();
-    const refused =
-      chatEmp.includes('later') ||
-      chatEmp.includes('refused') ||
-      chatEmp.includes('confidential') ||
-      (chat.workplace?.quote.toLowerCase().includes('later') ?? false);
-
-    if (adEmp && chatEmp && (adEmp !== chatEmp || refused)) {
-      conflicts.push({
-        field: 'employer',
-        fieldLabel: 'Employer Identity',
-        adValue: ad.employer.value,
-        adQuote: ad.employer.quote,
-        chatValue: chat.employer.value,
-        chatQuote: chat.employer.quote,
-        description: refused
-          ? 'The recruiter refused to provide the company or workplace address until you travel.'
-          : 'The employer or company name in chat does not match the company named on the ad.',
-        family: 'identity',
-        severity: 'medium',
-      });
+  if (stated(ad.employer)) {
+    if (stated(chat.employer) && !sameEmployer(ad.employer.value, chat.employer.value)) {
+      out.push(conflict('employer', 'employer_different', ad.employer, chat.employer, 'identity', 'medium', lang));
+    } else if (chat.employer && withheld(chat.employer)) {
+      out.push(conflict('employer', 'employer_refused', ad.employer, chat.employer, 'identity', 'medium', lang));
     }
   }
 
-  // 7. Salary conflict (Ad: amount X vs Chat: clearly different amount)
-  if (ad.salary && chat.salary) {
-    const adAmount = String(ad.salary.value.amount || '').replace(/[, ]/g, '');
-    const chatAmount = String(chat.salary.value.amount || '').replace(/[, ]/g, '');
-    const adNum = Number.parseFloat(adAmount);
-    const chatNum = Number.parseFloat(chatAmount);
+  const adPlace = stated(ad.workplace) ? ad.workplace : stated(ad.employer) ? ad.employer : null;
+  if (adPlace && chat.workplace && withheld(chat.workplace)) {
+    out.push(conflict('workplace', 'workplace_refused', adPlace, chat.workplace, 'identity', 'medium', lang));
+  }
 
-    if (!Number.isNaN(adNum) && !Number.isNaN(chatNum) && adNum > 0 && chatNum > 0) {
-      // Check ratio difference (> 30% diff)
-      const diff = Math.abs(adNum - chatNum) / Math.max(adNum, chatNum);
-      if (diff > 0.3) {
-        conflicts.push({
-          field: 'salary',
-          fieldLabel: 'Salary Terms',
-          adValue: `${ad.salary.value.amount} ${ad.salary.value.currency} / ${ad.salary.value.period}`,
-          adQuote: ad.salary.quote,
-          chatValue: `${chat.salary.value.amount} ${chat.salary.value.currency} / ${chat.salary.value.period}`,
-          chatQuote: chat.salary.quote,
-          description: 'The salary offered by the recruiter is significantly different from the advertised compensation.',
-          family: 'too_good',
-          severity: 'low',
-        });
-      }
+  if (stated(ad.salary) && stated(chat.salary) && salaryDiffers(ad.salary.value, chat.salary.value)) {
+    out.push(conflict('salary', 'salary_different', ad.salary, chat.salary, 'too_good', 'low', lang));
+  }
+
+  return out;
+}
+
+export interface JobFlag extends Flag {
+  /** A border-town route: context only, never scored without a non-geographic signal. */
+  geographic?: boolean;
+  source: 'ad' | 'chat' | 'both';
+  field: FactKey;
+}
+
+function signal(
+  code: SignalCode,
+  family: Family,
+  severity: Severity,
+  field: FactKey,
+  f: FactField<unknown>,
+  source: 'ad' | 'chat',
+  lang: Lang,
+  geographic = false,
+): JobFlag {
+  const evidence = f.quote ? `${SOURCE_NAME[source][lang]}: "${f.quote}"` : SOURCE_NAME[source][lang];
+  return { family, label: SIGNAL_LABEL[code][lang], evidence, severity, field, source, ...(geographic ? { geographic } : {}) };
+}
+
+/** Signals one source shows on its own: passport, documents, secrecy, payment, visa, pickup, border route. */
+export function singleSourceFlags(facts: JobFacts, source: 'ad' | 'chat', lang: Lang = 'en'): JobFlag[] {
+  const out: JobFlag[] = [];
+  const doc = facts.documentRequest;
+  if (stated(doc)) {
+    if (doc.value === 'passport_hold') out.push(signal('passport_hold', 'trafficking', 'high', 'documentRequest', doc, source, lang));
+    if (source === 'chat' && doc.value === 'passport_photo') {
+      out.push(signal('passport_photo', 'trafficking', 'medium', 'documentRequest', doc, source, lang));
     }
+    if (source === 'chat' && doc.value === 'id_copy')
+      out.push(signal('id_copy', 'trafficking', 'medium', 'documentRequest', doc, source, lang));
   }
-
-  return conflicts;
-}
-
-export function extractSingleSourceFlags(facts: JobFacts, sourceName: 'ad' | 'chat'): Flag[] {
-  const flags: Flag[] = [];
-
-  // Passport holding
-  if (facts.documentRequest?.value === 'passport_hold') {
-    flags.push({
-      family: 'trafficking',
-      label: `Recruiter demands surrender of original passport (${sourceName})`,
-      evidence: facts.documentRequest.quote,
-      severity: 'high',
-    });
+  if (stated(facts.secrecyRequest) && facts.secrecyRequest.value === true) {
+    out.push(signal('secrecy', 'trafficking', 'medium', 'secrecyRequest', facts.secrecyRequest, source, lang));
   }
-
-  // Secrecy request
-  if (facts.secrecyRequest?.value === true) {
-    flags.push({
-      family: 'pressure',
-      label: `Instructed to keep travel or job secret from family or officials (${sourceName})`,
-      evidence: facts.secrecyRequest.quote,
-      severity: 'high',
-    });
+  const pay = facts.paymentRequest;
+  if (stated(pay) && pay.value === 'before_contract') {
+    out.push(signal('pay_before_contract', 'payment_route', 'high', 'paymentRequest', pay, source, lang));
   }
-
-  // Payment before contract
-  if (facts.paymentRequest?.value === 'before_contract') {
-    flags.push({
-      family: 'payment_route',
-      label: `Payment demanded prior to signing a verified employment contract (${sourceName})`,
-      evidence: facts.paymentRequest.quote,
-      severity: 'high',
-    });
+  if (stated(pay) && pay.value === 'personal_account') {
+    out.push(signal('personal_account', 'payment_route', 'high', 'paymentRequest', pay, source, lang));
   }
-
-  // Payment to personal account
-  if (facts.paymentRequest?.value === 'personal_account') {
-    flags.push({
-      family: 'payment_route',
-      label: `Instructed to send funds to a personal bank or crypto account (${sourceName})`,
-      evidence: facts.paymentRequest.quote,
-      severity: 'high',
-    });
+  if (source === 'chat' && stated(facts.workerFee) && readFee(facts.workerFee.value) === 'positive') {
+    out.push(signal('worker_fee', 'payment_route', 'medium', 'workerFee', facts.workerFee, source, lang));
   }
-
-  // Tourist visa for employment
-  if (facts.visaOrPermit?.value === 'tourist') {
-    flags.push({
-      family: 'trafficking',
-      label: `Instructed to travel on a tourist visa for work (${sourceName})`,
-      evidence: facts.visaOrPermit.quote,
-      severity: 'high',
-    });
+  const visa = facts.visaOrPermit;
+  if (stated(visa) && visa.value === 'tourist') out.push(signal('tourist_visa', 'trafficking', 'high', 'visaOrPermit', visa, source, lang));
+  if (stated(visa) && visa.value === 'none') out.push(signal('no_visa', 'trafficking', 'medium', 'visaOrPermit', visa, source, lang));
+  const meet = facts.meetingPoint;
+  if (stated(meet) && meet.value === 'border')
+    out.push(signal('border_pickup', 'trafficking', 'medium', 'meetingPoint', meet, source, lang));
+  if (stated(meet) && meet.value === 'driver_pickup') {
+    out.push(signal('driver_pickup', 'trafficking', 'medium', 'meetingPoint', meet, source, lang));
   }
-
-  // Border pickup
-  if (facts.meetingPoint?.value === 'border' || facts.meetingPoint?.value === 'driver_pickup') {
-    const isBorder = isBorderLocation(facts.meetingPoint.quote) || isBorderLocation(facts.route?.quote);
-    flags.push({
-      family: 'trafficking',
-      label: isBorder ? `Pickup arranged near border crossing (${sourceName})` : `Informal driver pickup arranged (${sourceName})`,
-      evidence: facts.meetingPoint.quote,
-      severity: 'medium',
-    });
+  if (stated(meet) && meet.value === 'unnamed')
+    out.push(signal('unnamed_meeting', 'trafficking', 'low', 'meetingPoint', meet, source, lang));
+  if (source === 'chat' && withheld(facts.employer) && facts.employer) {
+    out.push(signal('employer_withheld', 'identity', 'low', 'employer', facts.employer, source, lang));
   }
-
-  return flags;
-}
-
-export function getStillUnclear(ad: JobFacts | null, chat: JobFacts | null): string[] {
-  const missing: string[] = [];
-
-  const workplaceGiven = (ad?.workplace && ad.workplace.value) || (chat?.workplace && chat.workplace.value);
-  if (!workplaceGiven) {
-    missing.push('No verifiable workplace address or physical facility location was provided.');
+  if (source === 'chat' && withheld(facts.workplace) && facts.workplace) {
+    out.push(signal('workplace_withheld', 'identity', 'low', 'workplace', facts.workplace, source, lang));
   }
-
-  const contractGiven =
-    (ad?.contract && ad.contract.value === 'official') || (chat?.contract && chat.contract.value === 'official');
-  if (!contractGiven) {
-    missing.push('No written employment contract or official terms of service were provided.');
-  }
-
-  const visaGiven =
-    (ad?.visaOrPermit && ad.visaOrPermit.value === 'work_visa') ||
-    (chat?.visaOrPermit && chat.visaOrPermit.value === 'work_visa');
-  if (!visaGiven) {
-    missing.push('No legal work visa or registered work permit pathway was confirmed.');
-  }
-
-  const employerGiven = (ad?.employer && ad.employer.value) || (chat?.employer && chat.employer.value);
-  if (!employerGiven) {
-    missing.push('Company registration number or verified corporate identity was not identified.');
-  }
-
-  return missing;
-}
-
-export function applyBorderProtection(flags: Flag[], scoreValue: number): { flags: Flag[]; score: number } {
-  // A route through a border town must never raise the result to danger unless another non-geographic family is present.
-  const nonGeoFlags = flags.filter(
-    (f) =>
-      f.family !== 'trafficking' ||
-      (!isBorderLocation(f.evidence) && !isBorderLocation(f.label) && !f.label.includes('border')),
+  const place = [facts.route, facts.workplace, facts.travelArrangedBy, facts.destinationCountry, facts.meetingPoint].find(
+    (f) => f && (mentionsBorderTown(typeof f.value === 'string' ? f.value : '') || mentionsBorderTown(f.quote)),
   );
-
-  const hasNonGeoRisks = nonGeoFlags.some(
-    (f) => f.family === 'payment_route' || f.family === 'pressure' || f.family === 'identity' || f.family === 'known_bad',
-  );
-
-  // If there are no other risk families and only border mention exists, cap score below danger (max 50, 'careful' at most)
-  if (!hasNonGeoRisks && scoreValue >= 70) {
-    return { flags, score: 50 };
-  }
-
-  return { flags, score: scoreValue };
+  if (place) out.push(signal('border_route', 'trafficking', 'low', 'route', place, source, lang, true));
+  return out;
 }
 
-export function mapToAttentionTier(verdict: 'safe' | 'careful' | 'danger'): { tier: AttentionTier; headline: string } {
-  switch (verdict) {
-    case 'danger':
-      return {
-        tier: 'pause',
-        headline: 'Pause before you pay, send documents or travel',
-      };
-    case 'careful':
-      return {
-        tier: 'verify',
-        headline: 'Some details do not add up, check them before you go',
-      };
-    case 'safe':
-    default:
-      return {
-        tier: 'lower',
-        headline: 'Few warning signs found, but important details may still be missing',
-      };
-  }
+const CONFLICT_COVERS: Partial<Record<ConflictCode, FactKey[]>> = {
+  contract_pay_first: ['paymentRequest'],
+  employer_refused: ['employer'],
+  workplace_refused: ['workplace'],
+};
+
+/** Conflict flags first, then single-source flags not already covered by a conflict on the same field. */
+export function collectFlags(ad: JobFacts | null, chat: JobFacts | null, conflicts: JobConflict[], lang: Lang = 'en'): JobFlag[] {
+  const covered = new Set<FactKey>(conflicts.flatMap((c) => [c.field, ...(CONFLICT_COVERS[c.code] ?? [])]));
+  const fromConflicts: JobFlag[] = conflicts.map((c) => ({
+    family: c.family,
+    label: c.description,
+    evidence: `${SOURCE_NAME.ad[lang]}: "${c.adQuote}" / ${SOURCE_NAME.chat[lang]}: "${c.chatQuote}"`,
+    severity: c.severity,
+    field: c.field,
+    source: 'both',
+  }));
+  const single = [
+    ...(ad ? singleSourceFlags(ad, 'ad', lang) : []),
+    ...(chat ? singleSourceFlags(chat, 'chat', lang).filter((f) => !covered.has(f.field)) : []),
+  ];
+  const seen = new Set<string>();
+  return [...fromConflicts, ...single].filter((f) => {
+    const key = `${f.family}|${f.label}|${f.geographic ? 'geo' : ''}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+export interface JobScore {
+  verdict: Verdict;
+  score: number;
+  flags: Flag[];
+  overrides: string[];
+}
+
+/**
+ * Scores with the shared engine. A border-town route counts only when a non-geographic signal is
+ * also present; on its own it is context and does not raise the result.
+ */
+export function scoreJob(flags: Array<Flag & { geographic?: boolean }>): JobScore {
+  const nonGeo = flags.filter((f) => !f.geographic);
+  const scored = nonGeo.length > 0 ? flags : [];
+  const strip = (f: Flag & { geographic?: boolean; source?: unknown; field?: unknown }): Flag => ({
+    family: f.family,
+    label: f.label,
+    evidence: f.evidence,
+    severity: f.severity,
+  });
+  const res = score({
+    flags: scored.map(strip),
+    linkChecks: [],
+    unsolicited: false,
+    scamType: scored.length > 0 ? 'job_trafficking' : 'none',
+  });
+  const overrides = nonGeo.length === 0 && flags.length > 0 ? [...res.overrides, 'border_context_only'] : res.overrides;
+  return { verdict: res.verdict, score: res.score, flags: scored.length > 0 ? res.flags : flags.map(strip), overrides };
+}
+
+export function attentionFor(verdict: Verdict): AttentionTier {
+  return verdict === 'danger' ? 'pause' : verdict === 'careful' ? 'verify' : 'lower';
+}
+
+export function headlineFor(tier: AttentionTier, lang: Lang): string {
+  return TIER_HEADLINE[tier][lang];
+}
+
+/** Important fields neither source states (withheld counts as not stated). */
+export function stillUnclear(ad: JobFacts | null, chat: JobFacts | null, lang: Lang = 'en'): { fields: FactKey[]; text: string[] } {
+  const fields = UNCLEAR_FIELDS.filter(
+    (k) => !stated(ad?.[k] as FactField<unknown> | null) && !stated(chat?.[k] as FactField<unknown> | null),
+  );
+  return { fields: [...fields], text: fields.map((k) => UNCLEAR_TEXT[k][lang]) };
 }
