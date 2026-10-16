@@ -5,8 +5,8 @@ import { type CaseFile, YAML } from '../v2/cases.js';
 
 type Box = NonNullable<CaseFile['redaction_boxes']>[number];
 
-const TEXT_KINDS = new Set(['name', 'phone', 'handle']);
-const PLACEHOLDER: Record<string, string> = { name: '[NAME]', phone: '[PHONE]', handle: '[HANDLE]' };
+const TEXT_KINDS = new Set(['name', 'phone', 'handle', 'other']);
+const PLACEHOLDER: Record<string, string> = { name: '[NAME]', phone: '[PHONE]', handle: '[HANDLE]', other: '[REDACTED]' };
 const PHONE_RE = /\+?\d(?:[ -]?\d){8,}/g;
 const HANDLE_RE = /@[A-Za-z0-9_.]{3,}/g;
 
@@ -61,7 +61,7 @@ export function sanitizeFacts(facts: FactEntry[] = [], boxes: Box[] = []): FactE
       out.push(f);
       continue;
     }
-    const variants = (f.variants ?? []).map((v) => sanitizeText(v, boxes)).filter((v) => !/\[(NAME|PHONE|HANDLE)\]/.test(v));
+    const variants = (f.variants ?? []).map((v) => sanitizeText(v, boxes)).filter((v) => !/\[(NAME|PHONE|HANDLE|REDACTED)\]/.test(v));
     if (f.variants && !variants.length) continue;
     out.push({ ...f, ...(f.variants ? { variants } : {}) });
   }

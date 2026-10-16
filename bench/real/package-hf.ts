@@ -12,6 +12,7 @@ if (flags.help || !str(flags.out)) {
   --out DIR        target folder (it is emptied first)
   --cases DIR      private real case files (omit to package synthetic only)
   --redacted DIR   redacted images named <id>.png
+  --exclude id,id  real case ids to leave out (exact duplicates)
   --synthetic DIR  synthetic case files (default bench/cases)`);
   process.exit(flags.help ? 0 : 2);
 }
@@ -19,6 +20,7 @@ if (flags.help || !str(flags.out)) {
 const out = resolve(str(flags.out) as string);
 const synDir = resolve(str(flags.synthetic) ?? CASES_DIR);
 const realDir = str(flags.cases) ? resolve(str(flags.cases) as string) : undefined;
+const exclude = new Set(str(flags.exclude)?.split(',') ?? []);
 const redDir = str(flags.redacted) ? resolve(str(flags.redacted) as string) : undefined;
 
 interface Row {
@@ -123,6 +125,7 @@ if (realDir && redDir) {
     .filter((x) => x.endsWith('.yaml') && !x.startsWith('_'))
     .sort()) {
     const raw = YAML.parse(readFileSync(join(realDir, f), 'utf8')) as CaseFile;
+    if (exclude.has(raw.id)) continue;
     const img = join(redDir, `${raw.id}.png`);
     if (!existsSync(img)) {
       problems.push(`${raw.id}: no redacted image`);
