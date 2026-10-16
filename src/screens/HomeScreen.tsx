@@ -9,7 +9,7 @@ import { Screen } from '../components/Screen';
 import { Grid } from '../components/Grid';
 import { useLayout } from '../hooks/useLayout';
 import { ShieldCard } from '../components/ShieldCard';
-import { Button, Card, EmptyState, Pill, SectionTitle } from '../components/ui';
+import { Button, Card, EmptyState, SectionTitle } from '../components/ui';
 import type { TabScreenProps } from '../navigation/types';
 import { useAppState } from '../state/AppState';
 import { VERDICT_STYLES } from '../lib/report';
@@ -19,6 +19,8 @@ import theme from '../theme/theme';
 
 const { colors, fonts } = theme;
 
+const VERDICT_GLYPH = { safe: 'checkCircle', careful: 'alert', danger: 'octagon' } as const;
+
 export const HomeScreen: React.FC<TabScreenProps<'Home'>> = ({ navigation }) => {
   const { t } = useTranslation('home');
   const { history, profile } = useAppState();
@@ -26,18 +28,19 @@ export const HomeScreen: React.FC<TabScreenProps<'Home'>> = ({ navigation }) => 
   const startCheck = (intent: 'link' | 'image' | 'text') => navigation.navigate('Check', { intent, nonce: Date.now() });
 
   const checkCard = (style?: StyleProp<ViewStyle>) => (
-      <Card style={[{ gap: 16 }, style]}>
-        <View style={{ gap: 4 }}>
-          <Text style={styles.cardTitle}>{t('check.title')}</Text>
-          <Text style={styles.cardBody}>{t('check.body')}</Text>
-        </View>
-        <View style={styles.quickRow}>
-          <QuickAction label={t('quick.link')} icon="link" onPress={() => startCheck('link')} />
-          <QuickAction label={t('quick.image')} icon="image" onPress={() => startCheck('image')} />
-          <QuickAction label={t('quick.chat')} icon="chat" onPress={() => startCheck('text')} />
-        </View>
-        <Button label={t('check.start')} onPress={() => navigation.navigate('Check')} testID="home-check-button" />
-      </Card>
+    <Card style={[{ gap: 12 }, style]}>
+      <View style={{ gap: 4 }}>
+        <Text accessibilityRole="header" style={styles.cardTitle}>{t('check.title')}</Text>
+        <Text style={styles.cardBody}>{t('check.body')}</Text>
+      </View>
+      <Button label={t('check.start')} onPress={() => navigation.navigate('Check')} testID="home-check-button" />
+      <Text style={styles.cardBody}>{t('quick.lead')}</Text>
+      <View style={styles.quickRow}>
+        <QuickAction label={t('quick.link')} icon="link" onPress={() => startCheck('link')} />
+        <QuickAction label={t('quick.image')} icon="image" onPress={() => startCheck('image')} />
+        <QuickAction label={t('quick.message')} icon="chat" onPress={() => startCheck('text')} />
+      </View>
+    </Card>
   );
 
   return (
@@ -48,6 +51,10 @@ export const HomeScreen: React.FC<TabScreenProps<'Home'>> = ({ navigation }) => 
           <View style={{ flex: 1 }}>
             <BrandLockup header />
           </View>
+          <TouchableOpacity testID="home-get-help" accessibilityRole="button" accessibilityLabel={t('help.a11y')} activeOpacity={0.7} onPress={() => navigation.navigate('GetHelp')} style={styles.helpButton}>
+            <Icon name="phone" size={20} color={colors.textPrimary} />
+            <Text style={styles.helpButtonText}>{t('help.title')}</Text>
+          </TouchableOpacity>
           <TouchableOpacity testID="open-settings" accessibilityRole="button" accessibilityLabel={t('settingsA11y')} activeOpacity={0.7} onPress={() => navigation.navigate('Settings')} style={styles.iconButton}>
             <Icon name="settings" size={24} />
           </TouchableOpacity>
@@ -56,17 +63,8 @@ export const HomeScreen: React.FC<TabScreenProps<'Home'>> = ({ navigation }) => 
     >
       <NoticeCard />
 
-      {layout.isExpanded ? (
-        <View style={styles.pair}>
-          <ShieldCard style={styles.pairItem} onDetails={() => navigation.navigate('Shield')} />
-          {checkCard(styles.pairItem)}
-        </View>
-      ) : (
-        <>
-          <ShieldCard onDetails={() => navigation.navigate('Shield')} />
-          {checkCard()}
-        </>
-      )}
+      {checkCard()}
+      <ShieldCard compact onDetails={() => navigation.navigate('Shield')} />
 
       <View style={{ gap: 8 }}>
         <SectionTitle>{t('recent.title')}</SectionTitle>
@@ -90,7 +88,10 @@ export const HomeScreen: React.FC<TabScreenProps<'Home'>> = ({ navigation }) => 
                   <Text numberOfLines={1} style={styles.recentTitle}>{entryLabel(entry.result, entry.source)}</Text>
                   <Text style={styles.recentMeta}>{formatRelative(entry.createdAt)}</Text>
                 </View>
-                <Pill label={verdictLabel(entry.result.verdict)} background={v.chipBackground} color={v.chipForeground} />
+                <View style={[styles.verdict, { backgroundColor: v.chipBackground }]}>
+                  <Icon name={VERDICT_GLYPH[entry.result.verdict]} size={16} color={v.chipForeground} />
+                  <Text style={[styles.verdictText, { color: v.chipForeground }]}>{verdictLabel(entry.result.verdict)}</Text>
+                </View>
               </TouchableOpacity>
             );
             })}
@@ -98,7 +99,6 @@ export const HomeScreen: React.FC<TabScreenProps<'Home'>> = ({ navigation }) => 
         )}
       </View>
 
-      <Grid columns={Math.min(layout.columns, 2)} gap={layout.isTablet ? 12 : 16}>
       <TouchableOpacity testID="home-radar" accessibilityRole="button" accessibilityLabel={t('radar.a11y')} activeOpacity={0.7} onPress={() => navigation.navigate('Radar')} style={styles.radar}>
         <View style={styles.rowIcon}>
           <Icon name="radar" size={24} color={colors.accent} />
@@ -109,27 +109,6 @@ export const HomeScreen: React.FC<TabScreenProps<'Home'>> = ({ navigation }) => 
         </View>
         <Icon name="chevron" size={22} color={colors.textMuted} />
       </TouchableOpacity>
-
-      <TouchableOpacity
-        testID="home-get-help"
-        accessibilityRole="button"
-        accessibilityLabel={t('help.a11y')}
-        activeOpacity={0.7}
-        onPress={() => navigation.navigate('GetHelp')}
-        style={styles.help}
-      >
-        <View style={[styles.rowIcon, { backgroundColor: colors.white }]}>
-          <Icon name="phone" size={24} color={colors.danger} />
-        </View>
-        <View style={{ flex: 1, gap: 2 }}>
-          <Text style={styles.helpTitle}>{t('help.title')}</Text>
-          <Text style={styles.helpBody}>
-            {profile.destinationCountry || profile.homeCountry ? t('help.bodyCountries') : t('help.bodyRegion')}
-          </Text>
-        </View>
-        <Icon name="chevron" size={22} color={colors.dangerDark} />
-      </TouchableOpacity>
-      </Grid>
     </Screen>
   );
 };
@@ -155,11 +134,10 @@ const styles = StyleSheet.create({
   radar: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 72, paddingVertical: 12, paddingHorizontal: 16, borderRadius: 16, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.border },
   radarTitle: { color: colors.textPrimary, fontSize: 16, lineHeight: 22, fontFamily: fonts.bold },
   radarBody: { color: colors.textSecondary, fontSize: 14, lineHeight: 20, fontFamily: fonts.regular },
-  help: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 72, paddingVertical: 12, paddingHorizontal: 16, borderRadius: 16, backgroundColor: colors.dangerSoftBg, borderWidth: 1, borderColor: colors.dangerBarTrack },
-  helpTitle: { color: colors.dangerSoftText, fontSize: 16, lineHeight: 22, fontFamily: fonts.bold },
-  helpBody: { color: colors.dangerDark, fontSize: 14, lineHeight: 20, fontFamily: fonts.regular },
-  pair: { flexDirection: 'row', gap: 16, alignItems: 'stretch' },
-  pairItem: { flex: 1, flexBasis: 0, minWidth: 0 },
+  helpButton: { flexDirection: 'row', alignItems: 'center', gap: 6, minHeight: 44, paddingHorizontal: 14, borderRadius: 22, borderWidth: 1, borderColor: colors.borderDark, backgroundColor: colors.white },
+  helpButtonText: { color: colors.textPrimary, fontSize: 14, lineHeight: 20, fontFamily: fonts.bold, includeFontPadding: false },
+  verdict: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingVertical: 6, paddingHorizontal: 10, borderRadius: 999 },
+  verdictText: { fontSize: 13, lineHeight: 18, fontFamily: fonts.bold, includeFontPadding: false },
   rowIcon: { width: 48, height: 48, borderRadius: 24, backgroundColor: colors.brandGoldSoft, alignItems: 'center', justifyContent: 'center' },
 });
 

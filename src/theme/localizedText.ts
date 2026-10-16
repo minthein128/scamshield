@@ -30,7 +30,9 @@ export function localizedStyle(text: string, style: StyleProp<TextStyle>): Style
   if (!weight) return style;
   const base = flat.lineHeight ?? (flat.fontSize ? Math.round(flat.fontSize * 1.25) : undefined);
   const script = scriptStyle(text, weight, base);
+  // YoeShin sits small next to Plus Jakarta Sans, so secondary Burmese text gets a larger step.
+  const size = scriptOf(text) === 'myanmar' && flat.fontSize && flat.fontSize >= 13 && flat.fontSize <= 16 ? { fontSize: Math.round(flat.fontSize * 1.1) } : null;
   // Web needs a Latin face after the script font, or it uses a serif. Android rejects font lists.
   const family = Platform.OS === 'web' && flat.fontFamily ? { fontFamily: `${script.fontFamily}, ${flat.fontFamily}` } : null;
-  return [style, script, family, { includeFontPadding: true }];
+  return [style, script, size, family, { includeFontPadding: true }];
 }

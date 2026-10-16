@@ -22,7 +22,6 @@ export const ScamCard: React.FC<{ scam: ScamType; onPress: () => void; style?: S
       onPress={onPress}
       style={[styles.card, style]}
     >
-      <View style={[styles.bar, { backgroundColor: accent }]} />
       <View style={[styles.icon, { backgroundColor: soft }]}>
         <Icon name={scam.icon} size={24} color={accent} />
       </View>
@@ -36,8 +35,7 @@ export const ScamCard: React.FC<{ scam: ScamType; onPress: () => void; style?: S
 };
 
 const styles = StyleSheet.create({
-  card: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 80, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.border, borderRadius: 16, paddingVertical: 14, paddingLeft: 18, paddingRight: 12, overflow: 'hidden' },
-  bar: { position: 'absolute', left: 0, top: 0, bottom: 0, width: 5 },
+  card: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 80, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.border, borderRadius: 16, paddingVertical: 14, paddingLeft: 14, paddingRight: 12 },
   icon: { width: 48, height: 48, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
   text: { flex: 1, gap: 2 },
   title: { color: colors.textPrimary, fontSize: 16, lineHeight: 22, fontFamily: fonts.bold },

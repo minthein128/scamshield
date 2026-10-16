@@ -6,12 +6,13 @@
   "check": {
     "title": "Suriin ang alok sa trabaho, mensahe, o link",
     "body": "I-paste ito o magbahagi ng screenshot. Naghahanap kami ng mga babala sa trafficking at money mule.",
-    "start": "Simulan ang pagsusuri"
+    "start": "Mag-check ng anuman"
   },
   "quick": {
-    "link": "I-paste ang link",
+    "lead": "O magsimula sa",
+    "link": "Link",
     "image": "Screenshot",
-    "chat": "Chat"
+    "message": "Mensahe"
   },
   "recent": {
     "title": "Mga kamakailang pagsusuri",

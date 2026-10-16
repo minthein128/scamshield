@@ -50,7 +50,7 @@ export const LearnScreen: React.FC<TabScreenProps<'Learn'>> = ({ navigation }) =
               onPress={() => setFlag(f)}
               style={styles.chip}
             >
-              <Icon name={f.icon} size={20} color={colors.danger} />
+              <Icon name={f.icon} size={20} color={colors.textPrimary} />
               <Text style={styles.chipText}>{f.name}</Text>
             </TouchableOpacity>
           ))}

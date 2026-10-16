@@ -33,7 +33,6 @@
     "placeholder": "Misalnya Bangkok, Thailand"
   },
   "optional": {
-    "title": "Opsional",
     "language": "Bahasa laporan"
   },
   "submit": "Periksa sekarang",
@@ -45,5 +44,9 @@
     "screenshot": "Tangkapan layar",
     "screenshotAt": "Tangkapan layar, {{place}}",
     "fallback": "Periksa"
-  }
+  },
+  "more": {
+    "title": "Detail tambahan (opsional)"
+  },
+  "submitHint": "Tambahkan pesan, tautan, atau tangkapan layar terlebih dahulu"
 }

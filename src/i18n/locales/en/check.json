@@ -30,7 +30,6 @@
     "placeholder": "For example Bangkok, Thailand"
   },
   "optional": {
-    "title": "Optional",
     "language": "Report language"
   },
   "submit": "Check now",
@@ -42,5 +41,9 @@
     "screenshot": "Screenshot",
     "screenshotAt": "Screenshot, {{place}}",
     "fallback": "Check"
-  }
+  },
+  "more": {
+    "title": "More detail (optional)"
+  },
+  "submitHint": "Add a message, link or screenshot first"
 }

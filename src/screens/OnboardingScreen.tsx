@@ -3,6 +3,7 @@ import { View, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useApiUrl } from '../config/runtime';
 import { BrandMark, Wordmark } from '../components/BrandMark';
+import { Icon } from '../components/Icon';
 import { Screen } from '../components/Screen';
 import { MessageGuardCard } from '../components/MessageGuardCard';
 import { Text } from '../components/Text';
@@ -67,12 +68,12 @@ export const OnboardingScreen: React.FC<{ onDone: (next?: AfterOnboarding) => vo
       }
     >
       <View style={styles.top}>
-        <View style={styles.dots} accessibilityLabel={t('step', { current: index + 1, total: steps.length })}>
+        {steps.length > 1 ? <View style={styles.dots} accessibilityLabel={t('step', { current: index + 1, total: steps.length })}>
           {steps.map((s, i) => (
             <View key={s} style={[styles.dot, i <= index && styles.dotOn]} />
           ))}
-        </View>
-        {step !== 'account' && step !== 'sharing' ? (
+        </View> : <View />}
+        {step !== 'account' && step !== 'sharing' && step !== 'language' ? (
           <TouchableOpacity testID="onboarding-skip" accessibilityRole="button" accessibilityLabel={t('skipA11y')} onPress={() => finish()} style={styles.skip}>
             <Text style={styles.skipText}>{t('common:actions.skip')}</Text>
           </TouchableOpacity>
@@ -83,18 +84,33 @@ export const OnboardingScreen: React.FC<{ onDone: (next?: AfterOnboarding) => vo
         <>
           <View testID="onboarding-hero" style={styles.hero} accessible accessibilityLabel={`${t('language.heroA11y')}. ${t('language.tagline')}`}>
             <View style={styles.heroDisc}>
-              <BrandMark size={tablet ? 120 : 100} />
+              <BrandMark size={tablet ? 88 : 64} />
             </View>
-            <Wordmark size={tablet ? 56 : 48} />
+            <Wordmark size={tablet ? 48 : 40} />
             <Text style={[styles.tagline, readable(tablet, 15, 22)]}>{t('language.tagline')}</Text>
           </View>
           <Heading title={t('language.title')} body={t('language.body')} />
-          <Text testID="onboarding-age" style={styles.body}>{t('language.age')}</Text>
-          <View style={styles.wrap}>
-            {UI_LANGUAGES.map(l => (
-              <Chip key={l.code} testID={`onboarding-language-${l.code}`} label={l.label} selected={uiLanguage === l.code} onPress={() => chooseLanguage(l.code)} />
-            ))}
+          <View style={styles.tiles}>
+            {UI_LANGUAGES.map(l => {
+              const on = uiLanguage === l.code;
+              return (
+                <TouchableOpacity
+                  key={l.code}
+                  testID={`onboarding-language-${l.code}`}
+                  accessibilityRole="button"
+                  accessibilityLabel={l.label}
+                  accessibilityState={{ selected: on }}
+                  activeOpacity={0.7}
+                  onPress={() => chooseLanguage(l.code)}
+                  style={[styles.tile, on && styles.tileOn]}
+                >
+                  <Text style={[styles.tileText, on && { color: colors.white }]}>{l.label}</Text>
+                  {on ? <Icon name="check" size={22} color={colors.white} /> : null}
+                </TouchableOpacity>
+              );
+            })}
           </View>
+          <Text testID="onboarding-age" style={styles.body}>{t('language.age')}</Text>
         </>
       ) : null}
 
@@ -182,11 +198,15 @@ const styles = StyleSheet.create({
   skip: { minHeight: 44, minWidth: 44, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 8 },
   skipText: { color: colors.textSecondary, fontSize: 14, fontFamily: fonts.bold },
   hero: { alignItems: 'center', gap: 8, paddingTop: 8, paddingBottom: 4 },
-  heroDisc: { width: 140, height: 140, borderRadius: 70, backgroundColor: colors.brandGoldSoft, alignItems: 'center', justifyContent: 'center', marginBottom: 4 },
+  heroDisc: { width: 88, height: 88, borderRadius: 44, backgroundColor: colors.brandGoldSoft, alignItems: 'center', justifyContent: 'center', marginBottom: 4 },
   tagline: { color: colors.textSecondary, fontSize: 15, lineHeight: 22, fontFamily: fonts.medium, textAlign: 'center', maxWidth: 320 },
   h1: { color: colors.textPrimary, fontSize: 24, lineHeight: 32, fontFamily: fonts.bold, letterSpacing: -0.4 },
   h2: { color: colors.textPrimary, fontSize: 18, lineHeight: 24, fontFamily: fonts.bold, marginTop: 8 },
   body: { color: colors.textSecondary, fontSize: 14, lineHeight: 20, fontFamily: fonts.regular },
+  tiles: { gap: 8 },
+  tile: { minHeight: 56, borderRadius: 16, borderWidth: 1.5, borderColor: colors.borderLight, backgroundColor: colors.white, paddingHorizontal: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  tileOn: { backgroundColor: colors.accent, borderColor: colors.accent },
+  tileText: { color: colors.textPrimary, fontSize: 18, lineHeight: 24, fontFamily: fonts.bold },
   wrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   point: { flexDirection: 'row', gap: 12, alignItems: 'flex-start', backgroundColor: colors.white, borderRadius: 16, borderWidth: 1, borderColor: colors.border, padding: 16 },
   pointNumber: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.brandGoldSoft, alignItems: 'center', justifyContent: 'center' },

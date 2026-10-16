@@ -3,12 +3,13 @@
   "check": {
     "title": "Check a job offer, message or link",
     "body": "Paste it or share a screenshot. We look for trafficking and money-mule warning signs.",
-    "start": "Start a check"
+    "start": "Check something"
   },
   "quick": {
-    "link": "Paste link",
+    "lead": "Or start with",
+    "link": "Link",
     "image": "Screenshot",
-    "chat": "Chat"
+    "message": "Message"
   },
   "recent": {
     "title": "Recent checks",

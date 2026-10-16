@@ -4,7 +4,7 @@
     "title": "Account",
     "signOut": "Sign out",
     "deleteAccount": "Delete account",
-    "unavailable": "You are using SafeRoute without an account. Accounts are not available in this build.",
+    "unavailable": "No account needed. Your checks stay on this phone.",
     "none": "No account",
     "noneBody": "Everything works without one. Create an account to keep your checks and contacts if you change phone, and to get a higher hourly check limit.",
     "create": "Create account",
@@ -73,5 +73,6 @@
   "deleted": {
     "title": "Account deleted",
     "message": "Your account and synced data are gone."
-  }
+  },
+  "notSet": "Not set"
 }
