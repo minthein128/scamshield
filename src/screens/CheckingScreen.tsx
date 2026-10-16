@@ -3,7 +3,8 @@ import { View, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Text } from '../components/Text';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import ShieldLoader, { useReduceMotion } from '../components/ShieldLoader';
+import DollLoader from '../components/DollLoader';
+import { useReduceMotion } from '../hooks/useReduceMotion';
 import type { Verdict } from '../api/types';
 import { Button, LinkButton } from '../components/ui';
 import { useAuth } from '../state/AuthState';
@@ -72,7 +73,7 @@ export const CheckingScreen: React.FC<RootScreenProps<'Checking'>> = ({ navigati
           </View>
         ) : (
           <View style={styles.loader}>
-            <ShieldLoader step={step} verdict={verdict} />
+            <DollLoader step={step} verdict={verdict} label={t('title')} />
             <Text accessibilityRole="header" style={styles.title}>{verdict ? t(`verdict.${verdict}`) : t('title')}</Text>
             <Text testID="checking-stage" accessibilityLiveRegion="polite" style={styles.stage}>{verdict ? ' ' : t(`steps.${STEPS[step]}`)}</Text>
           </View>

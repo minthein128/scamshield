@@ -2,7 +2,7 @@ import React, { useCallback, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, TouchableOpacity, View, type LayoutChangeEvent, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Text } from '../../components/Text';
-import { useReduceMotion } from '../../components/ShieldLoader';
+import { useReduceMotion } from '../../hooks/useReduceMotion';
 import theme from '../../theme/theme';
 import { DEMOS, DEMO_SIZE } from '../demo/registry';
 import type { DemoKey } from './content';
