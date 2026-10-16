@@ -60,6 +60,26 @@ describe('grounding', () => {
     expect(out.flags[0]?.severity).toBe('low');
   });
 
+  it('drops findings when the model ran no search', async () => {
+    const memory =
+      '{"findings":[{"family":"identity","label":"We could not find a licence record for Acme Recruit","evidence":"No record"}]}';
+    for (const res of [{ text: memory }, reply(memory), { text: memory, candidates: [{ groundingMetadata: {} }] }]) {
+      const generateContent = vi.fn(async () => res);
+      expect(await createGrounder(cfg, { models: { generateContent } } as never).ground(req, base, 5000)).toEqual({
+        flags: [],
+        sources: [],
+      });
+    }
+  });
+
+  it('keeps findings when the model searched but cited no page', async () => {
+    const generateContent = vi.fn(async () => ({
+      text: '{"findings":[{"family":"identity","label":"x","evidence":"y"}]}',
+      candidates: [{ groundingMetadata: { webSearchQueries: ['Acme Recruit licence Thailand'] } }],
+    }));
+    expect((await createGrounder(cfg, { models: { generateContent } } as never).ground(req, base, 5000)).flags).toHaveLength(1);
+  });
+
   it('degrades to empty on SDK errors', async () => {
     const generateContent = vi.fn(async () => {
       throw new Error('boom');
