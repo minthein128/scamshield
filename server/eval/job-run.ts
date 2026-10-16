@@ -7,7 +7,8 @@ import type { JobAssessResponse } from '../src/job/types.js';
 import { findJobBanned } from '../src/language-guard.js';
 import { JOB_PAIRS } from './job-pairs.js';
 
-const cfg = loadConfig({ ...process.env, MOCK: '0', LOG_SILENT: process.env.EVAL_VERBOSE ? '' : '1' });
+if (!process.env.EVAL_VERBOSE) process.env.LOG_SILENT = '1';
+const cfg = loadConfig({ ...process.env, MOCK: '0' });
 if (!cfg.geminiApiKey && !(cfg.useVertex && cfg.project)) {
   console.error('eval:job: set GEMINI_API_KEY (or Vertex env). Optional: GEMINI_MODEL, EVAL_DELAY_MS, EVAL_ONLY=id,id, EVAL_JSON=path');
   process.exit(2);

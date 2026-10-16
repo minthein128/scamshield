@@ -38,7 +38,7 @@ Sources
 
 Every field is null or an object {value, quote, confidence, refused}
 - null: the source says nothing about this field. This is the default. Do not guess, do not infer from what jobs usually offer, and do not fill a field from the other source.
-- refused: true only when the source explicitly holds the detail back, for example "the address will be shared after you arrive", "company name is confidential", "we discuss salary later". Then value is "" for text fields and quote is the sentence that holds it back. In every other case refused is false.
+- refused: true only when the source explicitly holds the detail back, for example "the address will be shared after you arrive", "you will see the factory location when you get there", "company name is confidential", "we discuss salary later". Such a field is NOT null: return {value: "", quote: <the sentence that holds it back>, confidence, refused: true}. In every other case refused is false.
 - "none": the source explicitly says there is none, for example "no fee", "free placement", "no documents needed", "no visa needed". This is a stated fact, not null.
 - Never output "not_mentioned". Use null instead.
 - quote: copy the exact words from the source, character for character, in the original language and script, at most about 200 characters. Do not translate, correct spelling or paraphrase. For an image, copy the visible text.
