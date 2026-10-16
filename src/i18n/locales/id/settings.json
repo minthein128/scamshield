@@ -1,0 +1,99 @@
+{
+  "_meta": {
+    "reviewed": false
+  },
+  "title": "Pengaturan",
+  "account": {
+    "title": "Akun",
+    "signOut": "Keluar",
+    "deleteAccount": "Hapus akun",
+    "unavailable": "Tidak perlu akun. Pemeriksaan Anda tetap tersimpan di ponsel ini.",
+    "none": "Tanpa akun",
+    "noneBody": "Semua fitur tetap bisa dipakai tanpa akun. Buat akun agar hasil periksa dan kontak Anda tidak hilang jika berganti HP, dan dapat batas periksa per jam lebih banyak.",
+    "create": "Buat akun",
+    "signIn": "Masuk"
+  },
+  "sync": {
+    "syncing": "Menyinkronkan hasil periksa dan kontak Anda...",
+    "done": "Hasil periksa dan kontak Anda sudah disinkronkan.",
+    "error": "Sinkronisasi dijeda. Kami akan mencoba lagi saat Anda membuka aplikasi nanti."
+  },
+  "language": {
+    "title": "Bahasa",
+    "body": "Aplikasi, laporan, peringatan suara, dan Bicara dengan SafeRoute memakai bahasa ini."
+  },
+  "myCountry": "Negara asal saya",
+  "destination": "Tempat saya akan bekerja atau bepergian",
+  "connection": {
+    "title": "Koneksi",
+    "host": "Server",
+    "healthy": "Server menjawab",
+    "unhealthy": "Server tidak menjawab",
+    "checking": "Memeriksa...",
+    "none": "Tidak ada alamat server",
+    "recheck": "Periksa ulang koneksi",
+    "openLog": "Log diagnostik"
+  },
+  "diagnostics": {
+    "title": "Log diagnostik",
+    "privacy": "Log ini tetap di ponsel Anda. Isinya tidak memuat pesan atau data pribadi. Bagikan hanya jika tim SafeRoute memintanya.",
+    "all": "Semua",
+    "errors": "Kesalahan",
+    "empty": "Belum ada catatan log.",
+    "emptyErrors": "Tidak ada kesalahan tercatat.",
+    "copy": "Salin laporan",
+    "share": "Bagikan laporan",
+    "clear": "Hapus log",
+    "copied": "Laporan disalin. Tempel di pesan ke tim SafeRoute.",
+    "clearTitle": "Hapus log?",
+    "clearMessage": "Ini menghapus semua catatan log di ponsel ini.",
+    "clearAction": "Hapus",
+    "levelError": "Kesalahan",
+    "levelWarn": "Peringatan",
+    "levelInfo": "Info"
+  },
+  "privacy": {
+    "title": "Privasi",
+    "share": "Bantu sesama: bagikan pola penipuan tanpa nama",
+    "shareBody": "Tidak aktif kecuali Anda menyalakannya. Tangkapan layar dan teks pesan tidak dibagikan. Nama dan info pribadi dihapus terlebih dahulu, nomor telepon serta akun hanya disimpan sebagai kode satu arah, dan nama situs web mungkin tetap disimpan. Pola yang dibagikan akan dihapus setelah 90 hari. Fitur laporkan penipuan akan selalu membagikan data, karena Anda memilih untuk mengirimkannya.",
+    "history": "Simpan riwayat pemeriksaan di ponsel ini",
+    "historyBody": "Saat fitur ini mati, SafeRoute hanya menyimpan pemeriksaan yang sedang Anda lihat dan menghapus pemeriksaan yang tersimpan. Akun yang masuk juga akan berhenti menyelaraskan pemeriksaan.",
+    "p1": "Pemeriksaan Anda disimpan di ponsel ini selama riwayat menyala. Akun yang masuk juga menyelaraskan catatan singkat tiap pemeriksaan (hasil penilaian, dugaan pola penipuan, dan ringkasan SafeRoute), kontak tepercaya, serta pengaturan. Pesan, tangkapan layar, dan tautan Anda tidak pernah diselaraskan. Tanpa akun, kontak yang sudah disimpan sebelumnya tetap ada di ponsel ini dan kontak baru tidak bisa disimpan.",
+    "p2": "Untuk memeriksa sesuatu, SafeRoute mengirim teks, tautan, atau tangkapan layar ke layanan periksa kami, yang menggunakan model AI Google dan Google Safe Browsing untuk menilainya. Kami tidak mencatat isinya.",
+    "p3": "Setiap pemasangan aplikasi mendapat ID anonim tanpa nama. Kami hanya memakainya untuk membatasi jumlah pemeriksaan per jam bagi setiap orang.",
+    "p4": "Anda dapat menghapus data di perangkat ini kapan saja. Pemilik akun juga dapat menghapus akun dan semua data yang disinkronkan.",
+    "policy": "Kebijakan privasi",
+    "deleteInfo": "Cara menghapus data Anda",
+    "deleteLocal": "Hapus data di perangkat ini",
+    "p5": "Log diagnostik di ponsel ini mencatat kode kesalahan dan waktu proses. Isinya tidak memuat pesan atau data pribadi. Log hanya dibagikan jika Anda memilih mengirimnya."
+  },
+  "confirm": {
+    "signOut": {
+      "title": "Keluar?",
+      "message": "Hasil periksa dan kontak Anda tetap tersimpan di akun Anda. Data di perangkat ini akan dibersihkan.",
+      "action": "Keluar"
+    },
+    "deleteLocal": {
+      "title": "Hapus data di perangkat ini?",
+      "messageSynced": "Tindakan ini menghapus hasil periksa, kontak, dan pengaturan di perangkat ini, lalu mengeluarkan akun Anda. Akun dan data yang tersinkronisasi tetap ada sampai Anda menghapus akun tersebut.",
+      "messageLocal": "Tindakan ini menghapus hasil periksa, kontak tepercaya, dan pengaturan Anda di perangkat ini.",
+      "action": "Hapus"
+    },
+    "deleteAccount": {
+      "title": "Hapus akun Anda?",
+      "message": "Tindakan ini menghapus akun Anda dan semua data yang tersinkronisasi selamanya. Data di perangkat ini juga akan dibersihkan.",
+      "action": "Hapus akun"
+    },
+    "historyOff": {
+      "title": "Hapus pemeriksaan yang tersimpan?",
+      "message": "Mematikan fitur ini akan menghapus pemeriksaan yang tersimpan di ponsel ini.",
+      "messageSynced": "Mematikan fitur ini akan menghapus pemeriksaan yang tersimpan di ponsel ini dan di akun Anda.",
+      "action": "Matikan"
+    }
+  },
+  "deleted": {
+    "title": "Akun telah dihapus",
+    "message": "Akun dan data yang tersinkronisasi sudah terhapus."
+  },
+  "notSet": "Belum diatur"
+}

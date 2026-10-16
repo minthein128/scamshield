@@ -1,0 +1,49 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import type { CheckResponse, LanguageCode } from '../api/types';
+
+const HISTORY_KEY = 'saferoute.history.v1';
+export const MAX_HISTORY = 30;
+
+export interface HistoryEntry {
+  id: string;
+  createdAt: string;
+  language: LanguageCode;
+  source?: string;
+  result: CheckResponse;
+}
+
+export async function loadHistory(): Promise<HistoryEntry[]> {
+  try {
+    const raw = await AsyncStorage.getItem(HISTORY_KEY);
+    const parsed: unknown = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? (parsed as HistoryEntry[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+export async function addHistory(entry: HistoryEntry): Promise<HistoryEntry[]> {
+  const existing = await loadHistory();
+  const next = [entry, ...existing.filter(e => e.id !== entry.id)].slice(0, MAX_HISTORY);
+  await AsyncStorage.setItem(HISTORY_KEY, JSON.stringify(next));
+  return next;
+}
+
+export async function clearHistory(): Promise<void> {
+  await AsyncStorage.removeItem(HISTORY_KEY);
+}
+
+export async function saveHistory(list: HistoryEntry[]): Promise<void> {
+  await AsyncStorage.setItem(HISTORY_KEY, JSON.stringify(list.slice(0, MAX_HISTORY)));
+}
+
+const SLIMMED_KEY = 'saferoute.historySlim.v1';
+
+/** True once this device rewrote the account's old full-report history docs. */
+export async function historySlimmed(uid: string): Promise<boolean> {
+  return (await AsyncStorage.getItem(`${SLIMMED_KEY}.${uid}`).catch(() => null)) === '1';
+}
+
+export async function markHistorySlimmed(uid: string): Promise<void> {
+  await AsyncStorage.setItem(`${SLIMMED_KEY}.${uid}`, '1');
+}

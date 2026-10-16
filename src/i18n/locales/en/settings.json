@@ -1,0 +1,96 @@
+{
+  "title": "Settings",
+  "account": {
+    "title": "Account",
+    "signOut": "Sign out",
+    "deleteAccount": "Delete account",
+    "unavailable": "No account needed. Your checks stay on this phone.",
+    "none": "No account",
+    "noneBody": "Everything works without one. Create an account to keep your checks and contacts if you change phone, and to get a higher hourly check limit.",
+    "create": "Create account",
+    "signIn": "Sign in"
+  },
+  "sync": {
+    "syncing": "Syncing your checks and contacts...",
+    "done": "Your checks and contacts are synced.",
+    "error": "Sync is paused. We will try again next time you open the app."
+  },
+  "language": {
+    "title": "Language",
+    "body": "The app, your reports, spoken warnings and Talk to SafeRoute all use this language."
+  },
+  "myCountry": "My country",
+  "destination": "Where I will work or travel",
+  "connection": {
+    "title": "Connection",
+    "host": "Server",
+    "healthy": "Server answers",
+    "unhealthy": "Server does not answer",
+    "checking": "Checking...",
+    "none": "No server address",
+    "recheck": "Re-check connection",
+    "openLog": "Diagnostics log"
+  },
+  "diagnostics": {
+    "title": "Diagnostics log",
+    "privacy": "This log stays on your phone. It contains no messages or personal details. Share it only if the SafeRoute team asks.",
+    "all": "All",
+    "errors": "Errors",
+    "empty": "No log entries yet.",
+    "emptyErrors": "No errors recorded.",
+    "copy": "Copy report",
+    "share": "Share report",
+    "clear": "Clear log",
+    "copied": "Report copied. Paste it in a message to the SafeRoute team.",
+    "clearTitle": "Clear the log?",
+    "clearMessage": "This deletes all log entries on this phone.",
+    "clearAction": "Clear",
+    "levelError": "Error",
+    "levelWarn": "Warning",
+    "levelInfo": "Info"
+  },
+  "privacy": {
+    "title": "Privacy",
+    "share": "Help others: share anonymous scam patterns",
+    "shareBody": "Off unless you turn it on. No screenshots and no message text are shared. Names and personal details are removed first, phone numbers and accounts are kept only as one-way codes, and website names may be kept. Shared patterns are deleted after 90 days. Report a scam always shares, because you choose to send it.",
+    "history": "Keep check history on this phone",
+    "historyBody": "When this is off, SafeRoute keeps only the check you are looking at and deletes saved checks. Signed-in accounts also stop syncing checks.",
+    "p1": "Your checks are saved on this phone while history is on. Signed-in accounts also sync a short record of each check (verdict, scam type and SafeRoute's summary), trusted contacts and settings. Your messages, screenshots and links are never synced. Without an account, contacts saved earlier stay on this phone and new ones cannot be saved.",
+    "p2": "To check something, SafeRoute sends the text, link or screenshot to our check service, which uses Google AI models and Google Safe Browsing to assess it. We do not log the content.",
+    "p3": "Each install gets an anonymous ID. We use it only to limit how many checks one person can run per hour.",
+    "p4": "You can delete the data on this device at any time. Account holders can also delete their account and everything synced.",
+    "policy": "Privacy policy",
+    "deleteInfo": "How to delete your data",
+    "deleteLocal": "Delete data on this device",
+    "p5": "A diagnostics log on this phone records error codes and timings. It holds no messages or personal details. It is shared only if you choose to send it."
+  },
+  "confirm": {
+    "signOut": {
+      "title": "Sign out?",
+      "message": "Your checks and contacts stay in your account. This device will be cleared.",
+      "action": "Sign out"
+    },
+    "deleteLocal": {
+      "title": "Delete data on this device?",
+      "messageSynced": "This clears checks, contacts and settings on this device and signs you out. Your account and its synced copies stay until you delete the account.",
+      "messageLocal": "This clears your checks, trusted contacts and settings on this device.",
+      "action": "Delete"
+    },
+    "deleteAccount": {
+      "title": "Delete your account?",
+      "message": "This permanently deletes your account and everything synced to it. Data on this device is cleared too.",
+      "action": "Delete account"
+    },
+    "historyOff": {
+      "title": "Delete saved checks?",
+      "message": "Turning this off deletes the checks saved on this phone.",
+      "messageSynced": "Turning this off deletes the checks saved on this phone and in your account.",
+      "action": "Turn off"
+    }
+  },
+  "deleted": {
+    "title": "Account deleted",
+    "message": "Your account and synced data are gone."
+  },
+  "notSet": "Not set"
+}

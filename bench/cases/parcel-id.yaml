@@ -1,0 +1,44 @@
+id: parcel-id
+file: ../public/v2/parcel-id.png
+language: id
+home: ID
+app: sms
+scam_type: parcel_phishing
+expected_verdict: danger
+score_range: [60, 100]
+families: [payment_route, pressure, link_risk]
+source_text: |
+  KilatKirim
+  Pesan teks - Hari ini 14:03
+  [KilatKirim] Paket Anda tertahan di gudang karena alamat tidak lengkap. Bayar biaya pengiriman ulang Rp 12.500 dalam 2 jam di https://kilatkirim-ongkir.example/bayar atau paket akan dikembalikan.
+must_mention:
+  - id: fee
+    variants: ["12500", "Rp 12.500", "biaya", "bayar"]
+  - link
+  - id: deadline
+    variants: ["2 jam", "dua jam", "batas waktu", "terburu-buru", "mendesak"]
+must_advise: [dont_click_link, dont_pay, verify_official]
+must_not:
+  accuse: [KilatKirim]
+translations:
+  - language: en
+    file: ../public/v2/parcel-id.en.png
+    source_text: |
+      KilatKirim
+      Text message - Today 14:03
+      [KilatKirim] Your parcel is held at the warehouse because the address is incomplete. Pay the redelivery fee of Rp 12,500 within 2 hours at https://kilatkirim-ongkir.example/bayar or the parcel will be returned.
+    synthetic:
+      layout: sms
+      sender: KilatKirim
+      messages:
+        - { from: time, text: "Text message - Today 14:03" }
+        - { from: them, text: "[KilatKirim] Your parcel is held at the warehouse because the address is incomplete. Pay the redelivery fee of Rp 12,500 within 2 hours at https://kilatkirim-ongkir.example/bayar or the parcel will be returned." }
+synthetic:
+  layout: sms
+  sender: KilatKirim
+  subtitle: Pesan teks
+  messages:
+    - { from: time, text: "Pesan teks - Hari ini 14:03" }
+    - { from: them, text: "[KilatKirim] Paket Anda tertahan di gudang karena alamat tidak lengkap. Bayar biaya pengiriman ulang Rp 12.500 dalam 2 jam di https://kilatkirim-ongkir.example/bayar atau paket akan dikembalikan." }
+notes: Fictional courier brand. Small redelivery fee behind a lookalike link with a two-hour deadline.
+public: true

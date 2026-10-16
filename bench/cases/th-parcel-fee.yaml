@@ -1,0 +1,31 @@
+id: th-parcel-fee
+file: ../public/v2/th-parcel-fee.png
+language: th
+home: TH
+app: sms
+scam_type: parcel_phishing
+expected_verdict: danger
+score_range: [60, 100]
+families: [payment_route, pressure, link_risk]
+source_text: |
+  ThaiSpeed
+  ข้อความ
+  [ThaiSpeed] พัสดุของคุณถูกระงับเนื่องจากที่อยู่ไม่ครบ กรุณาชำระค่าจัดส่งเพิ่ม 39 บาท ภายใน 12 ชั่วโมง ที่ https://thaispeed-redeliver.example/th มิฉะนั้นพัสดุจะถูกตีกลับ
+must_mention:
+  - id: fee
+    variants: ["39", "39 บาท", "ค่าจัดส่ง", "ค่าธรรมเนียม"]
+  - link
+  - id: deadline
+    variants: ["12 ชั่วโมง", "ภายใน", "เร่ง", "รีบ"]
+must_advise: [dont_click_link, dont_pay, verify_official]
+must_not:
+  accuse: [ThaiSpeed]
+synthetic:
+  layout: sms
+  sender: ThaiSpeed
+  subtitle: ข้อความ
+  messages:
+    - { from: time, text: "วันนี้ 13:05" }
+    - { from: them, text: "[ThaiSpeed] พัสดุของคุณถูกระงับเนื่องจากที่อยู่ไม่ครบ กรุณาชำระค่าจัดส่งเพิ่ม 39 บาท ภายใน 12 ชั่วโมง ที่ https://thaispeed-redeliver.example/th มิฉะนั้นพัสดุจะถูกตีกลับ" }
+notes: Fictional courier. Small redelivery fee behind a link with a 12-hour deadline.
+public: true

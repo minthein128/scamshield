@@ -1,0 +1,179 @@
+{
+  "_meta": {
+    "reviewed": false
+  },
+  "title": "Suriin ang isang bagay",
+  "whatIsIt": "Ano ito?",
+  "kinds": {
+    "job": "Alok na trabaho",
+    "message": "Mensahe",
+    "link": "Link",
+    "shop": "Tindahan",
+    "agency": "Ahensya"
+  },
+  "text": {
+    "title": "Mensaheng text",
+    "a11y": "Text o chat na susuriin",
+    "placeholder": "Post tungkol sa trabaho, mga mensahe sa chat, o SMS"
+  },
+  "link": {
+    "label": "Link",
+    "a11y": "Link na susuriin"
+  },
+  "screenshot": {
+    "label": "Screenshot",
+    "ready": "{{kb}} KB, handa nang ipadala",
+    "preparing": "Inihahanda ang larawan...",
+    "upload": "Mag-upload ng screenshot",
+    "pick": "Pumili ng screenshot"
+  },
+  "destination": {
+    "label": "Saan ka nagtatrabaho o bumibiyahe?",
+    "a11y": "Pupuntahan",
+    "placeholder": "Halimbawa: Bangkok, Thailand"
+  },
+  "optional": {
+    "language": "Wika ng ulat"
+  },
+  "submit": "Suriin ngayon",
+  "errors": {
+    "image": "Hindi magamit ang larawang iyon. Sumubok ng ibang screenshot.",
+    "clipboardEmpty": "Walang nakopya sa iyong clipboard."
+  },
+  "source": {
+    "screenshot": "Screenshot",
+    "screenshotAt": "Screenshot, {{place}}",
+    "fallback": "Pagsusuri"
+  },
+  "more": {
+    "title": "Dagdag na detalye (opsyonal)"
+  },
+  "submitHint": "Maglagay muna ng mensahe, link, o screenshot",
+  "job": {
+    "ad": {
+      "title": "Ang job ad",
+      "hint": "I-paste ang post, o magdagdag ng litrato nito.",
+      "a11y": "Teksto ng job ad",
+      "placeholder": "I-paste ang job ad dito"
+    },
+    "chat": {
+      "title": "Ang sinabi o tinanong ng recruiter sa iyo",
+      "optional": "Opsyonal",
+      "hint": "I-paste ang mga mensahe, o magdagdag ng litrato. Makakatulong ito para mapansin ang mga bagay na posibleng hindi tugma sa ad.",
+      "a11y": "Teksto ng chat sa recruiter",
+      "placeholder": "I-paste ang chat sa recruiter dito"
+    },
+    "submit": "Basahin ang mga tekstong ito",
+    "submitHint": "Idagdag muna ang job ad o ang chat",
+    "notMentioned": "Hindi nabanggit",
+    "source": {
+      "ad": "Job ad",
+      "chat": "Chat sa recruiter",
+      "both": "Job ad at chat"
+    },
+    "facts": {
+      "title": "Tama ba ito?",
+      "intro": "Ito ang posibleng naintindihan namin mula sa iyong mga teksto. Pakitama ang anumang mukhang mali. Gagamitin lamang ang iyong mga binago para sa pagsusuring ito.",
+      "adGroup": "Mula sa job ad",
+      "chatGroup": "Mula sa chat sa recruiter",
+      "unclearNote": "Maaaring hindi malinaw ang ilang detalye. Baka kailangang suriin ang mga may marka.",
+      "pleaseCheck": "Pakisuri",
+      "declined": "Maaaring hindi sila sumagot",
+      "edited": "Binago mo",
+      "quoteLabel": "Tekstong pinagmulan nito",
+      "noQuote": "Ikaw mismo ang nagdagdag nito",
+      "edit": "I-edit",
+      "editA11y": "I-edit ang {{field}}",
+      "done": "Tapos na",
+      "reset": "Bumalik sa nabasa namin",
+      "markNotMentioned": "Markahan bilang hindi nabanggit",
+      "add": "Magdagdag",
+      "amount": "Halaga",
+      "currency": "Pera",
+      "currencyPlaceholder": "Halimbawa THB",
+      "period": "Gaano kadalas",
+      "feeChoice": "Bayad o deposito",
+      "feeAmount": "Magkano, ayon sa salita ng recruiter",
+      "textPlaceholder": "I-type ang sinasabi sa teksto",
+      "empty": "Wala kaming nakitang malinaw na detalye sa mga tekstong ito. Maaari mo itong idagdag mismo, o bumalik at suriin ang teksto.",
+      "submit": "Mukhang tama, suriin ito",
+      "submitHint": "Maaari mo pa ring baguhin ang mga detalye pagkatapos mong makita ang resulta.",
+      "noMatch": "Hindi namin ito maitugma sa teksto, kaya pakitingnan ito.",
+      "feeHint": "Pakilagay ang halaga, halimbawa 300 USD. Maaaring hindi magamit sa pagsusuri ang detalyeng ito kung wala ito."
+    },
+    "fields": {
+      "employer": "Employer",
+      "jobTitle": "Pangalan ng trabaho",
+      "workplace": "Lugar ng trabaho",
+      "destinationCountry": "Bansa",
+      "salary": "Sahod",
+      "workerFee": "Bayad ng manggagawa",
+      "contract": "Kontrata",
+      "visaOrPermit": "Visa o permit",
+      "travelArrangedBy": "Sino ang mag-aayos ng biyahe",
+      "route": "Ruta",
+      "meetingPoint": "Lugar ng tagpuan",
+      "documentRequest": "Hinihinging mga dokumento",
+      "paymentRequest": "Hinihinging bayad",
+      "urgency": "Pagmamadali",
+      "contactChannel": "Paano ka nila kinontak",
+      "secrecyRequest": "Hininging ilihim ito"
+    },
+    "period": {
+      "hourly": "bawat oras",
+      "daily": "bawat araw",
+      "weekly": "bawat linggo",
+      "monthly": "bawat buwan",
+      "yearly": "bawat taon"
+    },
+    "values": {
+      "workerFee": {
+        "none": "Walang nabanggit na bayad",
+        "some": "May nabanggit na bayad o deposito"
+      },
+      "contract": {
+        "official": "Opisyal na kontrata",
+        "later": "Saka na ang kontrata",
+        "none": "Walang kontrata",
+        "not_mentioned": "Hindi nabanggit"
+      },
+      "visaOrPermit": {
+        "work_visa": "Work visa",
+        "tourist": "Tourist visa",
+        "none": "Walang visa",
+        "not_mentioned": "Hindi nabanggit"
+      },
+      "meetingPoint": {
+        "airport": "Paliparan",
+        "border": "Border",
+        "workplace": "Lugar ng trabaho",
+        "driver_pickup": "May driver na susundo sa iyo",
+        "unnamed": "Lugar na hindi pinangalanan",
+        "not_mentioned": "Hindi nabanggit"
+      },
+      "documentRequest": {
+        "passport_photo": "Litrato ng iyong pasaporte",
+        "passport_hold": "Itatago nila ang iyong pasaporte",
+        "id_copy": "Kopya ng iyong ID",
+        "none": "Walang dokumento",
+        "not_mentioned": "Hindi binanggit"
+      },
+      "paymentRequest": {
+        "before_contract": "Magbayad bago ang kontrata",
+        "personal_account": "Magbayad sa personal na account",
+        "none": "Walang bayad",
+        "not_mentioned": "Hindi binanggit"
+      },
+      "contactChannel": {
+        "company_channel": "Channel ng kumpanya",
+        "personal_chat_app": "Personal na chat app",
+        "phone": "Numero ng telepono",
+        "email": "Email"
+      },
+      "secrecyRequest": {
+        "yes": "Sinabihang ilihim ito",
+        "no": "Hindi sinabihang ilihim ito"
+      }
+    }
+  }
+}

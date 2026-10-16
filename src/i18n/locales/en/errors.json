@@ -1,0 +1,84 @@
+{
+  "api": {
+    "bad_request": {
+      "title": "We could not read that",
+      "message": "Add some text, a link or a screenshot and try again."
+    },
+    "too_large": {
+      "title": "That file is too large",
+      "message": "Pick a smaller screenshot and try again."
+    },
+    "upstream": {
+      "title": "The check service is down",
+      "message": "This is a problem on our side. Try again in a few minutes."
+    },
+    "rate_limited": {
+      "title": "You reached the check limit",
+      "message": "Wait a little and try again. A free account gets a higher limit."
+    },
+    "network": {
+      "title": "You are offline",
+      "message": "Check your internet connection and try again."
+    },
+    "server_unreachable": {
+      "title": "SafeRoute cannot be reached",
+      "message": "Your internet works, but our check service does not answer right now. Try again in a moment."
+    },
+    "timeout": {
+      "title": "The check took too long",
+      "message": "Your connection may be slow. Try again."
+    },
+    "cancelled": {
+      "title": "Check cancelled",
+      "message": "The check was cancelled."
+    },
+    "invalid_response": {
+      "title": "Unexpected answer",
+      "message": "The check service sent an answer we could not read. Try again."
+    },
+    "unavailable": {
+      "title": "Checks are not available",
+      "message": "This build is not connected to the check service. Update the app and try again."
+    },
+    "unknown": {
+      "title": "Something went wrong",
+      "message": "Please try again."
+    },
+    "not_found": {
+      "title": "That check has expired",
+      "message": "Feedback is accepted for a few days after a check."
+    }
+  },
+  "rateLimitedWait": "Try again in about {{wait}}. A free account gets a higher limit.",
+  "wait": {
+    "unknown": "a little while",
+    "minute": "a minute",
+    "minutes_one": "{{count}} minute",
+    "minutes_other": "{{count}} minutes",
+    "hours_one": "{{count}} hour",
+    "hours_other": "{{count}} hours"
+  },
+  "auth": {
+    "emailInUse": "That email already has an account. Sign in instead.",
+    "credentialInUse": "That account already exists. Sign in instead.",
+    "invalidEmail": "Enter a valid email address.",
+    "weakPassword": "Use a password with at least 6 characters.",
+    "missingPassword": "Enter your password.",
+    "badCredential": "The email or password is not right.",
+    "tooManyRequests": "Too many attempts. Wait a few minutes and try again.",
+    "network": "No connection. Check your internet and try again.",
+    "popupClosed": "The Google window was closed before sign-in finished.",
+    "differentMethod": "That email already has an account with another sign-in method. Use that method.",
+    "unauthorizedDomain": "Sign-in is not allowed from this web address.",
+    "popupBlocked": "Your browser blocked the Google window. Allow pop-ups and try again.",
+    "recentLogin": "For your safety, sign in again and then repeat this step.",
+    "notAllowed": "This sign-in method is not available yet.",
+    "fallback": "Something went wrong. Please try again."
+  },
+  "job": {
+    "unreadable": {
+      "title": "We could not read the job details",
+      "message": "The text or picture may be hard to read. Please try again, or paste the text."
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "_meta": {
+    "reviewed": false
+  },
+  "title": "Account",
+  "signedInAs": "Naka-sign in bilang",
+  "unavailable": {
+    "title": "Hindi available ang mga account",
+    "body": "Hindi konektado ang bersyong ito sa serbisyo ng account. Gumagana pa rin nang buo ang SafeRoute kahit walang account."
+  },
+  "createTitle": "Gumawa ng account",
+  "signInTitle": "Mag-sign in",
+  "introSignUp": "Mananatili ang iyong mga pagsusuri at mga pinagkakatiwalaang contact at mase-save sa bagong account.",
+  "introSignIn": "Mag-sign in para muling makuha ang iyong mga na-save na pagsusuri at mga pinagkakatiwalaang contact.",
+  "email": "Email",
+  "password": "Password",
+  "passwordHint": "Hindi bababa sa 6 na character.",
+  "haveAccount": "May account na ako",
+  "createNew": "Gumawa ng bagong account",
+  "forgot": "Nakalimutan ang password?",
+  "google": "Magpatuloy gamit ang Google",
+  "facebook": "Magpatuloy gamit ang Facebook",
+  "errors": {
+    "missing": "Ilagay ang iyong email at password.",
+    "resetNeedsEmail": "Ilagay muna ang iyong email, pagkatapos ay pindutin ang Nakalimutan ang password."
+  },
+  "resetSent": "Kung may account ang email na iyon, may ipapadalang link para sa pag-reset."
+}

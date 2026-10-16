@@ -1,0 +1,26 @@
+id: id-hardneg-payslip
+file: ../public/v2/id-hardneg-payslip.png
+language: id
+home: ID
+app: sms
+scam_type: none
+expected_verdict: safe
+score_range: [0, 40]
+families: []
+source_text: |
+  Sinar Kain HR
+  Pesan teks
+  Info Gaji: Gaji bulan Oktober sebesar Rp 4.500.000 sudah ditransfer ke rekening Anda. Slip gaji ada di kantor HR. Jangan bagikan PIN atau OTP kepada siapa pun. Pesan ini tidak perlu dibalas.
+must_mention: []
+must_advise: []
+must_not:
+  accuse: [Sinar Kain]
+synthetic:
+  layout: sms
+  sender: Sinar Kain HR
+  subtitle: Pesan teks
+  messages:
+    - { from: time, text: "Hari ini 16:40" }
+    - { from: them, text: "Info Gaji: Gaji bulan Oktober sebesar Rp 4.500.000 sudah ditransfer ke rekening Anda. Slip gaji ada di kantor HR. Jangan bagikan PIN atau OTP kepada siapa pun. Pesan ini tidak perlu dibalas." }
+notes: Hard negative. A fictional employer payslip notice that mentions money, account, PIN and OTP but asks for nothing.
+public: true

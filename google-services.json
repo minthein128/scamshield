@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "151183717652",
+    "project_id": "saferoute-aibc",
+    "storage_bucket": "saferoute-aibc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:151183717652:android:3b30fb0485630823ffbe01",
+        "android_client_info": {
+          "package_name": "com.saferoute.antifraud"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "151183717652-4v5l2o80h0ennv7iar2de0hl6m33gbcg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.saferoute.antifraud",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "151183717652-geaolhk07sat2kd7ake25mbii1qb4ij2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.saferoute.antifraud",
+            "certificate_hash": "1183b3e6427db46031b752594ddb0ecadaa0d043"
+          }
+        },
+        {
+          "client_id": "151183717652-8f2a4c69jup4bi5nnugh4ammk1rnp8li.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCYbMqU7fAFyQ_Neyc4UpGraofMRNCJI3I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "151183717652-8f2a4c69jup4bi5nnugh4ammk1rnp8li.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

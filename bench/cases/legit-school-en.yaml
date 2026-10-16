@@ -1,0 +1,36 @@
+id: legit-school-en
+file: ../public/v2/legit-school-en.png
+language: en
+home: ID
+app: sms
+scam_type: none
+expected_verdict: safe
+families: []
+source_text: |
+  Riverside Language Centre
+  Text message - Today 08:30
+  Hi Rina, this is Dewi from the Riverside Language Centre front desk. Your Thursday class moved to room 4. No payment needed. If you have questions, call the office number on our website.
+must_mention:
+  - id: room_change
+    variants: ["room 4", "room", "class"]
+must_advise: []
+translations:
+  - language: my
+    file: ../public/v2/legit-school-en.my.png
+    source_text: |
+      Riverside ဘာသာစကားစင်တာ
+      မင်္ဂလာပါ ရီနာ၊ ကျွန်မက Riverside ဘာသာစကားစင်တာ ရှေ့ကောင်တာက ဒေဝီပါ။ ကြာသပတေးနေ့ အတန်းကို အခန်း ၄ သို့ ပြောင်းထားပါတယ်။ ငွေပေးစရာ မလိုပါ။ မေးစရာရှိရင် ကျွန်မတို့ ဝက်ဘ်ဆိုက်ပေါ်က ရုံးဖုန်းနံပါတ်ကို ခေါ်ပါ။
+    synthetic:
+      layout: sms
+      sender: Riverside ဘာသာစကားစင်တာ
+      messages:
+        - { from: time, text: "ဒီနေ့ 08:30" }
+        - { from: them, text: "မင်္ဂလာပါ ရီနာ၊ ကျွန်မက Riverside ဘာသာစကားစင်တာ ရှေ့ကောင်တာက ဒေဝီပါ။ ကြာသပတေးနေ့ အတန်းကို အခန်း ၄ သို့ ပြောင်းထားပါတယ်။ ငွေပေးစရာ မလိုပါ။ မေးစရာရှိရင် ကျွန်မတို့ ဝက်ဘ်ဆိုက်ပေါ်က ရုံးဖုန်းနံပါတ်ကို ခေါ်ပါ။" }
+synthetic:
+  layout: sms
+  sender: Riverside Language Centre
+  messages:
+    - { from: time, text: "Text message - Today 08:30" }
+    - { from: them, text: "Hi Rina, this is Dewi from the Riverside Language Centre front desk. Your Thursday class moved to room 4. No payment needed. If you have questions, call the office number on our website." }
+notes: Fictional school. Ordinary schedule change with no money or link.
+public: true

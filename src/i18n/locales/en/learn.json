@@ -1,0 +1,252 @@
+{
+  "title": "Learn",
+  "tagline": "Know the signs before you reply, pay or travel.",
+  "scamsHeading": "Common scams",
+  "flagsHeading": "The 7 red flags",
+  "flagsHint": "SafeRoute looks for these signs. Tap one to learn more.",
+  "flagsHintA11y": "Opens an explanation",
+  "shieldRow": {
+    "title": "How the Screen shield works",
+    "hint": "3 quick steps"
+  },
+  "reportRow": "Report a scam",
+  "helpRow": "Get help",
+  "scamCardHint": "Opens the scam guide",
+  "guide": {
+    "eyebrow": "Scam guide",
+    "howItStarts": "How it starts",
+    "signs": "Warning signs",
+    "signFallback": "Warning",
+    "example": "See an example",
+    "exampleNote": "Example. Names and posts are made up.",
+    "exampleEnglish": "The example screens are shown in English.",
+    "actions": "What to do"
+  },
+  "shieldHowTo": {
+    "eyebrow": "Screen shield"
+  },
+  "stepper": {
+    "back": "Back",
+    "next": "Next",
+    "done": "Done",
+    "backA11y": "Back, to step {{step}} of {{total}}",
+    "nextA11y": "Next, to step {{step}} of {{total}}",
+    "scroller": "Example, {{total}} steps. Swipe or use Next and Back.",
+    "progress": "Step {{current}} of {{total}}: {{title}}",
+    "frame": "Example screen for step {{current}}: {{title}}"
+  },
+  "sheet": {
+    "example": "You might hear",
+    "close": "Close"
+  },
+  "actions": {
+    "noPay": {
+      "title": "Don't pay, don't send documents",
+      "body": "Real jobs, shops and banks rarely ask for money or your passport first."
+    },
+    "check": {
+      "title": "Check it with SafeRoute",
+      "body": "Paste the text or link, or add a screenshot."
+    },
+    "help": {
+      "title": "Get help",
+      "body": "Find hotlines and people who can help you."
+    }
+  },
+  "scams": {
+    "jobs": {
+      "title": "Risky job offers and trafficking",
+      "hook": "Overseas jobs with high pay, a border pickup, or a request to hand over your passport.",
+      "howItStarts": "A post or message offers a job abroad with a big salary. No experience, no interview. Someone asks for a photo of your passport to book your place, then tells you to meet a driver.",
+      "signs": {
+        "s1": "Very high pay for easy work, and no experience needed.",
+        "s2": "Only a few places left. Leave this week.",
+        "s3": "A pickup at the border or airport, and no visa papers.",
+        "s4": "They want to keep your passport.",
+        "s5": "The recruiter has no company name and only uses a private chat app."
+      }
+    },
+    "romance": {
+      "title": "Romance and investment",
+      "hook": "A friendly stranger who later pushes crypto or trading.",
+      "howItStarts": "A stranger writes to you by mistake and is kind. After days or weeks of chat, they say they make good money on a trading app. Then they invite you to try it with a small deposit.",
+      "signs": {
+        "s1": "A stranger says \"wrong number\" and then keeps chatting.",
+        "s2": "They show big profits from a trading or crypto app.",
+        "s3": "They send a link to an app you cannot find in the official store.",
+        "s4": "They ask for a deposit, or for crypto, to start.",
+        "s5": "They say the chance will close soon."
+      }
+    },
+    "parcel": {
+      "title": "Parcel and bank messages",
+      "hook": "\"Pay a fee\" or \"verify your account\" with a link.",
+      "howItStarts": "A text says your parcel is held, or your bank account is locked. It has a short link and a deadline. The link opens a copy of a real site that asks for your card or login.",
+      "signs": {
+        "s1": "A small fee to release a parcel.",
+        "s2": "A short link or a web address that looks a little wrong.",
+        "s3": "Pay today or it will be returned. Verify now or lose access.",
+        "s4": "The sender is an unknown number, not your bank.",
+        "s5": "The same message was sent to many other people."
+      }
+    },
+    "agency": {
+      "title": "Risky recruitment agencies",
+      "hook": "No licence, upfront fees.",
+      "howItStarts": "A page says it is an official, licensed agency. It lists many jobs abroad. When you write to them, they ask for a registration fee, a training fee or a deposit before any contract.",
+      "signs": {
+        "s1": "No licence number, or one you cannot verify.",
+        "s2": "Fees for registration, training, visa or a \"seat\".",
+        "s3": "Every job pays well and needs no skills.",
+        "s4": "They tell you to pay today to keep your place.",
+        "s5": "Other workers have reported the same name or number."
+      }
+    },
+    "shop": {
+      "title": "Risky online shop deals",
+      "hook": "Too-cheap deals, pay outside the app.",
+      "howItStarts": "You find a phone or a product at a very low price. The seller says \"chat me for a better deal\", and asks you to pay by bank transfer. After you pay, the seller goes quiet and nothing arrives.",
+      "signs": {
+        "s1": "The price is far below the normal price.",
+        "s2": "The seller asks you to pay outside the shop app.",
+        "s3": "A new seller account with no history or reviews.",
+        "s4": "\"Need money fast.\" \"Last one.\"",
+        "s5": "The seller moves the chat to another app."
+      }
+    }
+  },
+  "examples": {
+    "jobs": {
+      "e1": {
+        "title": "You see a job post",
+        "caption": "A big salary, free flight and no experience needed."
+      },
+      "e2": {
+        "title": "Tap the doll",
+        "caption": "The doll sees the post on your screen. It asks to open the hidden text."
+      },
+      "e3": {
+        "title": "SafeRoute checks it",
+        "caption": "It reads the whole post and looks for the red flags."
+      },
+      "e4": {
+        "title": "The result",
+        "caption": "SafeRoute shows a high-risk result, with the reasons and what to do next."
+      }
+    },
+    "romance": {
+      "e1": {
+        "title": "A stranger starts a chat",
+        "caption": "Friendly words, then talk about easy profit."
+      },
+      "e2": {
+        "title": "Tap the doll",
+        "caption": "SafeRoute needs the older messages to see the full story."
+      },
+      "e3": {
+        "title": "Scroll up and tap again",
+        "caption": "The start of the chat shows a \"wrong number\" opening."
+      },
+      "e4": {
+        "title": "The result",
+        "caption": "The chat shows signs of a romance and investment scam."
+      }
+    },
+    "parcel": {
+      "e1": {
+        "title": "A message arrives",
+        "caption": "SafeRoute warns you before you open the link."
+      },
+      "e2": {
+        "title": "Tap to see why",
+        "caption": "You see the reasons. Do not open the link."
+      }
+    },
+    "agency": {
+      "e1": {
+        "title": "You open an agency page",
+        "caption": "It says \"official\" and shows a licence number."
+      },
+      "e2": {
+        "title": "SafeRoute checks it",
+        "caption": "It looks for the licence and for reports about the agency."
+      }
+    },
+    "shop": {
+      "e1": {
+        "title": "You see a cheap deal",
+        "caption": "A phone for a fraction of its normal price."
+      },
+      "e2": {
+        "title": "Tap the seller name",
+        "caption": "Ask SafeRoute to look at who is selling."
+      },
+      "e3": {
+        "title": "Open the seller page",
+        "caption": "A new account with few sales."
+      },
+      "e4": {
+        "title": "The result",
+        "caption": "SafeRoute shows the signs that make this deal look risky."
+      }
+    }
+  },
+  "flags": {
+    "too_good": {
+      "name": "Too good",
+      "title": "Too good to be true",
+      "explain": "Pay or perks far above normal, with no experience needed.",
+      "phrase": "\"Earn 5,000 a month. No experience needed.\""
+    },
+    "pressure": {
+      "name": "Pressure",
+      "title": "Pressure",
+      "explain": "They want you to act fast and not think or ask anyone.",
+      "phrase": "\"Only 3 places left. Do not tell anyone.\""
+    },
+    "payment_route": {
+      "name": "Odd payment",
+      "title": "Payment route",
+      "explain": "Fees, deposits or transfers before you start, or outside the app.",
+      "phrase": "\"Send the fee to this account to book your seat.\""
+    },
+    "identity": {
+      "name": "Hidden identity",
+      "title": "Hidden identity",
+      "explain": "No clear name or company. They only use private chat apps.",
+      "phrase": "\"Just message me on Telegram.\""
+    },
+    "link_risk": {
+      "name": "Risky link",
+      "title": "Risky link",
+      "explain": "New web addresses, shortened links or look-alike tracking pages.",
+      "phrase": "\"Track your parcel: bit.ly/x7Kd2\""
+    },
+    "known_bad": {
+      "name": "Reported before",
+      "title": "Reported before",
+      "explain": "The number, page or script was already reported by others.",
+      "phrase": "\"Dear customer, your account is locked.\""
+    },
+    "trafficking": {
+      "name": "Trafficking",
+      "title": "Trafficking signs",
+      "explain": "No visa, your passport is kept, or a pickup at the border.",
+      "phrase": "\"A driver will meet you at the border. Bring your passport.\""
+    }
+  },
+  "shieldSteps": {
+    "s1": {
+      "title": "Turn on the shield",
+      "caption": "A small Pyit Taing Htaung doll sits on the side of your screen."
+    },
+    "s2": {
+      "title": "Tap it on anything strange",
+      "caption": "It works on posts, chats and shops in other apps."
+    },
+    "s3": {
+      "title": "Read the result",
+      "caption": "Low risk, Be careful or High risk, with the reasons."
+    }
+  }
+}

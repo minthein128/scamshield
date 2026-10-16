@@ -1,0 +1,365 @@
+{
+  "extract": {
+    "jobId": "job_b7c72eea27d14b36",
+    "ad": {
+      "employer": {
+        "value": "Bangkok Logistics Co., Ltd.",
+        "quote": "Bangkok Logistics Co., Ltd.",
+        "confidence": 1
+      },
+      "jobTitle": {
+        "value": "customer service staff",
+        "quote": "customer service staff",
+        "confidence": 1
+      },
+      "workplace": {
+        "value": "Bangkok",
+        "quote": "Bangkok",
+        "confidence": 1
+      },
+      "destinationCountry": {
+        "value": "Thailand",
+        "quote": "Thailand",
+        "confidence": 1
+      },
+      "salary": {
+        "value": {
+          "amount": 35000,
+          "currency": "THB",
+          "period": "monthly"
+        },
+        "quote": "Salary 35,000 THB per month",
+        "confidence": 1
+      },
+      "workerFee": {
+        "value": "none",
+        "quote": "No agency fees",
+        "confidence": 1
+      },
+      "contract": {
+        "value": "official",
+        "quote": "Official contract",
+        "confidence": 1
+      },
+      "visaOrPermit": {
+        "value": "work_visa",
+        "quote": "work visa provided",
+        "confidence": 1
+      },
+      "travelArrangedBy": null,
+      "route": null,
+      "meetingPoint": {
+        "value": "workplace",
+        "quote": "Meet at our office on Silom Road",
+        "confidence": 1
+      },
+      "documentRequest": null,
+      "paymentRequest": null,
+      "urgency": null,
+      "contactChannel": null,
+      "secrecyRequest": null
+    },
+    "chat": {
+      "employer": null,
+      "jobTitle": null,
+      "workplace": null,
+      "destinationCountry": null,
+      "salary": null,
+      "workerFee": null,
+      "contract": null,
+      "visaOrPermit": {
+        "value": "tourist",
+        "quote": "You will enter as a tourist first",
+        "confidence": 1
+      },
+      "travelArrangedBy": null,
+      "route": null,
+      "meetingPoint": {
+        "value": "border",
+        "quote": "A driver will pick you up at the border",
+        "confidence": 1
+      },
+      "documentRequest": {
+        "value": "passport_photo",
+        "quote": "please send a photo of your passport",
+        "confidence": 1
+      },
+      "paymentRequest": {
+        "value": "before_contract",
+        "quote": "Pay a 300 USD deposit",
+        "confidence": 1
+      },
+      "urgency": {
+        "value": "today",
+        "quote": "today",
+        "confidence": 1
+      },
+      "contactChannel": {
+        "value": "personal_chat_app",
+        "quote": "Hi, please send",
+        "confidence": 0.5
+      },
+      "secrecyRequest": {
+        "value": true,
+        "quote": "Do not tell your family",
+        "confidence": 1
+      }
+    }
+  },
+  "assess": {
+    "id": "job_b7c72eea27d14b36",
+    "createdAt": "2026-10-16T11:23:02.846Z",
+    "kind": "job",
+    "verdict": "danger",
+    "score": 100,
+    "title": "Pause before you pay, send documents or travel",
+    "summary": "This offer shows several warning signs that match common trafficking and fee scams. Please do not pay, send your passport or travel until you check the offer with someone you trust or a hotline.",
+    "spokenWarning": "Please pause. Don't pay, send your passport or travel until you check this offer with someone you trust.",
+    "scamType": "job_trafficking",
+    "flags": [
+      {
+        "family": "trafficking",
+        "label": "The ad does not ask for documents like this. The chat asks for a photo of your passport now.",
+        "evidence": "Chat: \"please send a photo of your passport\"",
+        "severity": "high"
+      },
+      {
+        "family": "payment_route",
+        "label": "The ad promises an official contract. The chat says the contract comes later or not at all.",
+        "evidence": "Ad: \"Official contract\" / Chat: \"\"",
+        "severity": "high"
+      },
+      {
+        "family": "trafficking",
+        "label": "The ad promises a work visa. The chat says to travel on a tourist visa.",
+        "evidence": "Ad: \"work visa provided\" / Chat: \"You will enter as a tourist first\"",
+        "severity": "high"
+      },
+      {
+        "family": "trafficking",
+        "label": "The ad names a workplace or an airport. The chat arranges a driver, a border pickup or a place it does not name.",
+        "evidence": "Ad: \"Meet at our office on Silom Road\" / Chat: \"A driver will pick you up at the border\"",
+        "severity": "medium"
+      },
+      {
+        "family": "trafficking",
+        "label": "Asks you to keep the job secret from family or officials",
+        "evidence": "Chat: \"Do not tell your family\"",
+        "severity": "medium"
+      },
+      {
+        "family": "payment_route",
+        "label": "Asks for payment before a contract is signed",
+        "evidence": "Chat: \"Pay a 300 USD deposit\"",
+        "severity": "high"
+      }
+    ],
+    "linkChecks": [],
+    "sources": [
+      {
+        "title": "dataforthai.com",
+        "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFrgOJAD3z5nxNNUw5YdkiOw-Nz0_v3eoPlSH4KR6pOAcwzw54vQKMhrcXRK4jbFlErZhDxC-ylerl70opn76llXoKHSj4Ws_p7kISDzi7AezNS44qsI2HNbZL0W-yAsXtOHeXg4KY8Dg=="
+      }
+    ],
+    "actions": [
+      {
+        "label": "Call hotline",
+        "type": "call"
+      },
+      {
+        "label": "Block and report this sender",
+        "type": "block"
+      },
+      {
+        "label": "Warn family or friends",
+        "type": "share"
+      },
+      {
+        "label": "Learn how scams like this work",
+        "type": "learn",
+        "value": "job_trafficking"
+      }
+    ],
+    "model": "job-shield-v2",
+    "attention": "pause",
+    "attentionHeadline": "Pause before you pay, send documents or travel",
+    "conflicts": [
+      {
+        "field": "documentRequest",
+        "code": "documents_passport_photo",
+        "fieldLabel": "Documents",
+        "adValue": "not_mentioned",
+        "adQuote": "",
+        "chatValue": "passport_photo",
+        "chatQuote": "please send a photo of your passport",
+        "description": "The ad does not ask for documents like this. The chat asks for a photo of your passport now.",
+        "family": "trafficking",
+        "severity": "high"
+      },
+      {
+        "field": "contract",
+        "code": "contract_later",
+        "fieldLabel": "Contract",
+        "adValue": "official",
+        "adQuote": "Official contract",
+        "chatValue": "later",
+        "chatQuote": "",
+        "description": "The ad promises an official contract. The chat says the contract comes later or not at all.",
+        "family": "payment_route",
+        "severity": "high"
+      },
+      {
+        "field": "visaOrPermit",
+        "code": "visa_tourist",
+        "fieldLabel": "Visa and work permit",
+        "adValue": "work_visa",
+        "adQuote": "work visa provided",
+        "chatValue": "tourist",
+        "chatQuote": "You will enter as a tourist first",
+        "description": "The ad promises a work visa. The chat says to travel on a tourist visa.",
+        "family": "trafficking",
+        "severity": "high"
+      },
+      {
+        "field": "meetingPoint",
+        "code": "meeting_informal",
+        "fieldLabel": "Meeting point",
+        "adValue": "workplace",
+        "adQuote": "Meet at our office on Silom Road",
+        "chatValue": "border",
+        "chatQuote": "A driver will pick you up at the border",
+        "description": "The ad names a workplace or an airport. The chat arranges a driver, a border pickup or a place it does not name.",
+        "family": "trafficking",
+        "severity": "medium"
+      }
+    ],
+    "stillUnclear": [],
+    "stillUnclearFields": [],
+    "findings": [
+      {
+        "code": "company_found",
+        "label": "We found a company with this name"
+      },
+      {
+        "code": "recruiter_not_confirmed",
+        "label": "We could not confirm this recruiter works for that company"
+      }
+    ],
+    "usedStoredExtraction": true,
+    "adFacts": {
+      "employer": {
+        "value": "Bangkok Logistics Co., Ltd.",
+        "quote": "Bangkok Logistics Co., Ltd.",
+        "confidence": 1
+      },
+      "jobTitle": {
+        "value": "customer service staff",
+        "quote": "customer service staff",
+        "confidence": 1
+      },
+      "workplace": {
+        "value": "Bangkok",
+        "quote": "Bangkok",
+        "confidence": 1
+      },
+      "destinationCountry": {
+        "value": "Thailand",
+        "quote": "Thailand",
+        "confidence": 1
+      },
+      "salary": {
+        "value": {
+          "amount": 40000,
+          "currency": "THB",
+          "period": "monthly"
+        },
+        "quote": "Salary 35,000 THB per month",
+        "confidence": 1,
+        "edited": true
+      },
+      "workerFee": {
+        "value": "none",
+        "quote": "No agency fees",
+        "confidence": 1
+      },
+      "contract": {
+        "value": "official",
+        "quote": "Official contract",
+        "confidence": 1
+      },
+      "visaOrPermit": {
+        "value": "work_visa",
+        "quote": "work visa provided",
+        "confidence": 1
+      },
+      "travelArrangedBy": null,
+      "route": null,
+      "meetingPoint": {
+        "value": "workplace",
+        "quote": "Meet at our office on Silom Road",
+        "confidence": 1
+      },
+      "documentRequest": null,
+      "paymentRequest": null,
+      "urgency": null,
+      "contactChannel": null,
+      "secrecyRequest": null
+    },
+    "chatFacts": {
+      "employer": null,
+      "jobTitle": null,
+      "workplace": null,
+      "destinationCountry": null,
+      "salary": null,
+      "workerFee": {
+        "value": "fee mentioned",
+        "quote": "",
+        "confidence": 1,
+        "edited": true
+      },
+      "contract": {
+        "value": "later",
+        "quote": "",
+        "confidence": 1,
+        "edited": true
+      },
+      "visaOrPermit": {
+        "value": "tourist",
+        "quote": "You will enter as a tourist first",
+        "confidence": 1
+      },
+      "travelArrangedBy": null,
+      "route": null,
+      "meetingPoint": {
+        "value": "border",
+        "quote": "A driver will pick you up at the border",
+        "confidence": 1
+      },
+      "documentRequest": {
+        "value": "passport_photo",
+        "quote": "please send a photo of your passport",
+        "confidence": 1
+      },
+      "paymentRequest": {
+        "value": "before_contract",
+        "quote": "Pay a 300 USD deposit",
+        "confidence": 1
+      },
+      "urgency": {
+        "value": "today",
+        "quote": "today",
+        "confidence": 1
+      },
+      "contactChannel": {
+        "value": "personal_chat_app",
+        "quote": "Hi, please send",
+        "confidence": 0.5
+      },
+      "secrecyRequest": {
+        "value": true,
+        "quote": "Do not tell your family",
+        "confidence": 1
+      }
+    }
+  }
+}

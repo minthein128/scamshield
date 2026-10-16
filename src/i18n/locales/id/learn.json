@@ -1,0 +1,255 @@
+{
+  "_meta": {
+    "reviewed": false
+  },
+  "title": "Pelajari",
+  "tagline": "Ketahui tanda-tandanya sebelum membalas, membayar, atau bepergian.",
+  "scamsHeading": "Penipuan yang sering terjadi",
+  "flagsHeading": "7 tanda bahaya",
+  "flagsHint": "SafeRoute mencari tanda-tanda ini. Ketuk salah satu untuk mempelajari lebih lanjut.",
+  "flagsHintA11y": "Membuka penjelasan",
+  "shieldRow": {
+    "title": "Cara kerja Screen shield",
+    "hint": "3 langkah cepat"
+  },
+  "reportRow": "Laporkan penipuan",
+  "helpRow": "Dapatkan bantuan",
+  "scamCardHint": "Membuka panduan penipuan",
+  "guide": {
+    "eyebrow": "Panduan penipuan",
+    "howItStarts": "Awal mulanya",
+    "signs": "Tanda peringatan",
+    "signFallback": "Peringatan",
+    "example": "Lihat contoh",
+    "exampleNote": "Contoh. Nama dan kiriman hanya rekaan.",
+    "exampleEnglish": "Layar contoh ditampilkan dalam bahasa Inggris.",
+    "actions": "Yang harus dilakukan"
+  },
+  "shieldHowTo": {
+    "eyebrow": "Screen shield"
+  },
+  "stepper": {
+    "back": "Kembali",
+    "next": "Berikutnya",
+    "done": "Selesai",
+    "backA11y": "Kembali, ke langkah {{step}} dari {{total}}",
+    "nextA11y": "Berikutnya, ke langkah {{step}} dari {{total}}",
+    "scroller": "Contoh, {{total}} langkah. Geser layar atau gunakan tombol Berikutnya dan Kembali.",
+    "progress": "Langkah {{current}} dari {{total}}: {{title}}",
+    "frame": "Layar contoh untuk langkah {{current}}: {{title}}"
+  },
+  "sheet": {
+    "example": "Yang mungkin Anda dengar",
+    "close": "Tutup"
+  },
+  "actions": {
+    "noPay": {
+      "title": "Jangan bayar, jangan kirim dokumen",
+      "body": "Pekerjaan, toko, dan bank resmi jarang meminta uang atau paspor Anda di awal."
+    },
+    "check": {
+      "title": "Periksa dengan SafeRoute",
+      "body": "Tempel teks atau tautan, atau tambahkan tangkapan layar."
+    },
+    "help": {
+      "title": "Dapatkan bantuan",
+      "body": "Temukan nomor bantuan dan orang yang bisa membantu Anda."
+    }
+  },
+  "scams": {
+    "jobs": {
+      "title": "Tawaran kerja berisiko dan perdagangan orang",
+      "hook": "Pekerjaan luar negeri dengan gaji tinggi, jemputan di perbatasan, atau permintaan menyerahkan paspor.",
+      "howItStarts": "Sebuah kiriman atau pesan menawarkan kerja di luar negeri dengan gaji besar. Tanpa pengalaman, tanpa wawancara. Seseorang meminta foto paspor Anda untuk memesan tempat, lalu menyuruh Anda menemui seorang sopir.",
+      "signs": {
+        "s1": "Gaji sangat tinggi untuk pekerjaan mudah, dan tidak perlu pengalaman.",
+        "s2": "Hanya sisa sedikit tempat. Berangkat minggu ini.",
+        "s3": "Dijemput di perbatasan atau bandara, tanpa surat visa.",
+        "s4": "Mereka ingin menahan paspor Anda.",
+        "s5": "Perekrut tidak punya nama perusahaan dan hanya memakai aplikasi pesan pribadi."
+      }
+    },
+    "romance": {
+      "title": "Asmara dan investasi",
+      "hook": "Orang tak dikenal yang ramah, lalu membujuk Anda main kripto atau trading.",
+      "howItStarts": "Orang tak dikenal mengaku salah kirim pesan dan bersikap ramah. Setelah mengobrol berhari-hari atau berminggu-minggu, mereka bilang dapat banyak uang dari aplikasi trading. Lalu mereka mengajak Anda mencoba dengan setoran kecil.",
+      "signs": {
+        "s1": "Orang asing bilang \"salah nomor\" lalu terus mengajak mengobrol.",
+        "s2": "Mereka memamerkan untung besar dari aplikasi trading atau kripto.",
+        "s3": "Mereka mengirim tautan aplikasi yang tidak ada di toko resmi.",
+        "s4": "Mereka meminta setoran atau kripto untuk mulai.",
+        "s5": "Mereka bilang kesempatan ini akan segera ditutup."
+      }
+    },
+    "parcel": {
+      "title": "Pesan paket dan bank",
+      "hook": "\"Bayar biaya\" atau \"verifikasi akun\" lewat tautan.",
+      "howItStarts": "Sebuah pesan menyebut paket Anda tertahan atau rekening bank terkunci. Pesan itu menyertakan tautan pendek dan batas waktu. Tautan membuka tiruan situs resmi yang meminta data kartu atau akun Anda.",
+      "signs": {
+        "s1": "Meminta biaya kecil agar paket dikirim.",
+        "s2": "Tautan pendek atau alamat web yang terlihat agak aneh.",
+        "s3": "Bayar hari ini atau paket dikembalikan. Verifikasi sekarang atau akses hilang.",
+        "s4": "Pengirim berasal dari nomor tak dikenal, bukan bank Anda.",
+        "s5": "Pesan yang sama dikirimkan ke banyak orang lain."
+      }
+    },
+    "agency": {
+      "title": "Agensi penyalur kerja berisiko",
+      "hook": "Tanpa izin resmi, minta biaya di awal.",
+      "howItStarts": "Sebuah laman mengaku agensi resmi berizin. Mereka menawarkan banyak lowongan ke luar negeri. Saat Anda menghubungi, mereka meminta biaya pendaftaran, biaya pelatihan, atau uang jaminan sebelum ada kontrak.",
+      "signs": {
+        "s1": "Tidak ada nomor izin, atau nomornya tidak bisa dicek.",
+        "s2": "Biaya untuk pendaftaran, pelatihan, visa, atau \"kursi\".",
+        "s3": "Semua lowongan menawarkan gaji tinggi tanpa butuh keahlian.",
+        "s4": "Mereka meminta Anda membayar hari ini agar tempat Anda aman.",
+        "s5": "Pekerja lain pernah melaporkan nama atau nomor yang sama."
+      }
+    },
+    "shop": {
+      "title": "Tawaran belanja online berisiko",
+      "hook": "Harga terlalu murah, bayar di luar aplikasi.",
+      "howItStarts": "Anda melihat ponsel atau barang dengan harga sangat murah. Penjual berkata \"hubungi saya untuk harga lebih hemat\", dan meminta transfer bank. Setelah dibayar, penjual tidak membalas lagi dan barang tidak pernah sampai.",
+      "signs": {
+        "s1": "Harganya jauh di bawah harga biasa.",
+        "s2": "Penjual meminta pembayaran di luar aplikasi belanja.",
+        "s3": "Akun penjual masih baru tanpa riwayat atau ulasan.",
+        "s4": "\"Butuh uang cepat.\" \"Barang terakhir.\"",
+        "s5": "Penjual mengajak pindah obrolan ke aplikasi lain."
+      }
+    }
+  },
+  "examples": {
+    "jobs": {
+      "e1": {
+        "title": "Anda melihat info lowongan",
+        "caption": "Gaji besar, tiket pesawat gratis, dan tanpa syarat pengalaman."
+      },
+      "e2": {
+        "title": "Ketuk boneka",
+        "caption": "Boneka melihat postingan di layar Anda. Boneka meminta untuk membuka teks yang tersembunyi."
+      },
+      "e3": {
+        "title": "SafeRoute memeriksanya",
+        "caption": "SafeRoute membaca seluruh postingan dan mencari tanda bahaya."
+      },
+      "e4": {
+        "title": "Hasilnya",
+        "caption": "SafeRoute menunjukkan hasil risiko tinggi, lengkap dengan alasan dan langkah selanjutnya."
+      }
+    },
+    "romance": {
+      "e1": {
+        "title": "Orang asing mulai mengobrol",
+        "caption": "Kata-kata ramah, lalu mulai membahas keuntungan mudah."
+      },
+      "e2": {
+        "title": "Ketuk boneka",
+        "caption": "SafeRoute butuh pesan yang lebih lama untuk melihat cerita lengkapnya."
+      },
+      "e3": {
+        "title": "Gulir ke atas dan ketuk lagi",
+        "caption": "Awal obrolan menunjukkan pembuka berupa \"salah nomor\"."
+      },
+      "e4": {
+        "title": "Hasilnya",
+        "caption": "Obrolan menunjukkan tanda-tanda penipuan asmara dan investasi."
+      }
+    },
+    "parcel": {
+      "e1": {
+        "title": "Pesan masuk",
+        "caption": "SafeRoute memperingatkan Anda sebelum membuka tautan."
+      },
+      "e2": {
+        "title": "Ketuk untuk melihat alasannya",
+        "caption": "Anda melihat alasannya. Jangan buka tautan tersebut."
+      }
+    },
+    "agency": {
+      "e1": {
+        "title": "Anda membuka halaman agensi",
+        "caption": "Halaman itu tertulis \"resmi\" dan menampilkan nomor izin."
+      },
+      "e2": {
+        "title": "SafeRoute memeriksanya",
+        "caption": "SafeRoute memeriksa nomor izin dan laporan tentang agensi tersebut."
+      }
+    },
+    "shop": {
+      "e1": {
+        "title": "Anda melihat tawaran murah",
+        "caption": "Ponsel dengan harga jauh di bawah harga biasa."
+      },
+      "e2": {
+        "title": "Ketuk nama penjual",
+        "caption": "Minta SafeRoute untuk memeriksa siapa yang menjual."
+      },
+      "e3": {
+        "title": "Buka halaman penjual",
+        "caption": "Akun baru dengan penjualan yang sedikit."
+      },
+      "e4": {
+        "title": "Hasilnya",
+        "caption": "SafeRoute menunjukkan tanda-tanda yang membuat tawaran ini tampak berisiko."
+      }
+    }
+  },
+  "flags": {
+    "too_good": {
+      "name": "Terlalu bagus",
+      "title": "Terlalu bagus untuk jadi kenyataan",
+      "explain": "Gaji atau keuntungan jauh di atas normal, tanpa perlu pengalaman.",
+      "phrase": "\"Hasilkan 5.000 sebulan. Tidak perlu pengalaman.\""
+    },
+    "pressure": {
+      "name": "Tekanan",
+      "title": "Tekanan",
+      "explain": "Mereka mendesak Anda bertindak cepat tanpa berpikir atau bertanya ke orang lain.",
+      "phrase": "\"Hanya tersisa 3 tempat. Jangan beritahu siapa pun.\""
+    },
+    "payment_route": {
+      "name": "Pembayaran janggal",
+      "title": "Jalur pembayaran",
+      "explain": "Biaya, uang muka, atau transfer sebelum mulai, atau di luar aplikasi.",
+      "phrase": "\"Kirim biaya ke rekening ini untuk memesan tempat Anda.\""
+    },
+    "identity": {
+      "name": "Identitas tersembunyi",
+      "title": "Identitas tersembunyi",
+      "explain": "Tidak ada nama atau perusahaan yang jelas. Hanya memakai aplikasi pesan pribadi.",
+      "phrase": "\"Hubungi saya lewat Telegram saja.\""
+    },
+    "link_risk": {
+      "name": "Tautan berisiko",
+      "title": "Tautan berisiko",
+      "explain": "Alamat web baru, tautan yang dipersingkat, atau halaman pelacak tiruan.",
+      "phrase": "\"Lacak paket Anda: bit.ly/x7Kd2\""
+    },
+    "known_bad": {
+      "name": "Pernah dilaporkan",
+      "title": "Pernah dilaporkan",
+      "explain": "Nomor, halaman, atau pesan ini sudah pernah dilaporkan oleh orang lain.",
+      "phrase": "\"Pelanggan yang terhormat, akun Anda terkunci.\""
+    },
+    "trafficking": {
+      "name": "Perdagangan orang",
+      "title": "Tanda perdagangan orang",
+      "explain": "Tanpa visa, paspor Anda ditahan, atau dijemput di perbatasan.",
+      "phrase": "\"Sopir akan menjemput Anda di perbatasan. Bawa paspor Anda.\""
+    }
+  },
+  "shieldSteps": {
+    "s1": {
+      "title": "Nyalakan Screen shield",
+      "caption": "Boneka Pyit Taing Htaung kecil ada di samping layar Anda."
+    },
+    "s2": {
+      "title": "Ketuk jika ada yang aneh",
+      "caption": "Berfungsi untuk postingan, obrolan, dan toko di aplikasi lain."
+    },
+    "s3": {
+      "title": "Baca hasilnya",
+      "caption": "Risiko rendah, Hati-hati, atau Risiko tinggi, beserta alasannya."
+    }
+  }
+}

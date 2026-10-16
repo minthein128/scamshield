@@ -1,0 +1,41 @@
+id: th-job-poipet
+file: ../public/v2/th-job-poipet.png
+language: th
+home: TH
+destination: Cambodia
+app: line
+scam_type: job_trafficking
+expected_verdict: danger
+score_range: [70, 100]
+families: [trafficking, too_good, pressure, identity]
+source_text: |
+  พี่นก หางานต่างประเทศ
+  ออนไลน์
+  รับสมัครแอดมินออนไลน์ ทำงานที่ปอยเปต กัมพูชา เงินเดือน 50,000 บาท ไม่ต้องมีประสบการณ์
+  ส่งรูปบัตรประชาชนกับพาสปอร์ตมาทางไลน์ได้เลย พรุ่งนี้มีรถไปรับที่อรัญประเทศ ข้ามแดนให้ ไม่ต้องทำใบอนุญาตทำงาน
+  ปลอดภัยไหมคะ
+  ปลอดภัย 100% ไม่ต้องบอกที่บ้านนะ ไลน์ @nok_jobs_kh
+must_mention:
+  - id: poipet
+    variants: ["ปอยเปต", "Poipet", "กัมพูชา"]
+  - id: salary
+    variants: ["50000", "50,000"]
+  - id: documents
+    library: true
+    variants: ["บัตรประชาชน", "พาสปอร์ต", "หนังสือเดินทาง"]
+  - id: handle
+    variants: ["@nok_jobs_kh", "nok_jobs_kh", "ไลน์", "LINE"]
+must_advise: [dont_send_documents, dont_travel, verify_trusted, call_hotline]
+must_not:
+  accuse: [พี่นก, nok_jobs_kh]
+synthetic:
+  layout: chat
+  sender: พี่นก หางานต่างประเทศ
+  subtitle: ออนไลน์
+  messages:
+    - { from: them, text: "รับสมัครแอดมินออนไลน์ ทำงานที่ปอยเปต กัมพูชา เงินเดือน 50,000 บาท ไม่ต้องมีประสบการณ์" }
+    - { from: them, text: "ส่งรูปบัตรประชาชนกับพาสปอร์ตมาทางไลน์ได้เลย พรุ่งนี้มีรถไปรับที่อรัญประเทศ ข้ามแดนให้ ไม่ต้องทำใบอนุญาตทำงาน" }
+    - { from: me, text: "ปลอดภัยไหมคะ" }
+    - { from: them, text: "ปลอดภัย 100% ไม่ต้องบอกที่บ้านนะ ไลน์ @nok_jobs_kh" }
+notes: Fictional recruiter. Scam-compound job across the Cambodian border with ID and passport request.
+public: true

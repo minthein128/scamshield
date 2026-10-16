@@ -1,0 +1,7 @@
+file,app,expected,scam_type,language,notes,public
+chat-job-01.png,chat,danger,job_trafficking,en,from pitch/demo-inputs.md flow 1,yes
+chat-romance-02.png,chat,danger,romance_pig_butchering,en,from pitch/demo-inputs.md flow 2,yes
+sms-parcel-03.png,sms,danger,parcel_phishing,en,from pitch/demo-inputs.md spare inputs,yes
+sms-school-04.png,sms,safe,none,en,safe control from pitch/demo-inputs.md,yes
+social-agency-05.png,social,careful,fake_agency,en,from pitch/demo-inputs.md careful case,yes
+chat-family-06.png,chat,safe,none,tl,server/eval case legit-family-tl,yes

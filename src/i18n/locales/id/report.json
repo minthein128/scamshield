@@ -1,0 +1,69 @@
+{
+  "_meta": {
+    "reviewed": false
+  },
+  "seen_other": "Dilaporkan {{count}} kali oleh pengguna SafeRoute lain dalam 30 hari terakhir",
+  "title": "Laporan risiko",
+  "a11yVerdict": "{{verdict}}. Tingkat {{step}} dari 3.",
+  "warn": "Beri tahu keluarga saya",
+  "call": "Hubungi {{number}}",
+  "callExt": "lalu minta sambungan lokal {{ext}}",
+  "help": "Minta bantuan",
+  "share": "Bagikan peringatan ini",
+  "flagsRisky": "Tanda peringatan yang kami temukan",
+  "flagsSafe": "Hal yang kami perhatikan",
+  "sources": "Sumber yang kami periksa",
+  "linkChecks": "Pemeriksaan tautan",
+  "actions": "Hal yang dapat Anda lakukan",
+  "severity": {
+    "high": "Tanda serius",
+    "medium": "Perlu diperiksa",
+    "low": "Tanda ringan"
+  },
+  "domainAge_other": "Usia domain: {{count}} hari",
+  "domainAgeUnknown": "Usia domain tidak diketahui",
+  "webRisk": {
+    "clean": "Tidak ada ancaman yang diketahui",
+    "malware": "Peringatan malware",
+    "social_engineering": "Peringatan phishing atau penipuan",
+    "unwanted_software": "Peringatan aplikasi tak diinginkan",
+    "unknown": "Tidak diperiksa"
+  },
+  "block": {
+    "title": "Blokir pengirim",
+    "withValue": "Blokir {{value}} di aplikasi tempat Anda menemukannya.",
+    "generic": "Blokir dan laporkan pengirim di aplikasi tempat Anda menemukannya."
+  },
+  "shareMessage": "Pemeriksaan SafeRoute: {{title}}\n{{summary}}\nSkor risiko {{score}}/100.",
+  "warnMessage": "Peringatan SafeRoute ({{verdict}}): {{title}}. {{summary}} Mohon jangan kirim uang atau berkas apa pun. Hubungi saya dulu.",
+  "thanks": "Terima kasih, ini membantu melindungi orang lain",
+  "attention": {
+    "word": {
+      "lower": "Tanda lebih sedikit",
+      "verify": "Periksa dulu",
+      "pause": "Tunggu dulu"
+    },
+    "headline": {
+      "lower": "Sedikit tanda bahaya ditemukan, tetapi rincian penting mungkin belum lengkap",
+      "verify": "Ada rincian yang tidak cocok, periksa dulu sebelum Anda pergi",
+      "pause": "Tunggu dulu sebelum Anda membayar, mengirim dokumen, atau berangkat"
+    },
+    "note": {
+      "lower": "Hasil seperti ini tidak membuktikan bahwa tawaran ini asli. Harap tetap periksa rinciannya sebelum Anda membayar, mengirim dokumen, atau berangkat.",
+      "verify": "Harap minta perekrut menjelaskan hal-hal di bawah ini secara tertulis sebelum Anda melanjutkan."
+    }
+  },
+  "conflicts": {
+    "title": "Yang tidak cocok",
+    "adSays": "Di iklan tertulis",
+    "chatSays": "Di obrolan tertulis",
+    "adNoDocuments": "Iklan tidak menyebutkan dokumen",
+    "adNotMentioned": "Iklan tidak menyebutkan hal ini"
+  },
+  "unclear": {
+    "title": "Masih belum jelas"
+  },
+  "findings": {
+    "title": "Apa yang bisa dan tidak bisa kami pastikan"
+  }
+}

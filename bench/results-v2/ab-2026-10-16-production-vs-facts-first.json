@@ -1,0 +1,315 @@
+{
+  "kind": "bench-v2-ab",
+  "date": "2026-10-16",
+  "model": "gemini-3.5-flash-lite",
+  "cases": 24,
+  "variants": "no images, repeats 3",
+  "a": {
+    "prompt": "production",
+    "hash": "0d51b64cf51b",
+    "source": "server/src/prompt.ts",
+    "file": "2026-10-16-gemini-3.5-flash-lite-production-seed24-ab.json"
+  },
+  "b": {
+    "prompt": "facts-first",
+    "hash": "b59bfa9faa26",
+    "source": "../bench/prompts/facts-first.yaml",
+    "file": "2026-10-16-gemini-3.5-flash-lite-facts-first-seed24-ab.json"
+  },
+  "metrics": [
+    {
+      "label": "Protection Score (mean of 3 runs)",
+      "a": 90.05833333333334,
+      "b": 94.25833333333334,
+      "delta": 4.200000000000003,
+      "scale": 1
+    },
+    {
+      "label": "Cases with a critical failure in any run",
+      "a": 0,
+      "b": 0,
+      "delta": 0,
+      "scale": 1
+    },
+    {
+      "label": "Numbers not in the message, any run",
+      "a": 0,
+      "b": 1,
+      "delta": 1,
+      "scale": 1
+    },
+    {
+      "label": "Risk calibration",
+      "a": 0.9899999999999999,
+      "b": 0.9873333333333333,
+      "delta": -0.002666666666666595
+    },
+    {
+      "label": "Critical-fact coverage",
+      "a": 0.787037037037037,
+      "b": 0.8518518518518517,
+      "delta": 0.06481481481481477
+    },
+    {
+      "label": "Actionability",
+      "a": 0.5921052631578947,
+      "b": 0.8728070175438596,
+      "delta": 0.2807017543859649
+    },
+    {
+      "label": "Evidence fidelity",
+      "a": 1,
+      "b": 0.9821428571428571,
+      "delta": -0.017857142857142905
+    },
+    {
+      "label": "Safe language",
+      "a": 1,
+      "b": 1,
+      "delta": 0
+    },
+    {
+      "label": "Red-flag families",
+      "a": 0.8817791005291006,
+      "b": 0.883101851851852,
+      "delta": 0.001322751322751392
+    },
+    {
+      "label": "Comprehension",
+      "a": 0.9951993464052288,
+      "b": 0.9913333333333333,
+      "delta": -0.003866013071895491
+    },
+    {
+      "label": "Robustness",
+      "a": 0.9765625,
+      "b": 0.9609375,
+      "delta": -0.015625
+    },
+    {
+      "label": "Cases with a critical failure",
+      "a": 0,
+      "b": 0,
+      "delta": 0,
+      "scale": 1
+    },
+    {
+      "label": "Severe false reassurance rate",
+      "a": 0,
+      "b": 0,
+      "delta": 0
+    },
+    {
+      "label": "Exact verdict",
+      "a": 0.9583333333333334,
+      "b": 0.9583333333333334,
+      "delta": 0
+    },
+    {
+      "label": "Fact recall",
+      "a": 0.7678571428571429,
+      "b": 0.8571428571428571,
+      "delta": 0.08928571428571419
+    },
+    {
+      "label": "Numbers not in the message",
+      "a": 0,
+      "b": 0,
+      "delta": 0,
+      "scale": 1
+    },
+    {
+      "label": "Advice recall",
+      "a": 0.72,
+      "b": 0.84,
+      "delta": 0.12
+    },
+    {
+      "label": "Evidence grounded",
+      "a": 1,
+      "b": 0.9811320754716981,
+      "delta": -0.018867924528301883
+    },
+    {
+      "label": "Spoken warning seconds (mean)",
+      "a": 5.495833333333334,
+      "b": 6.562500000000001,
+      "delta": 1.0666666666666673,
+      "scale": 1
+    }
+  ],
+  "paired": {
+    "wins": 13,
+    "losses": 4,
+    "ties": 7,
+    "tieBand": 1,
+    "p": 0.049041748046875,
+    "note": "B is better on paired cases (p < 0.05)."
+  },
+  "changes": [
+    {
+      "id": "agency-my",
+      "aVerdict": "careful",
+      "bVerdict": "danger",
+      "aScore": 74.1,
+      "bScore": 74.2,
+      "aCritical": [],
+      "bCritical": []
+    },
+    {
+      "id": "en-hardneg-licensed-agency",
+      "aVerdict": "safe",
+      "bVerdict": "safe",
+      "aScore": 71.3,
+      "bScore": 90.2,
+      "aCritical": [],
+      "bCritical": []
+    },
+    {
+      "id": "en-marketplace-fake-payment",
+      "aVerdict": "danger",
+      "bVerdict": "careful",
+      "aScore": 94,
+      "bScore": 84.3,
+      "aCritical": [],
+      "bCritical": []
+    },
+    {
+      "id": "hardneg-job-en",
+      "aVerdict": "safe",
+      "bVerdict": "safe",
+      "aScore": 88.3,
+      "bScore": 76.5,
+      "aCritical": [],
+      "bCritical": []
+    },
+    {
+      "id": "job-trafficking-en",
+      "aVerdict": "danger",
+      "bVerdict": "danger",
+      "aScore": 88.6,
+      "bScore": 96.1,
+      "aCritical": [],
+      "bCritical": []
+    },
+    {
+      "id": "job-trafficking-my",
+      "aVerdict": "danger",
+      "bVerdict": "danger",
+      "aScore": 91.7,
+      "bScore": 89.7,
+      "aCritical": [],
+      "bCritical": [
+        "number 200000"
+      ]
+    },
+    {
+      "id": "marketplace-th",
+      "aVerdict": "danger",
+      "bVerdict": "danger",
+      "aScore": 89.5,
+      "bScore": 100,
+      "aCritical": [],
+      "bCritical": []
+    },
+    {
+      "id": "my-hardneg-labour-notice",
+      "aVerdict": "safe",
+      "bVerdict": "safe",
+      "aScore": 84.6,
+      "bScore": 99.1,
+      "aCritical": [],
+      "bCritical": []
+    },
+    {
+      "id": "my-job-malaysia",
+      "aVerdict": "danger",
+      "bVerdict": "danger",
+      "aScore": 88.9,
+      "bScore": 93.7,
+      "aCritical": [],
+      "bCritical": []
+    },
+    {
+      "id": "my-romance-usdt",
+      "aVerdict": "danger",
+      "bVerdict": "danger",
+      "aScore": 86.7,
+      "bScore": 99.3,
+      "aCritical": [],
+      "bCritical": []
+    },
+    {
+      "id": "parcel-id",
+      "aVerdict": "danger",
+      "bVerdict": "danger",
+      "aScore": 94.2,
+      "bScore": 95.8,
+      "aCritical": [],
+      "bCritical": []
+    },
+    {
+      "id": "parcel-tl",
+      "aVerdict": "danger",
+      "bVerdict": "danger",
+      "aScore": 91.7,
+      "bScore": 96,
+      "aCritical": [],
+      "bCritical": []
+    },
+    {
+      "id": "romance-en",
+      "aVerdict": "danger",
+      "bVerdict": "danger",
+      "aScore": 94.2,
+      "bScore": 95.8,
+      "aCritical": [],
+      "bCritical": []
+    },
+    {
+      "id": "romance-th",
+      "aVerdict": "danger",
+      "bVerdict": "danger",
+      "aScore": 96.5,
+      "bScore": 98.2,
+      "aCritical": [],
+      "bCritical": []
+    },
+    {
+      "id": "th-hardneg-bank",
+      "aVerdict": "safe",
+      "bVerdict": "safe",
+      "aScore": 74.4,
+      "bScore": 97.4,
+      "aCritical": [],
+      "bCritical": []
+    },
+    {
+      "id": "th-job-poipet",
+      "aVerdict": "danger",
+      "bVerdict": "danger",
+      "aScore": 82.8,
+      "bScore": 92.6,
+      "aCritical": [],
+      "bCritical": []
+    },
+    {
+      "id": "th-parcel-fee",
+      "aVerdict": "danger",
+      "bVerdict": "danger",
+      "aScore": 96.5,
+      "bScore": 94.2,
+      "aCritical": [],
+      "bCritical": []
+    },
+    {
+      "id": "tl-hardneg-advisory",
+      "aVerdict": "safe",
+      "bVerdict": "safe",
+      "aScore": 76.9,
+      "bScore": 92.3,
+      "aCritical": [],
+      "bCritical": []
+    }
+  ]
+}

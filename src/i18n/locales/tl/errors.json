@@ -1,0 +1,87 @@
+{
+  "_meta": {
+    "reviewed": false
+  },
+  "api": {
+    "bad_request": {
+      "title": "Hindi namin mabasa iyon",
+      "message": "Maglagay ng kaunting text, link, o screenshot at subukan muli."
+    },
+    "too_large": {
+      "title": "Masyadong malaki ang file na iyon",
+      "message": "Pumili ng mas maliit na screenshot at subukan muli."
+    },
+    "upstream": {
+      "title": "Hindi gumagana ang serbisyo sa pagsusuri",
+      "message": "Problema ito sa aming panig. Subukan muli pagkalipas ng ilang minuto."
+    },
+    "rate_limited": {
+      "title": "Naabot mo na ang limitasyon sa pagsusuri",
+      "message": "Maghintay nang kaunti at subukan muli. Mas mataas ang limitasyon sa libreng account."
+    },
+    "network": {
+      "title": "Wala kang internet",
+      "message": "Suriin ang iyong koneksyon sa internet at subukan muli."
+    },
+    "server_unreachable": {
+      "title": "Hindi maabot ang SafeRoute",
+      "message": "Gumagana ang internet mo, pero hindi sumasagot ang aming check service ngayon. Subukan ulit pagkatapos ng ilang sandali."
+    },
+    "timeout": {
+      "title": "Masyadong matagal ang pagsusuri",
+      "message": "Maaaring mabagal ang iyong koneksyon. Subukan muli."
+    },
+    "cancelled": {
+      "title": "Kinansela ang pagsusuri",
+      "message": "Kinansela ang pagsusuri."
+    },
+    "invalid_response": {
+      "title": "Hindi inaasahang sagot",
+      "message": "Nagpadala ang serbisyo sa pagsusuri ng sagot na hindi namin mabasa. Subukan muli."
+    },
+    "unavailable": {
+      "title": "Hindi magagamit ang pagsusuri",
+      "message": "Hindi konektado ang bersyong ito sa serbisyo sa pagsusuri. I-update ang app at subukan muli."
+    },
+    "unknown": {
+      "title": "May nagkaproblema",
+      "message": "Pakiusap, subukan muli."
+    },
+    "not_found": {
+      "title": "Lumipas na ang pagsusuring iyon",
+      "message": "Tinatanggap ang feedback sa loob ng ilang araw pagkatapos ng pagsusuri."
+    }
+  },
+  "rateLimitedWait": "Subukan muli sa loob ng mga {{wait}}. Mas mataas ang limitasyon sa libreng account.",
+  "wait": {
+    "unknown": "kaunting sandali",
+    "minute": "isang minuto",
+    "minutes_one": "{{count}} minuto",
+    "minutes_other": "{{count}} minuto",
+    "hours_one": "{{count}} oras",
+    "hours_other": "{{count}} oras"
+  },
+  "auth": {
+    "emailInUse": "May account na ang email na iyon. Mag-sign in na lang.",
+    "credentialInUse": "Mayroon nang ganoong account. Mag-sign in na lang.",
+    "invalidEmail": "Maglagay ng tamang email address.",
+    "weakPassword": "Gumamit ng password na may hindi bababa sa 6 na character.",
+    "missingPassword": "Ilagay ang iyong password.",
+    "badCredential": "Hindi tama ang email o password.",
+    "tooManyRequests": "Masyadong maraming pagsubok. Maghintay nang ilang minuto at subukan muli.",
+    "network": "Walang koneksyon. Suriin ang iyong internet at subukan muli.",
+    "popupClosed": "Naisara ang Google window bago natapos ang pag-sign in.",
+    "differentMethod": "May account na ang email na iyon gamit ang ibang paraan ng pag-sign in. Gamitin ang paraang iyon.",
+    "unauthorizedDomain": "Hindi pinapayagan ang pag-sign in mula sa web address na ito.",
+    "popupBlocked": "Hinarang ng iyong browser ang Google window. Payagan ang mga pop-up at subukan muli.",
+    "recentLogin": "Para sa iyong kaligtasan, mag-sign in muli at ulitin ang hakbang na ito.",
+    "notAllowed": "Hindi pa puwedeng gamitin ang paraang ito sa pag-sign in.",
+    "fallback": "May nagkaproblema. Pakisubukan muli."
+  },
+  "job": {
+    "unreadable": {
+      "title": "Hindi namin mabasa ang mga detalye ng trabaho",
+      "message": "Maaaring mahirap basahin ang teksto o larawan. Pakisubukan muli, o i-paste ang teksto."
+    }
+  }
+}

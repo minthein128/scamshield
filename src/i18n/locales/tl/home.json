@@ -1,0 +1,37 @@
+{
+  "_meta": {
+    "reviewed": false
+  },
+  "settingsA11y": "Mga Setting",
+  "check": {
+    "title": "Suriin ang alok sa trabaho, mensahe, o link",
+    "body": "I-paste ito o magbahagi ng screenshot. Naghahanap kami ng mga babala sa trafficking at money mule.",
+    "start": "Mag-check ng anuman"
+  },
+  "quick": {
+    "lead": "O magsimula sa",
+    "link": "Link",
+    "image": "Screenshot",
+    "message": "Mensahe"
+  },
+  "recent": {
+    "title": "Mga kamakailang pagsusuri",
+    "emptyTitle": "Wala pang pagsusuri",
+    "emptyBody": "Naka-save ang iyong mga pagsusuri sa device na ito at makikita rito.",
+    "historyOff": "Naka-off ang history. Hindi naitatabi ang mga pagsusuri sa teleponong ito."
+  },
+  "radar": {
+    "title": "Scam radar",
+    "a11y": "Scam radar: ang mga inirereport ng mga tao",
+    "body": "Tingnan ang mga scam na inirereport ng mga tao ngayon."
+  },
+  "help": {
+    "title": "Humingi ng tulong",
+    "a11y": "Humingi ng tulong: mga hotline at pag-report",
+    "bodyCountries": "Mga hotline para sa iyong mga bansa.",
+    "bodyRegion": "Mga hotline at linya para sa pag-report sa Timog-Silangang Asya."
+  },
+  "notice": {
+    "dismiss": "Isara"
+  }
+}

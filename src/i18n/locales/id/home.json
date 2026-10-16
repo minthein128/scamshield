@@ -1,0 +1,37 @@
+{
+  "_meta": {
+    "reviewed": false
+  },
+  "settingsA11y": "Pengaturan",
+  "check": {
+    "title": "Periksa tawaran kerja, pesan, atau tautan",
+    "body": "Tempel teks atau bagikan tangkapan layar. Kami memeriksa tanda bahaya perdagangan orang dan rekening perantara.",
+    "start": "Periksa sesuatu"
+  },
+  "quick": {
+    "lead": "Atau mulai dengan",
+    "link": "Tautan",
+    "image": "Tangkapan layar",
+    "message": "Pesan"
+  },
+  "recent": {
+    "title": "Pemeriksaan terbaru",
+    "emptyTitle": "Belum ada pemeriksaan",
+    "emptyBody": "Pemeriksaan Anda disimpan di perangkat ini dan akan muncul di sini.",
+    "historyOff": "Riwayat tidak aktif. Pemeriksaan tidak disimpan di ponsel ini."
+  },
+  "radar": {
+    "title": "Radar penipuan",
+    "a11y": "Radar penipuan: apa yang dilaporkan orang-orang",
+    "body": "Lihat modus penipuan yang sedang dilaporkan saat ini."
+  },
+  "help": {
+    "title": "Dapatkan bantuan",
+    "a11y": "Dapatkan bantuan: saluran bantuan dan pelaporan",
+    "bodyCountries": "Saluran bantuan untuk negara Anda.",
+    "bodyRegion": "Saluran bantuan dan pelaporan di Asia Tenggara."
+  },
+  "notice": {
+    "dismiss": "Tutup"
+  }
+}

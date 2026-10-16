@@ -1,0 +1,64 @@
+id: romance-th
+file: ../public/v2/romance-th.png
+language: th
+home: TH
+app: chat
+scam_type: romance_pig_butchering
+expected_verdict: danger
+score_range: [65, 100]
+families: [too_good, payment_route, pressure, identity]
+source_text: |
+  ฟ้า
+  ออนไลน์
+  สวัสดีค่ะ ขอโทษที่ทักผิดคนนะคะ แต่โปรไฟล์คุณดูใจดีมาก
+  ไม่เป็นไรครับ
+  3 สัปดาห์ต่อมา
+  คุยกับคุณทุกวันทำให้ฉันมีความสุขมาก ฉันทำงานอยู่สิงคโปร์ เหงามากเลย
+  ลุงของฉันมีแอปเทรดทองชื่อ GoldWave Asia ได้กำไรวันละ 5% รับประกันไม่ขาดทุน ฉันถอนได้แล้ว 80,000 บาท
+  ลองเติมเงิน 10,000 บาทก่อนนะคะ โอนเข้าบัญชีพี่เลี้ยงของเรา เลขบัญชี 123-4-56789-0 โปรหมดคืนนี้ อย่าบอกใครนะ
+must_mention:
+  - id: top_up
+    variants: ["10000", "10,000", "เติมเงิน"]
+  - id: guaranteed_profit
+    variants: ["5%", "รับประกัน", "ไม่ขาดทุน", "กำไร"]
+  - id: account
+    variants: ["บัญชี", "account"]
+  - id: secrecy
+    variants: ["อย่าบอกใคร", "ปิดบัง", "เป็นความลับ", "ความลับ"]
+must_advise: [dont_pay, verify_trusted, block_report]
+must_not:
+  accuse: [ฟ้า, GoldWave Asia]
+  advice: [โอนได้เลย]
+translations:
+  - language: en
+    file: ../public/v2/romance-th.en.png
+    source_text: |
+      Hello, sorry I messaged the wrong person, but your profile looks very kind.
+      That's fine.
+      3 weeks later
+      Talking to you every day makes me so happy. I work in Singapore and I am very lonely.
+      My uncle has a gold trading app called GoldWave Asia. It makes 5% profit a day, no loss guaranteed. I already withdrew 80,000 baht.
+      Try topping up 10,000 baht first. Transfer to our mentor's account 123-4-56789-0. The promotion ends tonight, don't tell anyone.
+    synthetic:
+      layout: chat
+      sender: Fah
+      messages:
+        - { from: them, text: "Hello, sorry I messaged the wrong person, but your profile looks very kind." }
+        - { from: me, text: "That's fine." }
+        - { from: time, text: "3 weeks later" }
+        - { from: them, text: "Talking to you every day makes me so happy. I work in Singapore and I am very lonely." }
+        - { from: them, text: "My uncle has a gold trading app called GoldWave Asia. It makes 5% profit a day, no loss guaranteed. I already withdrew 80,000 baht." }
+        - { from: them, text: "Try topping up 10,000 baht first. Transfer to our mentor's account 123-4-56789-0. The promotion ends tonight, don't tell anyone." }
+synthetic:
+  layout: chat
+  sender: ฟ้า
+  subtitle: ออนไลน์
+  messages:
+    - { from: them, text: "สวัสดีค่ะ ขอโทษที่ทักผิดคนนะคะ แต่โปรไฟล์คุณดูใจดีมาก" }
+    - { from: me, text: "ไม่เป็นไรครับ" }
+    - { from: time, text: "3 สัปดาห์ต่อมา" }
+    - { from: them, text: "คุยกับคุณทุกวันทำให้ฉันมีความสุขมาก ฉันทำงานอยู่สิงคโปร์ เหงามากเลย" }
+    - { from: them, text: "ลุงของฉันมีแอปเทรดทองชื่อ GoldWave Asia ได้กำไรวันละ 5% รับประกันไม่ขาดทุน ฉันถอนได้แล้ว 80,000 บาท" }
+    - { from: them, text: "ลองเติมเงิน 10,000 บาทก่อนนะคะ โอนเข้าบัญชีพี่เลี้ยงของเรา เลขบัญชี 123-4-56789-0 โปรหมดคืนนี้ อย่าบอกใครนะ" }
+notes: Fictional Thai pig-butchering script. The account number is a placeholder pattern, not a real account.
+public: true

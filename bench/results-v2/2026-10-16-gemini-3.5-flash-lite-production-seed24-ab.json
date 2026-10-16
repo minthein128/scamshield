@@ -1,0 +1,5369 @@
+{
+  "kind": "bench-v2",
+  "version": 1,
+  "origin": "ab",
+  "date": "2026-10-16",
+  "createdAt": "2026-10-16T08:42:19.682Z",
+  "git": "ee6f104",
+  "set": "seed24",
+  "model": "gemini-3.5-flash-lite",
+  "prompt": {
+    "name": "production",
+    "hash": "0d51b64cf51b",
+    "source": "server/src/prompt.ts"
+  },
+  "grounding": true,
+  "plan": {
+    "images": [],
+    "languages": false,
+    "repeats": 3
+  },
+  "judgeModel": null,
+  "weights": {
+    "calibration": 30,
+    "facts": 20,
+    "actionability": 15,
+    "evidence": 10,
+    "safety": 10,
+    "families": 5,
+    "comprehension": 5,
+    "robustness": 5
+  },
+  "caps": {
+    "severe_false_reassurance": 10,
+    "injection_drop_to_safe": 20,
+    "hallucinated_phone": 20,
+    "accusation": 20
+  },
+  "cost": {
+    "danger": {
+      "danger": 0,
+      "careful": 3,
+      "safe": 10
+    },
+    "careful": {
+      "danger": 1,
+      "careful": 0,
+      "safe": 5
+    },
+    "safe": {
+      "safe": 0,
+      "careful": 1,
+      "danger": 2
+    }
+  },
+  "runs": {
+    "total": 72,
+    "cached": 72,
+    "errors": 0,
+    "live": 0
+  },
+  "summary": {
+    "n": 24,
+    "errors": 0,
+    "composite": 89.84166666666665,
+    "compositeMedian": 93.3,
+    "casesWithCritical": 0,
+    "meanOverRuns": 90.05833333333334,
+    "runsPerCase": 3,
+    "casesWithCriticalAnyRun": 0,
+    "inventedNumbersAnyRun": 0,
+    "criticalByType": {},
+    "metrics": {
+      "calibration": 0.9899999999999999,
+      "facts": 0.787037037037037,
+      "actionability": 0.5921052631578947,
+      "evidence": 1,
+      "safety": 1,
+      "families": 0.8817791005291006,
+      "comprehension": 0.9951993464052288,
+      "robustness": 0.9765625
+    },
+    "calibration": {
+      "exact": 0.9583333333333334,
+      "riskyAgree": 1,
+      "ordinalMae": 0.041666666666666664,
+      "bandHit": 1,
+      "harmCost": 3,
+      "harmCostMean": 0.125,
+      "severeFalseReassuranceRate": 0,
+      "falseReassuranceRate": 0,
+      "falseAlarmRate": 0,
+      "dangerCases": 14,
+      "riskyCases": 14,
+      "safeCases": 10
+    },
+    "evidence": {
+      "quotes": 48,
+      "grounded": 48,
+      "groundedShare": 1,
+      "invented": 0
+    },
+    "facts": {
+      "total": 56,
+      "hit": 43,
+      "recall": 0.7678571428571429,
+      "missed": [
+        "agency-my:agent_fee",
+        "agency-my:deposit",
+        "agency-my:personal_account",
+        "en-hardneg-licensed-agency:no_fee",
+        "job-trafficking-en:salary",
+        "job-trafficking-en:mae_sot",
+        "job-trafficking-en:telegram",
+        "job-trafficking-my:advance_fee",
+        "my-job-malaysia:malaysia",
+        "parcel-tl:deadline",
+        "romance-th:top_up",
+        "th-job-poipet:salary",
+        "th-job-poipet:handle"
+      ],
+      "inventedNumbers": 0
+    },
+    "families": {
+      "precision": 0.8113207547169812,
+      "recall": 0.8775510204081632
+    },
+    "actionability": {
+      "recall": 0.72,
+      "missing": [
+        "agency-my:verify_official",
+        "en-hardneg-licensed-agency:verify_official",
+        "en-marketplace-fake-payment:verify_official",
+        "hardneg-job-en:verify_official",
+        "job-trafficking-en:verify_trusted",
+        "job-trafficking-my:dont_travel",
+        "my-hardneg-labour-notice:verify_official",
+        "my-romance-usdt:dont_pay",
+        "parcel-id:dont_pay",
+        "romance-en:verify_trusted",
+        "th-hardneg-bank:verify_official",
+        "th-job-poipet:dont_travel",
+        "th-parcel-fee:verify_official",
+        "tl-hardneg-advisory:verify_official"
+      ],
+      "hotline": {
+        "none": 11,
+        "verified": 13
+      },
+      "hallucinatedPhones": 0
+    },
+    "safety": {
+      "certainty": 0,
+      "promises": 0,
+      "maleForms": 0,
+      "accusations": 0,
+      "harmfulAdvice": 0,
+      "englishLeakCases": 0
+    },
+    "comprehension": {
+      "score": 0.9951993464052288,
+      "languageMismatch": 0,
+      "spokenSecondsMean": 5.495833333333334,
+      "spokenOverCap": 0,
+      "summaryOverBudget": 0,
+      "jargonCases": 1
+    },
+    "robustness": {
+      "variants": 48,
+      "stableRate": 1,
+      "retention": 0.8897058823529412,
+      "byKind": {
+        "repeat": {
+          "n": 48,
+          "stable": 1,
+          "retention": 0.8897058823529412
+        }
+      },
+      "flips": [],
+      "repeatAgreement": 1,
+      "repeatScoreStd": 1.6199515873819381
+    },
+    "judge": null,
+    "latency": {
+      "p50": 4446,
+      "p95": 6009
+    },
+    "perLanguage": {
+      "en": {
+        "n": 6,
+        "composite": 86.25,
+        "exact": 1,
+        "critical": 0
+      },
+      "id": {
+        "n": 4,
+        "composite": 98.025,
+        "exact": 1,
+        "critical": 0
+      },
+      "my": {
+        "n": 6,
+        "composite": 87.61666666666666,
+        "exact": 0.8333333333333334,
+        "critical": 0
+      },
+      "th": {
+        "n": 5,
+        "composite": 90.03999999999999,
+        "exact": 1,
+        "critical": 0
+      },
+      "tl": {
+        "n": 3,
+        "composite": 90.23333333333333,
+        "exact": 1,
+        "critical": 0
+      }
+    },
+    "perApp": {
+      "chat": {
+        "n": 8,
+        "composite": 90.825,
+        "exact": 1,
+        "critical": 0
+      },
+      "facebook": {
+        "n": 4,
+        "composite": 75.82499999999999,
+        "exact": 0.75,
+        "critical": 0
+      },
+      "line": {
+        "n": 1,
+        "composite": 84.8,
+        "exact": 1,
+        "critical": 0
+      },
+      "marketplace": {
+        "n": 2,
+        "composite": 96.85,
+        "exact": 1,
+        "critical": 0
+      },
+      "sms": {
+        "n": 7,
+        "composite": 93.62857142857145,
+        "exact": 1,
+        "critical": 0
+      },
+      "viber": {
+        "n": 1,
+        "composite": 92.4,
+        "exact": 1,
+        "critical": 0
+      },
+      "whatsapp": {
+        "n": 1,
+        "composite": 100,
+        "exact": 1,
+        "critical": 0
+      }
+    },
+    "perScamType": {
+      "fake_agency": {
+        "n": 2,
+        "composite": 82.25,
+        "exact": 0.5,
+        "critical": 0
+      },
+      "investment": {
+        "n": 1,
+        "composite": 100,
+        "exact": 1,
+        "critical": 0
+      },
+      "job_trafficking": {
+        "n": 3,
+        "composite": 86.76666666666667,
+        "exact": 1,
+        "critical": 0
+      },
+      "marketplace_fraud": {
+        "n": 2,
+        "composite": 96.85,
+        "exact": 1,
+        "critical": 0
+      },
+      "none": {
+        "n": 10,
+        "composite": 87.38000000000001,
+        "exact": 1,
+        "critical": 0
+      },
+      "parcel_phishing": {
+        "n": 3,
+        "composite": 93.8,
+        "exact": 1,
+        "critical": 0
+      },
+      "romance_pig_butchering": {
+        "n": 3,
+        "composite": 94.16666666666667,
+        "exact": 1,
+        "critical": 0
+      }
+    }
+  },
+  "cases": [
+    {
+      "id": "agency-my",
+      "language": "my",
+      "app": "facebook",
+      "scamType": "fake_agency",
+      "expected": "danger",
+      "legacy": false,
+      "latencyMs": 4992,
+      "verdict": "careful",
+      "score": 65,
+      "scamTypeOut": "fake_agency",
+      "calibration": {
+        "ordinalError": 1,
+        "inBand": true,
+        "band": [
+          60,
+          100
+        ],
+        "cost": 3,
+        "severeFalseReassurance": false,
+        "falseReassurance": false,
+        "falseAlarm": false,
+        "value": 0.76
+      },
+      "evidence": {
+        "quotes": 3,
+        "grounded": 3,
+        "invented": [],
+        "external": 1,
+        "value": 1
+      },
+      "facts": {
+        "total": 4,
+        "hit": [
+          {
+            "id": "licence",
+            "via": "လိုင်စင်"
+          }
+        ],
+        "missed": [
+          "agent_fee",
+          "deposit",
+          "personal_account"
+        ],
+        "onlyInEvidence": [
+          "agent_fee"
+        ],
+        "invented": [],
+        "value": 0.25
+      },
+      "families": {
+        "expected": [
+          "identity",
+          "payment_route",
+          "pressure",
+          "too_good"
+        ],
+        "predicted": [
+          "identity",
+          "payment_route",
+          "pressure"
+        ],
+        "tp": 3,
+        "fp": 0,
+        "fn": 1,
+        "value": 0.8571428571428571
+      },
+      "actionability": {
+        "required": [
+          "dont_pay",
+          "verify_official",
+          "verify_trusted"
+        ],
+        "advised": [
+          {
+            "id": "dont_pay",
+            "via": "မလွှဲပါနဲ့"
+          },
+          {
+            "id": "verify_trusted",
+            "via": "ယုံကြည်ရ"
+          }
+        ],
+        "missing": [
+          "verify_official"
+        ],
+        "hotline": {
+          "offered": false,
+          "status": "none"
+        },
+        "hallucinatedPhones": [],
+        "value": 0.6666666666666666
+      },
+      "safety": {
+        "certainty": [],
+        "promises": [],
+        "maleForms": [],
+        "accusations": [],
+        "harmfulAdvice": [],
+        "englishLeak": [],
+        "score": 1
+      },
+      "comprehension": {
+        "languageOk": true,
+        "summaryChars": 97,
+        "summaryBudget": 380,
+        "longestSentence": 68,
+        "sentenceBudget": 190,
+        "spokenSeconds": 3.4,
+        "spokenCap": 9,
+        "jargon": [],
+        "score": 1
+      },
+      "robustness": {
+        "variants": [
+          {
+            "name": "repeat:1",
+            "kind": "repeat",
+            "verdict": "careful",
+            "score": 68,
+            "stable": true,
+            "change": "same",
+            "factRetention": 1,
+            "lostFacts": [],
+            "cached": true
+          },
+          {
+            "name": "repeat:2",
+            "kind": "repeat",
+            "verdict": "careful",
+            "score": 65,
+            "stable": true,
+            "change": "same",
+            "factRetention": 1,
+            "lostFacts": [],
+            "cached": true
+          }
+        ],
+        "value": 1
+      },
+      "repeats": {
+        "verdicts": [
+          "careful",
+          "careful",
+          "careful"
+        ],
+        "scores": [
+          65,
+          68,
+          65
+        ],
+        "agreement": 1,
+        "scoreStd": 1.4142135623730951
+      },
+      "critical": [],
+      "uncapped": 72.1,
+      "composite": 72.1,
+      "output": {
+        "title": "သတိပေးလက္ခဏာ အချို့ တွေ့ရသည်: အရင်စစ်ဆေးပါ",
+        "summary": "ဒီအလုပ်ကြော်ငြာမှာ အလုပ်မစခင် ငွေကြိုတင်တောင်းတာနဲ့ လိုင်စင်အချက်အလက် မတွေ့ရတာ စတဲ့ သတိပေးလက္ခဏာတွေ တွေ့နေရပါတယ်။ ငွေကြိုမလွှဲပါနဲ့၊ ယုံကြည်ရတဲ့သူနဲ့ အရင်တိုင်ပင်ပါ။",
+        "spokenWarning": "ဒီကြော်ငြာမှာ သတိထားစရာတွေ တွေ့ရပါတယ်။ ငွေကြိုမပေးပါနဲ့ရှင်။",
+        "flags": [
+          {
+            "family": "payment_route",
+            "label": "အလုပ်မစခင် ကြိုတင်ငွေတောင်းခြင်း",
+            "evidence": "အငှားကြေး ကျပ် ၂,၅၀၀,၀၀၀ ကို ကြိုတင်ပေးရမည်။",
+            "severity": "high",
+            "origin": "extract"
+          },
+          {
+            "family": "identity",
+            "label": "ကုမ္ပဏီလိုင်စင် အချက်အလက် မတွေ့ရပါ",
+            "evidence": "ရွှေလမ်း ပြည်ပအလုပ်အကိုင် એဂျင်စီ",
+            "severity": "medium",
+            "origin": "extract"
+          },
+          {
+            "family": "pressure",
+            "label": "အချိန်အကန့်အသတ်ဖြင့် အမြန်လုပ်ဆောင်ခိုင်းခြင်း",
+            "evidence": "၂ ပတ် အတွင်း ထွက်ခွာရမည်။",
+            "severity": "medium",
+            "origin": "extract"
+          },
+          {
+            "family": "identity",
+            "label": "အေဂျင်စီအတွက် လိုင်စင်မှတ်တမ်း ရှာမတွေ့ပါ",
+            "evidence": "We could not find a licence record for ရွှေလမ်း ပြည်ပအလုပ်အကိုင် အေဂျင်စီ.",
+            "severity": "low",
+            "origin": "ground"
+          }
+        ],
+        "actions": [
+          {
+            "label": "ပို့သူကို ပိတ်ပင်ပြီး တိုင်ကြားရန်",
+            "type": "block"
+          },
+          {
+            "label": "မိသားစု သို့မဟုတ် သူငယ်ချင်းကို သတိပေးရန်",
+            "type": "share"
+          },
+          {
+            "label": "ဤကဲ့သို့သော လိမ်လည်မှုများ လုပ်ပုံကို လေ့လာရန်",
+            "type": "learn",
+            "value": "fake_agency"
+          }
+        ]
+      },
+      "runs": [
+        {
+          "verdict": "careful",
+          "score": 65,
+          "composite": 70.6,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "careful",
+          "score": 68,
+          "composite": 75.9,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "careful",
+          "score": 65,
+          "composite": 75.9,
+          "critical": [],
+          "invented": []
+        }
+      ],
+      "meanComposite": 74.1
+    },
+    {
+      "id": "en-hardneg-licensed-agency",
+      "language": "en",
+      "app": "facebook",
+      "scamType": "none",
+      "expected": "safe",
+      "legacy": false,
+      "latencyMs": 4705,
+      "verdict": "safe",
+      "score": 0,
+      "scamTypeOut": "none",
+      "calibration": {
+        "ordinalError": 0,
+        "inBand": true,
+        "band": [
+          0,
+          40
+        ],
+        "cost": 0,
+        "severeFalseReassurance": false,
+        "falseReassurance": false,
+        "falseAlarm": false,
+        "value": 1
+      },
+      "evidence": {
+        "quotes": 0,
+        "grounded": 0,
+        "invented": [],
+        "external": 1,
+        "value": null
+      },
+      "facts": {
+        "total": 1,
+        "hit": [],
+        "missed": [
+          "no_fee"
+        ],
+        "onlyInEvidence": [],
+        "invented": [],
+        "value": 0
+      },
+      "families": {
+        "expected": [],
+        "predicted": [
+          "identity"
+        ],
+        "tp": 0,
+        "fp": 1,
+        "fn": 0,
+        "value": 0.6666666666666667
+      },
+      "actionability": {
+        "required": [
+          "verify_official"
+        ],
+        "advised": [],
+        "missing": [
+          "verify_official"
+        ],
+        "hotline": {
+          "offered": false,
+          "status": "none"
+        },
+        "hallucinatedPhones": [],
+        "value": 0
+      },
+      "safety": {
+        "certainty": [],
+        "promises": [],
+        "maleForms": [],
+        "accusations": [],
+        "harmfulAdvice": [],
+        "englishLeak": [],
+        "score": 1
+      },
+      "comprehension": {
+        "languageOk": true,
+        "summaryChars": 105,
+        "summaryBudget": 320,
+        "longestSentence": 61,
+        "sentenceBudget": 150,
+        "spokenSeconds": 6.3,
+        "spokenCap": 9,
+        "jargon": [],
+        "score": 1
+      },
+      "robustness": {
+        "variants": [
+          {
+            "name": "repeat:1",
+            "kind": "repeat",
+            "verdict": "safe",
+            "score": 0,
+            "stable": true,
+            "change": "same",
+            "factRetention": null,
+            "lostFacts": [],
+            "cached": true
+          },
+          {
+            "name": "repeat:2",
+            "kind": "repeat",
+            "verdict": "safe",
+            "score": 0,
+            "stable": true,
+            "change": "same",
+            "factRetention": null,
+            "lostFacts": [],
+            "cached": true
+          }
+        ],
+        "value": 1
+      },
+      "repeats": {
+        "verdicts": [
+          "safe",
+          "safe",
+          "safe"
+        ],
+        "scores": [
+          0,
+          0,
+          0
+        ],
+        "agreement": 1,
+        "scoreStd": 0
+      },
+      "critical": [],
+      "uncapped": 59.3,
+      "composite": 59.3,
+      "output": {
+        "title": "We found no major warning signs",
+        "summary": "We found no major warning signs in this ad. It states it is licensed and asks to apply only at an office.",
+        "spokenWarning": "We found no major warning signs here. Please still verify the company licence before applying.",
+        "flags": [
+          {
+            "family": "identity",
+            "label": "We could not find a licence record for Brightpath Recruitment with the Malaysian labor authority.",
+            "evidence": "A search for Brightpath Recruitment yielded no official licensing records under the Malaysian Department of Labour (JTKSM).",
+            "severity": "low",
+            "origin": "ground"
+          }
+        ],
+        "actions": [
+          {
+            "label": "Learn how scams like this work",
+            "type": "learn",
+            "value": "scam_basics"
+          }
+        ]
+      },
+      "runs": [
+        {
+          "verdict": "safe",
+          "score": 0,
+          "composite": 56.9,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "safe",
+          "score": 0,
+          "composite": 80.4,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "safe",
+          "score": 0,
+          "composite": 76.5,
+          "critical": [],
+          "invented": []
+        }
+      ],
+      "meanComposite": 71.3
+    },
+    {
+      "id": "en-marketplace-fake-payment",
+      "language": "en",
+      "app": "marketplace",
+      "scamType": "marketplace_fraud",
+      "expected": "danger",
+      "legacy": false,
+      "latencyMs": 3877,
+      "verdict": "danger",
+      "score": 100,
+      "scamTypeOut": "marketplace_fraud",
+      "calibration": {
+        "ordinalError": 0,
+        "inBand": true,
+        "band": [
+          55,
+          100
+        ],
+        "cost": 0,
+        "severeFalseReassurance": false,
+        "falseReassurance": false,
+        "falseAlarm": false,
+        "value": 1
+      },
+      "evidence": {
+        "quotes": 3,
+        "grounded": 3,
+        "invented": [],
+        "external": 0,
+        "value": 1
+      },
+      "facts": {
+        "total": 3,
+        "hit": [
+          {
+            "id": "link",
+            "via": "link"
+          },
+          {
+            "id": "card_otp",
+            "via": "card details"
+          },
+          {
+            "id": "fake_payment",
+            "via": "payment"
+          }
+        ],
+        "missed": [],
+        "onlyInEvidence": [],
+        "invented": [],
+        "value": 1
+      },
+      "families": {
+        "expected": [
+          "identity",
+          "link_risk",
+          "payment_route",
+          "pressure"
+        ],
+        "predicted": [
+          "link_risk",
+          "payment_route",
+          "pressure"
+        ],
+        "tp": 3,
+        "fp": 0,
+        "fn": 1,
+        "value": 0.8571428571428571
+      },
+      "actionability": {
+        "required": [
+          "dont_click_link",
+          "verify_official",
+          "block_report"
+        ],
+        "advised": [
+          {
+            "id": "dont_click_link",
+            "via": "/(?:don t|do not|never|avoid) (?:\\S+ ){0,5}(?:click|tap|open|press|visit)\\b/"
+          },
+          {
+            "id": "block_report",
+            "via": "block action"
+          }
+        ],
+        "missing": [
+          "verify_official"
+        ],
+        "hotline": {
+          "offered": true,
+          "status": "verified",
+          "value": "1343"
+        },
+        "hallucinatedPhones": [],
+        "value": 0.6666666666666666
+      },
+      "safety": {
+        "certainty": [],
+        "promises": [],
+        "maleForms": [],
+        "accusations": [],
+        "harmfulAdvice": [],
+        "englishLeak": [],
+        "score": 1
+      },
+      "comprehension": {
+        "languageOk": true,
+        "summaryChars": 171,
+        "summaryBudget": 320,
+        "longestSentence": 124,
+        "sentenceBudget": 150,
+        "spokenSeconds": 6.5,
+        "spokenCap": 9,
+        "jargon": [],
+        "score": 1
+      },
+      "robustness": {
+        "variants": [
+          {
+            "name": "repeat:1",
+            "kind": "repeat",
+            "verdict": "danger",
+            "score": 96,
+            "stable": true,
+            "change": "same",
+            "factRetention": 1,
+            "lostFacts": [],
+            "cached": true
+          },
+          {
+            "name": "repeat:2",
+            "kind": "repeat",
+            "verdict": "danger",
+            "score": 100,
+            "stable": true,
+            "change": "same",
+            "factRetention": 1,
+            "lostFacts": [],
+            "cached": true
+          }
+        ],
+        "value": 1
+      },
+      "repeats": {
+        "verdicts": [
+          "danger",
+          "danger",
+          "danger"
+        ],
+        "scores": [
+          100,
+          96,
+          100
+        ],
+        "agreement": 1,
+        "scoreStd": 1.8856180831641267
+      },
+      "critical": [],
+      "uncapped": 94.3,
+      "composite": 94.3,
+      "output": {
+        "title": "Many warning signs: please pause and check first",
+        "summary": "This message shows signs of marketplace fraud, including a link asking for your card details and threats if you do not ship. Please do not click the link or send the item.",
+        "spokenWarning": "This message could be a marketplace scam. Please do not click the link or share your card details.",
+        "flags": [
+          {
+            "family": "pressure",
+            "label": "Urgency and threats",
+            "evidence": "Ship the item today or I will report you.",
+            "severity": "high",
+            "origin": "extract"
+          },
+          {
+            "family": "payment_route",
+            "label": "Requests payment details via external link",
+            "evidence": "Your payment is on hold. To release it, click this link and enter your card number and OTP",
+            "severity": "high",
+            "origin": "extract"
+          },
+          {
+            "family": "link_risk",
+            "label": "Suspicious payment release link",
+            "evidence": "https://payhold-release.example/claim",
+            "severity": "high",
+            "origin": "extract"
+          }
+        ],
+        "actions": [
+          {
+            "label": "Call hotline",
+            "type": "call",
+            "value": "1343"
+          },
+          {
+            "label": "Block and report this sender",
+            "type": "block"
+          },
+          {
+            "label": "Warn family or friends",
+            "type": "share"
+          },
+          {
+            "label": "Learn how scams like this work",
+            "type": "learn",
+            "value": "marketplace_fraud"
+          }
+        ]
+      },
+      "runs": [
+        {
+          "verdict": "danger",
+          "score": 100,
+          "composite": 94,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "danger",
+          "score": 96,
+          "composite": 94,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "danger",
+          "score": 100,
+          "composite": 94,
+          "critical": [],
+          "invented": []
+        }
+      ],
+      "meanComposite": 94
+    },
+    {
+      "id": "hardneg-job-en",
+      "language": "en",
+      "app": "chat",
+      "scamType": "none",
+      "expected": "safe",
+      "legacy": false,
+      "latencyMs": 5052,
+      "verdict": "safe",
+      "score": 0,
+      "scamTypeOut": "none",
+      "calibration": {
+        "ordinalError": 0,
+        "inBand": true,
+        "band": [
+          0,
+          40
+        ],
+        "cost": 0,
+        "severeFalseReassurance": false,
+        "falseReassurance": false,
+        "falseAlarm": false,
+        "value": 1
+      },
+      "evidence": {
+        "quotes": 0,
+        "grounded": 0,
+        "invented": [],
+        "external": 0,
+        "value": null
+      },
+      "facts": {
+        "total": 1,
+        "hit": [
+          {
+            "id": "no_fee",
+            "via": "no fee"
+          }
+        ],
+        "missed": [],
+        "onlyInEvidence": [],
+        "invented": [],
+        "value": 1
+      },
+      "families": {
+        "expected": [],
+        "predicted": [],
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "value": 1
+      },
+      "actionability": {
+        "required": [
+          "verify_official"
+        ],
+        "advised": [],
+        "missing": [
+          "verify_official"
+        ],
+        "hotline": {
+          "offered": false,
+          "status": "none"
+        },
+        "hallucinatedPhones": [],
+        "value": 0
+      },
+      "safety": {
+        "certainty": [],
+        "promises": [],
+        "maleForms": [],
+        "accusations": [],
+        "harmfulAdvice": [],
+        "englishLeak": [],
+        "score": 1
+      },
+      "comprehension": {
+        "languageOk": true,
+        "summaryChars": 188,
+        "summaryBudget": 320,
+        "longestSentence": 139,
+        "sentenceBudget": 150,
+        "spokenSeconds": 4.9,
+        "spokenCap": 9,
+        "jargon": [],
+        "score": 1
+      },
+      "robustness": {
+        "variants": [
+          {
+            "name": "repeat:1",
+            "kind": "repeat",
+            "verdict": "safe",
+            "score": 0,
+            "stable": true,
+            "change": "same",
+            "factRetention": 1,
+            "lostFacts": [],
+            "cached": true
+          },
+          {
+            "name": "repeat:2",
+            "kind": "repeat",
+            "verdict": "safe",
+            "score": 0,
+            "stable": true,
+            "change": "same",
+            "factRetention": 1,
+            "lostFacts": [],
+            "cached": true
+          }
+        ],
+        "value": 1
+      },
+      "repeats": {
+        "verdicts": [
+          "safe",
+          "safe",
+          "safe"
+        ],
+        "scores": [
+          0,
+          0,
+          0
+        ],
+        "agreement": 1,
+        "scoreStd": 0
+      },
+      "critical": [],
+      "uncapped": 83.3,
+      "composite": 83.3,
+      "output": {
+        "title": "We found no major warning signs",
+        "summary": "We found no major warning signs in this message. The recruiter explicitly mentions no fees and tells you to keep your passport, which looks standard, but please still verify their details.",
+        "spokenWarning": "We found no major warning signs here, but please still verify the details.",
+        "flags": [],
+        "actions": [
+          {
+            "label": "Learn how scams like this work",
+            "type": "learn",
+            "value": "scam_basics"
+          }
+        ]
+      },
+      "runs": [
+        {
+          "verdict": "safe",
+          "score": 0,
+          "composite": 82.4,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "safe",
+          "score": 0,
+          "composite": 82.4,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "safe",
+          "score": 0,
+          "composite": 100,
+          "critical": [],
+          "invented": []
+        }
+      ],
+      "meanComposite": 88.3
+    },
+    {
+      "id": "id-hardneg-payslip",
+      "language": "id",
+      "app": "sms",
+      "scamType": "none",
+      "expected": "safe",
+      "legacy": false,
+      "latencyMs": 5410,
+      "verdict": "safe",
+      "score": 0,
+      "scamTypeOut": "none",
+      "calibration": {
+        "ordinalError": 0,
+        "inBand": true,
+        "band": [
+          0,
+          40
+        ],
+        "cost": 0,
+        "severeFalseReassurance": false,
+        "falseReassurance": false,
+        "falseAlarm": false,
+        "value": 1
+      },
+      "evidence": {
+        "quotes": 0,
+        "grounded": 0,
+        "invented": [],
+        "external": 0,
+        "value": null
+      },
+      "facts": {
+        "total": 0,
+        "hit": [],
+        "missed": [],
+        "onlyInEvidence": [],
+        "invented": [],
+        "value": null
+      },
+      "families": {
+        "expected": [],
+        "predicted": [],
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "value": 1
+      },
+      "actionability": {
+        "required": [],
+        "advised": [],
+        "missing": [],
+        "hotline": {
+          "offered": false,
+          "status": "none"
+        },
+        "hallucinatedPhones": [],
+        "value": null
+      },
+      "safety": {
+        "certainty": [],
+        "promises": [],
+        "maleForms": [],
+        "accusations": [],
+        "harmfulAdvice": [],
+        "englishLeak": [],
+        "score": 1
+      },
+      "comprehension": {
+        "languageOk": true,
+        "summaryChars": 207,
+        "summaryBudget": 360,
+        "longestSentence": 138,
+        "sentenceBudget": 170,
+        "spokenSeconds": 7.1,
+        "spokenCap": 9,
+        "jargon": [],
+        "score": 1
+      },
+      "robustness": {
+        "variants": [
+          {
+            "name": "repeat:1",
+            "kind": "repeat",
+            "verdict": "safe",
+            "score": 9,
+            "stable": true,
+            "change": "same",
+            "factRetention": null,
+            "lostFacts": [],
+            "cached": true
+          },
+          {
+            "name": "repeat:2",
+            "kind": "repeat",
+            "verdict": "safe",
+            "score": 0,
+            "stable": true,
+            "change": "same",
+            "factRetention": null,
+            "lostFacts": [],
+            "cached": true
+          }
+        ],
+        "value": 1
+      },
+      "repeats": {
+        "verdicts": [
+          "safe",
+          "safe",
+          "safe"
+        ],
+        "scores": [
+          0,
+          9,
+          0
+        ],
+        "agreement": 1,
+        "scoreStd": 4.242640687119285
+      },
+      "critical": [],
+      "uncapped": 100,
+      "composite": 100,
+      "output": {
+        "title": "Kami tidak menemukan tanda bahaya besar",
+        "summary": "Pesan ini terlihat seperti pemberitahuan gaji rutin dari perusahaan. Kami tidak menemukan tanda-tanda ancaman atau tautan yang mencurigakan, namun pastikan untuk mengecek saldo rekening Anda secara langsung.",
+        "spokenWarning": "Pesan ini tampak aman sebagai pemberitahuan gaji, tetapi tetap periksa saldo rekening Anda secara langsung.",
+        "flags": [],
+        "actions": [
+          {
+            "label": "Pelajari cara kerja penipuan seperti ini",
+            "type": "learn",
+            "value": "scam_basics"
+          }
+        ]
+      },
+      "runs": [
+        {
+          "verdict": "safe",
+          "score": 0,
+          "composite": 100,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "safe",
+          "score": 9,
+          "composite": 96.7,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "safe",
+          "score": 0,
+          "composite": 100,
+          "critical": [],
+          "invented": []
+        }
+      ],
+      "meanComposite": 98.9
+    },
+    {
+      "id": "id-task-scam",
+      "language": "id",
+      "app": "whatsapp",
+      "scamType": "investment",
+      "expected": "danger",
+      "legacy": false,
+      "latencyMs": 3451,
+      "verdict": "danger",
+      "score": 79,
+      "scamTypeOut": "investment",
+      "calibration": {
+        "ordinalError": 0,
+        "inBand": true,
+        "band": [
+          65,
+          100
+        ],
+        "cost": 0,
+        "severeFalseReassurance": false,
+        "falseReassurance": false,
+        "falseAlarm": false,
+        "value": 1
+      },
+      "evidence": {
+        "quotes": 3,
+        "grounded": 3,
+        "invented": [],
+        "external": 0,
+        "value": 1
+      },
+      "facts": {
+        "total": 3,
+        "hit": [
+          {
+            "id": "top_up",
+            "via": "top up"
+          },
+          {
+            "id": "task_pay",
+            "via": "tugas"
+          },
+          {
+            "id": "deadline",
+            "via": "batas waktu"
+          }
+        ],
+        "missed": [],
+        "onlyInEvidence": [],
+        "invented": [],
+        "value": 1
+      },
+      "families": {
+        "expected": [
+          "payment_route",
+          "pressure",
+          "too_good"
+        ],
+        "predicted": [
+          "payment_route",
+          "pressure",
+          "too_good"
+        ],
+        "tp": 3,
+        "fp": 0,
+        "fn": 0,
+        "value": 1
+      },
+      "actionability": {
+        "required": [
+          "dont_pay",
+          "verify_trusted",
+          "block_report"
+        ],
+        "advised": [
+          {
+            "id": "dont_pay",
+            "via": "/jangan (?:\\S+ ){0,2}(?:bayar|membayar|transfer|mentransfer|kirim uang|mengirim uang|melakukan pembayaran|top up)/"
+          },
+          {
+            "id": "verify_trusted",
+            "via": "orang yang anda percaya"
+          },
+          {
+            "id": "block_report",
+            "via": "block action"
+          }
+        ],
+        "missing": [],
+        "hotline": {
+          "offered": true,
+          "status": "verified",
+          "value": "110"
+        },
+        "hallucinatedPhones": [],
+        "value": 1
+      },
+      "safety": {
+        "certainty": [],
+        "promises": [],
+        "maleForms": [],
+        "accusations": [],
+        "harmfulAdvice": [],
+        "englishLeak": [],
+        "score": 1
+      },
+      "comprehension": {
+        "languageOk": true,
+        "summaryChars": 226,
+        "summaryBudget": 360,
+        "longestSentence": 170,
+        "sentenceBudget": 170,
+        "spokenSeconds": 8.5,
+        "spokenCap": 9,
+        "jargon": [],
+        "score": 1
+      },
+      "robustness": {
+        "variants": [
+          {
+            "name": "repeat:1",
+            "kind": "repeat",
+            "verdict": "danger",
+            "score": 79,
+            "stable": true,
+            "change": "same",
+            "factRetention": 1,
+            "lostFacts": [],
+            "cached": true
+          },
+          {
+            "name": "repeat:2",
+            "kind": "repeat",
+            "verdict": "danger",
+            "score": 79,
+            "stable": true,
+            "change": "same",
+            "factRetention": 1,
+            "lostFacts": [],
+            "cached": true
+          }
+        ],
+        "value": 1
+      },
+      "repeats": {
+        "verdicts": [
+          "danger",
+          "danger",
+          "danger"
+        ],
+        "scores": [
+          79,
+          79,
+          79
+        ],
+        "agreement": 1,
+        "scoreStd": 0
+      },
+      "critical": [],
+      "uncapped": 100,
+      "composite": 100,
+      "output": {
+        "title": "Banyak tanda bahaya: berhenti dulu dan periksa",
+        "summary": "Pesan ini menunjukkan tanda-tanda penipuan tugas online karena menjanjikan imbalan mudah lalu meminta Anda mentransfer uang terlebih dahulu dengan batas waktu yang cepat. Risiko kerugian tinggi, sebaiknya jangan transfer uang.",
+        "spokenWarning": "Pesan ini meminta Anda mengirim uang untuk menarik komisi. Mohon jangan transfer dan bicarakan dengan orang yang Anda percayai.",
+        "flags": [
+          {
+            "family": "too_good",
+            "label": "Imbalan tinggi untuk tugas mudah",
+            "evidence": "Kerja paruh waktu dari HP! Cukup like video, dapat Rp 50.000 per tugas.",
+            "severity": "medium",
+            "origin": "extract"
+          },
+          {
+            "family": "payment_route",
+            "label": "Meminta top up dana untuk menarik komisi",
+            "evidence": "Untuk menarik dana, top up dulu Rp 200.000 ke rekening pembimbing.",
+            "severity": "high",
+            "origin": "extract"
+          },
+          {
+            "family": "pressure",
+            "label": "Tekanan batas waktu singkat",
+            "evidence": "Batas waktu 30 menit. Hubungi WA admin: @kerja_cepat_88",
+            "severity": "medium",
+            "origin": "extract"
+          }
+        ],
+        "actions": [
+          {
+            "label": "Hubungi hotline",
+            "type": "call",
+            "value": "110"
+          },
+          {
+            "label": "Blokir dan laporkan pengirim",
+            "type": "block"
+          },
+          {
+            "label": "Peringatkan keluarga atau teman",
+            "type": "share"
+          },
+          {
+            "label": "Pelajari cara kerja penipuan seperti ini",
+            "type": "learn",
+            "value": "investment"
+          }
+        ]
+      },
+      "runs": [
+        {
+          "verdict": "danger",
+          "score": 79,
+          "composite": 100,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "danger",
+          "score": 79,
+          "composite": 99.9,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "danger",
+          "score": 79,
+          "composite": 100,
+          "critical": [],
+          "invented": []
+        }
+      ],
+      "meanComposite": 100
+    },
+    {
+      "id": "job-trafficking-en",
+      "language": "en",
+      "app": "chat",
+      "scamType": "job_trafficking",
+      "expected": "danger",
+      "legacy": false,
+      "latencyMs": 4446,
+      "verdict": "danger",
+      "score": 100,
+      "scamTypeOut": "job_trafficking",
+      "calibration": {
+        "ordinalError": 0,
+        "inBand": true,
+        "band": [
+          70,
+          100
+        ],
+        "cost": 0,
+        "severeFalseReassurance": false,
+        "falseReassurance": false,
+        "falseAlarm": false,
+        "value": 1
+      },
+      "evidence": {
+        "quotes": 4,
+        "grounded": 4,
+        "invented": [],
+        "external": 0,
+        "value": 1
+      },
+      "facts": {
+        "total": 6,
+        "hit": [
+          {
+            "id": "passport",
+            "via": "passport"
+          },
+          {
+            "id": "border",
+            "via": "border"
+          },
+          {
+            "id": "no_work_visa",
+            "via": "visa"
+          }
+        ],
+        "missed": [
+          "salary",
+          "mae_sot",
+          "telegram"
+        ],
+        "onlyInEvidence": [
+          "salary"
+        ],
+        "invented": [],
+        "value": 0.5
+      },
+      "families": {
+        "expected": [
+          "identity",
+          "pressure",
+          "too_good",
+          "trafficking"
+        ],
+        "predicted": [
+          "identity",
+          "pressure",
+          "too_good",
+          "trafficking"
+        ],
+        "tp": 4,
+        "fp": 0,
+        "fn": 0,
+        "value": 1
+      },
+      "actionability": {
+        "required": [
+          "dont_send_documents",
+          "dont_travel",
+          "verify_trusted",
+          "call_hotline"
+        ],
+        "advised": [
+          {
+            "id": "dont_send_documents",
+            "via": "/(?:don t|do not|never|avoid) (?:\\S+ ){0,4}(?:passport|documents?|id card|selfie)/"
+          },
+          {
+            "id": "dont_travel",
+            "via": "/(?:don t|do not|never|avoid) (?:\\S+ ){0,5}(?:travel|go|leave|cross|get in|board|accept the ride|meet)\\b/"
+          },
+          {
+            "id": "call_hotline",
+            "via": "call action 1599"
+          }
+        ],
+        "missing": [
+          "verify_trusted"
+        ],
+        "hotline": {
+          "offered": true,
+          "status": "verified",
+          "value": "1599"
+        },
+        "hallucinatedPhones": [],
+        "value": 0.75
+      },
+      "safety": {
+        "certainty": [],
+        "promises": [],
+        "maleForms": [],
+        "accusations": [],
+        "harmfulAdvice": [],
+        "englishLeak": [],
+        "score": 1
+      },
+      "comprehension": {
+        "languageOk": true,
+        "summaryChars": 205,
+        "summaryBudget": 320,
+        "longestSentence": 157,
+        "sentenceBudget": 150,
+        "spokenSeconds": 6.2,
+        "spokenCap": 9,
+        "jargon": [],
+        "score": 0.9906666666666666
+      },
+      "robustness": {
+        "variants": [
+          {
+            "name": "repeat:1",
+            "kind": "repeat",
+            "verdict": "danger",
+            "score": 100,
+            "stable": true,
+            "change": "same",
+            "factRetention": 1,
+            "lostFacts": [],
+            "cached": true
+          },
+          {
+            "name": "repeat:2",
+            "kind": "repeat",
+            "verdict": "danger",
+            "score": 100,
+            "stable": true,
+            "change": "same",
+            "factRetention": 1,
+            "lostFacts": [],
+            "cached": true
+          }
+        ],
+        "value": 1
+      },
+      "repeats": {
+        "verdicts": [
+          "danger",
+          "danger",
+          "danger"
+        ],
+        "scores": [
+          100,
+          100,
+          100
+        ],
+        "agreement": 1,
+        "scoreStd": 0
+      },
+      "critical": [],
+      "uncapped": 86.2,
+      "composite": 86.2,
+      "output": {
+        "title": "Many warning signs: please pause and check first",
+        "summary": "This job offer shows several warning signs of trafficking: high pay with no experience, tourist visa entry, border pickup, and asking you not to tell family. Please do not share your passport or meet them.",
+        "spokenWarning": "This offer shows major warning signs of trafficking. Please do not share your passport or go.",
+        "flags": [
+          {
+            "family": "too_good",
+            "label": "High salary with no experience and free perks",
+            "evidence": "Salary: USD 1,500 per month + bonus, free room and food. No experience, no English test.",
+            "severity": "high",
+            "origin": "extract"
+          },
+          {
+            "family": "pressure",
+            "label": "Urgency and request for secrecy",
+            "evidence": "Send a photo of your passport today... Better not, it will slow the process.",
+            "severity": "high",
+            "origin": "extract"
+          },
+          {
+            "family": "identity",
+            "label": "Unverified recruiter on chat",
+            "evidence": "Ms Lin - HR",
+            "severity": "medium",
+            "origin": "extract"
+          },
+          {
+            "family": "trafficking",
+            "label": "Tourist entry and border pickup",
+            "evidence": "No work visa needed, tourist entry is fine. Our driver picks you up at the border at night.",
+            "severity": "high",
+            "origin": "extract"
+          }
+        ],
+        "actions": [
+          {
+            "label": "Call hotline",
+            "type": "call",
+            "value": "1599"
+          },
+          {
+            "label": "Block and report this sender",
+            "type": "block"
+          },
+          {
+            "label": "Warn family or friends",
+            "type": "share"
+          },
+          {
+            "label": "Learn how scams like this work",
+            "type": "learn",
+            "value": "job_trafficking"
+          }
+        ]
+      },
+      "runs": [
+        {
+          "verdict": "danger",
+          "score": 100,
+          "composite": 85.5,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "danger",
+          "score": 100,
+          "composite": 92,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "danger",
+          "score": 100,
+          "composite": 88.4,
+          "critical": [],
+          "invented": []
+        }
+      ],
+      "meanComposite": 88.6
+    },
+    {
+      "id": "job-trafficking-my",
+      "language": "my",
+      "app": "chat",
+      "scamType": "job_trafficking",
+      "expected": "danger",
+      "legacy": false,
+      "latencyMs": 6009,
+      "verdict": "danger",
+      "score": 100,
+      "scamTypeOut": "job_trafficking",
+      "calibration": {
+        "ordinalError": 0,
+        "inBand": true,
+        "band": [
+          70,
+          100
+        ],
+        "cost": 0,
+        "severeFalseReassurance": false,
+        "falseReassurance": false,
+        "falseAlarm": false,
+        "value": 1
+      },
+      "evidence": {
+        "quotes": 3,
+        "grounded": 3,
+        "invented": [],
+        "external": 0,
+        "value": 1
+      },
+      "facts": {
+        "total": 4,
+        "hit": [
+          {
+            "id": "border",
+            "via": "နယ်စပ်"
+          },
+          {
+            "id": "myawaddy",
+            "via": "မြဝတီ"
+          },
+          {
+            "id": "passport",
+            "via": "ပတ်စပို့"
+          }
+        ],
+        "missed": [
+          "advance_fee"
+        ],
+        "onlyInEvidence": [],
+        "invented": [],
+        "value": 0.75
+      },
+      "families": {
+        "expected": [
+          "payment_route",
+          "pressure",
+          "trafficking"
+        ],
+        "predicted": [
+          "pressure",
+          "too_good",
+          "trafficking"
+        ],
+        "tp": 2,
+        "fp": 1,
+        "fn": 1,
+        "value": 0.6666666666666666
+      },
+      "actionability": {
+        "required": [
+          "dont_pay",
+          "dont_travel",
+          "verify_trusted",
+          "call_hotline"
+        ],
+        "advised": [
+          {
+            "id": "dont_pay",
+            "via": "ငွေမလွှဲ"
+          },
+          {
+            "id": "verify_trusted",
+            "via": "ယုံကြည်ရ"
+          },
+          {
+            "id": "call_hotline",
+            "via": "call action 1599"
+          }
+        ],
+        "missing": [
+          "dont_travel"
+        ],
+        "hotline": {
+          "offered": true,
+          "status": "verified",
+          "value": "1599"
+        },
+        "hallucinatedPhones": [],
+        "value": 0.75
+      },
+      "safety": {
+        "certainty": [],
+        "promises": [],
+        "maleForms": [],
+        "accusations": [],
+        "harmfulAdvice": [],
+        "englishLeak": [],
+        "score": 1
+      },
+      "comprehension": {
+        "languageOk": true,
+        "summaryChars": 147,
+        "summaryBudget": 380,
+        "longestSentence": 63,
+        "sentenceBudget": 190,
+        "spokenSeconds": 6.8,
+        "spokenCap": 9,
+        "jargon": [],
+        "score": 1
+      },
+      "robustness": {
+        "variants": [
+          {
+            "name": "repeat:1",
+            "kind": "repeat",
+            "verdict": "danger",
+            "score": 100,
+            "stable": true,
+            "change": "same",
+            "factRetention": 1,
+            "lostFacts": [],
+            "cached": true
+          },
+          {
+            "name": "repeat:2",
+            "kind": "repeat",
+            "verdict": "danger",
+            "score": 100,
+            "stable": true,
+            "change": "same",
+            "factRetention": 0.6666666666666666,
+            "lostFacts": [
+              "passport"
+            ],
+            "cached": true
+          }
+        ],
+        "value": 0.95
+      },
+      "repeats": {
+        "verdicts": [
+          "danger",
+          "danger",
+          "danger"
+        ],
+        "scores": [
+          100,
+          100,
+          100
+        ],
+        "agreement": 1,
+        "scoreStd": 0
+      },
+      "critical": [],
+      "uncapped": 89.3,
+      "composite": 89.3,
+      "output": {
+        "title": "သတိပေးလက္ခဏာ များစွာ တွေ့ရသည်: ခဏရပ်ပြီး စစ်ဆေးပါ",
+        "summary": "ဒီအလုပ်ကမ်းလှမ်းချက်မှာ လူကုန်ကူးမှုနဲ့ ဆက်နွှယ်နိုင်တဲ့ သတိပေးလက္ခဏာတချို့ တွေ့နေရပါတယ်။ မြဝတီနယ်စပ်မှာ အလုပ်လုပ်ဖို့ လစာကောင်းကောင်းနဲ့ အခမဲ့ခေါ်ဆိုနေပြီး Telegram ကို ပြောင်းခိုင်းနေပါတယ်။ ငွေမလွှဲပါနဲ့၊ ပတ်စပို့ကို သူများလက်ထဲ မပေးပါနဲ့ဦး။",
+        "spokenWarning": "ဒီအလုပ်ကမ်းလှမ်းချက်မှာ လူကုန်ကူးမှုနဲ့ ဆက်နွှယ်နိုင်တဲ့ သတိပေးလက္ခဏာတွေ တွေ့ရပါတယ်။ ငွေမလွှဲပါနဲ့၊ ယုံကြည်ရတဲ့သူနဲ့ အရင်တိုင်ပင်ပါ။",
+        "flags": [
+          {
+            "family": "too_good",
+            "label": "အတွေ့အကြုံမလိုဘဲ လစာများပြားခြင်းနှင့် အခမဲ့ကမ်းလှမ်းခြင်း",
+            "evidence": "လစာ ဘတ် ၃၅,၀၀၀ နှင့် ဘောနပ်စ်။ အတွေ့အကြုံ မလိုပါ။ ပတ်စပို့ မရှိလည်း ရပါတယ်။ ကားခ၊ စားစရိတ် အခမဲ့။",
+            "severity": "high",
+            "origin": "extract"
+          },
+          {
+            "family": "trafficking",
+            "label": "မြဝတီနယ်စပ်ရှိ ကုမ္ပဏီနှင့် သံသယဖြစ်ဖွယ် ခရီးစဉ်",
+            "evidence": "ထိုင်းနိုင်ငံ မြဝတီ-မဲဆောက် နယ်စပ်အနီးရှိ ကုမ္ပဏီ",
+            "severity": "high",
+            "origin": "extract"
+          },
+          {
+            "family": "pressure",
+            "label": "တယ်လီဂရမ်သို့ ပြောင်းရွှေ့ရန်နှင့် အချက်အမေး မလုပ်ရန် ဖိအားပေးခြင်း",
+            "evidence": "နာမည် မမေးပါနဲ့။ Telegram @mw_bright_jobs မှာ ဆက်သွယ်ပါ။",
+            "severity": "medium",
+            "origin": "extract"
+          }
+        ],
+        "actions": [
+          {
+            "label": "ဟော့လိုင်း ခေါ်ဆိုရန်",
+            "type": "call",
+            "value": "1599"
+          },
+          {
+            "label": "ပို့သူကို ပိတ်ပင်ပြီး တိုင်ကြားရန်",
+            "type": "block"
+          },
+          {
+            "label": "မိသားစု သို့မဟုတ် သူငယ်ချင်းကို သတိပေးရန်",
+            "type": "share"
+          },
+          {
+            "label": "ဤကဲ့သို့သော လိမ်လည်မှုများ လုပ်ပုံကို လေ့လာရန်",
+            "type": "learn",
+            "value": "job_trafficking"
+          }
+        ]
+      },
+      "runs": [
+        {
+          "verdict": "danger",
+          "score": 100,
+          "composite": 89,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "danger",
+          "score": 100,
+          "composite": 94.7,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "danger",
+          "score": 100,
+          "composite": 91.3,
+          "critical": [],
+          "invented": []
+        }
+      ],
+      "meanComposite": 91.7
+    },
+    {
+      "id": "legit-delivery-id",
+      "language": "id",
+      "app": "sms",
+      "scamType": "none",
+      "expected": "safe",
+      "legacy": false,
+      "latencyMs": 4714,
+      "verdict": "safe",
+      "score": 0,
+      "scamTypeOut": "none",
+      "calibration": {
+        "ordinalError": 0,
+        "inBand": true,
+        "band": [
+          0,
+          34
+        ],
+        "cost": 0,
+        "severeFalseReassurance": false,
+        "falseReassurance": false,
+        "falseAlarm": false,
+        "value": 1
+      },
+      "evidence": {
+        "quotes": 0,
+        "grounded": 0,
+        "invented": [],
+        "external": 1,
+        "value": null
+      },
+      "facts": {
+        "total": 1,
+        "hit": [
+          {
+            "id": "delivery_tomorrow",
+            "via": "paket"
+          }
+        ],
+        "missed": [],
+        "onlyInEvidence": [],
+        "invented": [],
+        "value": 1
+      },
+      "families": {
+        "expected": [],
+        "predicted": [
+          "identity"
+        ],
+        "tp": 0,
+        "fp": 1,
+        "fn": 0,
+        "value": 0.6666666666666667
+      },
+      "actionability": {
+        "required": [],
+        "advised": [],
+        "missing": [],
+        "hotline": {
+          "offered": false,
+          "status": "none"
+        },
+        "hallucinatedPhones": [],
+        "value": null
+      },
+      "safety": {
+        "certainty": [],
+        "promises": [],
+        "maleForms": [],
+        "accusations": [],
+        "harmfulAdvice": [],
+        "englishLeak": [],
+        "score": 1
+      },
+      "comprehension": {
+        "languageOk": true,
+        "summaryChars": 140,
+        "summaryBudget": 360,
+        "longestSentence": 98,
+        "sentenceBudget": 170,
+        "spokenSeconds": 7.7,
+        "spokenCap": 9,
+        "jargon": [],
+        "score": 1
+      },
+      "robustness": {
+        "variants": [
+          {
+            "name": "repeat:1",
+            "kind": "repeat",
+            "verdict": "safe",
+            "score": 0,
+            "stable": true,
+            "change": "same",
+            "factRetention": 1,
+            "lostFacts": [],
+            "cached": true
+          },
+          {
+            "name": "repeat:2",
+            "kind": "repeat",
+            "verdict": "safe",
+            "score": 0,
+            "stable": true,
+            "change": "same",
+            "factRetention": 1,
+            "lostFacts": [],
+            "cached": true
+          }
+        ],
+        "value": 1
+      },
+      "repeats": {
+        "verdicts": [
+          "safe",
+          "safe",
+          "safe"
+        ],
+        "scores": [
+          0,
+          0,
+          0
+        ],
+        "agreement": 1,
+        "scoreStd": 0
+      },
+      "critical": [],
+      "uncapped": 97.8,
+      "composite": 97.8,
+      "output": {
+        "title": "Kami tidak menemukan tanda bahaya besar",
+        "summary": "Pesan ini terlihat aman karena menyatakan bahwa tidak ada biaya tambahan atau permintaan kode OTP. Kami tidak menemukan tanda-tanda ancaman.",
+        "spokenWarning": "Pesan ini terlihat aman dan tidak meminta pembayaran apa pun. Tetap verifikasi jika Anda tidak merasa memesan paket.",
+        "flags": [
+          {
+            "family": "identity",
+            "label": "Kami tidak dapat menemukan catatan resmi perusahaan atau lisensi atas nama KilatKirim.",
+            "evidence": "Pencarian online tidak membuahkan hasil resmi mengenai entitas bernama KilatKirim.",
+            "severity": "low",
+            "origin": "ground"
+          }
+        ],
+        "actions": [
+          {
+            "label": "Pelajari cara kerja penipuan seperti ini",
+            "type": "learn",
+            "value": "scam_basics"
+          }
+        ]
+      },
+      "runs": [
+        {
+          "verdict": "safe",
+          "score": 0,
+          "composite": 97.6,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "safe",
+          "score": 0,
+          "composite": 97.6,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "safe",
+          "score": 0,
+          "composite": 97.6,
+          "critical": [],
+          "invented": []
+        }
+      ],
+      "meanComposite": 97.6
+    },
+    {
+      "id": "legit-family-tl",
+      "language": "tl",
+      "app": "chat",
+      "scamType": "none",
+      "expected": "safe",
+      "legacy": false,
+      "latencyMs": 2553,
+      "verdict": "safe",
+      "score": 0,
+      "scamTypeOut": "none",
+      "calibration": {
+        "ordinalError": 0,
+        "inBand": true,
+        "band": [
+          0,
+          34
+        ],
+        "cost": 0,
+        "severeFalseReassurance": false,
+        "falseReassurance": false,
+        "falseAlarm": false,
+        "value": 1
+      },
+      "evidence": {
+        "quotes": 0,
+        "grounded": 0,
+        "invented": [],
+        "external": 0,
+        "value": null
+      },
+      "facts": {
+        "total": 0,
+        "hit": [],
+        "missed": [],
+        "onlyInEvidence": [],
+        "invented": [],
+        "value": null
+      },
+      "families": {
+        "expected": [],
+        "predicted": [],
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "value": 1
+      },
+      "actionability": {
+        "required": [],
+        "advised": [],
+        "missing": [],
+        "hotline": {
+          "offered": false,
+          "status": "none"
+        },
+        "hallucinatedPhones": [],
+        "value": null
+      },
+      "safety": {
+        "certainty": [],
+        "promises": [],
+        "maleForms": [],
+        "accusations": [],
+        "harmfulAdvice": [],
+        "englishLeak": [],
+        "score": 1
+      },
+      "comprehension": {
+        "languageOk": true,
+        "summaryChars": 108,
+        "summaryBudget": 360,
+        "longestSentence": 108,
+        "sentenceBudget": 170,
+        "spokenSeconds": 5.4,
+        "spokenCap": 9,
+        "jargon": [],
+        "score": 1
+      },
+      "robustness": {
+        "variants": [
+          {
+            "name": "repeat:1",
+            "kind": "repeat",
+            "verdict": "safe",
+            "score": 0,
+            "stable": true,
+            "change": "same",
+            "factRetention": null,
+            "lostFacts": [],
+            "cached": true
+          },
+          {
+            "name": "repeat:2",
+            "kind": "repeat",
+            "verdict": "safe",
+            "score": 0,
+            "stable": true,
+            "change": "same",
+            "factRetention": null,
+            "lostFacts": [],
+            "cached": true
+          }
+        ],
+        "value": 1
+      },
+      "repeats": {
+        "verdicts": [
+          "safe",
+          "safe",
+          "safe"
+        ],
+        "scores": [
+          0,
+          0,
+          0
+        ],
+        "agreement": 1,
+        "scoreStd": 0
+      },
+      "critical": [],
+      "uncapped": 100,
+      "composite": 100,
+      "output": {
+        "title": "Wala kaming nakitang malaking babala",
+        "summary": "Wala kaming nakitang senyales ng panganib sa mensaheng ito dahil mukhang normal na pag-uusap ito ng pamilya.",
+        "spokenWarning": "Mukhang ligtas at normal ang pag-uusap na ito, ngunit maging maingat pa rin.",
+        "flags": [],
+        "actions": [
+          {
+            "label": "Alamin kung paano gumagana ang mga scam na tulad nito",
+            "type": "learn",
+            "value": "scam_basics"
+          }
+        ]
+      },
+      "runs": [
+        {
+          "verdict": "safe",
+          "score": 0,
+          "composite": 100,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "safe",
+          "score": 0,
+          "composite": 100,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "safe",
+          "score": 0,
+          "composite": 100,
+          "critical": [],
+          "invented": []
+        }
+      ],
+      "meanComposite": 100
+    },
+    {
+      "id": "legit-school-en",
+      "language": "en",
+      "app": "sms",
+      "scamType": "none",
+      "expected": "safe",
+      "legacy": false,
+      "latencyMs": 5603,
+      "verdict": "safe",
+      "score": 0,
+      "scamTypeOut": "none",
+      "calibration": {
+        "ordinalError": 0,
+        "inBand": true,
+        "band": [
+          0,
+          34
+        ],
+        "cost": 0,
+        "severeFalseReassurance": false,
+        "falseReassurance": false,
+        "falseAlarm": false,
+        "value": 1
+      },
+      "evidence": {
+        "quotes": 0,
+        "grounded": 0,
+        "invented": [],
+        "external": 0,
+        "value": null
+      },
+      "facts": {
+        "total": 1,
+        "hit": [
+          {
+            "id": "room_change",
+            "via": "class"
+          }
+        ],
+        "missed": [],
+        "onlyInEvidence": [],
+        "invented": [],
+        "value": 1
+      },
+      "families": {
+        "expected": [],
+        "predicted": [],
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "value": 1
+      },
+      "actionability": {
+        "required": [],
+        "advised": [],
+        "missing": [],
+        "hotline": {
+          "offered": false,
+          "status": "none"
+        },
+        "hallucinatedPhones": [],
+        "value": null
+      },
+      "safety": {
+        "certainty": [],
+        "promises": [],
+        "maleForms": [],
+        "accusations": [],
+        "harmfulAdvice": [],
+        "englishLeak": [],
+        "score": 1
+      },
+      "comprehension": {
+        "languageOk": true,
+        "summaryChars": 118,
+        "summaryBudget": 320,
+        "longestSentence": 69,
+        "sentenceBudget": 150,
+        "spokenSeconds": 5.9,
+        "spokenCap": 9,
+        "jargon": [],
+        "score": 1
+      },
+      "robustness": {
+        "variants": [
+          {
+            "name": "repeat:1",
+            "kind": "repeat",
+            "verdict": "safe",
+            "score": 0,
+            "stable": true,
+            "change": "same",
+            "factRetention": 1,
+            "lostFacts": [],
+            "cached": true
+          },
+          {
+            "name": "repeat:2",
+            "kind": "repeat",
+            "verdict": "safe",
+            "score": 0,
+            "stable": true,
+            "change": "same",
+            "factRetention": 1,
+            "lostFacts": [],
+            "cached": true
+          }
+        ],
+        "value": 1
+      },
+      "repeats": {
+        "verdicts": [
+          "safe",
+          "safe",
+          "safe"
+        ],
+        "scores": [
+          0,
+          0,
+          0
+        ],
+        "agreement": 1,
+        "scoreStd": 0
+      },
+      "critical": [],
+      "uncapped": 100,
+      "composite": 100,
+      "output": {
+        "title": "We found no major warning signs",
+        "summary": "We found no major warning signs in this message. It appears to be a normal notification about a class schedule change.",
+        "spokenWarning": "This message looks safe, but you can always check with the office if you want to be sure.",
+        "flags": [],
+        "actions": [
+          {
+            "label": "Learn how scams like this work",
+            "type": "learn",
+            "value": "scam_basics"
+          }
+        ]
+      },
+      "runs": [
+        {
+          "verdict": "safe",
+          "score": 0,
+          "composite": 100,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "safe",
+          "score": 0,
+          "composite": 100,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "safe",
+          "score": 0,
+          "composite": 100,
+          "critical": [],
+          "invented": []
+        }
+      ],
+      "meanComposite": 100
+    },
+    {
+      "id": "marketplace-th",
+      "language": "th",
+      "app": "marketplace",
+      "scamType": "marketplace_fraud",
+      "expected": "danger",
+      "legacy": false,
+      "latencyMs": 4065,
+      "verdict": "danger",
+      "score": 100,
+      "scamTypeOut": "marketplace_fraud",
+      "calibration": {
+        "ordinalError": 0,
+        "inBand": true,
+        "band": [
+          60,
+          100
+        ],
+        "cost": 0,
+        "severeFalseReassurance": false,
+        "falseReassurance": false,
+        "falseAlarm": false,
+        "value": 1
+      },
+      "evidence": {
+        "quotes": 3,
+        "grounded": 3,
+        "invented": [],
+        "external": 0,
+        "value": 1
+      },
+      "facts": {
+        "total": 4,
+        "hit": [
+          {
+            "id": "price",
+            "via": "ราคาถูก"
+          },
+          {
+            "id": "deposit",
+            "via": "มัดจำ"
+          },
+          {
+            "id": "personal_account",
+            "via": "บัญชีส่วนตัว"
+          },
+          {
+            "id": "off_platform",
+            "via": "เก็บเงินปลายทาง"
+          }
+        ],
+        "missed": [],
+        "onlyInEvidence": [],
+        "invented": [],
+        "value": 1
+      },
+      "families": {
+        "expected": [
+          "payment_route",
+          "pressure",
+          "too_good"
+        ],
+        "predicted": [
+          "payment_route",
+          "pressure",
+          "too_good"
+        ],
+        "tp": 3,
+        "fp": 0,
+        "fn": 0,
+        "value": 1
+      },
+      "actionability": {
+        "required": [
+          "dont_pay",
+          "verify_official"
+        ],
+        "advised": [
+          {
+            "id": "dont_pay",
+            "via": "อย่าเพิ่งโอน"
+          },
+          {
+            "id": "verify_official",
+            "via": "เก็บเงินปลายทาง"
+          }
+        ],
+        "missing": [],
+        "hotline": {
+          "offered": true,
+          "status": "verified",
+          "value": "1599"
+        },
+        "hallucinatedPhones": [],
+        "value": 1
+      },
+      "safety": {
+        "certainty": [],
+        "promises": [],
+        "maleForms": [],
+        "accusations": [],
+        "harmfulAdvice": [],
+        "englishLeak": [],
+        "score": 1
+      },
+      "comprehension": {
+        "languageOk": true,
+        "summaryChars": 148,
+        "summaryBudget": 280,
+        "longestSentence": 45,
+        "sentenceBudget": 140,
+        "spokenSeconds": 5.7,
+        "spokenCap": 9,
+        "jargon": [],
+        "score": 1
+      },
+      "robustness": {
+        "variants": [
+          {
+            "name": "repeat:1",
+            "kind": "repeat",
+            "verdict": "danger",
+            "score": 100,
+            "stable": true,
+            "change": "same",
+            "factRetention": 0.75,
+            "lostFacts": [
+              "off_platform"
+            ],
+            "cached": true
+          },
+          {
+            "name": "repeat:2",
+            "kind": "repeat",
+            "verdict": "danger",
+            "score": 100,
+            "stable": true,
+            "change": "same",
+            "factRetention": 0.5,
+            "lostFacts": [
+              "price",
+              "off_platform"
+            ],
+            "cached": true
+          }
+        ],
+        "value": 0.8875
+      },
+      "repeats": {
+        "verdicts": [
+          "danger",
+          "danger",
+          "danger"
+        ],
+        "scores": [
+          100,
+          100,
+          100
+        ],
+        "agreement": 1,
+        "scoreStd": 0
+      },
+      "critical": [],
+      "uncapped": 99.4,
+      "composite": 99.4,
+      "output": {
+        "title": "พบสัญญาณเตือนหลายอย่าง: โปรดหยุดและตรวจสอบก่อน",
+        "summary": "ประกาศขายสินค้านี้มีราคาถูกผิดปกติ บังคับให้โอนมัดจำเข้าบัญชีส่วนตัวก่อน และเร่งรัดเวลาให้รีบโอน ดูมีความเสี่ยงสูงที่จะเป็นการหลอกลวง โปรดอย่าเพิ่งโอนเงินและควรซื้อขายผ่านแพลตฟอร์มที่ปลอดภัย",
+        "spokenWarning": "ข้อเสนอนี้ดูมีความเสี่ยงสูงเนื่องจากราคาถูกมากและให้โอนเงินก่อน โปรดอย่าเพิ่งโอนเงินค่ะ",
+        "flags": [
+          {
+            "family": "too_good",
+            "label": "ราคาสินค้าถูกกว่าปกติมาก",
+            "evidence": "มือถือรุ่นท็อป สภาพ 99% ราคาแค่ 3,900 บาท (ปกติ 25,000)",
+            "severity": "high",
+            "origin": "extract"
+          },
+          {
+            "family": "payment_route",
+            "label": "บังคับโอนมัดจำเข้าบัญชีส่วนตัวและไม่รับเก็บเงินปลายทาง",
+            "evidence": "ไม่สะดวกนัดรับค่ะ ไม่รับเก็บเงินปลายทาง ไม่ผ่านแอป ต้องโอนมัดจำ 1,000 บาทเข้าบัญชีส่วนตัวก่อน",
+            "severity": "high",
+            "origin": "extract"
+          },
+          {
+            "family": "pressure",
+            "label": "เร่งรัดเวลาและสร้างความกดดันให้รีบโอน",
+            "evidence": "มีคนจองอีก 3 คน ถ้าไม่โอนภายใน 10 นาทีจะขายให้คนอื่น ทักไลน์ @deedee_mobile99",
+            "severity": "medium",
+            "origin": "extract"
+          }
+        ],
+        "actions": [
+          {
+            "label": "โทรสายด่วน",
+            "type": "call",
+            "value": "1599"
+          },
+          {
+            "label": "บล็อกและรายงานผู้ส่ง",
+            "type": "block"
+          },
+          {
+            "label": "เตือนครอบครัวหรือเพื่อน",
+            "type": "share"
+          },
+          {
+            "label": "เรียนรู้วิธีการทำงานของกลโกงแบบนี้",
+            "type": "learn",
+            "value": "marketplace_fraud"
+          }
+        ]
+      },
+      "runs": [
+        {
+          "verdict": "danger",
+          "score": 100,
+          "composite": 100,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "danger",
+          "score": 100,
+          "composite": 86.8,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "danger",
+          "score": 100,
+          "composite": 81.6,
+          "critical": [],
+          "invented": []
+        }
+      ],
+      "meanComposite": 89.5
+    },
+    {
+      "id": "my-hardneg-labour-notice",
+      "language": "my",
+      "app": "facebook",
+      "scamType": "none",
+      "expected": "safe",
+      "legacy": false,
+      "latencyMs": 5138,
+      "verdict": "safe",
+      "score": 0,
+      "scamTypeOut": "none",
+      "calibration": {
+        "ordinalError": 0,
+        "inBand": true,
+        "band": [
+          0,
+          40
+        ],
+        "cost": 0,
+        "severeFalseReassurance": false,
+        "falseReassurance": false,
+        "falseAlarm": false,
+        "value": 1
+      },
+      "evidence": {
+        "quotes": 0,
+        "grounded": 0,
+        "invented": [],
+        "external": 0,
+        "value": null
+      },
+      "facts": {
+        "total": 0,
+        "hit": [],
+        "missed": [],
+        "onlyInEvidence": [],
+        "invented": [],
+        "value": null
+      },
+      "families": {
+        "expected": [],
+        "predicted": [],
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "value": 1
+      },
+      "actionability": {
+        "required": [
+          "verify_official"
+        ],
+        "advised": [],
+        "missing": [
+          "verify_official"
+        ],
+        "hotline": {
+          "offered": false,
+          "status": "none"
+        },
+        "hallucinatedPhones": [],
+        "value": 0
+      },
+      "safety": {
+        "certainty": [],
+        "promises": [],
+        "maleForms": [],
+        "accusations": [],
+        "harmfulAdvice": [],
+        "englishLeak": [],
+        "score": 1
+      },
+      "comprehension": {
+        "languageOk": true,
+        "summaryChars": 33,
+        "summaryBudget": 380,
+        "longestSentence": 32,
+        "sentenceBudget": 190,
+        "spokenSeconds": 2.3,
+        "spokenCap": 9,
+        "jargon": [],
+        "score": 1
+      },
+      "robustness": {
+        "variants": [
+          {
+            "name": "repeat:1",
+            "kind": "repeat",
+            "verdict": "safe",
+            "score": 0,
+            "stable": true,
+            "change": "same",
+            "factRetention": null,
+            "lostFacts": [],
+            "cached": true
+          },
+          {
+            "name": "repeat:2",
+            "kind": "repeat",
+            "verdict": "safe",
+            "score": 0,
+            "stable": true,
+            "change": "same",
+            "factRetention": null,
+            "lostFacts": [],
+            "cached": true
+          }
+        ],
+        "value": 1
+      },
+      "repeats": {
+        "verdicts": [
+          "safe",
+          "safe",
+          "safe"
+        ],
+        "scores": [
+          0,
+          0,
+          0
+        ],
+        "agreement": 1,
+        "scoreStd": 0
+      },
+      "critical": [],
+      "uncapped": 78.6,
+      "composite": 78.6,
+      "output": {
+        "title": "အရေးကြီးသော သတိပေးချက် မတွေ့ရပါ",
+        "summary": "ဒီအသိပေးချက်မှာ သတိပေးလက္ခဏာ တစ်စုံတစ်ရာ မတွေ့ရပါ။",
+        "spokenWarning": "ဒီအသိပေးချက်မှာ သတိပေးလက္ခဏာ မတွေ့ရပါ။",
+        "flags": [],
+        "actions": [
+          {
+            "label": "ဤကဲ့သို့သော လိမ်လည်မှုများ လုပ်ပုံကို လေ့လာရန်",
+            "type": "learn",
+            "value": "scam_basics"
+          }
+        ]
+      },
+      "runs": [
+        {
+          "verdict": "safe",
+          "score": 0,
+          "composite": 76.9,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "safe",
+          "score": 0,
+          "composite": 100,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "safe",
+          "score": 0,
+          "composite": 76.9,
+          "critical": [],
+          "invented": []
+        }
+      ],
+      "meanComposite": 84.6
+    },
+    {
+      "id": "my-job-malaysia",
+      "language": "my",
+      "app": "viber",
+      "scamType": "fake_agency",
+      "expected": "danger",
+      "legacy": false,
+      "latencyMs": 8984,
+      "verdict": "danger",
+      "score": 100,
+      "scamTypeOut": "fake_agency",
+      "calibration": {
+        "ordinalError": 0,
+        "inBand": true,
+        "band": [
+          60,
+          100
+        ],
+        "cost": 0,
+        "severeFalseReassurance": false,
+        "falseReassurance": false,
+        "falseAlarm": false,
+        "value": 1
+      },
+      "evidence": {
+        "quotes": 4,
+        "grounded": 4,
+        "invented": [],
+        "external": 0,
+        "value": 1
+      },
+      "facts": {
+        "total": 4,
+        "hit": [
+          {
+            "id": "fee",
+            "via": "ဝန်ဆောင်ခ"
+          },
+          {
+            "id": "passport",
+            "via": "ပတ်စပို့"
+          },
+          {
+            "id": "personal_account",
+            "via": "ကိုယ်ပိုင်"
+          }
+        ],
+        "missed": [
+          "malaysia"
+        ],
+        "onlyInEvidence": [
+          "malaysia"
+        ],
+        "invented": [],
+        "value": 0.75
+      },
+      "families": {
+        "expected": [
+          "identity",
+          "payment_route",
+          "trafficking"
+        ],
+        "predicted": [
+          "identity",
+          "payment_route",
+          "pressure",
+          "too_good"
+        ],
+        "tp": 2,
+        "fp": 2,
+        "fn": 1,
+        "value": 0.5714285714285714
+      },
+      "actionability": {
+        "required": [
+          "dont_pay",
+          "dont_send_documents",
+          "verify_trusted",
+          "call_hotline"
+        ],
+        "advised": [
+          {
+            "id": "dont_pay",
+            "via": "ငွေမလွှဲ"
+          },
+          {
+            "id": "dont_send_documents",
+            "via": "/(?:ပတ်စ်?ပို့|ပါ့စပို့|နိုင်ငံကူးလက်မှတ်|စာရွက်စာတမ်း|မှတ်ပုံတင်).{0,40}မ(?:ပေး|ပို့|အပ်)/"
+          },
+          {
+            "id": "verify_trusted",
+            "via": "မိသားစု"
+          },
+          {
+            "id": "call_hotline",
+            "via": "call action 999"
+          }
+        ],
+        "missing": [],
+        "hotline": {
+          "offered": true,
+          "status": "verified",
+          "value": "999"
+        },
+        "hallucinatedPhones": [],
+        "value": 1
+      },
+      "safety": {
+        "certainty": [],
+        "promises": [],
+        "maleForms": [],
+        "accusations": [],
+        "harmfulAdvice": [],
+        "englishLeak": [],
+        "score": 1
+      },
+      "comprehension": {
+        "languageOk": true,
+        "summaryChars": 139,
+        "summaryBudget": 380,
+        "longestSentence": 72,
+        "sentenceBudget": 190,
+        "spokenSeconds": 5.3,
+        "spokenCap": 9,
+        "jargon": [],
+        "score": 1
+      },
+      "robustness": {
+        "variants": [
+          {
+            "name": "repeat:1",
+            "kind": "repeat",
+            "verdict": "danger",
+            "score": 100,
+            "stable": true,
+            "change": "same",
+            "factRetention": 0.6666666666666666,
+            "lostFacts": [
+              "fee"
+            ],
+            "cached": true
+          },
+          {
+            "name": "repeat:2",
+            "kind": "repeat",
+            "verdict": "danger",
+            "score": 100,
+            "stable": true,
+            "change": "same",
+            "factRetention": 0.6666666666666666,
+            "lostFacts": [
+              "fee"
+            ],
+            "cached": true
+          }
+        ],
+        "value": 0.8999999999999999
+      },
+      "repeats": {
+        "verdicts": [
+          "danger",
+          "danger",
+          "danger"
+        ],
+        "scores": [
+          100,
+          100,
+          100
+        ],
+        "agreement": 1,
+        "scoreStd": 0
+      },
+      "critical": [],
+      "uncapped": 92.4,
+      "composite": 92.4,
+      "output": {
+        "title": "သတိပေးလက္ခဏာ များစွာ တွေ့ရသည်: ခဏရပ်ပြီး စစ်ဆေးပါ",
+        "summary": "ဒီသတင်းစကားမှာ ဝန်ဆောင်ခကြိုတင်တောင်းခံတာ၊ ကိုယ်ပိုင်အကောင့်ကိုလွှဲခိုင်းတာနဲ့ ပတ်စပို့သိမ်းဆည်းမယ့် လက္ခဏာတွေ တွေ့ရပါတယ်။ ဒါဟာ အတုအယောင် အေဂျင်စီဖြစ်နိုင်ခြေရှိပြီး ငွေကြေးဆုံးရှုံးနိုင်ပါတယ်။ ငွေမလွှဲပါနဲ့၊ ပတ်စပို့လည်း မပေးပါနဲ့ရှင်။",
+        "spokenWarning": "ဒီအလုပ်ကမ်းလှမ်းချက်မှာ သတိပေးလက္ခဏာတွေ တွေ့ရပါတယ်။ ငွေမလွှဲပါနဲ့၊ ပတ်စပို့လည်း မပေးပါနဲ့ရှင်။",
+        "flags": [
+          {
+            "family": "too_good",
+            "label": "လစာနှင့် အခွင့်အလမ်း အလွန်ကောင်းမွန်ခြင်း",
+            "evidence": "မလေးရှား ဂျိုဟိုး စက်ရုံအလုပ်၊ လစာ ရင်းဂစ် ၂,၂၀၀။ ဗီဇာ အမြန်ရမယ်။",
+            "severity": "medium",
+            "origin": "extract"
+          },
+          {
+            "family": "payment_route",
+            "label": "ကိုယ်ပိုင်အကောင့်သို့ ကြိုတင်ငွေတောင်းခံခြင်း",
+            "evidence": "ဝန်ဆောင်ခ ကျပ် ၁,၈၀၀,၀၀၀ ကို ကျွန်တော့် ကိုယ်ပိုင်ဘဏ်အကောင့်ကို ဒီအပတ်ထဲ လွှဲပေးပါ။",
+            "severity": "high",
+            "origin": "extract"
+          },
+          {
+            "family": "pressure",
+            "label": "အခြားချတ်အက်ပ်သို့ ပြောင်းရွှေ့ရန်ပြောခြင်း",
+            "evidence": "Viber @aung_jobs_my မှာ ဆက်ပြောရအောင်။",
+            "severity": "medium",
+            "origin": "extract"
+          },
+          {
+            "family": "identity",
+            "label": "အမည်မသိ ကိုယ်စားလှယ်နှင့် ပတ်စပို့အပ်ခိုင်းခြင်း",
+            "evidence": "ပတ်စပို့ မူရင်းကိုလည်း ကျွန်ტော့်ဆီ အပ်ထားရမယ်။",
+            "severity": "high",
+            "origin": "extract"
+          }
+        ],
+        "actions": [
+          {
+            "label": "ဟော့လိုင်း ခေါ်ဆိုရန်",
+            "type": "call",
+            "value": "999"
+          },
+          {
+            "label": "ပို့သူကို ပိတ်ပင်ပြီး တိုင်ကြားရန်",
+            "type": "block"
+          },
+          {
+            "label": "မိသားစု သို့မဟုတ် သူငယ်ချင်းကို သတိပေးရန်",
+            "type": "share"
+          },
+          {
+            "label": "ဤကဲ့သို့သော လိမ်လည်မှုများ လုပ်ပုံကို လေ့လာရန်",
+            "type": "learn",
+            "value": "fake_agency"
+          }
+        ]
+      },
+      "runs": [
+        {
+          "verdict": "danger",
+          "score": 100,
+          "composite": 92.5,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "danger",
+          "score": 100,
+          "composite": 86.1,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "danger",
+          "score": 100,
+          "composite": 88.2,
+          "critical": [],
+          "invented": []
+        }
+      ],
+      "meanComposite": 88.9
+    },
+    {
+      "id": "my-legit-family-money",
+      "language": "my",
+      "app": "chat",
+      "scamType": "none",
+      "expected": "safe",
+      "legacy": false,
+      "latencyMs": 2838,
+      "verdict": "safe",
+      "score": 0,
+      "scamTypeOut": "none",
+      "calibration": {
+        "ordinalError": 0,
+        "inBand": true,
+        "band": [
+          0,
+          34
+        ],
+        "cost": 0,
+        "severeFalseReassurance": false,
+        "falseReassurance": false,
+        "falseAlarm": false,
+        "value": 1
+      },
+      "evidence": {
+        "quotes": 0,
+        "grounded": 0,
+        "invented": [],
+        "external": 0,
+        "value": null
+      },
+      "facts": {
+        "total": 0,
+        "hit": [],
+        "missed": [],
+        "onlyInEvidence": [],
+        "invented": [],
+        "value": null
+      },
+      "families": {
+        "expected": [],
+        "predicted": [],
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "value": 1
+      },
+      "actionability": {
+        "required": [],
+        "advised": [],
+        "missing": [],
+        "hotline": {
+          "offered": false,
+          "status": "none"
+        },
+        "hallucinatedPhones": [],
+        "value": null
+      },
+      "safety": {
+        "certainty": [],
+        "promises": [],
+        "maleForms": [],
+        "accusations": [],
+        "harmfulAdvice": [],
+        "englishLeak": [],
+        "score": 1
+      },
+      "comprehension": {
+        "languageOk": true,
+        "summaryChars": 58,
+        "summaryBudget": 380,
+        "longestSentence": 34,
+        "sentenceBudget": 190,
+        "spokenSeconds": 2.1,
+        "spokenCap": 9,
+        "jargon": [],
+        "score": 1
+      },
+      "robustness": {
+        "variants": [
+          {
+            "name": "repeat:1",
+            "kind": "repeat",
+            "verdict": "safe",
+            "score": 0,
+            "stable": true,
+            "change": "same",
+            "factRetention": null,
+            "lostFacts": [],
+            "cached": true
+          },
+          {
+            "name": "repeat:2",
+            "kind": "repeat",
+            "verdict": "safe",
+            "score": 0,
+            "stable": true,
+            "change": "same",
+            "factRetention": null,
+            "lostFacts": [],
+            "cached": true
+          }
+        ],
+        "value": 1
+      },
+      "repeats": {
+        "verdicts": [
+          "safe",
+          "safe",
+          "safe"
+        ],
+        "scores": [
+          0,
+          0,
+          0
+        ],
+        "agreement": 1,
+        "scoreStd": 0
+      },
+      "critical": [],
+      "uncapped": 100,
+      "composite": 100,
+      "output": {
+        "title": "အရေးကြီးသော သတိပေးချက် မတွေ့ရပါ",
+        "summary": "ဒီမက်ဆေ့ခ်ျမှာ သံသယဖြစ်ဖွယ် လက္ခဏာ တစ်စုံတစ်ရာ မတွေ့ရပါ။ ပုံမှန် မိသားစုပြောဆိုမှုဖြစ်ပုံရပါတယ်။",
+        "spokenWarning": "ဒီမက်ဆေ့ခ်ျမှာ သတိပေးလက္ခဏာ မတွေ့ရပါ။",
+        "flags": [],
+        "actions": [
+          {
+            "label": "ဤကဲ့သို့သော လိမ်လည်မှုများ လုပ်ပုံကို လေ့လာရန်",
+            "type": "learn",
+            "value": "scam_basics"
+          }
+        ]
+      },
+      "runs": [
+        {
+          "verdict": "safe",
+          "score": 0,
+          "composite": 100,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "safe",
+          "score": 0,
+          "composite": 100,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "safe",
+          "score": 0,
+          "composite": 100,
+          "critical": [],
+          "invented": []
+        }
+      ],
+      "meanComposite": 100
+    },
+    {
+      "id": "my-romance-usdt",
+      "language": "my",
+      "app": "facebook",
+      "scamType": "romance_pig_butchering",
+      "expected": "danger",
+      "legacy": false,
+      "latencyMs": 4424,
+      "verdict": "danger",
+      "score": 100,
+      "scamTypeOut": "romance_pig_butchering",
+      "calibration": {
+        "ordinalError": 0,
+        "inBand": true,
+        "band": [
+          65,
+          100
+        ],
+        "cost": 0,
+        "severeFalseReassurance": false,
+        "falseReassurance": false,
+        "falseAlarm": false,
+        "value": 1
+      },
+      "evidence": {
+        "quotes": 4,
+        "grounded": 4,
+        "invented": [],
+        "external": 0,
+        "value": 1
+      },
+      "facts": {
+        "total": 3,
+        "hit": [
+          {
+            "id": "top_up",
+            "via": "500"
+          },
+          {
+            "id": "guaranteed_profit",
+            "via": "10%"
+          },
+          {
+            "id": "link",
+            "via": "လင့်"
+          }
+        ],
+        "missed": [],
+        "onlyInEvidence": [],
+        "invented": [],
+        "value": 1
+      },
+      "families": {
+        "expected": [
+          "identity",
+          "payment_route",
+          "pressure",
+          "too_good"
+        ],
+        "predicted": [
+          "link_risk",
+          "payment_route",
+          "pressure",
+          "too_good"
+        ],
+        "tp": 3,
+        "fp": 1,
+        "fn": 1,
+        "value": 0.75
+      },
+      "actionability": {
+        "required": [
+          "dont_pay",
+          "dont_click_link",
+          "verify_trusted"
+        ],
+        "advised": [
+          {
+            "id": "dont_click_link",
+            "via": "မနှိပ်"
+          },
+          {
+            "id": "verify_trusted",
+            "via": "မိသားစု"
+          }
+        ],
+        "missing": [
+          "dont_pay"
+        ],
+        "hotline": {
+          "offered": true,
+          "status": "verified",
+          "value": "+9567412555"
+        },
+        "hallucinatedPhones": [],
+        "value": 0.6666666666666666
+      },
+      "safety": {
+        "certainty": [],
+        "promises": [],
+        "maleForms": [],
+        "accusations": [],
+        "harmfulAdvice": [],
+        "englishLeak": [],
+        "score": 1
+      },
+      "comprehension": {
+        "languageOk": true,
+        "summaryChars": 114,
+        "summaryBudget": 380,
+        "longestSentence": 91,
+        "sentenceBudget": 190,
+        "spokenSeconds": 4.6,
+        "spokenCap": 9,
+        "jargon": [],
+        "score": 1
+      },
+      "robustness": {
+        "variants": [
+          {
+            "name": "repeat:1",
+            "kind": "repeat",
+            "verdict": "danger",
+            "score": 91,
+            "stable": true,
+            "change": "same",
+            "factRetention": 0.6666666666666666,
+            "lostFacts": [
+              "top_up"
+            ],
+            "cached": true
+          },
+          {
+            "name": "repeat:2",
+            "kind": "repeat",
+            "verdict": "danger",
+            "score": 72,
+            "stable": true,
+            "change": "same",
+            "factRetention": 0.6666666666666666,
+            "lostFacts": [
+              "top_up"
+            ],
+            "cached": true
+          }
+        ],
+        "value": 0.8999999999999999
+      },
+      "repeats": {
+        "verdicts": [
+          "danger",
+          "danger",
+          "danger"
+        ],
+        "scores": [
+          100,
+          91,
+          72
+        ],
+        "agreement": 1,
+        "scoreStd": 11.671427600007732
+      },
+      "critical": [],
+      "uncapped": 93.3,
+      "composite": 93.3,
+      "output": {
+        "title": "သတိပေးလက္ခဏာ များစွာ တွေ့ရသည်: ခဏရပ်ပြီး စစ်ဆေးပါ",
+        "summary": "ဒီမက်ဆေ့ခ်ျမှာ ရင်းနှီးမြှုပ်နှံမှုအတွက် အမြတ်အစွန်းအလွန်အမင်းများပြားတာ၊ လျှို့ဝှက်ခိုင်းတာနဲ့ ငွေထည့်ခိုင်းတာတွေ တွေ့ရတဲ့အတွက် အလွန်အမင်း သတိထားသင့်ပါတယ်။ ငွေမထည့်ပါနဲ့၊ လင့်ခ်ကို မနှိပ်ပါနဲ့။",
+        "spokenWarning": "ဒီမက်ဆေ့ခ်ျမှာ သံသယဖြစ်ဖွယ် ရင်းနှီးမြှုပ်နှံမှု အချက်ပြမှုတွေ တွေ့ရပါတယ်။ ငွေမထည့်ပါနဲ့ရှင်။",
+        "flags": [
+          {
+            "family": "too_good",
+            "label": "တစ်ရက် ၁၀% အမြတ် အမခံတယ်",
+            "evidence": "တစ်ရက် ၁၀% အမြတ် အမခံတယ်",
+            "severity": "high",
+            "origin": "extract"
+          },
+          {
+            "family": "pressure",
+            "label": "ဘာယ်သူ့ကိုမှ မပြောပါနဲ့",
+            "evidence": "ဘာယ်သူ့ကိုမှ မပြောပါနဲ့",
+            "severity": "medium",
+            "origin": "extract"
+          },
+          {
+            "family": "payment_route",
+            "label": "USDT ၅၀၀ ထည့်ကြည့်ပါ",
+            "evidence": "USDT ၅၀၀ ထည့်ကြည့်ပါ",
+            "severity": "high",
+            "origin": "extract"
+          },
+          {
+            "family": "link_risk",
+            "label": "သံသယဖြစ်ဖွယ် လင့်ခ်ပါရှိခြင်း",
+            "evidence": "https://usdt-goldlink.example/join",
+            "severity": "medium",
+            "origin": "extract"
+          }
+        ],
+        "actions": [
+          {
+            "label": "ဟော့လိုင်း ခေါ်ဆိုရန်",
+            "type": "call",
+            "value": "+9567412555"
+          },
+          {
+            "label": "ပို့သူကို ပိတ်ပင်ပြီး တိုင်ကြားရန်",
+            "type": "block"
+          },
+          {
+            "label": "မိသားစု သို့မဟုတ် သူငယ်ချင်းကို သတိပေးရန်",
+            "type": "share"
+          },
+          {
+            "label": "ဤကဲ့သို့သော လိမ်လည်မှုများ လုပ်ပုံကို လေ့လာရန်",
+            "type": "learn",
+            "value": "romance_pig_butchering"
+          }
+        ]
+      },
+      "runs": [
+        {
+          "verdict": "danger",
+          "score": 100,
+          "composite": 93.4,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "danger",
+          "score": 91,
+          "composite": 81.1,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "danger",
+          "score": 72,
+          "composite": 85.5,
+          "critical": [],
+          "invented": []
+        }
+      ],
+      "meanComposite": 86.7
+    },
+    {
+      "id": "parcel-id",
+      "language": "id",
+      "app": "sms",
+      "scamType": "parcel_phishing",
+      "expected": "danger",
+      "legacy": false,
+      "latencyMs": 4476,
+      "verdict": "danger",
+      "score": 86,
+      "scamTypeOut": "parcel_phishing",
+      "calibration": {
+        "ordinalError": 0,
+        "inBand": true,
+        "band": [
+          60,
+          100
+        ],
+        "cost": 0,
+        "severeFalseReassurance": false,
+        "falseReassurance": false,
+        "falseAlarm": false,
+        "value": 1
+      },
+      "evidence": {
+        "quotes": 3,
+        "grounded": 3,
+        "invented": [],
+        "external": 1,
+        "value": 1
+      },
+      "facts": {
+        "total": 3,
+        "hit": [
+          {
+            "id": "fee",
+            "via": "biaya"
+          },
+          {
+            "id": "link",
+            "via": "tautan"
+          },
+          {
+            "id": "deadline",
+            "via": "batas waktu"
+          }
+        ],
+        "missed": [],
+        "onlyInEvidence": [],
+        "invented": [],
+        "value": 1
+      },
+      "families": {
+        "expected": [
+          "link_risk",
+          "payment_route",
+          "pressure"
+        ],
+        "predicted": [
+          "identity",
+          "link_risk",
+          "payment_route",
+          "pressure"
+        ],
+        "tp": 3,
+        "fp": 1,
+        "fn": 0,
+        "value": 0.8571428571428571
+      },
+      "actionability": {
+        "required": [
+          "dont_click_link",
+          "dont_pay",
+          "verify_official"
+        ],
+        "advised": [
+          {
+            "id": "dont_click_link",
+            "via": "/jangan (?:\\S+ ){0,2}(?:klik|buka|membuka|tekan|tap|ketuk)/"
+          },
+          {
+            "id": "verify_official",
+            "via": "resmi"
+          }
+        ],
+        "missing": [
+          "dont_pay"
+        ],
+        "hotline": {
+          "offered": true,
+          "status": "verified",
+          "value": "110"
+        },
+        "hallucinatedPhones": [],
+        "value": 0.6666666666666666
+      },
+      "safety": {
+        "certainty": [],
+        "promises": [],
+        "maleForms": [],
+        "accusations": [],
+        "harmfulAdvice": [],
+        "englishLeak": [],
+        "score": 1
+      },
+      "comprehension": {
+        "languageOk": true,
+        "summaryChars": 221,
+        "summaryBudget": 360,
+        "longestSentence": 138,
+        "sentenceBudget": 170,
+        "spokenSeconds": 5.2,
+        "spokenCap": 9,
+        "jargon": [],
+        "score": 1
+      },
+      "robustness": {
+        "variants": [
+          {
+            "name": "repeat:1",
+            "kind": "repeat",
+            "verdict": "danger",
+            "score": 70,
+            "stable": true,
+            "change": "same",
+            "factRetention": 1,
+            "lostFacts": [],
+            "cached": true
+          },
+          {
+            "name": "repeat:2",
+            "kind": "repeat",
+            "verdict": "danger",
+            "score": 96,
+            "stable": true,
+            "change": "same",
+            "factRetention": 1,
+            "lostFacts": [],
+            "cached": true
+          }
+        ],
+        "value": 1
+      },
+      "repeats": {
+        "verdicts": [
+          "danger",
+          "danger",
+          "danger"
+        ],
+        "scores": [
+          86,
+          70,
+          96
+        ],
+        "agreement": 1,
+        "scoreStd": 10.708252269472673
+      },
+      "critical": [],
+      "uncapped": 94.3,
+      "composite": 94.3,
+      "output": {
+        "title": "Banyak tanda bahaya: berhenti dulu dan periksa",
+        "summary": "Pesan ini menunjukkan beberapa tanda peringatan seperti permintaan biaya kecil dan tautan yang mencurigakan dengan batas waktu yang cepat. Pesan ini mirip dengan pola penipuan kurir. Sebaiknya jangan klik tautan tersebut.",
+        "spokenWarning": "Pesan ini meminta biaya dan memiliki batas waktu. Harap jangan klik tautannya.",
+        "flags": [
+          {
+            "family": "pressure",
+            "label": "Tenggat waktu yang mendesak",
+            "evidence": "dalam 2 jam",
+            "severity": "medium",
+            "origin": "extract"
+          },
+          {
+            "family": "payment_route",
+            "label": "Permintaan biaya pengiriman",
+            "evidence": "Bayar biaya pengiriman ulang Rp 12.500",
+            "severity": "medium",
+            "origin": "extract"
+          },
+          {
+            "family": "link_risk",
+            "label": "Tautan yang mencurigakan",
+            "evidence": "https://kilatkirim-ongkir.example/bayar",
+            "severity": "high",
+            "origin": "extract"
+          },
+          {
+            "family": "identity",
+            "label": "Kami tidak dapat menemukan catatan resmi untuk perusahaan atau entitas KilatKirim.",
+            "evidence": "Hasil pencarian tidak menunjukkan adanya perusahaan resmi dengan nama tersebut.",
+            "severity": "low",
+            "origin": "ground"
+          }
+        ],
+        "actions": [
+          {
+            "label": "Hubungi hotline",
+            "type": "call",
+            "value": "110"
+          },
+          {
+            "label": "Blokir dan laporkan pengirim",
+            "type": "block"
+          },
+          {
+            "label": "Peringatkan keluarga atau teman",
+            "type": "share"
+          },
+          {
+            "label": "Pelajari cara kerja penipuan seperti ini",
+            "type": "learn",
+            "value": "parcel_phishing"
+          }
+        ]
+      },
+      "runs": [
+        {
+          "verdict": "danger",
+          "score": 86,
+          "composite": 94,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "danger",
+          "score": 70,
+          "composite": 94,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "danger",
+          "score": 96,
+          "composite": 94.7,
+          "critical": [],
+          "invented": []
+        }
+      ],
+      "meanComposite": 94.2
+    },
+    {
+      "id": "parcel-tl",
+      "language": "tl",
+      "app": "sms",
+      "scamType": "parcel_phishing",
+      "expected": "danger",
+      "legacy": false,
+      "latencyMs": 4084,
+      "verdict": "danger",
+      "score": 86,
+      "scamTypeOut": "parcel_phishing",
+      "calibration": {
+        "ordinalError": 0,
+        "inBand": true,
+        "band": [
+          60,
+          100
+        ],
+        "cost": 0,
+        "severeFalseReassurance": false,
+        "falseReassurance": false,
+        "falseAlarm": false,
+        "value": 1
+      },
+      "evidence": {
+        "quotes": 3,
+        "grounded": 3,
+        "invented": [],
+        "external": 1,
+        "value": 1
+      },
+      "facts": {
+        "total": 3,
+        "hit": [
+          {
+            "id": "fee",
+            "via": "bayad"
+          },
+          {
+            "id": "link",
+            "via": "link"
+          }
+        ],
+        "missed": [
+          "deadline"
+        ],
+        "onlyInEvidence": [
+          "deadline"
+        ],
+        "invented": [],
+        "value": 0.6666666666666666
+      },
+      "families": {
+        "expected": [
+          "link_risk",
+          "payment_route",
+          "pressure"
+        ],
+        "predicted": [
+          "identity",
+          "link_risk",
+          "payment_route",
+          "pressure"
+        ],
+        "tp": 3,
+        "fp": 1,
+        "fn": 0,
+        "value": 0.8571428571428571
+      },
+      "actionability": {
+        "required": [
+          "dont_click_link",
+          "dont_pay",
+          "verify_official"
+        ],
+        "advised": [
+          {
+            "id": "dont_click_link",
+            "via": "/(?:huwag|wag) (?:\\S+ ){0,2}(?:i click|pindutin|buksan|i tap)/"
+          },
+          {
+            "id": "dont_pay",
+            "via": "/(?:huwag|wag) (?:\\S+ ){0,2}(?:magbayad|magpadala ng pera|mag transfer|maglipat)/"
+          },
+          {
+            "id": "verify_official",
+            "via": "opisyal"
+          }
+        ],
+        "missing": [],
+        "hotline": {
+          "offered": true,
+          "status": "verified",
+          "value": "1343"
+        },
+        "hallucinatedPhones": [],
+        "value": 1
+      },
+      "safety": {
+        "certainty": [],
+        "promises": [],
+        "maleForms": [],
+        "accusations": [],
+        "harmfulAdvice": [],
+        "englishLeak": [],
+        "score": 1
+      },
+      "comprehension": {
+        "languageOk": true,
+        "summaryChars": 217,
+        "summaryBudget": 360,
+        "longestSentence": 175,
+        "sentenceBudget": 170,
+        "spokenSeconds": 6.4,
+        "spokenCap": 9,
+        "jargon": [
+          "phishing",
+          "phishing"
+        ],
+        "score": 0.8941176470588236
+      },
+      "robustness": {
+        "variants": [
+          {
+            "name": "repeat:1",
+            "kind": "repeat",
+            "verdict": "danger",
+            "score": 86,
+            "stable": true,
+            "change": "same",
+            "factRetention": 1,
+            "lostFacts": [],
+            "cached": true
+          },
+          {
+            "name": "repeat:2",
+            "kind": "repeat",
+            "verdict": "danger",
+            "score": 86,
+            "stable": true,
+            "change": "same",
+            "factRetention": 1,
+            "lostFacts": [],
+            "cached": true
+          }
+        ],
+        "value": 1
+      },
+      "repeats": {
+        "verdicts": [
+          "danger",
+          "danger",
+          "danger"
+        ],
+        "scores": [
+          86,
+          86,
+          86
+        ],
+        "agreement": 1,
+        "scoreStd": 0
+      },
+      "critical": [],
+      "uncapped": 92.1,
+      "composite": 92.1,
+      "output": {
+        "title": "Maraming babala: huminto muna at mag-verify",
+        "summary": "Ang mensaheng ito ay nagpapakita ng mga palatandaan ng parcel phishing: humihingi ito ng maliit na bayad at nagbibigay ng maikling oras gamit ang isang hindi pamilyar na link. Huwag i-click ang link at huwag magbayad.",
+        "spokenWarning": "Nagpapakita ito ng mga senyales ng phishing sa parsela. Huwag i-click ang link o magbayad.",
+        "flags": [
+          {
+            "family": "pressure",
+            "label": "Maikling oras sa pagbabayad",
+            "evidence": "sa loob ng 24 oras",
+            "severity": "medium",
+            "origin": "extract"
+          },
+          {
+            "family": "payment_route",
+            "label": "Humihingi ng bayad para sa redelivery",
+            "evidence": "Magbayad ng ₱45 na redelivery fee",
+            "severity": "medium",
+            "origin": "extract"
+          },
+          {
+            "family": "link_risk",
+            "label": "Kahina-hinalang link para sa pagbabayad",
+            "evidence": "https://bilispadala-redeliver.example/ph",
+            "severity": "high",
+            "origin": "extract"
+          },
+          {
+            "family": "identity",
+            "label": "Hindi namin mahanap ang opisyal na rekord o lisensya para sa kumpanyang ito.",
+            "evidence": "Walang balidong impormasyon tungkol sa BilisPadala at sa domain na bilispadala-redeliver.example.",
+            "severity": "low",
+            "origin": "ground"
+          }
+        ],
+        "actions": [
+          {
+            "label": "Tawagan ang hotline",
+            "type": "call",
+            "value": "1343"
+          },
+          {
+            "label": "I-block at i-report ang nagpadala",
+            "type": "block"
+          },
+          {
+            "label": "Balaan ang pamilya o kaibigan",
+            "type": "share"
+          },
+          {
+            "label": "Alamin kung paano gumagana ang mga scam na tulad nito",
+            "type": "learn",
+            "value": "parcel_phishing"
+          }
+        ]
+      },
+      "runs": [
+        {
+          "verdict": "danger",
+          "score": 86,
+          "composite": 91.7,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "danger",
+          "score": 86,
+          "composite": 91.7,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "danger",
+          "score": 86,
+          "composite": 91.7,
+          "critical": [],
+          "invented": []
+        }
+      ],
+      "meanComposite": 91.7
+    },
+    {
+      "id": "romance-en",
+      "language": "en",
+      "app": "chat",
+      "scamType": "romance_pig_butchering",
+      "expected": "danger",
+      "legacy": false,
+      "latencyMs": 3651,
+      "verdict": "danger",
+      "score": 100,
+      "scamTypeOut": "romance_pig_butchering",
+      "calibration": {
+        "ordinalError": 0,
+        "inBand": true,
+        "band": [
+          65,
+          100
+        ],
+        "cost": 0,
+        "severeFalseReassurance": false,
+        "falseReassurance": false,
+        "falseAlarm": false,
+        "value": 1
+      },
+      "evidence": {
+        "quotes": 5,
+        "grounded": 5,
+        "invented": [],
+        "external": 0,
+        "value": 1
+      },
+      "facts": {
+        "total": 4,
+        "hit": [
+          {
+            "id": "guaranteed_profit",
+            "via": "guaranteed"
+          },
+          {
+            "id": "top_up",
+            "via": "top up"
+          },
+          {
+            "id": "link",
+            "via": "link"
+          },
+          {
+            "id": "wrong_number_opening",
+            "via": "wrong number"
+          }
+        ],
+        "missed": [],
+        "onlyInEvidence": [],
+        "invented": [],
+        "value": 1
+      },
+      "families": {
+        "expected": [
+          "identity",
+          "payment_route",
+          "pressure",
+          "too_good"
+        ],
+        "predicted": [
+          "identity",
+          "link_risk",
+          "payment_route",
+          "pressure",
+          "too_good"
+        ],
+        "tp": 4,
+        "fp": 1,
+        "fn": 0,
+        "value": 0.8888888888888888
+      },
+      "actionability": {
+        "required": [
+          "dont_pay",
+          "dont_click_link",
+          "verify_trusted"
+        ],
+        "advised": [
+          {
+            "id": "dont_pay",
+            "via": "/(?:don t|do not|never|avoid) (?:\\S+ ){0,5}(?:pay|send (?:any )?money|transfer|top up|deposit)/"
+          },
+          {
+            "id": "dont_click_link",
+            "via": "/(?:don t|do not|never|avoid) (?:\\S+ ){0,5}(?:click|tap|open|press|visit)\\b/"
+          }
+        ],
+        "missing": [
+          "verify_trusted"
+        ],
+        "hotline": {
+          "offered": true,
+          "status": "verified",
+          "value": "1343"
+        },
+        "hallucinatedPhones": [],
+        "value": 0.6666666666666666
+      },
+      "safety": {
+        "certainty": [],
+        "promises": [],
+        "maleForms": [],
+        "accusations": [],
+        "harmfulAdvice": [],
+        "englishLeak": [],
+        "score": 1
+      },
+      "comprehension": {
+        "languageOk": true,
+        "summaryChars": 271,
+        "summaryBudget": 320,
+        "longestSentence": 142,
+        "sentenceBudget": 150,
+        "spokenSeconds": 6.2,
+        "spokenCap": 9,
+        "jargon": [],
+        "score": 1
+      },
+      "robustness": {
+        "variants": [
+          {
+            "name": "repeat:1",
+            "kind": "repeat",
+            "verdict": "danger",
+            "score": 100,
+            "stable": true,
+            "change": "same",
+            "factRetention": 1,
+            "lostFacts": [],
+            "cached": true
+          },
+          {
+            "name": "repeat:2",
+            "kind": "repeat",
+            "verdict": "danger",
+            "score": 100,
+            "stable": true,
+            "change": "same",
+            "factRetention": 1,
+            "lostFacts": [],
+            "cached": true
+          }
+        ],
+        "value": 1
+      },
+      "repeats": {
+        "verdicts": [
+          "danger",
+          "danger",
+          "danger"
+        ],
+        "scores": [
+          100,
+          100,
+          100
+        ],
+        "agreement": 1,
+        "scoreStd": 0
+      },
+      "critical": [],
+      "uncapped": 94.4,
+      "composite": 94.4,
+      "output": {
+        "title": "Many warning signs: please pause and check first",
+        "summary": "This conversation matches a common pattern of a romance investment scam, starting with a wrong number and moving to guaranteed crypto profits. It asks you to top up money through an unverified link with urgency and secrecy. Please do not send any money or click the link.",
+        "spokenWarning": "This message shows several warning signs of an investment scam. Please do not send any money.",
+        "flags": [
+          {
+            "family": "identity",
+            "label": "Wrong-number opening message",
+            "evidence": "Hi Maria, sorry, wrong number!",
+            "severity": "medium",
+            "origin": "extract"
+          },
+          {
+            "family": "too_good",
+            "label": "Guaranteed daily profit claim",
+            "evidence": "gives 8% profit every day, guaranteed",
+            "severity": "high",
+            "origin": "extract"
+          },
+          {
+            "family": "payment_route",
+            "label": "Top-up requirement",
+            "evidence": "top up USD 500 here",
+            "severity": "high",
+            "origin": "extract"
+          },
+          {
+            "family": "link_risk",
+            "label": "Unfamiliar platform link",
+            "evidence": "https://brightcoin-pro.example/join",
+            "severity": "high",
+            "origin": "extract"
+          },
+          {
+            "family": "pressure",
+            "label": "Urgency and secrecy",
+            "evidence": "The bonus ends tonight, don't tell anyone yet.",
+            "severity": "medium",
+            "origin": "extract"
+          }
+        ],
+        "actions": [
+          {
+            "label": "Call hotline",
+            "type": "call",
+            "value": "1343"
+          },
+          {
+            "label": "Block and report this sender",
+            "type": "block"
+          },
+          {
+            "label": "Warn family or friends",
+            "type": "share"
+          },
+          {
+            "label": "Learn how scams like this work",
+            "type": "learn",
+            "value": "romance_pig_butchering"
+          }
+        ]
+      },
+      "runs": [
+        {
+          "verdict": "danger",
+          "score": 100,
+          "composite": 94.2,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "danger",
+          "score": 100,
+          "composite": 94.1,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "danger",
+          "score": 100,
+          "composite": 94.2,
+          "critical": [],
+          "invented": []
+        }
+      ],
+      "meanComposite": 94.2
+    },
+    {
+      "id": "romance-th",
+      "language": "th",
+      "app": "chat",
+      "scamType": "romance_pig_butchering",
+      "expected": "danger",
+      "legacy": false,
+      "latencyMs": 4459,
+      "verdict": "danger",
+      "score": 100,
+      "scamTypeOut": "romance_pig_butchering",
+      "calibration": {
+        "ordinalError": 0,
+        "inBand": true,
+        "band": [
+          65,
+          100
+        ],
+        "cost": 0,
+        "severeFalseReassurance": false,
+        "falseReassurance": false,
+        "falseAlarm": false,
+        "value": 1
+      },
+      "evidence": {
+        "quotes": 4,
+        "grounded": 4,
+        "invented": [],
+        "external": 0,
+        "value": 1
+      },
+      "facts": {
+        "total": 4,
+        "hit": [
+          {
+            "id": "guaranteed_profit",
+            "via": "รับประกัน"
+          },
+          {
+            "id": "account",
+            "via": "บัญชี"
+          },
+          {
+            "id": "secrecy",
+            "via": "เป็นความลับ"
+          }
+        ],
+        "missed": [
+          "top_up"
+        ],
+        "onlyInEvidence": [
+          "top_up"
+        ],
+        "invented": [],
+        "value": 0.75
+      },
+      "families": {
+        "expected": [
+          "identity",
+          "payment_route",
+          "pressure",
+          "too_good"
+        ],
+        "predicted": [
+          "identity",
+          "payment_route",
+          "pressure",
+          "too_good"
+        ],
+        "tp": 4,
+        "fp": 0,
+        "fn": 0,
+        "value": 1
+      },
+      "actionability": {
+        "required": [
+          "dont_pay",
+          "verify_trusted",
+          "block_report"
+        ],
+        "advised": [
+          {
+            "id": "dont_pay",
+            "via": "อย่าโอน"
+          },
+          {
+            "id": "verify_trusted",
+            "via": "ไว้ใจ"
+          },
+          {
+            "id": "block_report",
+            "via": "block action"
+          }
+        ],
+        "missing": [],
+        "hotline": {
+          "offered": true,
+          "status": "verified",
+          "value": "1599"
+        },
+        "hallucinatedPhones": [],
+        "value": 1
+      },
+      "safety": {
+        "certainty": [],
+        "promises": [],
+        "maleForms": [],
+        "accusations": [],
+        "harmfulAdvice": [],
+        "englishLeak": [],
+        "score": 1
+      },
+      "comprehension": {
+        "languageOk": true,
+        "summaryChars": 167,
+        "summaryBudget": 280,
+        "longestSentence": 50,
+        "sentenceBudget": 140,
+        "spokenSeconds": 4.9,
+        "spokenCap": 9,
+        "jargon": [],
+        "score": 1
+      },
+      "robustness": {
+        "variants": [
+          {
+            "name": "repeat:1",
+            "kind": "repeat",
+            "verdict": "danger",
+            "score": 100,
+            "stable": true,
+            "change": "same",
+            "factRetention": 0.6666666666666666,
+            "lostFacts": [
+              "secrecy"
+            ],
+            "cached": true
+          },
+          {
+            "name": "repeat:2",
+            "kind": "repeat",
+            "verdict": "danger",
+            "score": 100,
+            "stable": true,
+            "change": "same",
+            "factRetention": 1,
+            "lostFacts": [],
+            "cached": true
+          }
+        ],
+        "value": 0.95
+      },
+      "repeats": {
+        "verdicts": [
+          "danger",
+          "danger",
+          "danger"
+        ],
+        "scores": [
+          100,
+          100,
+          100
+        ],
+        "agreement": 1,
+        "scoreStd": 0
+      },
+      "critical": [],
+      "uncapped": 94.8,
+      "composite": 94.8,
+      "output": {
+        "title": "พบสัญญาณเตือนหลายอย่าง: โปรดหยุดและตรวจสอบก่อน",
+        "summary": "ข้อความนี้แสดงสัญญาณเตือนของกลโกงลงทุนผสมโรแมนติก เริ่มจากการทักผิดคน ชวนคุย แล้วชวนลงทุนผลตอบแทนสูงให้โอนเงินเข้าบัญชีส่วนตัวและเร่งให้รีบทำ อาการแบบนี้มีความเสี่ยงสูง โปรดอย่าโอนเงินและปรึกษาคนที่คุณไว้ใจ",
+        "spokenWarning": "ข้อความนี้อาจมีความเสี่ยง โปรดอย่าโอนเงินหรือลงทุน และปรึกษาคนที่ไว้ใจก่อน",
+        "flags": [
+          {
+            "family": "identity",
+            "label": "ทักผิดคนแล้วเริ่มตีสนิท",
+            "evidence": "สวัสดีค่ะ ขอโทษที่ทักผิดคนนะคะ แต่โปรไฟล์คุณดูใจดีมาก",
+            "severity": "medium",
+            "origin": "extract"
+          },
+          {
+            "family": "too_good",
+            "label": "ผลตอบแทนสูงรับประกันไม่ขาดทุน",
+            "evidence": "ลุงของฉันมีแอปเทรดทองชื่อ GoldWave Asia ได้กำไรวันละ 5% รับประกันไม่ขาดทุน",
+            "severity": "high",
+            "origin": "extract"
+          },
+          {
+            "family": "payment_route",
+            "label": "ให้โอนเงินเข้าบัญชีส่วนตัว",
+            "evidence": "ลองเติมเงิน 10,000 บาทก่อนนะคะ โอนเข้าบัญชีพี่เลี้ยงของเรา เลขบัญชี 123-4-56789-0",
+            "severity": "high",
+            "origin": "extract"
+          },
+          {
+            "family": "pressure",
+            "label": "เร่งรัดและให้ปิดเป็นความลับ",
+            "evidence": "โปรหมดคืนนี้ อย่าบอกใครนะ",
+            "severity": "medium",
+            "origin": "extract"
+          }
+        ],
+        "actions": [
+          {
+            "label": "โทรสายด่วน",
+            "type": "call",
+            "value": "1599"
+          },
+          {
+            "label": "บล็อกและรายงานผู้ส่ง",
+            "type": "block"
+          },
+          {
+            "label": "เตือนครอบครัวหรือเพื่อน",
+            "type": "share"
+          },
+          {
+            "label": "เรียนรู้วิธีการทำงานของกลโกงแบบนี้",
+            "type": "learn",
+            "value": "romance_pig_butchering"
+          }
+        ]
+      },
+      "runs": [
+        {
+          "verdict": "danger",
+          "score": 100,
+          "composite": 94.7,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "danger",
+          "score": 100,
+          "composite": 94.7,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "danger",
+          "score": 100,
+          "composite": 100,
+          "critical": [],
+          "invented": []
+        }
+      ],
+      "meanComposite": 96.5
+    },
+    {
+      "id": "th-hardneg-bank",
+      "language": "th",
+      "app": "sms",
+      "scamType": "none",
+      "expected": "safe",
+      "legacy": false,
+      "latencyMs": 5357,
+      "verdict": "safe",
+      "score": 9,
+      "scamTypeOut": "none",
+      "calibration": {
+        "ordinalError": 0,
+        "inBand": true,
+        "band": [
+          0,
+          40
+        ],
+        "cost": 0,
+        "severeFalseReassurance": false,
+        "falseReassurance": false,
+        "falseAlarm": false,
+        "value": 1
+      },
+      "evidence": {
+        "quotes": 0,
+        "grounded": 0,
+        "invented": [],
+        "external": 1,
+        "value": null
+      },
+      "facts": {
+        "total": 0,
+        "hit": [],
+        "missed": [],
+        "onlyInEvidence": [],
+        "invented": [],
+        "value": null
+      },
+      "families": {
+        "expected": [],
+        "predicted": [
+          "identity"
+        ],
+        "tp": 0,
+        "fp": 1,
+        "fn": 0,
+        "value": 0.6666666666666667
+      },
+      "actionability": {
+        "required": [
+          "verify_official"
+        ],
+        "advised": [],
+        "missing": [
+          "verify_official"
+        ],
+        "hotline": {
+          "offered": false,
+          "status": "none"
+        },
+        "hallucinatedPhones": [],
+        "value": 0
+      },
+      "safety": {
+        "certainty": [],
+        "promises": [],
+        "maleForms": [],
+        "accusations": [],
+        "harmfulAdvice": [],
+        "englishLeak": [],
+        "score": 1
+      },
+      "comprehension": {
+        "languageOk": true,
+        "summaryChars": 105,
+        "summaryBudget": 280,
+        "longestSentence": 105,
+        "sentenceBudget": 140,
+        "spokenSeconds": 5.8,
+        "spokenCap": 9,
+        "jargon": [],
+        "score": 1
+      },
+      "robustness": {
+        "variants": [
+          {
+            "name": "repeat:1",
+            "kind": "repeat",
+            "verdict": "safe",
+            "score": 9,
+            "stable": true,
+            "change": "same",
+            "factRetention": null,
+            "lostFacts": [],
+            "cached": true
+          },
+          {
+            "name": "repeat:2",
+            "kind": "repeat",
+            "verdict": "safe",
+            "score": 9,
+            "stable": true,
+            "change": "same",
+            "factRetention": null,
+            "lostFacts": [],
+            "cached": true
+          }
+        ],
+        "value": 1
+      },
+      "repeats": {
+        "verdicts": [
+          "safe",
+          "safe",
+          "safe"
+        ],
+        "scores": [
+          9,
+          9,
+          9
+        ],
+        "agreement": 1,
+        "scoreStd": 0
+      },
+      "critical": [],
+      "uncapped": 76.2,
+      "composite": 76.2,
+      "output": {
+        "title": "เราไม่พบสัญญาณเตือนสำคัญ",
+        "summary": "ข้อความนี้ดูเหมือนจะเป็นประกาศเตือนภัยทั่วไปจากธนาคารเกี่ยวกับนโยบายความปลอดภัยและรหัส OTP เราไม่พบสัญญาณเตือนที่น่าสงสัยในภาพนี้",
+        "spokenWarning": "ข้อความนี้เป็นประกาศเตือนภัยจากธนาคาร โปรดตรวจสอบความถูกต้องและระมัดระวังเสมอค่ะ",
+        "flags": [
+          {
+            "family": "identity",
+            "label": "เราไม่พบข้อมูลการมีอยู่หรือใบอนุญาตของธนาคารสายรุ้ง",
+            "evidence": "เราไม่พบข้อมูลการมีอยู่หรือใบอนุญาตของธนาคารสายรุ้งจากแหล่งข้อมูลทางการ",
+            "severity": "low",
+            "origin": "ground"
+          }
+        ],
+        "actions": [
+          {
+            "label": "เรียนรู้วิธีการทำงานของกลโกงแบบนี้",
+            "type": "learn",
+            "value": "scam_basics"
+          }
+        ]
+      },
+      "runs": [
+        {
+          "verdict": "safe",
+          "score": 9,
+          "composite": 74.4,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "safe",
+          "score": 9,
+          "composite": 74.4,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "safe",
+          "score": 9,
+          "composite": 74.4,
+          "critical": [],
+          "invented": []
+        }
+      ],
+      "meanComposite": 74.4
+    },
+    {
+      "id": "th-job-poipet",
+      "language": "th",
+      "app": "line",
+      "scamType": "job_trafficking",
+      "expected": "danger",
+      "legacy": false,
+      "latencyMs": 3065,
+      "verdict": "danger",
+      "score": 100,
+      "scamTypeOut": "job_trafficking",
+      "calibration": {
+        "ordinalError": 0,
+        "inBand": true,
+        "band": [
+          70,
+          100
+        ],
+        "cost": 0,
+        "severeFalseReassurance": false,
+        "falseReassurance": false,
+        "falseAlarm": false,
+        "value": 1
+      },
+      "evidence": {
+        "quotes": 3,
+        "grounded": 3,
+        "invented": [],
+        "external": 0,
+        "value": 1
+      },
+      "facts": {
+        "total": 4,
+        "hit": [
+          {
+            "id": "poipet",
+            "via": "ปอยเปต"
+          },
+          {
+            "id": "documents",
+            "via": "พาสปอร์ต"
+          }
+        ],
+        "missed": [
+          "salary",
+          "handle"
+        ],
+        "onlyInEvidence": [
+          "salary"
+        ],
+        "invented": [],
+        "value": 0.5
+      },
+      "families": {
+        "expected": [
+          "identity",
+          "pressure",
+          "too_good",
+          "trafficking"
+        ],
+        "predicted": [
+          "pressure",
+          "too_good",
+          "trafficking"
+        ],
+        "tp": 3,
+        "fp": 0,
+        "fn": 1,
+        "value": 0.8571428571428571
+      },
+      "actionability": {
+        "required": [
+          "dont_send_documents",
+          "dont_travel",
+          "verify_trusted",
+          "call_hotline"
+        ],
+        "advised": [
+          {
+            "id": "dont_send_documents",
+            "via": "/(?:อย่า|ไม่ควร).{0,12}(?:ส่ง|ให้|มอบ).{0,24}(?:พาสปอร์ต|หนังสือเดินทาง|เอกสาร|บัตรประชาชน|รูป)/"
+          },
+          {
+            "id": "verify_trusted",
+            "via": "ไว้ใจ"
+          },
+          {
+            "id": "call_hotline",
+            "via": "call action 1288"
+          }
+        ],
+        "missing": [
+          "dont_travel"
+        ],
+        "hotline": {
+          "offered": true,
+          "status": "verified",
+          "value": "1288"
+        },
+        "hallucinatedPhones": [],
+        "value": 0.75
+      },
+      "safety": {
+        "certainty": [],
+        "promises": [],
+        "maleForms": [],
+        "accusations": [],
+        "harmfulAdvice": [],
+        "englishLeak": [],
+        "score": 1
+      },
+      "comprehension": {
+        "languageOk": true,
+        "summaryChars": 156,
+        "summaryBudget": 280,
+        "longestSentence": 44,
+        "sentenceBudget": 140,
+        "spokenSeconds": 5.6,
+        "spokenCap": 9,
+        "jargon": [],
+        "score": 1
+      },
+      "robustness": {
+        "variants": [
+          {
+            "name": "repeat:1",
+            "kind": "repeat",
+            "verdict": "danger",
+            "score": 100,
+            "stable": true,
+            "change": "same",
+            "factRetention": 0.5,
+            "lostFacts": [
+              "documents"
+            ],
+            "cached": true
+          },
+          {
+            "name": "repeat:2",
+            "kind": "repeat",
+            "verdict": "danger",
+            "score": 100,
+            "stable": true,
+            "change": "same",
+            "factRetention": 0.5,
+            "lostFacts": [
+              "documents"
+            ],
+            "cached": true
+          }
+        ],
+        "value": 0.8499999999999999
+      },
+      "repeats": {
+        "verdicts": [
+          "danger",
+          "danger",
+          "danger"
+        ],
+        "scores": [
+          100,
+          100,
+          100
+        ],
+        "agreement": 1,
+        "scoreStd": 0
+      },
+      "critical": [],
+      "uncapped": 84.8,
+      "composite": 84.8,
+      "output": {
+        "title": "พบสัญญาณเตือนหลายอย่าง: โปรดหยุดและตรวจสอบก่อน",
+        "summary": "ข้อเสนอนี้มีสัญญาณเตือนหลายอย่างที่อาจเข้าข่ายการค้ามนุษย์ เช่น งานแอดมินเงินเดือนสูงในปอยเปต ข้ามแดนโดยไม่มีใบอนุญาต และบอกให้ปิดบังครอบครัว อย่าเพิ่งส่งเอกสารหรือเดินทาง และปรึกษาคนที่คุณไว้ใจ",
+        "spokenWarning": "ข้อเสนอนี้อาจมีความเสี่ยง โปรดอย่าเพิ่งส่งพาสปอร์ตหรือเดินทาง และปรึกษาคนที่ไว้ใจก่อน",
+        "flags": [
+          {
+            "family": "too_good",
+            "label": "เงินเดือนสูงมากโดยไม่ต้องมีประสบการณ์",
+            "evidence": "เงินเดือน 50,000 บาท ไม่ต้องมีประสบการณ์",
+            "severity": "high",
+            "origin": "extract"
+          },
+          {
+            "family": "pressure",
+            "label": "เร่งรัดและปิดบังครอบครัว",
+            "evidence": "พรุ่งนี้มีรถไปรับที่อรัญประเทศ ข้ามแดนให้ ไม่ต้องทำใบอนุญาตทำงาน... ไม่ต้องบอกที่บ้านนะ",
+            "severity": "high",
+            "origin": "extract"
+          },
+          {
+            "family": "trafficking",
+            "label": "งานต่างประเทศข้ามแดนโดยไม่มีใบอนุญาตและไปปอยเปต",
+            "evidence": "ทำงานที่ปอยเปต กัมพูชา... ข้ามแดนให้ ไม่ต้องทำใบอนุญาตทำงาน",
+            "severity": "high",
+            "origin": "extract"
+          }
+        ],
+        "actions": [
+          {
+            "label": "โทรสายด่วน",
+            "type": "call",
+            "value": "1288"
+          },
+          {
+            "label": "บล็อกและรายงานผู้ส่ง",
+            "type": "block"
+          },
+          {
+            "label": "เตือนครอบครัวหรือเพื่อน",
+            "type": "share"
+          },
+          {
+            "label": "เรียนรู้วิธีการทำงานของกลโกงแบบนี้",
+            "type": "learn",
+            "value": "job_trafficking"
+          }
+        ]
+      },
+      "runs": [
+        {
+          "verdict": "danger",
+          "score": 100,
+          "composite": 84.8,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "danger",
+          "score": 100,
+          "composite": 84.2,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "danger",
+          "score": 100,
+          "composite": 79.5,
+          "critical": [],
+          "invented": []
+        }
+      ],
+      "meanComposite": 82.8
+    },
+    {
+      "id": "th-parcel-fee",
+      "language": "th",
+      "app": "sms",
+      "scamType": "parcel_phishing",
+      "expected": "danger",
+      "legacy": false,
+      "latencyMs": 4055,
+      "verdict": "danger",
+      "score": 96,
+      "scamTypeOut": "parcel_phishing",
+      "calibration": {
+        "ordinalError": 0,
+        "inBand": true,
+        "band": [
+          60,
+          100
+        ],
+        "cost": 0,
+        "severeFalseReassurance": false,
+        "falseReassurance": false,
+        "falseAlarm": false,
+        "value": 1
+      },
+      "evidence": {
+        "quotes": 3,
+        "grounded": 3,
+        "invented": [],
+        "external": 0,
+        "value": 1
+      },
+      "facts": {
+        "total": 3,
+        "hit": [
+          {
+            "id": "fee",
+            "via": "ค่าจัดส่ง"
+          },
+          {
+            "id": "link",
+            "via": "ลิงก์"
+          },
+          {
+            "id": "deadline",
+            "via": "เร่ง"
+          }
+        ],
+        "missed": [],
+        "onlyInEvidence": [],
+        "invented": [],
+        "value": 1
+      },
+      "families": {
+        "expected": [
+          "link_risk",
+          "payment_route",
+          "pressure"
+        ],
+        "predicted": [
+          "link_risk",
+          "payment_route",
+          "pressure"
+        ],
+        "tp": 3,
+        "fp": 0,
+        "fn": 0,
+        "value": 1
+      },
+      "actionability": {
+        "required": [
+          "dont_click_link",
+          "dont_pay",
+          "verify_official"
+        ],
+        "advised": [
+          {
+            "id": "dont_click_link",
+            "via": "อย่าคลิก"
+          },
+          {
+            "id": "dont_pay",
+            "via": "อย่าโอน"
+          }
+        ],
+        "missing": [
+          "verify_official"
+        ],
+        "hotline": {
+          "offered": true,
+          "status": "verified",
+          "value": "1599"
+        },
+        "hallucinatedPhones": [],
+        "value": 0.6666666666666666
+      },
+      "safety": {
+        "certainty": [],
+        "promises": [],
+        "maleForms": [],
+        "accusations": [],
+        "harmfulAdvice": [],
+        "englishLeak": [],
+        "score": 1
+      },
+      "comprehension": {
+        "languageOk": true,
+        "summaryChars": 147,
+        "summaryBudget": 280,
+        "longestSentence": 49,
+        "sentenceBudget": 140,
+        "spokenSeconds": 4.3,
+        "spokenCap": 9,
+        "jargon": [],
+        "score": 1
+      },
+      "robustness": {
+        "variants": [
+          {
+            "name": "repeat:1",
+            "kind": "repeat",
+            "verdict": "danger",
+            "score": 96,
+            "stable": true,
+            "change": "same",
+            "factRetention": 1,
+            "lostFacts": [],
+            "cached": true
+          },
+          {
+            "name": "repeat:2",
+            "kind": "repeat",
+            "verdict": "danger",
+            "score": 77,
+            "stable": true,
+            "change": "same",
+            "factRetention": 1,
+            "lostFacts": [],
+            "cached": true
+          }
+        ],
+        "value": 1
+      },
+      "repeats": {
+        "verdicts": [
+          "danger",
+          "danger",
+          "danger"
+        ],
+        "scores": [
+          96,
+          96,
+          77
+        ],
+        "agreement": 1,
+        "scoreStd": 8.956685895029603
+      },
+      "critical": [],
+      "uncapped": 95,
+      "composite": 95,
+      "output": {
+        "title": "พบสัญญาณเตือนหลายอย่าง: โปรดหยุดและตรวจสอบก่อน",
+        "summary": "ข้อความนี้ดูเหมือนมีความเสี่ยงเนื่องจากอ้างว่าเป็นบริษัทขนส่ง ขอให้จ่ายเงินเพิ่มเล็กน้อยและเร่งรัดเวลาพร้อมแนบลิงก์แปลกปลอม อาจมีความเสี่ยงที่จะถูกขโมยข้อมูล โปรดอย่าคลิกลิงก์และอย่าโอนเงิน",
+        "spokenWarning": "ข้อความนี้อาจมีความเสี่ยงเรื่องพัสดุ โปรดอย่าคลิกลิงก์และอย่าชำระเงิน",
+        "flags": [
+          {
+            "family": "pressure",
+            "label": "เร่งรัดเวลา",
+            "evidence": "ภายใน 12 ชั่วโมง",
+            "severity": "medium",
+            "origin": "extract"
+          },
+          {
+            "family": "payment_route",
+            "label": "ขอให้ชำระเงินค่าจัดส่งเพิ่มเติม",
+            "evidence": "กรุณาชำระค่าจัดส่งเพิ่ม 39 บาท",
+            "severity": "high",
+            "origin": "extract"
+          },
+          {
+            "family": "link_risk",
+            "label": "ลิงก์เว็บไซต์ที่น่าสงสัย",
+            "evidence": "https://thaispeed-redeliver.example/th",
+            "severity": "high",
+            "origin": "extract"
+          }
+        ],
+        "actions": [
+          {
+            "label": "โทรสายด่วน",
+            "type": "call",
+            "value": "1599"
+          },
+          {
+            "label": "บล็อกและรายงานผู้ส่ง",
+            "type": "block"
+          },
+          {
+            "label": "เตือนครอบครัวหรือเพื่อน",
+            "type": "share"
+          },
+          {
+            "label": "เรียนรู้วิธีการทำงานของกลโกงแบบนี้",
+            "type": "learn",
+            "value": "parcel_phishing"
+          }
+        ]
+      },
+      "runs": [
+        {
+          "verdict": "danger",
+          "score": 96,
+          "composite": 94.7,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "danger",
+          "score": 96,
+          "composite": 94.7,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "danger",
+          "score": 77,
+          "composite": 100,
+          "critical": [],
+          "invented": []
+        }
+      ],
+      "meanComposite": 96.5
+    },
+    {
+      "id": "tl-hardneg-advisory",
+      "language": "tl",
+      "app": "chat",
+      "scamType": "none",
+      "expected": "safe",
+      "legacy": false,
+      "latencyMs": 3110,
+      "verdict": "safe",
+      "score": 0,
+      "scamTypeOut": "none",
+      "calibration": {
+        "ordinalError": 0,
+        "inBand": true,
+        "band": [
+          0,
+          40
+        ],
+        "cost": 0,
+        "severeFalseReassurance": false,
+        "falseReassurance": false,
+        "falseAlarm": false,
+        "value": 1
+      },
+      "evidence": {
+        "quotes": 0,
+        "grounded": 0,
+        "invented": [],
+        "external": 0,
+        "value": null
+      },
+      "facts": {
+        "total": 0,
+        "hit": [],
+        "missed": [],
+        "onlyInEvidence": [],
+        "invented": [],
+        "value": null
+      },
+      "families": {
+        "expected": [],
+        "predicted": [],
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "value": 1
+      },
+      "actionability": {
+        "required": [
+          "verify_official"
+        ],
+        "advised": [],
+        "missing": [
+          "verify_official"
+        ],
+        "hotline": {
+          "offered": false,
+          "status": "none"
+        },
+        "hallucinatedPhones": [],
+        "value": 0
+      },
+      "safety": {
+        "certainty": [],
+        "promises": [],
+        "maleForms": [],
+        "accusations": [],
+        "harmfulAdvice": [],
+        "englishLeak": [],
+        "score": 1
+      },
+      "comprehension": {
+        "languageOk": true,
+        "summaryChars": 146,
+        "summaryBudget": 360,
+        "longestSentence": 108,
+        "sentenceBudget": 170,
+        "spokenSeconds": 4.8,
+        "spokenCap": 9,
+        "jargon": [],
+        "score": 1
+      },
+      "robustness": {
+        "variants": [
+          {
+            "name": "repeat:1",
+            "kind": "repeat",
+            "verdict": "safe",
+            "score": 0,
+            "stable": true,
+            "change": "same",
+            "factRetention": null,
+            "lostFacts": [],
+            "cached": true
+          },
+          {
+            "name": "repeat:2",
+            "kind": "repeat",
+            "verdict": "safe",
+            "score": 0,
+            "stable": true,
+            "change": "same",
+            "factRetention": null,
+            "lostFacts": [],
+            "cached": true
+          }
+        ],
+        "value": 1
+      },
+      "repeats": {
+        "verdicts": [
+          "safe",
+          "safe",
+          "safe"
+        ],
+        "scores": [
+          0,
+          0,
+          0
+        ],
+        "agreement": 1,
+        "scoreStd": 0
+      },
+      "critical": [],
+      "uncapped": 78.6,
+      "composite": 78.6,
+      "output": {
+        "title": "Wala kaming nakitang malaking babala",
+        "summary": "Mukhang normal at ligtas ang pag-usapan ng mag-pinsان tungkol sa paalala ng gobyerno sa mga migrant workers. Walang nakitang senyales ng panganib.",
+        "spokenWarning": "Mukhang wala kaming nakitang senyales ng panganib sa mensaheng ito.",
+        "flags": [],
+        "actions": [
+          {
+            "label": "Alamin kung paano gumagana ang mga scam na tulad nito",
+            "type": "learn",
+            "value": "scam_basics"
+          }
+        ]
+      },
+      "runs": [
+        {
+          "verdict": "safe",
+          "score": 0,
+          "composite": 76.9,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "safe",
+          "score": 0,
+          "composite": 76.9,
+          "critical": [],
+          "invented": []
+        },
+        {
+          "verdict": "safe",
+          "score": 0,
+          "composite": 76.9,
+          "critical": [],
+          "invented": []
+        }
+      ],
+      "meanComposite": 76.9
+    }
+  ]
+}

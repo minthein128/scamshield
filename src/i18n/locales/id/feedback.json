@@ -1,0 +1,48 @@
+{
+  "_meta": {
+    "reviewed": false
+  },
+  "row": {
+    "label": "Apakah ini benar?",
+    "thanks": "Terima kasih atas masukannya",
+    "up": "Ya, ini benar",
+    "down": "Tidak, ini salah",
+    "failed": "Gagal mengirim. Coba lagi nanti."
+  },
+  "sheet": {
+    "titleRisky": "Tentang apa ini?",
+    "titleSafe": "Penipuan jenis apa ini?",
+    "pick": "Pilih yang paling sesuai.",
+    "sendBody": "Jawaban Anda membantu kami memperingatkan orang lain dengan lebih tepat. Tulisan Anda tidak akan dikirimkan.",
+    "itWasSafe": "Menurut saya ini aman",
+    "different": "Menurut saya ini penipuan jenis lain",
+    "optional": "Opsional. Jawaban Anda membantu kami mengenalinya di lain waktu.",
+    "scam": "Menurut saya ini penipuan",
+    "send": "Kirim"
+  },
+  "choices": {
+    "job_trafficking": "Lowongan kerja luar negeri",
+    "romance_pig_butchering": "Asmara atau kripto",
+    "parcel_phishing": "Paket atau tautan biaya",
+    "fake_agency": "Penyalur tenaga kerja",
+    "marketplace_fraud": "Toko online",
+    "investment": "Investasi atau tugas",
+    "other": "Lainnya"
+  },
+  "reportScam": {
+    "title": "Laporkan penipuan",
+    "intro": "Ceritakan penipuan yang Anda lihat. Kami menghapus nama, nomor, dan tautan sebelum disimpan, dan ini membantu memperingatkan orang lain.",
+    "shareNote": "Mengirim laporan ini akan membagikan polanya tanpa nama Anda untuk mengingatkan orang lain, meskipun fitur berbagi dimatikan di Pengaturan.",
+    "textLabel": "Tempel teks atau chat",
+    "textA11y": "Teks atau chat penipuan",
+    "placeholder": "Pesan, lowongan kerja, atau chat",
+    "screenshotLabel": "Atau tangkapan layar",
+    "kindLabel": "Penipuan jenis apa ini?",
+    "lostLabel": "Apakah Anda kehilangan uang? (opsional)",
+    "yes": "Ya",
+    "no": "Tidak",
+    "lostNote": "Cukup ya atau tidak. Kami tidak pernah menanyakan jumlahnya.",
+    "submit": "Kirim laporan",
+    "source": "Laporan penipuan"
+  }
+}

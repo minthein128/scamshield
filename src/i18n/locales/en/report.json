@@ -1,0 +1,68 @@
+{
+  "seen_one": "Reported {{count}} time by other SafeRoute users in the last 30 days",
+  "seen_other": "Reported {{count}} times by other SafeRoute users in the last 30 days",
+  "title": "Risk report",
+  "a11yVerdict": "{{verdict}}. Step {{step}} of 3.",
+  "warn": "Warn my family",
+  "call": "Call {{number}}",
+  "callExt": "then ask for local {{ext}}",
+  "help": "Get help",
+  "share": "Share this warning",
+  "flagsRisky": "Warning signs we found",
+  "flagsSafe": "What we noticed",
+  "sources": "Sources we checked",
+  "linkChecks": "Link checks",
+  "actions": "What you can do",
+  "severity": {
+    "high": "Serious sign",
+    "medium": "Worth checking",
+    "low": "Minor sign"
+  },
+  "domainAge_one": "Domain age: {{count}} day",
+  "domainAge_other": "Domain age: {{count}} days",
+  "domainAgeUnknown": "Domain age unknown",
+  "webRisk": {
+    "clean": "No known threats",
+    "malware": "Malware warning",
+    "social_engineering": "Phishing or deception warning",
+    "unwanted_software": "Unwanted software warning",
+    "unknown": "Not checked"
+  },
+  "block": {
+    "title": "Block the sender",
+    "withValue": "Block {{value}} in the app where you found it.",
+    "generic": "Block and report the sender in the app where you found it."
+  },
+  "shareMessage": "SafeRoute check: {{title}}\n{{summary}}\nRisk score {{score}}/100.",
+  "warnMessage": "SafeRoute warning ({{verdict}}): {{title}}. {{summary}} Please do not pay money or send documents. Call me first.",
+  "thanks": "Thanks, this helps protect others",
+  "attention": {
+    "word": {
+      "lower": "Fewer signs",
+      "verify": "Check first",
+      "pause": "Pause"
+    },
+    "headline": {
+      "lower": "Few warning signs found, but important details may still be missing",
+      "verify": "Some details do not add up, check them before you go",
+      "pause": "Pause before you pay, send documents or travel"
+    },
+    "note": {
+      "lower": "A result like this cannot show that an offer is real. Please still check the details before you pay, send documents or travel.",
+      "verify": "Please ask the recruiter to clear up the points below, in writing, before you go on."
+    }
+  },
+  "conflicts": {
+    "title": "What doesn't match",
+    "adSays": "The ad says",
+    "chatSays": "The chat says",
+    "adNoDocuments": "The ad does not mention documents",
+    "adNotMentioned": "The ad does not mention this"
+  },
+  "unclear": {
+    "title": "Still unclear"
+  },
+  "findings": {
+    "title": "What we could and could not confirm"
+  }
+}

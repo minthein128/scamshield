@@ -1,0 +1,7 @@
+{
+  "name": "live-audio",
+  "platforms": ["android"],
+  "android": {
+    "modules": ["com.saferoute.liveaudio.LiveAudioModule"]
+  }
+}

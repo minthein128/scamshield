@@ -1,0 +1,29 @@
+id: legit-family-tl
+file: ../public/v2/legit-family-tl.png
+language: tl
+home: PH
+app: chat
+scam_type: none
+expected_verdict: safe
+families: []
+source_text: |
+  Nanay
+  online
+  Kahapon
+  Ma, kumain ka na ba? Nakarating na ako sa Maynila, mag-iingat po kayo diyan.
+  Tatawag ako mamaya pagkatapos ng trabaho. Sabihin mo kay bunso na mag-aral siyang mabuti.
+  Uuwi ako sa Sabado para sa kaarawan ni Tatay.
+  Salamat anak. Ingat ka palagi.
+must_mention: []
+must_advise: []
+synthetic:
+  layout: chat
+  sender: Nanay
+  messages:
+    - { from: time, text: "Kahapon" }
+    - { from: me, text: "Ma, kumain ka na ba? Nakarating na ako sa Maynila, mag-iingat po kayo diyan." }
+    - { from: me, text: "Tatawag ako mamaya pagkatapos ng trabaho. Sabihin mo kay bunso na mag-aral siyang mabuti." }
+    - { from: me, text: "Uuwi ako sa Sabado para sa kaarawan ni Tatay." }
+    - { from: them, text: "Salamat anak. Ingat ka palagi." }
+notes: Ordinary family chat in Tagalog.
+public: true

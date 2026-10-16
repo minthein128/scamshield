@@ -1,0 +1,31 @@
+id: my-case-id
+file: ../private/screens/my-case-id.png
+language: my
+home: MM
+destination: Thailand
+app: facebook
+scam_type: job_trafficking
+expected_verdict: danger
+score_range: [70, 100]
+families: [trafficking, payment_route, pressure]
+source_text: |
+  Type every word visible in the screenshot here, in reading order.
+  Keep the original language and script. One line per message.
+must_mention:
+  - passport
+  - border
+  - id: fee
+    variants: ["300000", "၃၀၀,၀၀၀", "၃ သိန်း", "fee"]
+  - id: telegram
+    variants: ["@example_handle", "example_handle", "Telegram"]
+must_advise: [dont_pay, dont_send_documents, dont_travel, verify_trusted, call_hotline]
+must_not:
+  accuse: [Example Company, example_handle]
+  advice: [you can trust this offer]
+translations:
+  - language: en
+    file: ../private/screens/my-case-id.en.png
+    source_text: |
+      The same message in English.
+notes: Why this label. Never published.
+public: false

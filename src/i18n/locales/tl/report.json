@@ -1,0 +1,71 @@
+{
+  "_meta": {
+    "reviewed": false
+  },
+  "seen_one": "Iniulat nang {{count}} beses ng iba pang gumagamit ng SafeRoute sa nakaraang 30 araw",
+  "seen_other": "Iniulat nang {{count}} beses ng iba pang gumagamit ng SafeRoute sa nakaraang 30 araw",
+  "title": "Ulat sa panganib",
+  "a11yVerdict": "{{verdict}}. Antas {{step}} sa 3.",
+  "warn": "Balaan ang pamilya ko",
+  "call": "Tawagan ang {{number}}",
+  "callExt": "tapos hingin ang local {{ext}}",
+  "help": "Humingi ng tulong",
+  "share": "Ibahagi ang babalang ito",
+  "flagsRisky": "Mga babalang napansin namin",
+  "flagsSafe": "Ang aming napansin",
+  "sources": "Mga source na sinuri namin",
+  "linkChecks": "Pagsusuri sa link",
+  "actions": "Ang maaari mong gawin",
+  "severity": {
+    "high": "Seryosong palatandaan",
+    "medium": "Dapat suriin",
+    "low": "Maliit na palatandaan"
+  },
+  "domainAge_one": "Edad ng domain: {{count}} araw",
+  "domainAge_other": "Edad ng domain: {{count}} araw",
+  "domainAgeUnknown": "Hindi alam ang edad ng domain",
+  "webRisk": {
+    "clean": "Walang nakitang banta",
+    "malware": "Babala sa malware",
+    "social_engineering": "Babala sa panlilinlang o phishing",
+    "unwanted_software": "Babala sa hindi gustong software",
+    "unknown": "Hindi nasuri"
+  },
+  "block": {
+    "title": "I-block ang nagpadala",
+    "withValue": "I-block ang {{value}} sa app kung saan mo ito nakita.",
+    "generic": "I-block at i-report ang nagpadala sa app kung saan mo ito nakita."
+  },
+  "shareMessage": "Pagsusuri ng SafeRoute: {{title}}\n{{summary}}\nRisk score na {{score}}/100.",
+  "warnMessage": "Babala mula sa SafeRoute ({{verdict}}): {{title}}. {{summary}} Huwag munang magbayad ng pera o magpadala ng mga dokumento. Tawagan muna ako.",
+  "thanks": "Salamat, nakakatulong ito na maprotektahan ang iba",
+  "attention": {
+    "word": {
+      "lower": "Mas kaunting babala",
+      "verify": "Suriin muna",
+      "pause": "Huminto muna"
+    },
+    "headline": {
+      "lower": "Kakaunti ang nakitang babala, ngunit maaaring may kulang pa ring mahahalagang detalye",
+      "verify": "May ilang detalyeng hindi nagtutugma, suriin muna ang mga ito bago ka umalis",
+      "pause": "Huminto muna bago magbayad, magpadala ng mga dokumento o maglakbay"
+    },
+    "note": {
+      "lower": "Hindi mapapatunayan ng ganitong resulta na totoo ang alok. Pakisuri pa rin ang mga detalye bago magbayad, magpadala ng mga dokumento o maglakbay.",
+      "verify": "Pakihiling sa recruiter na linawin nang nakasulat ang mga punto sa ibaba bago ka magpatuloy."
+    }
+  },
+  "conflicts": {
+    "title": "Mga hindi nagtutugma",
+    "adSays": "Sabi sa patalastas",
+    "chatSays": "Sabi sa chat",
+    "adNoDocuments": "Hindi binanggit sa patalastas ang mga dokumento",
+    "adNotMentioned": "Hindi ito binanggit sa patalastas"
+  },
+  "unclear": {
+    "title": "Hindi pa malinaw"
+  },
+  "findings": {
+    "title": "Ang mga nakumpirma at hindi nakumpirma"
+  }
+}

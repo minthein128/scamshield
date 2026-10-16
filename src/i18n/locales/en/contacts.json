@@ -1,0 +1,45 @@
+{
+  "title": "Trusted contacts",
+  "intro": "People you trust. When a check looks risky, warn them with one tap, or call them first.",
+  "emptyTitle": "No trusted contacts yet",
+  "emptyBody": "Add a family member or friend below. Their number is saved with your account.",
+  "emptyBodyGated": "Saving a trusted contact needs you to sign in. You can still share a warning without an account.",
+  "call": "Call",
+  "remove": "Remove",
+  "add": {
+    "title": "Add a contact",
+    "name": "Name",
+    "phone": "Phone number",
+    "phoneHint": "Include the country code, for example +95.",
+    "submit": "Add contact",
+    "pick": "Pick from my contacts"
+  },
+  "footnote": {
+    "synced": "Your contacts are synced to your account."
+  },
+  "errors": {
+    "permission": "Allow access to contacts to pick someone, or type their number below.",
+    "noNumber": "That contact has no phone number.",
+    "openFailed": "We could not open your contacts. Type the number below instead.",
+    "nameRequired": "Enter a name.",
+    "nameTooLong": "That name is too long.",
+    "phoneInvalid": "Enter a phone number with 6 to 15 digits.",
+    "duplicate": "That number is already in your list."
+  },
+  "warn": {
+    "title": "Warn someone you trust",
+    "body": "This opens a text message with the warning. You choose whether to send it.",
+    "addContact": "Add a trusted contact",
+    "text": "Text {{name}}",
+    "share": "Share another way",
+    "shareNow": "Share this warning"
+  },
+  "gate": {
+    "body": "Sign in to save trusted contacts, so they are kept safely with your account.",
+    "signIn": "Sign in",
+    "notNow": "Not now",
+    "unavailable": "Saving contacts needs an account, which is not available in this version.",
+    "legacy": "Sign in to keep these contacts with your account.",
+    "signInToSave": "Sign in to save contacts"
+  }
+}

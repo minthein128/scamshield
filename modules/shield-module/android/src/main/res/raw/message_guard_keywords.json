@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "threshold": 3,
+  "minLength": 15,
+  "maxSendLength": 600,
+  "otpMaxLength": 240,
+  "weights": {
+    "link": 2,
+    "shortener": 1,
+    "payment": 2,
+    "otp": 2,
+    "account": 2,
+    "urgency": 1,
+    "parcel": 2,
+    "bank": 2,
+    "job": 2,
+    "channel_move": 1,
+    "unknown_sender": 1
+  },
+  "shorteners": [
+    "bit.ly", "tinyurl.com", "t.co", "cutt.ly", "is.gd", "rb.gy", "s.id", "shorturl.at",
+    "ow.ly", "buff.ly", "t.ly", "tiny.cc", "rebrand.ly", "lnkd.in", "goo.gl", "v.gd", "shope.ee", "wa.me"
+  ],
+  "tlds": [
+    "com", "net", "org", "info", "xyz", "top", "click", "vip", "cc", "icu", "live", "site",
+    "online", "shop", "link", "app", "club", "work", "buzz", "cfd", "sbs", "cyou", "ly", "gl"
+  ],
+  "categories": {
+    "payment": {
+      "en": ["payment", "pay now", "transfer", "wire ", "fee", "deposit", "refund", "claim your", "reward", "prize", "winner", "gift card", "crypto", "usdt", "top up", "unpaid", "outstanding", "invoice", "tax", "fine of", "penalty"],
+      "id": ["bayar", "pembayaran", "transfer", "biaya", "denda", "deposit", "pengembalian dana", "hadiah", "undian", "pajak", "tagihan", "isi saldo", "rekening", "ongkir"],
+      "tl": ["bayad", "magbayad", "bayaran", "padala", "ipadala", "deposito", "premyo", "nanalo", "napanalo", "multa", "bayarin", "fee", "load"],
+      "my": ["ငွေပေးချေ", "ပေးချေ", "ငွေလွှဲ", "လွှဲပေး", "ကြေး", "အခွန်", "ဒဏ်ကြေး", "ဆုကြေးငွေ", "ဆုပေါက်", "ငွေပြန်အမ်း", "ငွေသွင်း", "စရန်ငွေ"]
+    },
+    "otp": {
+      "en": ["otp", "one-time", "one time password", "verification code", "security code", "passcode", "pin", "your code", "share the code", "send the code", "code"],
+      "id": ["kode otp", "kode verifikasi", "kode keamanan", "berikan kode", "kirim kode", "pin", "kode"],
+      "tl": ["otp", "verification code", "kodigo", "ibigay ang code", "ipadala ang code", "pin", "code"],
+      "my": ["ကုဒ်နံပါတ်", "ကုဒ်", "otp", "လျှို့ဝှက်နံပါတ်", "အတည်ပြုကုဒ်"]
+    },
+    "account": {
+      "en": ["account", "suspended", "blocked", "locked", "verify", "verification", "login", "log in", "sign in", "password", "unusual activity", "kyc", "update your", "confirm your identity", "wallet", "restricted"],
+      "id": ["akun", "diblokir", "dibekukan", "ditangguhkan", "verifikasi", "login", "kata sandi", "password", "aktivitas mencurigakan", "perbarui data", "konfirmasi data", "m-banking", "mobile banking"],
+      "tl": ["account", "na-block", "na-lock", "naka-lock", "suspendido", "i-verify", "verify", "password", "login", "mag-log in", "kahina-hinala", "i-update", "kumpirmahin", "nakompromiso"],
+      "my": ["အကောင့်", "ပိတ်ထား", "ပိတ်သွား", "ပိတ်မည်", "အတည်ပြု", "လော့ဂ်အင်", "စကားဝှက်", "သံသယဖြစ်ဖွယ်", "ပြန်လည်အတည်ပြု"]
+    },
+    "urgency": {
+      "en": ["urgent", "immediately", "asap", "within 24", "24 hours", "expires", "expire", "final notice", "last chance", "act now", "today only", "right away", "hurry", "within 1 hour", "will be closed"],
+      "id": ["segera", "mendesak", "sekarang juga", "dalam 24 jam", "batas waktu", "terakhir", "kedaluwarsa", "hangus", "peringatan", "jika tidak", "akan diblokir", "buruan"],
+      "tl": ["agad", "madalian", "ngayon na", "ngayong araw", "sa loob ng 24", "huling paalala", "mag-expire", "mapapaso", "bilisan", "huwag palampasin", "kapag hindi", "ma-block", "kaagad"],
+      "my": ["အမြန်", "ချက်ချင်း", "ယနေ့အတွင်း", "၂၄ နာရီ", "24 နာရီ", "နောက်ဆုံး", "သက်တမ်းကုန်", "ယခုပဲ", "မဟုတ်ပါက"]
+    },
+    "parcel": {
+      "en": ["parcel", "package", "delivery", "courier", "shipment", "tracking", "customs", "redeliver", "undelivered", "dhl", "fedex", "ups", "usps", "post office", "j&t", "ninja van", "lbc", "flash express", "kerry", "poslaju"],
+      "id": ["paket", "kurir", "pengiriman", "resi", "bea cukai", "alamat tidak lengkap", "gagal kirim", "jne", "j&t", "sicepat", "anteraja", "pos indonesia", "spx", "tiki", "lion parcel", "dhl"],
+      "tl": ["parcel", "package", "padala", "delivery", "courier", "hindi na-deliver", "hindi naihatid", "naantala", "tracking", "customs", "lbc", "j&t", "flash express", "ninja van", "2go", "xend", "phlpost"],
+      "my": ["ပါဆယ်", "ပါဆယ်ထုပ်", "ပို့ဆောင်", "ပစ္စည်းပို့", "ကောင်ရီယာ", "အကောက်ခွန်", "ပို့မရ", "လိပ်စာမပြည့်စုံ", "dhl", "fedex", "ခြေရာခံ"]
+    },
+    "bank": {
+      "en": ["bank", "banking", "atm", "debit card", "credit card", "paypal", "maybank", "cimb", "hsbc", "citibank", "promptpay", "truemoney", "gcash", "maya", "bdo", "bpi"],
+      "id": ["bank", "bca", "bri", "bni", "mandiri", "btn", "permata", "danamon", "ovo", "dana", "gopay", "shopeepay", "linkaja", "kartu kredit", "atm", "ojk", "bi-fast"],
+      "tl": ["bank", "bdo", "bpi", "metrobank", "unionbank", "landbank", "security bank", "rcbc", "pnb", "gcash", "maya", "paymaya", "gotyme", "coins.ph", "atm", "credit card", "debit card"],
+      "my": ["ဘဏ်", "kbz", "ကေဘီဇက်", "kpay", "kbzpay", "wave", "wavepay", "wave money", "aya", "cb pay", "cbpay", "uab", "ayapay", "မိုဘိုင်းဘဏ်", "အေတီအမ်"]
+    },
+    "job": {
+      "en": ["job offer", "hiring", "vacancy", "recruit", "work from home", "part-time", "part time", "per day", "salary", "commission", "earn ", "no experience", "data entry", "overseas job", "work abroad", "visa sponsor", "employer", "registration fee", "easy money", "daily income", "per hour", "tasks"],
+      "id": ["lowongan", "loker", "gaji", "kerja online", "kerja dari rumah", "freelance", "tanpa pengalaman", "komisi", "tugas", "bonus harian", "rekrutmen", "penempatan", "luar negeri", "tki", "visa kerja", "biaya administrasi", "penghasilan", "paruh waktu", "dibutuhkan"],
+      "tl": ["hiring", "trabaho", "kailangan ng", "work from home", "sahod", "suweldo", "komisyon", "walang experience", "walang karanasan", "part-time", "online job", "data entry", "sa ibang bansa", "bayad sa application", "placement fee", "kumita"],
+      "my": ["အလုပ်လျှောက်", "အလုပ်အကိုင်", "အလုပ်ခေါ်", "လစာ", "လုပ်ခ", "အိမ်မှလုပ်", "အွန်လိုင်းအလုပ်", "အတွေ့အကြုံမလို", "ကော်မရှင်", "နိုင်ငံခြား", "ဗီဇာ", "အေးဂျင့်", "တစ်ရက်လျှင်", "ဝင်ငွေ", "လူခေါ်", "ဝန်ထမ်းခေါ်", "စာရင်းသွင်းကြေး"]
+    },
+    "channel_move": {
+      "en": ["whatsapp", "telegram", "line id", "wechat", "contact us on", "add me", "dm me", "chat me"],
+      "id": ["hubungi", "wa.me", "chat wa", "telegram", "tambahkan", "grup"],
+      "tl": ["telegram", "viber", "whatsapp", "mag-message", "i-add", "group chat"],
+      "my": ["တယ်လီဂရမ်", "telegram", "viber", "ဗိုက်ဘာ", "whatsapp", "ဆက်သွယ်"]
+    }
+  }
+}
