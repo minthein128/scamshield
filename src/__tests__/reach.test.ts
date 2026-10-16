@@ -1,11 +1,26 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { API_URL_CACHE_KEY, apiHost, checkHealth, connectionReport, fetchFirstApiUrl, hasInternet, parseConfigUrls, resolveApiUrl } from '../config/runtime';
+import {
+  API_URL_CACHE_KEY,
+  STABLE_RECHECK_MS,
+  apiHost,
+  checkHealth,
+  connectionReport,
+  ensureApiUrl,
+  fetchFirstApiUrl,
+  getResolvedApiUrl,
+  hasInternet,
+  parseConfigUrls,
+  resetRuntimeUrl,
+  resolveApiUrl,
+} from '../config/runtime';
+import { CLOUD_RUN_API_URL, FALLBACK_API_URL, STABLE_API_URL } from '../config/env';
 import { ApiError, createRuntimeClient, type CheckClient, type CheckRequest } from '../api';
 
 const A = 'https://a.config/config.json';
 const B = 'https://b.config/config.json';
 const OLD = 'https://old.example';
 const NEW = 'https://new.example';
+const LEGACY = 'https://saferoute-api.akkhayar.com';
 
 type Route = 'down' | 'hang' | 'notfound' | { apiUrl: string } | 'ok';
 
@@ -17,7 +32,7 @@ function fakeFetch(routes: Record<string, Route>) {
     if (route === 'down') return Promise.reject(new TypeError('Failed to fetch'));
     if (route === 'notfound') return Promise.resolve({ ok: false, status: 404, json: async () => ({}) });
     if (route === 'hang') return new Promise((_r, rej) => init?.signal?.addEventListener('abort', () => rej(new Error('abort'))));
-    return Promise.resolve({ ok: true, json: async () => (route === 'ok' ? {} : route) });
+    return Promise.resolve({ ok: true, status: 200, json: async () => (route === 'ok' ? {} : route) });
   });
   return { fetchImpl: impl as unknown as typeof fetch, calls };
 }
@@ -100,20 +115,65 @@ describe('config sources', () => {
     expect(calls).toContain(`${stable}/health`);
   });
 
-  it('orders candidates: stable run.app first, then the legacy host, then the cache', async () => {
+  it('orders candidates: stable run.app first, then the fallback, then the cache, while config.json answers', async () => {
     const stable = 'https://api.stable.test';
-    const legacy = 'https://api.legacy.test';
+    const fallback = 'https://api.fallback.test';
     await AsyncStorage.setItem(API_URL_CACHE_KEY, 'https://cached.example');
-    const { fetchImpl, calls } = fakeFetch({ [`${stable}/health`]: 'ok', [`${legacy}/health`]: 'ok' });
-    expect(await resolveApiUrl({ ...base, stableUrl: stable, fallbackUrl: legacy, envUrl: '', graceMs: 10, fetchImpl })).toBe(stable);
-    expect(calls.slice(0, 3)).toEqual([`${stable}/health`, `${legacy}/health`, 'https://cached.example/health']);
+    const { fetchImpl, calls } = fakeFetch({ [A]: { apiUrl: fallback }, [B]: { apiUrl: fallback }, [`${stable}/health`]: 'ok', [`${fallback}/health`]: 'ok' });
+    expect(await resolveApiUrl({ ...base, stableUrl: stable, fallbackUrl: fallback, envUrl: '', graceMs: 10, fetchImpl })).toBe(stable);
+    expect(calls.slice(0, 3)).toEqual([`${stable}/health`, `${fallback}/health`, 'https://cached.example/health']);
   });
 
-  it('uses the legacy host when the stable one is down', async () => {
+  it('keeps run.app when config.json names the healthy legacy host, and replaces a cached legacy host with run.app', async () => {
+    await AsyncStorage.setItem(API_URL_CACHE_KEY, LEGACY);
+    const { fetchImpl, calls } = fakeFetch({ [A]: { apiUrl: LEGACY }, [B]: { apiUrl: LEGACY }, [`${CLOUD_RUN_API_URL}/health`]: 'ok', [`${LEGACY}/health`]: 'ok' });
+    expect(await resolveApiUrl({ ...base, stableUrl: CLOUD_RUN_API_URL, envUrl: '', fetchImpl })).toBe(CLOUD_RUN_API_URL);
+    expect(await AsyncStorage.getItem(API_URL_CACHE_KEY)).toBe(CLOUD_RUN_API_URL);
+    expect(calls).not.toContain(A);
+  });
+
+  it('uses the config.json host only when run.app fails its health check', async () => {
+    const { fetchImpl } = fakeFetch({ [A]: { apiUrl: NEW }, [`${NEW}/health`]: 'ok' });
+    expect(await resolveApiUrl({ ...base, stableUrl: CLOUD_RUN_API_URL, envUrl: '', fetchImpl })).toBe(NEW);
+    expect(await AsyncStorage.getItem(API_URL_CACHE_KEY)).toBe(NEW);
+  });
+
+  it('moves a running app from a cached legacy host back to run.app once run.app is healthy again', async () => {
+    jest.useFakeTimers();
+    let stableUp = false;
+    const impl = jest.fn((url: string) => {
+      const up = url === `${LEGACY}/health` || (stableUp && url === `${CLOUD_RUN_API_URL}/health`);
+      return up ? Promise.resolve({ ok: true, status: 200, json: async () => ({}) }) : Promise.reject(new TypeError('Failed to fetch'));
+    });
+    const realFetch = global.fetch;
+    global.fetch = impl as unknown as typeof fetch;
+    try {
+      await AsyncStorage.setItem(API_URL_CACHE_KEY, LEGACY);
+      resetRuntimeUrl();
+      const first = ensureApiUrl();
+      await jest.advanceTimersByTimeAsync(9000);
+      expect(await first).toBe(LEGACY);
+      stableUp = true;
+      await jest.advanceTimersByTimeAsync(STABLE_RECHECK_MS + 100);
+      expect(getResolvedApiUrl()).toBe(CLOUD_RUN_API_URL);
+      expect(await AsyncStorage.getItem(API_URL_CACHE_KEY)).toBe(CLOUD_RUN_API_URL);
+    } finally {
+      resetRuntimeUrl();
+      global.fetch = realFetch;
+      jest.useRealTimers();
+    }
+  });
+
+  it('uses the fallback host when the stable one is down', async () => {
     const stable = 'https://api.stable.test';
-    const legacy = 'https://api.legacy.test';
-    const { fetchImpl } = fakeFetch({ [`${legacy}/health`]: 'ok' });
-    expect(await resolveApiUrl({ ...base, stableUrl: stable, fallbackUrl: legacy, fetchImpl })).toBe(legacy);
+    const fallback = 'https://api.fallback.test';
+    const { fetchImpl } = fakeFetch({ [`${fallback}/health`]: 'ok' });
+    expect(await resolveApiUrl({ ...base, stableUrl: stable, fallbackUrl: fallback, fetchImpl })).toBe(fallback);
+  });
+
+  it('defaults to Cloud Run only: no fallback host, no legacy host in the config sources', () => {
+    expect(STABLE_API_URL).toBe('https://sg-dev-808112092414.asia-southeast1.run.app');
+    expect(FALLBACK_API_URL).toBe('');
   });
 
   it('never fetches config.json from the legacy host by default', () => {

@@ -23,9 +23,8 @@ export function readFirebaseConfig(env: Record<string, string | undefined> = {})
 /** Dev builds only: EXPO_PUBLIC_OFFLINE_MOCK=1 skips URL resolution so the offline mock answers. */
 export const OFFLINE_MOCK = __DEV__ && process.env.EXPO_PUBLIC_OFFLINE_MOCK === '1';
 export const CLOUD_RUN_API_URL = 'https://sg-dev-808112092414.asia-southeast1.run.app';
-export const LEGACY_API_URL = 'https://saferoute-api.akkhayar.com';
 export const STABLE_API_URL = (process.env.EXPO_PUBLIC_STABLE_API_URL?.trim() || CLOUD_RUN_API_URL).replace(/\/+$/, '');
-export const FALLBACK_API_URL = (process.env.EXPO_PUBLIC_FALLBACK_API_URL?.trim() || LEGACY_API_URL).replace(/\/+$/, '');
+export const FALLBACK_API_URL = (process.env.EXPO_PUBLIC_FALLBACK_API_URL?.trim() ?? '').replace(/\/+$/, '');
 // Dev builds without a URL keep using the offline mock.
 export const API_URL = process.env.EXPO_PUBLIC_API_URL?.trim() || (__DEV__ ? '' : STABLE_API_URL);
 

@@ -28,6 +28,7 @@ export const INTERNET_PROBE_URLS = [
 ];
 const RECENT_REACH_MS = 30_000;
 export const FOREGROUND_REFRESH_MS = 5 * 60 * 1000;
+export const STABLE_RECHECK_MS = 5 * 60 * 1000;
 
 export function validApiUrl(value: unknown): string | null {
   if (typeof value !== 'string') return null;
@@ -181,7 +182,14 @@ async function resolveUrlInner(deps: ResolveDeps): Promise<string> {
     for (const u of known) if (await healthy(u)) return u;
     return null;
   };
+  const remember = (u: string) => AsyncStorage.setItem(API_URL_CACHE_KEY, u).catch(() => undefined);
   known.forEach(healthy);
+
+  // config.json still names the legacy host for old installs, so a healthy stable URL wins.
+  if (stable && (await healthy(stable))) {
+    if (cached !== stable) await remember(stable);
+    return stable;
+  }
 
   const remoteP = fetchFirstApiUrl(fetchImpl, deps.configUrls ?? CONFIG_URLS, { staggerMs: deps.staggerMs });
   const grace = firstAlive().then(u => (u ? new Promise<null>(r => setTimeout(() => r(null), deps.graceMs ?? CONFIG_GRACE_MS)) : new Promise<null>(() => undefined)));
@@ -189,12 +197,12 @@ async function resolveUrlInner(deps: ResolveDeps): Promise<string> {
 
   if (remote) {
     if (await healthy(remote)) {
-      await AsyncStorage.setItem(API_URL_CACHE_KEY, remote).catch(() => undefined);
+      await remember(remote);
       return remote;
     }
     const alive = await firstAlive();
     if (alive) return alive;
-    await AsyncStorage.setItem(API_URL_CACHE_KEY, remote).catch(() => undefined);
+    await remember(remote);
     return remote;
   }
   return (await firstAlive()) ?? known[0] ?? '';
@@ -203,12 +211,32 @@ async function resolveUrlInner(deps: ResolveDeps): Promise<string> {
 let pending: Promise<string> | null = null;
 let current: string | null = null;
 let refreshing: Promise<string> | null = null;
+let stableTimer: ReturnType<typeof setTimeout> | null = null;
 const listeners = new Set<(url: string) => void>();
 
+/** While the app runs on another host, retries the stable URL and moves back once it is healthy. */
+export function scheduleStableRecheck(url: string, stableUrl: string = STABLE_API_URL, fetchImpl: typeof fetch = fetch): void {
+  if (stableTimer) clearTimeout(stableTimer);
+  stableTimer = null;
+  const stable = validApiUrl(stableUrl);
+  if (!stable || !url || url === stable || OFFLINE_MOCK) return;
+  stableTimer = setTimeout(() => {
+    stableTimer = null;
+    void checkHealth(stable, fetchImpl)
+      .then(ok => {
+        if (ok) return refreshApiUrl();
+        scheduleStableRecheck(url, stableUrl, fetchImpl);
+        return url;
+      })
+      .catch(() => undefined);
+  }, STABLE_RECHECK_MS);
+}
+
 function publish(url: string): string {
-    const changed = url !== current;
+  const changed = url !== current;
   current = url;
   if (changed) listeners.forEach(l => l(url));
+  scheduleStableRecheck(url);
   return url;
 }
 
@@ -251,6 +279,8 @@ export function useApiUrl(): string | null {
 
 /** Test helper. */
 export function resetRuntimeUrl(): void {
+  if (stableTimer) clearTimeout(stableTimer);
+  stableTimer = null;
   pending = null;
   current = null;
   refreshing = null;
