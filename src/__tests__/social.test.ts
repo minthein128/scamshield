@@ -1,4 +1,5 @@
-import { linkOrSignIn } from '../services/accounts';
+import { authErrorMessage, linkOrSignIn } from '../services/accounts';
+import { t } from '../i18n';
 
 const mockLink = jest.fn();
 const mockSignIn = jest.fn();
@@ -38,5 +39,29 @@ describe('social credential linking', () => {
     await linkOrSignIn({ currentUser: null } as never, credential);
     expect(mockSignIn).toHaveBeenCalled();
     expect(mockLink).not.toHaveBeenCalled();
+  });
+});
+
+describe('auth error message', () => {
+  const fallback = () => t('errors:auth.fallback');
+
+  it('appends the native Google Sign-In status code to the fallback', () => {
+    expect(authErrorMessage({ code: '10' })).toBe(`${fallback()} (code 10)`);
+    expect(authErrorMessage({ code: 12500 })).toBe(`${fallback()} (code 12500)`);
+    expect(authErrorMessage({ code: 'PLAY_SERVICES_NOT_AVAILABLE' })).toBe(`${fallback()} (code PLAY_SERVICES_NOT_AVAILABLE)`);
+  });
+
+  it('appends unmapped Firebase codes', () => {
+    expect(authErrorMessage({ code: 'auth/internal-error' })).toBe(`${fallback()} (code auth/internal-error)`);
+  });
+
+  it('keeps mapped messages free of codes', () => {
+    expect(authErrorMessage({ code: 'auth/popup-closed-by-user' })).toBe(t('errors:auth.popupClosed'));
+  });
+
+  it('shows the plain fallback when there is no code', () => {
+    expect(authErrorMessage(new Error('boom'))).toBe(fallback());
+    expect(authErrorMessage(null)).toBe(fallback());
+    expect(authErrorMessage({ code: '  ' })).toBe(fallback());
   });
 });

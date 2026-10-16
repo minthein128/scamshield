@@ -48,10 +48,18 @@ const MESSAGE_KEYS = {
   'auth/operation-not-allowed': 'errors:auth.notAllowed',
 } as const;
 
+export function authErrorCode(error: unknown): string | null {
+  const code = (error as { code?: unknown } | null)?.code;
+  if (typeof code !== 'string' && typeof code !== 'number') return null;
+  const text = String(code).trim();
+  return text ? text.slice(0, 40) : null;
+}
+
 export function authErrorMessage(error: unknown): string {
-  const code = (error as { code?: string } | null)?.code;
-  const key = code && code in MESSAGE_KEYS ? MESSAGE_KEYS[code as keyof typeof MESSAGE_KEYS] : 'errors:auth.fallback';
-  return t(key);
+  const code = authErrorCode(error);
+  if (code && code in MESSAGE_KEYS) return t(MESSAGE_KEYS[code as keyof typeof MESSAGE_KEYS]);
+  const fallback = t('errors:auth.fallback');
+  return code ? `${fallback} (code ${code})` : fallback;
 }
 
 export async function ensureAnonymous(auth: Auth): Promise<void> {
