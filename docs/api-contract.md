@@ -312,14 +312,16 @@ Response 200 is a `CheckResponse` (see `POST /v1/check`, `kind: "job"`, `scamTyp
 
 Errors: `400 bad_request` for malformed facts, an enum value outside the codes, or a missing `facts` with an unknown `jobId`. Assess never calls the model except for the company search; a search failure only adds `company_not_checked`.
 
-## GET /healthz
+## GET /healthz, GET /health
 
 `{ "ok": true, "model": "...", "mock": false }`
+
+`/health` returns the same body. Cloud Run reserves `/healthz` on `run.app` URLs, so probe `/health` there.
 
 ## GET /download, GET|HEAD /download/saferoute.apk
 
 `/download` returns a plain HTML install page (English and Burmese, no external assets) with the version (`APK_VERSION`), the file size and a link to the APK.
 
-`/download/saferoute.apk` streams the file at `APK_PATH`. Headers: `Content-Type: application/vnd.android.package-archive`, `Content-Disposition: attachment; filename="SafeRoute.apk"`, `Content-Length`, `Cache-Control: no-cache`, `ETag` (mtime and size). When `APK_PATH` is unset or the file is missing the response is 404 with the usual error body. Limit: `APK_LIMIT_PER_HOUR` (default 20) per IP, separate from the check limits; over it the response is 429 `rate_limited`.
+`/download/saferoute.apk` streams the file at `APK_PATH`. Headers: `Content-Type: application/vnd.android.package-archive`, `Content-Disposition: attachment; filename="SafeRoute.apk"`, `Content-Length`, `Cache-Control: no-cache`, `ETag` (mtime and size). When `APK_PATH` is unset, `/download` and `/download/saferoute.apk` answer `302` to `https://saferoute-aibc.web.app/saferoute.apk` with `Cache-Control: no-store`. When the file at `APK_PATH` is missing the response is 404 with the usual error body. Limit: `APK_LIMIT_PER_HOUR` (default 20) per IP, separate from the check limits; over it the response is 429 `rate_limited`.
 
 With `APK_VERSION` set, `GET /download/saferoute.apk` answers `302` to `/download/saferoute-<APK_VERSION>.apk` with `Cache-Control: no-store`. The versioned URL serves the file with `Cache-Control: public, max-age=31536000, immutable`; any other versioned name is 404. The `/download` page links the versioned URL. Without `APK_VERSION` the unversioned URL serves the file directly.
