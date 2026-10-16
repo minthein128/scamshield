@@ -7,7 +7,7 @@ import { Text } from '../components/Text';
 import { Button, Card, LinkButton, Pill, SectionTitle } from '../components/ui';
 import { HeaderWithLeave } from '../components/LeaveQuickly';
 import { getApiClient } from '../api';
-import type { CheckAction, JobConflict, Verdict } from '../api/types';
+import type { CheckAction, Verdict } from '../api/types';
 import {
   VERDICT_STYLES,
   groupFlags,
@@ -26,6 +26,7 @@ import { WarnFamilySheet } from '../components/WarnFamilySheet';
 import { Avatar } from '../components/Avatar';
 import { BrandMark } from '../components/BrandMark';
 import { VERDICT_MOOD } from '../components/DollLoader';
+import { ConflictCard } from '../components/ConflictCard';
 import { LiveVoiceSheet } from '../components/LiveVoiceSheet';
 import { FeedbackRow } from '../components/FeedbackRow';
 import { canGiveFeedback } from '../lib/feedback';
@@ -357,39 +358,7 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
   );
 };
 
-const ConflictCard: React.FC<{ conflict: JobConflict; tablet: boolean }> = ({ conflict, tablet }) => {
-  const { t } = useTranslation('report');
-  const sev = SEVERITY[conflict.severity];
-  return (
-    <View testID={`conflict-${conflict.field}`} style={styles.conflictCard}>
-      <View style={styles.conflictHead}>
-        <View style={[styles.flagIcon, { backgroundColor: sev.bg }]}>
-          <Icon name={FAMILY_ICONS[conflict.family] ?? 'flag'} size={22} color={sev.fg} />
-        </View>
-        <View style={{ flex: 1, minWidth: 0, gap: 4 }}>
-          <Text style={[styles.flagLabel, readable(tablet, 15, 22)]}>{conflict.fieldLabel}</Text>
-          <Pill label={t(`severity.${conflict.severity}`)} background={sev.bg} color={sev.fg} />
-        </View>
-      </View>
-      <Text style={[styles.flagEvidence, readable(tablet, 14, 20)]}>{conflict.description}</Text>
-      <View style={styles.quoteBox}>
-        <Text style={styles.quoteLabel}>{t('conflicts.adSays')}</Text>
-        <Text testID={`conflict-${conflict.field}-ad`} style={[styles.quoteText, readable(tablet, 14, 20)]}>{conflict.adQuote || conflict.adValue}</Text>
-      </View>
-      <View style={styles.quoteBox}>
-        <Text style={styles.quoteLabel}>{t('conflicts.chatSays')}</Text>
-        <Text testID={`conflict-${conflict.field}-chat`} style={[styles.quoteText, readable(tablet, 14, 20)]}>{conflict.chatQuote || conflict.chatValue}</Text>
-      </View>
-    </View>
-  );
-};
-
 const styles = StyleSheet.create({
-  conflictCard: { gap: 10, padding: 16, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.border, borderRadius: 16 },
-  conflictHead: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  quoteBox: { gap: 2, padding: 10, borderRadius: 10, backgroundColor: colors.codeBg },
-  quoteLabel: { color: colors.textSecondary, fontSize: 12, lineHeight: 16, fontFamily: fonts.semiBold },
-  quoteText: { color: colors.codeText, fontSize: 14, lineHeight: 20, fontFamily: fonts.regular },
   tierNote: { color: colors.textSecondary, fontSize: 14, lineHeight: 20, fontFamily: fonts.medium },
   unclearList: { gap: 8, padding: 16, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.border, borderRadius: 16 },
   unclearRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
