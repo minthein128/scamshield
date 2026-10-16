@@ -353,7 +353,7 @@ class MessageGuardTest {
 
     @Test
     fun manifest_can_see_every_watched_app() {
-        val manifest = listOf("src/main/AndroidManifest.xml", "android/src/main/AndroidManifest.xml").map(::java.io.File).first { it.exists() }.readText()
+        val manifest = listOf("src/main/AndroidManifest.xml", "android/src/main/AndroidManifest.xml").map { java.io.File(it) }.first { it.exists() }.readText()
         for (pkg in MessageApps.catalog.flatMap { it.packages } + MessageApps.oemSms) {
             assertTrue(pkg, manifest.contains("<package android:name=\"$pkg\" />"))
         }
