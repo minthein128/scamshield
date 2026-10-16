@@ -85,10 +85,9 @@ class MessageGuardActivityTest {
         listener.onNotificationPosted(sbn("com.whatsapp", "Your verification code is 482913. Do not share it with anyone."))
         listener.onNotificationPosted(sbn("com.whatsapp", "URGENT: your bank account is locked. Verify now at bit.ly/3xYzAb", sender = "+95 9 123 456 789"))
 
-        val events = waitFor(5)
+        val events = waitFor(4)
         assertEquals(
             listOf(
-                "viber:skipped_app_not_chosen",
                 "whatsapp:skipped_not_risky",
                 "whatsapp:skipped_hidden_preview",
                 "whatsapp:skipped_otp",
@@ -103,6 +102,46 @@ class MessageGuardActivityTest {
         assertEquals("check_failed:no_server", (status["last"] as Map<*, *>)["outcome"])
         assertEquals("WhatsApp", (status["last"] as Map<*, *>)["label"])
         listener.onDestroy()
+    }
+
+    @Test
+    fun an_app_the_user_did_not_choose_leaves_no_record() {
+        MessageGuardBridge.grantConsent(context, listOf("whatsapp"))
+        MessageGuardBridge.setEnabled(context, true)
+        val listener = Robolectric.buildService(MessageGuardListener::class.java).create().get()
+        for (pkg in listOf("com.viber.voip", "com.android.mms", "org.telegram.messenger", "com.android.chrome")) {
+            listener.onNotificationPosted(sbn(pkg, "Your parcel is held, pay the fee at http://pay-x.top/x"))
+            listener.onNotificationPosted(sbn(pkg, "New message"))
+            listener.onNotificationPosted(sbn(pkg, "Syncing", Notification.FLAG_ONGOING_EVENT))
+        }
+        MessageGuardStore(context).pause(MessageGuardStore.PAUSE_DAILY)
+        listener.onNotificationPosted(sbn("com.viber.voip", "Your parcel is held, pay the fee at http://pay-x.top/x"))
+        listener.onNotificationPosted(sbn("com.whatsapp", "Your parcel is held, pay the fee at http://pay-x.top/x"))
+
+        assertEquals(listOf("whatsapp:skipped_paused"), waitFor(1).map { "${it.app}:${it.outcome}" })
+        val store = MessageGuardStore(context)
+        assertEquals(mapOf("skipped_paused" to 1), store.activity.counts())
+        assertTrue(store.log.entries().isEmpty())
+        val raw = File(context.noBackupFilesDir, "message_guard/activity.json").readText()
+        assertFalse(raw.contains("viber") || raw.contains("telegram") || raw.contains("sms"))
+        listener.onDestroy()
+    }
+
+    @Test
+    fun records_from_earlier_builds_about_other_apps_are_dropped() {
+        val file = File(context.noBackupFilesDir, "message_guard/activity.json")
+        file.parentFile!!.mkdirs()
+        val now = System.currentTimeMillis()
+        file.writeText(
+            """{"nextSeq":2,"events":[{"seq":0,"at":$now,"app":"viber","outcome":"skipped_app_not_chosen"},""" +
+                """{"seq":1,"at":$now,"app":"sms","outcome":"skipped_not_risky"}],""" +
+                """"counts":{"skipped_app_not_chosen":3,"skipped_not_risky":1}}""",
+        )
+        val activity = MessageGuardStore(context).activity
+        assertEquals(listOf("sms:skipped_not_risky"), activity.events().map { "${it.app}:${it.outcome}" })
+        assertEquals(mapOf("skipped_not_risky" to 1), activity.counts())
+        activity.record("sms", MessageGuardActivity.SENT)
+        assertFalse(file.readText().contains("not_chosen"))
     }
 
     @Test

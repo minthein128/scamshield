@@ -9,7 +9,7 @@ import java.util.concurrent.Executors
 
 /**
  * Reads notifications only from the messaging apps the user chose, and only while Message Guard is on
- * with consent. Notifications from every other app are dropped before any content is read.
+ * with consent. Notifications from every other app are dropped before anything is read or recorded.
  */
 class MessageGuardListener : NotificationListenerService() {
 
@@ -42,14 +42,11 @@ class MessageGuardListener : NotificationListenerService() {
         val enabled = store.enabled
         if (!enabled && !store.paused) return
         val sms = MessageApps.defaultSmsPackage(applicationContext)
+        if (pkg !in MessageApps.watchedPackages(sms, store.enabledApps)) return
         val appId = MessageApps.idFor(pkg, sms) ?: return
         val notification = sbn.notification ?: return
         if (!enabled) {
             record(appId, MessageGuardActivity.SKIPPED_PAUSED)
-            return
-        }
-        if (pkg !in MessageApps.watchedPackages(sms, store.enabledApps)) {
-            record(appId, MessageGuardActivity.SKIPPED_APP_NOT_CHOSEN)
             return
         }
         if (notification.flags and (Notification.FLAG_ONGOING_EVENT or Notification.FLAG_FOREGROUND_SERVICE) != 0) {

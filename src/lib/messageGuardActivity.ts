@@ -32,7 +32,6 @@ export function problemsFor(status: MessageGuardStatus, access: boolean): Messag
 }
 
 const OUTCOME_KEYS: Record<string, string> = {
-  skipped_app_not_chosen: 'notChosen',
   skipped_paused: 'paused',
   skipped_self: 'self',
   skipped_no_text: 'noText',

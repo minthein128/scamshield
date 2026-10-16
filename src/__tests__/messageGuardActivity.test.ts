@@ -52,7 +52,7 @@ beforeEach(async () => {
 describe('outcome codes in the diagnostics log', () => {
   it('keeps every outcome code through the sanitizer', () => {
     for (const code of [
-      'skipped_app_not_chosen',
+      'skipped_too_short',
       'skipped_hidden_preview',
       'skipped_rate_limited',
       'skipped_not_risky',
@@ -145,7 +145,7 @@ describe('last activity line', () => {
     expect(lastActivityLine(event(3, 'skipped_not_risky', now.getTime() - 5 * 60_000), now)).toBe(
       'Last message from Viber, 5 min ago: looked normal, not sent',
     );
-    expect(describeOutcome('skipped_app_not_chosen')).toBe('not read, this app is not on your list');
+    expect(describeOutcome('skipped_otp')).toBe('a one-time code, kept on your phone');
     expect(describeOutcome('check_failed:server_503')).toBe('the check did not finish. Check your internet connection.');
     expect(describeOutcome('result:danger')).toBe('checked, SafeRoute posted a notice');
     expect(describeOutcome('result:careful:notice_blocked')).toContain('notifications are off');

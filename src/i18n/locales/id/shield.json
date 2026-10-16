@@ -101,7 +101,6 @@
       "waiting": "Menunggu pesan dari aplikasi pilihan Anda.",
       "last": "Pesan terakhir dari {{app}}, {{time}}: {{outcome}}",
       "outcome": {
-        "notChosen": "tidak dibaca, aplikasi ini tidak ada di daftar Anda",
         "paused": "tidak diperiksa, Message Guard dijeda",
         "self": "pesan Anda sendiri, tidak diperiksa",
         "noText": "tidak ada teks untuk diperiksa",
