@@ -317,7 +317,7 @@ internal class ResultCardView(
     }
 
     private fun announceState(expanded: Boolean) {
-        header.contentDescription = model.description + if (expanded) ". Expanded." else ""
+        header.contentDescription = model.description + if (expanded) ". ${strings["a11yExpanded"]}" else ""
     }
 
     fun apply(t: Float) {

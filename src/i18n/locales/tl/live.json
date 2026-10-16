@@ -82,6 +82,18 @@
     "tapToRetry": "I-tap para subukan muli",
     "fullReport": "Buong ulat",
     "showDetails": "Ipakita ang mga detalye",
-    "closeShield": "Isara ang shield"
+    "closeShield": "Isara ang shield",
+    "a11yShield": "SafeRoute shield",
+    "a11yCheckScreen": "Pindutin nang dalawang beses para suriin ang screen.",
+    "a11yChecking": "Sinusuri ang screen.",
+    "a11yShowDetails": "Pindutin nang dalawang beses para ipakita ang mga detalye.",
+    "a11yExpanded": "Pinalawak.",
+    "errNoConnection": "Walang koneksyon. Tingnan ang iyong internet at subukang muli.",
+    "errTooMany": "Masyadong maraming pagsusuri. Maghintay nang isang minuto at subukang muli.",
+    "errBusy": "Abala ang serbisyo sa pagsusuri. Subukang muli mamaya.",
+    "errTooLarge": "Masyadong malaki ang screenshot para suriin.",
+    "errCapture": "Hindi mabasa ang screen. Pindutin ang shield para subukang muli.",
+    "errCaptureDenied": "Hindi pinayagan ang screen capture. Pindutin ang shield para subukang muli.",
+    "errFailed": "Hindi nagtagumpay ang pagsusuri. Subukang muli."
   }
 }

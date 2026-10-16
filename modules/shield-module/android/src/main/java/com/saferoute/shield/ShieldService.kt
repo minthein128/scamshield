@@ -295,7 +295,7 @@ class ShieldService : Service(), ShieldOverlay.Listener {
         when {
             view.endedBy == EndReason.CAP -> o.endCompanion(strings.endedCap)
             view.endedBy == EndReason.ERROR && view.error == "check_failed" ->
-                o.endCompanion(lastCheckError ?: strings.error(null))
+                o.endCompanion(lastCheckError?.let { strings.errorText(it) } ?: strings.error(null))
             view.endedBy == EndReason.ERROR ->
                 o.endCompanion(strings.error(view.error), opensApp = view.error == "needs_foreground" || view.error == "mic_denied")
             else -> o.endCompanion()
