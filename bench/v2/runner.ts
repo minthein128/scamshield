@@ -4,6 +4,7 @@ import { basename, extname, join } from 'node:path';
 import type { GoogleGenAI } from '@google/genai';
 import { type Config, loadConfig } from '../../server/src/config.js';
 import { createCorrelator } from '../../server/src/correlate.js';
+import { buildActions, titleFor } from '../../server/src/explain.js';
 import { createClient, type Extractor } from '../../server/src/extract.js';
 import { createExtractor } from '../../server/src/extract-stream.js';
 import { createGrounder } from '../../server/src/ground.js';
@@ -97,6 +98,20 @@ export interface Runner {
   keyOf(input: RunInput): string;
 }
 
+/** Title and actions come from explain.ts, so cached runs rebuild them with the current code. */
+function refreshExplain(rec: RunRecord, c: Case): RunRecord {
+  const r = rec.response;
+  if (!r) return rec;
+  return {
+    ...rec,
+    response: {
+      ...r,
+      title: titleFor(r.verdict, c.language),
+      actions: buildActions(r.verdict, r.scamType, c.language, c.destination, c.home),
+    },
+  };
+}
+
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 export function createRunner(opts: RunnerOptions): Runner {
@@ -185,7 +200,7 @@ export function createRunner(opts: RunnerOptions): Runner {
       const file = join(RESPONSE_CACHE, `${key}.json`);
       if (opts.cache && existsSync(file)) {
         const hit = JSON.parse(readFileSync(file, 'utf8')) as RunRecord;
-        return { ...hit, sourceText: i.sourceText, cached: true };
+        return { ...refreshExplain(hit, i.c), sourceText: i.sourceText, cached: true };
       }
       if (opts.offline) {
         return {

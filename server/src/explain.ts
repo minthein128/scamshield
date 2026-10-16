@@ -58,9 +58,12 @@ const LABELS: Record<'call' | 'share' | 'block' | 'learn', Record<Lang, string>>
   },
 };
 
-export function countryOf(destination: string | undefined): string | undefined {
-  const d = destination?.toLowerCase();
-  return d ? COUNTRIES.find((c) => c.aliases.some((a) => d.includes(a)))?.code : undefined;
+export function countryOf(place: string | undefined): string | undefined {
+  const raw = place?.trim();
+  if (!raw) return undefined;
+  if (COUNTRIES.some((c) => c.code === raw.toUpperCase())) return raw.toUpperCase();
+  const d = raw.toLowerCase();
+  return COUNTRIES.find((c) => c.name.toLowerCase() === d || c.aliases.some((a) => d.includes(a)))?.code;
 }
 
 let hotlineSource: () => Hotline[] = () => HOTLINES;
@@ -70,10 +73,36 @@ export function setHotlineSource(source: () => Hotline[]): void {
   hotlineSource = source;
 }
 
-export function hotlineFor(destination: string | undefined, env: NodeJS.ProcessEnv = process.env): string | undefined {
-  const country = countryOf(destination);
-  const pick = (category: HotlineCategory) => hotlineSource().find((h) => h.country === country && h.category === category && h.dial);
-  const hit = country ? (pick('trafficking') ?? pick('police')) : undefined;
+const DIAL_PREFIX: Record<string, string> = { TH: '66', MM: '95', KH: '855', LA: '856', MY: '60', ID: '62', PH: '63', VN: '84' };
+
+/** Country a dial string rings in: the international prefix, or the owner country for a local number. */
+export function dialCountry(h: Pick<Hotline, 'country' | 'dial'>): string | undefined {
+  const dial = h.dial ?? '';
+  if (!dial.startsWith('+')) return h.country;
+  const digits = dial.slice(1);
+  return Object.entries(DIAL_PREFIX)
+    .sort((a, b) => b[1].length - a[1].length)
+    .find(([, p]) => digits.startsWith(p))?.[0];
+}
+
+const callableFrom = (h: Hotline, where: string | undefined) => !h.domesticOnly || h.dial?.startsWith('+') || where === h.country;
+
+/** Destination trafficking or police line, else a home consular line there, else a home line. */
+export function hotlineFor(destination: string | undefined, env: NodeJS.ProcessEnv = process.env, home?: string): string | undefined {
+  const dest = countryOf(destination);
+  const own = countryOf(home);
+  const list = hotlineSource().filter((h) => h.dial);
+  const first = (pred: (h: Hotline) => boolean) => list.find(pred);
+  const of = (country: string | undefined, category: HotlineCategory) => (h: Hotline) => h.country === country && h.category === category;
+  const where = dest ?? own;
+  const homeOrder: HotlineCategory[] = ['trafficking', 'police', 'consular', 'cybercrime', 'ngo'];
+  const hit =
+    (dest && (first(of(dest, 'trafficking')) ?? first(of(dest, 'police')))) ||
+    (dest && own && dest !== own && first((h) => h.country === own && h.category === 'consular' && dialCountry(h) === dest)) ||
+    (own &&
+      (homeOrder.map((c) => first((h) => of(own, c)(h) && callableFrom(h, where))).find(Boolean) ??
+        homeOrder.map((c) => first(of(own, c))).find(Boolean))) ||
+    undefined;
   return hit?.dial ?? (env.DEFAULT_HOTLINE || undefined);
 }
 
@@ -86,10 +115,10 @@ export function withWebRiskNote(summary: string, links: LinkCheck[], lang: Lang)
   return hit ? `${summary} ${WEB_RISK_NOTE[lang]}`.trim() : summary;
 }
 
-export function buildActions(verdict: Verdict, scamType: ScamType, lang: Lang, destination?: string): Action[] {
+export function buildActions(verdict: Verdict, scamType: ScamType, lang: Lang, destination?: string, home?: string): Action[] {
   if (verdict === 'safe') return [{ label: LABELS.learn[lang], type: 'learn', value: 'scam_basics' }];
   const actions: Action[] = [];
-  const hotline = hotlineFor(destination);
+  const hotline = hotlineFor(destination, process.env, home);
   if (verdict === 'danger' || scamType === 'job_trafficking') {
     actions.push(hotline ? { label: LABELS.call[lang], type: 'call', value: hotline } : { label: LABELS.call[lang], type: 'call' });
   }
