@@ -3,9 +3,11 @@ import { createMockClient } from '../api/mock';
 import type { FactField, JobFacts } from '../api/types';
 import {
   FIELD_DEFS,
+  NO_FEE,
   draftFromFacts,
   enumOptions,
   isUnclear,
+  parseAmount,
   resetFact,
   setNotMentioned,
   setValue,
@@ -27,7 +29,7 @@ describe('fact editing', () => {
   const facts: JobFacts = {
     ...empty(),
     contract: fact('later' as const, 'We sign the contract when you arrive'),
-    salary: fact({ amount: '35000', currency: 'THB', period: 'monthly' }, '35,000 THB / month', 0.5),
+    salary: fact({ amount: 35000, currency: 'THB', period: 'monthly' }, '35,000 THB / month', 0.5),
     employer: fact('Golden Star', 'talk to Golden Star office', 0.4),
   };
 
@@ -53,8 +55,15 @@ describe('fact editing', () => {
 
   it('edits salary as amount, currency and period', () => {
     const next = setValue(draftFromFacts(facts), 'salary', { amount: ' 1,200 ', currency: 'usd', period: 'daily' });
-    expect(toFacts(next).salary).toMatchObject({ value: { amount: '1,200', currency: 'USD', period: 'daily' }, quote: '35,000 THB / month', edited: true });
-    expect(valueLabel('salary', { amount: '1200', currency: 'USD', period: 'daily' })).toBe('1200 USD per day');
+    expect(toFacts(next).salary).toMatchObject({ value: { amount: 1200, currency: 'USD', period: 'daily' }, quote: '35,000 THB / month', edited: true });
+    expect(valueLabel('salary', { amount: 1200, currency: 'USD', period: 'daily' })).toBe('1200 USD per day');
+    expect(parseAmount('၃၅,၀၀၀')).toBe(35000);
+    expect(parseAmount('abc')).toBeNull();
+  });
+
+  it('sends a fee as none or the amount as written', () => {
+    expect(toFacts(setValue(draftFromFacts(facts), 'workerFee', NO_FEE)).workerFee).toMatchObject({ value: 'none', edited: true });
+    expect(toFacts(setValue(draftFromFacts(facts), 'workerFee', '15,000 THB')).workerFee).toMatchObject({ value: '15,000 THB' });
   });
 
   it('treats an emptied salary as not mentioned', () => {

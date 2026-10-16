@@ -29,7 +29,7 @@ const EXTRACTION: JobExtractResponse = {
   chat: {
     ...blank(),
     contract: { value: 'later', quote: 'We sign the contract when you arrive', confidence: 0.9 },
-    salary: { value: { amount: '1500', currency: 'USD', period: 'monthly' }, quote: 'USD 1,500 a month', confidence: 0.5 },
+    salary: { value: { amount: 1500, currency: 'USD', period: 'monthly' }, quote: 'USD 1,500 a month', confidence: 0.5 },
     workplace: { value: '', quote: 'address will be shared later', confidence: 0.5, refused: true },
   },
 };
@@ -87,7 +87,7 @@ describe('Is this right screen', () => {
     fireEvent.press(screen.getByTestId('fact-chat-salary-period'));
     fireEvent.press(screen.getByTestId('fact-chat-salary-period-daily'));
     fireEvent.press(screen.getByTestId('facts-submit'));
-    expect(sent(navigate).facts.chat.salary).toEqual({ value: { amount: '40000', currency: 'THB', period: 'daily' }, quote: 'USD 1,500 a month', confidence: 1, edited: true });
+    expect(sent(navigate).facts.chat.salary).toEqual({ value: { amount: 40000, currency: 'THB', period: 'daily' }, quote: 'USD 1,500 a month', confidence: 1, edited: true });
   });
 
   it('marks a fact not mentioned, keeps its quote and sends null', () => {

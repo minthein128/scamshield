@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useState } from 'react';
-import { API_URL, STABLE_API_URL } from './env';
+import { API_URL, OFFLINE_MOCK, STABLE_API_URL } from './env';
 
 const DEFAULT_CONFIG_URLS = [`${STABLE_API_URL}/config.json`, 'https://saferoute-aibc.web.app/config.json', 'https://saferoute-aibc.firebaseapp.com/config.json'];
 
@@ -146,6 +146,7 @@ export interface ResolveDeps {
 }
 
 export async function resolveApiUrl(deps: ResolveDeps = {}): Promise<string> {
+  if (OFFLINE_MOCK) return '';
   const fetchImpl = deps.fetchImpl ?? fetch;
   trace = [];
   const cached = validApiUrl(await AsyncStorage.getItem(API_URL_CACHE_KEY).catch(() => null));
