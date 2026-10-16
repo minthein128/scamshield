@@ -16,6 +16,7 @@ import {
   type User,
 } from 'firebase/auth';
 import { t } from '../i18n';
+import { diag, shortHash } from '../lib/diagLog';
 
 export type AuthStatus =
   | { kind: 'loading' }
@@ -62,8 +63,26 @@ export function authErrorMessage(error: unknown): string {
   return code ? `${fallback} (code ${code})` : fallback;
 }
 
+export type AuthMethod = 'google' | 'facebook' | 'emailSignIn' | 'emailSignUp' | 'reset' | 'signOut' | 'deleteAccount' | 'anonymous';
+
+/** Logs the attempt, the outcome and the error code of an auth action, then passes the result through. */
+export async function withAuthLog<T>(method: AuthMethod, action: () => Promise<T>, uidOf?: () => string | undefined): Promise<T> {
+  const started = Date.now();
+  diag.info('auth', 'attempt', { method });
+  try {
+    const result = await action();
+    const uid = uidOf?.();
+    diag.info('auth', 'ok', { method, ms: Date.now() - started, ...(uid ? { uid: shortHash(uid) } : {}) });
+    return result;
+  } catch (e) {
+    const code = authErrorCode(e) ?? 'unknown';
+    diag[code === 'auth/popup-closed-by-user' ? 'warn' : 'error']('auth', 'failed', { method, code, ms: Date.now() - started });
+    throw e;
+  }
+}
+
 export async function ensureAnonymous(auth: Auth): Promise<void> {
-  if (!auth.currentUser) await signInAnonymously(auth);
+  if (!auth.currentUser) await withAuthLog('anonymous', () => signInAnonymously(auth));
 }
 
 export async function signUpWithEmail(auth: Auth, email: string, password: string): Promise<void> {

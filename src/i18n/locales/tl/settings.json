@@ -32,8 +32,25 @@
     "checking": "Sinusuri...",
     "none": "Walang address ng server",
     "recheck": "Suriin muli ang koneksyon",
-    "copyReport": "Kopyahin ang ulat ng koneksyon",
-    "copied": "Nakopya ang ulat ng koneksyon. I-paste ito sa mensahe para sa SafeRoute team."
+    "openLog": "Diagnostics log"
+  },
+  "diagnostics": {
+    "title": "Diagnostics log",
+    "privacy": "Nananatili ang log na ito sa telepono mo. Walang laman itong mensahe o personal na detalye. Ibahagi lang kung hihingin ng SafeRoute team.",
+    "all": "Lahat",
+    "errors": "Mga error",
+    "empty": "Wala pang tala sa log.",
+    "emptyErrors": "Walang naitalang error.",
+    "copy": "Kopyahin ang ulat",
+    "share": "Ibahagi ang ulat",
+    "clear": "Burahin ang log",
+    "copied": "Nakopya ang ulat. I-paste ito sa mensahe sa SafeRoute team.",
+    "clearTitle": "Buburahin ang log?",
+    "clearMessage": "Buburahin nito ang lahat ng tala ng log sa teleponong ito.",
+    "clearAction": "Burahin",
+    "levelError": "Error",
+    "levelWarn": "Babala",
+    "levelInfo": "Impormasyon"
   },
   "privacy": {
     "title": "Privacy",
@@ -47,7 +64,8 @@
     "p4": "Maaari mong burahin ang data sa teleponong ito anumang oras. Puwede ring burahin ng mga may account ang kanilang account at ang lahat ng naka-sync.",
     "policy": "Patakaran sa Privacy",
     "deleteInfo": "Paano burahin ang iyong data",
-    "deleteLocal": "Burahin ang data sa teleponong ito"
+    "deleteLocal": "Burahin ang data sa teleponong ito",
+    "p5": "Ang diagnostics log sa teleponong ito ay nagtatala ng mga error code at oras ng proseso. Walang laman itong mensahe o personal na detalye. Ibabahagi lang ito kung pipiliin mong ipadala."
   },
   "confirm": {
     "signOut": {

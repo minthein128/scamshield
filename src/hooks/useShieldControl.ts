@@ -5,6 +5,7 @@ import * as ShieldModule from 'shield-module';
 import { t } from '../i18n';
 import { useApiUrl } from '../config/runtime';
 import { companionStrings } from '../lib/companionStrings';
+import { diag, errorCode } from '../lib/diagLog';
 import { isCleartext } from '../lib/shield';
 import { getAuthToken } from '../services/token';
 import { useAppState } from '../state/AppState';
@@ -65,6 +66,7 @@ export function useShieldControl(): ShieldControl {
     setError(null);
     try {
       if (!(await ShieldModule.hasOverlayPermission())) {
+        diag.info('shield', 'overlay_permission_requested');
         setStep('overlay');
         awaitingOverlay.current = true;
         await ShieldModule.requestOverlayPermission();
@@ -77,6 +79,7 @@ export function useShieldControl(): ShieldControl {
       }
       setStep('capture');
       if (!(await ShieldModule.requestScreenCapturePermission())) {
+        diag.warn('shield', 'capture_denied');
         setError(t('shield:errors.needsScreen'));
         setStep('idle');
         return;
@@ -96,10 +99,12 @@ export function useShieldControl(): ShieldControl {
         ...(destinationCountry ? { destination: destinationCountry } : {}),
         ...(token ? { authToken: token } : {}),
       });
+      diag[ok ? 'info' : 'warn']('shield', ok ? 'started' : 'not_started', { hasUrl: Boolean(apiUrl), hasToken: Boolean(token) });
       if (!ok) setError(t('shield:errors.notStarted'));
       setStep('idle');
       await refresh();
-    } catch {
+    } catch (e) {
+      diag.error('shield', 'start_failed', { code: errorCode(e) });
       setError(t('shield:errors.failed'));
       setStep('idle');
     } finally {
@@ -141,8 +146,10 @@ export function useShieldControl(): ShieldControl {
   const checkNow = useCallback(async () => {
     try {
       await ShieldModule.checkScreenNow();
+      diag.info('shield', 'check_now');
       return true;
-    } catch {
+    } catch (e) {
+      diag.error('shield', 'check_now_failed', { code: errorCode(e) });
       setError(t('shield:errors.checkFailed'));
       return false;
     }

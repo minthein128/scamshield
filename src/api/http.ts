@@ -1,3 +1,4 @@
+import { diag } from '../lib/diagLog';
 import { ApiError, codeFromStatus } from './errors';
 import { createSseParser } from './sse';
 import type { ApiErrorBody, ApiErrorCode, CheckClient, CheckRequest, CheckResponse, CheckStage, CheckUpdate, FeedbackRequest, HealthResponse, Insights, JobAssessRequest, JobAssessResponse, JobExtractRequest, JobExtractResponse, RequestOptions, SpeakRequest, SpeakResponse } from './types';
@@ -14,6 +15,20 @@ export interface HttpClientConfig {
   stream?: boolean;
   /** fetch used only for streamed checks. React Native needs expo/fetch to read a response stream. */
   streamFetchImpl?: typeof fetch;
+}
+
+const ENDPOINT_NAMES: Record<string, string> = {
+  '/v1/check': 'check',
+  '/v1/speak': 'speak',
+  '/v1/feedback': 'feedback',
+  '/v1/insights': 'insights',
+  '/v1/job/extract': 'jobExtract',
+  '/v1/job/assess': 'jobAssess',
+  '/healthz': 'health',
+};
+
+function endpointName(path: string): string {
+  return ENDPOINT_NAMES[path.split('?')[0] ?? ''] ?? 'other';
 }
 
 export const DEFAULT_TIMEOUT_MS = 30000;
@@ -78,6 +93,11 @@ async function readCheckStream(response: Response, onUpdate: (u: CheckUpdate) =>
   return final;
 }
 
+function invalid(endpoint: string): never {
+  diag.error('api', 'invalid_response', { endpoint });
+  throw new ApiError('invalid_response', 'Unexpected response shape');
+}
+
 export function createHttpClient(config: HttpClientConfig): CheckClient {
   const baseUrl = config.baseUrl.replace(/\/+$/, '');
   const timeoutMs = config.timeoutMs ?? DEFAULT_TIMEOUT_MS;
@@ -102,6 +122,8 @@ export function createHttpClient(config: HttpClientConfig): CheckClient {
     }, limitMs);
     const onAbort = () => controller.abort();
     options?.signal?.addEventListener('abort', onAbort);
+    const started = Date.now();
+    const endpoint = endpointName(path);
 
     try {
       const token = (await config.getToken?.().catch(() => null)) ?? null;
@@ -114,17 +136,22 @@ export function createHttpClient(config: HttpClientConfig): CheckClient {
         },
         signal: controller.signal,
       });
-      if (response.ok) return await readOk(response);
+      if (response.ok) {
+        const parsed = await readOk(response);
+        diag.info('api', 'request', { endpoint, status: response.status, ms: Date.now() - started });
+        return parsed;
+      }
       const body = await readJson(response);
       const retryAfter = Number(response.headers?.get?.('retry-after'));
       const retryAfterSec = Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter : undefined;
       if (isErrorBody(body)) throw new ApiError(body.error.code, body.error.message, response.status, retryAfterSec);
       throw new ApiError(codeFromStatus(response.status), `HTTP ${response.status}`, response.status, retryAfterSec);
     } catch (e) {
-      if (e instanceof ApiError) throw e;
-      if (timedOut) throw new ApiError('timeout', 'Request timed out');
-      if (options?.signal?.aborted) throw new ApiError('cancelled', 'Request cancelled');
-      throw new ApiError('network', e instanceof Error ? e.message : 'Network error');
+      const failed = e instanceof ApiError ? e : timedOut ? new ApiError('timeout', 'Request timed out') : options?.signal?.aborted ? new ApiError('cancelled', 'Request cancelled') : new ApiError('network', e instanceof Error ? e.message : 'Network error');
+      if (failed.code !== 'cancelled') {
+        diag[failed.code === 'rate_limited' ? 'warn' : 'error']('api', 'request_failed', { endpoint, kind: failed.code, ms: Date.now() - started, ...(failed.status ? { status: failed.status } : {}) });
+      }
+      throw failed;
     } finally {
       clearTimeout(timer);
       options?.signal?.removeEventListener('abort', onAbort);
@@ -148,12 +175,12 @@ export function createHttpClient(config: HttpClientConfig): CheckClient {
               checkTimeoutMs
             )
           : await send('/v1/check', { method: 'POST', body: JSON.stringify(request) }, options, readJson, 'application/json', fetchImpl, checkTimeoutMs);
-      if (!isCheckResponse(body)) throw new ApiError('invalid_response', 'Unexpected response shape');
+      if (!isCheckResponse(body)) return invalid('check');
       return normalizeResponse(body);
     },
     async speak(request: SpeakRequest, options?: RequestOptions): Promise<SpeakResponse> {
       const body = (await send('/v1/speak', { method: 'POST', body: JSON.stringify(request) }, options)) as SpeakResponse | null;
-      if (!body || typeof body.audioBase64 !== 'string') throw new ApiError('invalid_response', 'Unexpected response shape');
+      if (!body || typeof body.audioBase64 !== 'string') return invalid('speak');
       return body;
     },
     async feedback(request: FeedbackRequest, options?: RequestOptions): Promise<void> {
@@ -161,18 +188,18 @@ export function createHttpClient(config: HttpClientConfig): CheckClient {
     },
     async insights(country: string, options?: RequestOptions): Promise<Insights> {
       const body = (await send(`/v1/insights?country=${encodeURIComponent(country)}&days=30`, { method: 'GET' }, options)) as Insights | null;
-      if (!body || !Array.isArray(body.risks)) throw new ApiError('invalid_response', 'Unexpected response shape');
+      if (!body || !Array.isArray(body.risks)) return invalid('insights');
       return { ...body, domains: body.domains ?? [] };
     },
     async extractJob(request: JobExtractRequest, options?: RequestOptions): Promise<JobExtractResponse> {
       if (!hasJobInput(request.ad) && !hasJobInput(request.chat)) throw new ApiError('bad_request', 'Nothing to read');
       const body = await send('/v1/job/extract', { method: 'POST', body: JSON.stringify(request) }, options, readJson, 'application/json', fetchImpl, checkTimeoutMs);
-      if (!isJobExtractResponse(body)) throw new ApiError('invalid_response', 'Unexpected response shape');
+      if (!isJobExtractResponse(body)) return invalid('jobExtract');
       return { jobId: body.jobId, ad: body.ad ?? null, chat: body.chat ?? null };
     },
     async assessJob(request: JobAssessRequest, options?: RequestOptions): Promise<JobAssessResponse> {
       const body = await send('/v1/job/assess', { method: 'POST', body: JSON.stringify(request) }, options, readJson, 'application/json', fetchImpl, checkTimeoutMs);
-      if (!isCheckResponse(body)) throw new ApiError('invalid_response', 'Unexpected response shape');
+      if (!isCheckResponse(body)) return invalid('jobAssess');
       return normalizeJobResponse(body as JobAssessResponse);
     },
     async health(options?: RequestOptions): Promise<HealthResponse> {

@@ -29,7 +29,7 @@ const SYNC_KEYS: Record<SyncState, 'sync.syncing' | 'sync.done' | 'sync.error' |
 
 const NONE = 'none';
 
-export const PRIVACY_POINTS = ['privacy.p1', 'privacy.p2', 'privacy.p3', 'privacy.p4'] as const;
+export const PRIVACY_POINTS = ['privacy.p1', 'privacy.p2', 'privacy.p3', 'privacy.p4', 'privacy.p5'] as const;
 
 export const SettingsScreen: React.FC<RootScreenProps<'Settings'>> = ({ navigation }) => {
   const { t } = useTranslation(['settings', 'common']);
@@ -180,7 +180,7 @@ export const SettingsScreen: React.FC<RootScreenProps<'Settings'>> = ({ navigati
 
       <View style={{ gap: 8 }}>
         <SectionTitle>{t('connection.title')}</SectionTitle>
-        <ConnectionCard />
+        <ConnectionCard onOpenLog={() => navigation.navigate('Diagnostics')} />
       </View>
 
       <Text style={styles.version}>{`SafeRoute ${Constants.expoConfig?.version ?? ''}`.trim()}</Text>

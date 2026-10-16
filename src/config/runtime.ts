@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useState } from 'react';
+import { diag } from '../lib/diagLog';
 import { API_URL, OFFLINE_MOCK, STABLE_API_URL } from './env';
 
 const DEFAULT_CONFIG_URLS = [`${STABLE_API_URL}/config.json`, 'https://saferoute-aibc.web.app/config.json', 'https://saferoute-aibc.firebaseapp.com/config.json'];
@@ -70,7 +71,9 @@ async function timedFetch(fetchImpl: typeof fetch, url: string, timeoutMs: numbe
     clearTimeout(timer);
   }
   const ok = kind === 'probe' ? res !== null : Boolean(res?.ok);
-  trace.push({ kind, target: traceTarget(url), ok, ms: Date.now() - started, ...(res ? { status: res.status } : {}) });
+  const ms = Date.now() - started;
+  trace.push({ kind, target: traceTarget(url), ok, ms, ...(res ? { status: res.status } : {}) });
+  if (kind !== 'probe') diag[ok ? 'info' : 'warn']('connection', kind, { host: apiHost(url), ok, ms, ...(res ? { status: res.status } : {}) });
   return res;
 }
 
@@ -133,7 +136,9 @@ export async function checkHealth(url: string, fetchImpl: typeof fetch = fetch, 
 /** True when any reliable public endpoint answers, whatever the status. */
 export async function hasInternet(fetchImpl: typeof fetch = fetch, urls: string[] = INTERNET_PROBE_URLS, timeoutMs = 5000): Promise<boolean> {
   const results = await Promise.all(urls.map(u => timedFetch(fetchImpl, u, timeoutMs, 'probe', { method: 'GET', mode: 'no-cors' } as RequestInit)));
-  return results.some(r => r !== null);
+  const reached = results.filter(r => r !== null).length;
+  diag[reached > 0 ? 'info' : 'warn']('connection', 'internet_probe', { reached, of: results.length });
+  return reached > 0;
 }
 
 export interface ResolveDeps {
@@ -146,6 +151,14 @@ export interface ResolveDeps {
 }
 
 export async function resolveApiUrl(deps: ResolveDeps = {}): Promise<string> {
+  if (OFFLINE_MOCK) return '';
+  const started = Date.now();
+  const chosen = await resolveUrlInner(deps);
+  diag[chosen ? 'info' : 'warn']('connection', 'url_resolved', { host: chosen ? apiHost(chosen) : 'none', ms: Date.now() - started });
+  return chosen;
+}
+
+async function resolveUrlInner(deps: ResolveDeps): Promise<string> {
   if (OFFLINE_MOCK) return '';
   const fetchImpl = deps.fetchImpl ?? fetch;
   trace = [];

@@ -29,8 +29,25 @@
     "checking": "Checking...",
     "none": "No server address",
     "recheck": "Re-check connection",
-    "copyReport": "Copy connection report",
-    "copied": "Connection report copied. Paste it in a message to the SafeRoute team."
+    "openLog": "Diagnostics log"
+  },
+  "diagnostics": {
+    "title": "Diagnostics log",
+    "privacy": "This log stays on your phone. It contains no messages or personal details. Share it only if the SafeRoute team asks.",
+    "all": "All",
+    "errors": "Errors",
+    "empty": "No log entries yet.",
+    "emptyErrors": "No errors recorded.",
+    "copy": "Copy report",
+    "share": "Share report",
+    "clear": "Clear log",
+    "copied": "Report copied. Paste it in a message to the SafeRoute team.",
+    "clearTitle": "Clear the log?",
+    "clearMessage": "This deletes all log entries on this phone.",
+    "clearAction": "Clear",
+    "levelError": "Error",
+    "levelWarn": "Warning",
+    "levelInfo": "Info"
   },
   "privacy": {
     "title": "Privacy",
@@ -44,7 +61,8 @@
     "p4": "You can delete the data on this device at any time. Account holders can also delete their account and everything synced.",
     "policy": "Privacy policy",
     "deleteInfo": "How to delete your data",
-    "deleteLocal": "Delete data on this device"
+    "deleteLocal": "Delete data on this device",
+    "p5": "A diagnostics log on this phone records error codes and timings. It holds no messages or personal details. It is shared only if you choose to send it."
   },
   "confirm": {
     "signOut": {
