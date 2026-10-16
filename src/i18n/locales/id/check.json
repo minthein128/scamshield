@@ -2,34 +2,18 @@
   "_meta": {
     "reviewed": false
   },
-  "title": "Periksa sesuatu",
+  "title": "Periksa tanda bahaya",
   "whatIsIt": "Apa yang ingin Anda periksa?",
-  "kinds": {
-    "job": "Lowongan kerja",
-    "message": "Pesan",
-    "link": "Tautan",
-    "shop": "Toko",
-    "agency": "Agensi"
-  },
   "text": {
-    "title": "Pesan teks",
-    "a11y": "Teks atau obrolan untuk diperiksa",
-    "placeholder": "Lowongan kerja, pesan obrolan, atau SMS",
-    "hint": "Tempel pesan atau postingan, atau tambahkan gambarnya."
-  },
-  "link": {
-    "label": "Tautan",
-    "a11y": "Tautan untuk diperiksa",
-    "hint": "Tempel tautan yang ingin Anda periksa."
+    "a11y": "Teks atau obrolan untuk diperiksa"
   },
   "screenshot": {
-    "label": "Tangkapan layar",
     "ready": "{{kb}} KB, siap dikirim",
     "preparing": "Menyiapkan gambar...",
+    "added": "Tangkapan layar ditambahkan",
+    "replace": "Ganti",
     "upload": "Unggah tangkapan layar",
-    "pick": "Pilih tangkapan layar",
-    "change": "Ganti",
-    "pickHint": "Gambar dari ponsel Anda"
+    "pick": "Pilih tangkapan layar"
   },
   "destination": {
     "label": "Di mana Anda bekerja atau bepergian?",
@@ -39,7 +23,7 @@
   "optional": {
     "language": "Bahasa laporan"
   },
-  "submit": "Periksa sekarang",
+  "submit": "Periksa tanda bahaya",
   "errors": {
     "image": "Gambar tersebut tidak dapat digunakan. Coba tangkapan layar yang lain.",
     "clipboardEmpty": "Papan klip Anda kosong."
@@ -50,27 +34,20 @@
     "fallback": "Periksa"
   },
   "more": {
-    "title": "Detail tambahan (opsional)"
+    "title": "Tambah detail (opsional)"
   },
-  "submitHint": "Tambahkan pesan, tautan, atau tangkapan layar terlebih dahulu",
+  "submitHint": "Tambahkan pesan, tautan, atau gambar terlebih dahulu",
   "job": {
     "ad": {
-      "title": "Iklan lowongan kerja",
-      "hint": "Tempel unggahan ini, atau tambahkan fotonya.",
       "a11y": "Teks iklan lowongan kerja",
-      "placeholder": "Tempel iklan lowongan di sini",
-      "pickHint": "Gambar iklan dari ponsel Anda"
+      "placeholder": "Tempel iklan lowongan di sini"
     },
     "chat": {
-      "title": "Pesan dari perekrut",
-      "optional": "Opsional",
-      "hint": "Tempel pesan, atau tambahkan foto. Ini bisa membantu kami melihat hal yang tidak sesuai dengan iklan.",
       "a11y": "Teks obrolan perekrut",
-      "placeholder": "Tempel obrolan dengan perekrut di sini",
-      "pickHint": "Gambar obrolan dari ponsel Anda"
+      "placeholder": "Tempel obrolan dengan perekrut di sini"
     },
-    "submit": "Baca teks ini",
-    "submitHint": "Tambahkan iklan lowongan atau obrolan terlebih dahulu",
+    "submit": "Periksa dan bandingkan",
+    "submitHint": "Tambahkan tawaran kerja terlebih dahulu",
     "notMentioned": "Tidak disebutkan",
     "source": {
       "ad": "Iklan lowongan kerja",
@@ -180,7 +157,39 @@
         "yes": "Diminta merahasiakannya",
         "no": "Tidak diminta merahasiakannya"
       }
+    },
+    "step1": "1. Tawaran kerja",
+    "step1Hint": "Iklan atau postingan. Gambar atau tulisannya.",
+    "step2": "2. Pesan dari perekrut",
+    "optional": "opsional",
+    "step2Hint": "Kami membandingkan tawaran dengan apa yang diminta perekrut dari Anda.",
+    "added": {
+      "ad": "Tawaran kerja ditambahkan",
+      "chat": "Pesan ditambahkan"
     }
   },
-  "or": "atau"
+  "or": "atau",
+  "sub": "Tambahkan pesan, tautan, atau tangkapan layar. Satu saja sudah cukup.",
+  "exit": "Keluar cepat",
+  "chips": {
+    "message": "Pesan",
+    "job": "Tawaran kerja",
+    "shop": "Belanja",
+    "general": "Tidak yakin"
+  },
+  "message": {
+    "title": "Pesan Anda",
+    "placeholder": "Tempel pesan atau tautan di sini"
+  },
+  "shop": {
+    "title": "Toko atau postingan",
+    "placeholder": "Tempel tautan toko atau pesan penjual di sini"
+  },
+  "general": {
+    "title": "Yang Anda terima",
+    "placeholder": "Tempel apa saja di sini: pesan, tautan, atau iklan"
+  },
+  "clip": "Tempel yang Anda salin",
+  "upload": "Unggah tangkapan layar atau foto",
+  "warn": "{{app}} bisa saja melewatkan penipuan. Risiko rendah tidak berarti pasti aman."
 }

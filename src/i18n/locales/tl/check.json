@@ -2,44 +2,28 @@
   "_meta": {
     "reviewed": false
   },
-  "title": "Suriin ang isang bagay",
+  "title": "Suriin ang mga babala",
   "whatIsIt": "Ano ang gusto mong suriin?",
-  "kinds": {
-    "job": "Alok na trabaho",
-    "message": "Mensahe",
-    "link": "Link",
-    "shop": "Tindahan",
-    "agency": "Ahensya"
-  },
   "text": {
-    "title": "Mensaheng text",
-    "a11y": "Text o chat na susuriin",
-    "placeholder": "Post tungkol sa trabaho, mga mensahe sa chat, o SMS",
-    "hint": "I-paste ang mensahe o post, o magdagdag ng larawan nito."
-  },
-  "link": {
-    "label": "Link",
-    "a11y": "Link na susuriin",
-    "hint": "I-paste ang link na gusto mong suriin."
+    "a11y": "Text o chat na susuriin"
   },
   "screenshot": {
-    "label": "Screenshot",
     "ready": "{{kb}} KB, handa nang ipadala",
     "preparing": "Inihahanda ang larawan...",
+    "added": "Naidagdag ang screenshot",
+    "replace": "Palitan",
     "upload": "Mag-upload ng screenshot",
-    "pick": "Pumili ng screenshot",
-    "change": "Palitan",
-    "pickHint": "Larawan mula sa iyong telepono"
+    "pick": "Pumili ng screenshot"
   },
   "destination": {
-    "label": "Saan ka nagtatrabaho o bumibiyahe?",
+    "label": "Saan ka magtatrabaho o maglalakbay?",
     "a11y": "Pupuntahan",
-    "placeholder": "Halimbawa: Bangkok, Thailand"
+    "placeholder": "Halimbawa Bangkok, Thailand"
   },
   "optional": {
     "language": "Wika ng ulat"
   },
-  "submit": "Suriin ngayon",
+  "submit": "Suriin ang mga babala",
   "errors": {
     "image": "Hindi magamit ang larawang iyon. Sumubok ng ibang screenshot.",
     "clipboardEmpty": "Walang nakopya sa iyong clipboard."
@@ -50,27 +34,20 @@
     "fallback": "Pagsusuri"
   },
   "more": {
-    "title": "Dagdag na detalye (opsyonal)"
+    "title": "Magdagdag ng detalye (opsyonal)"
   },
-  "submitHint": "Maglagay muna ng mensahe, link, o screenshot",
+  "submitHint": "Maglagay muna ng mensahe, link o larawan",
   "job": {
     "ad": {
-      "title": "Ang job ad",
-      "hint": "I-paste ang post, o magdagdag ng litrato nito.",
       "a11y": "Teksto ng job ad",
-      "placeholder": "I-paste ang job ad dito",
-      "pickHint": "Larawan ng ad mula sa iyong telepono"
+      "placeholder": "I-paste dito ang job ad"
     },
     "chat": {
-      "title": "Ang sinabi o tinanong ng recruiter sa iyo",
-      "optional": "Opsyonal",
-      "hint": "I-paste ang mga mensahe, o magdagdag ng litrato. Makakatulong ito para mapansin ang mga bagay na posibleng hindi tugma sa ad.",
       "a11y": "Teksto ng chat sa recruiter",
-      "placeholder": "I-paste ang chat sa recruiter dito",
-      "pickHint": "Larawan ng chat mula sa iyong telepono"
+      "placeholder": "I-paste dito ang chat sa recruiter"
     },
-    "submit": "Basahin ang mga tekstong ito",
-    "submitHint": "Idagdag muna ang job ad o ang chat",
+    "submit": "Suriin at ihambing",
+    "submitHint": "Idagdag muna ang alok na trabaho",
     "notMentioned": "Hindi nabanggit",
     "source": {
       "ad": "Job ad",
@@ -180,7 +157,39 @@
         "yes": "Sinabihang ilihim ito",
         "no": "Hindi sinabihang ilihim ito"
       }
+    },
+    "step1": "1. Alok na trabaho",
+    "step1Hint": "Ang ad o post. Larawan o ang mga salita.",
+    "step2": "2. Mga mensahe ng recruiter",
+    "optional": "opsyonal",
+    "step2Hint": "Ikinukumpara namin ang alok sa hinihiling nila sa iyo.",
+    "added": {
+      "ad": "Naidagdag ang alok na trabaho",
+      "chat": "Naidagdag ang mga mensahe"
     }
   },
-  "or": "o"
+  "or": "o",
+  "sub": "Magdagdag ng mensahe, link o screenshot. Sapat na ang isa.",
+  "exit": "Mabilis na labas",
+  "chips": {
+    "message": "Mensahe",
+    "job": "Alok na trabaho",
+    "shop": "Pamimili",
+    "general": "Hindi sigurado"
+  },
+  "message": {
+    "title": "Ang mensahe mo",
+    "placeholder": "I-paste dito ang mensahe o link"
+  },
+  "shop": {
+    "title": "Ang tindahan o post",
+    "placeholder": "I-paste dito ang link ng tindahan o mensahe ng nagbebenta"
+  },
+  "general": {
+    "title": "Ang natanggap mo",
+    "placeholder": "I-paste dito ang anuman: mensahe, link o ad"
+  },
+  "clip": "I-paste ang kinopya mo",
+  "upload": "Mag-upload ng screenshot o larawan",
+  "warn": "Maaaring makaligtaan ng {{app}} ang mga scam. Ang mababang panganib ay hindi garantiya na ligtas."
 }

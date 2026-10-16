@@ -13,7 +13,22 @@ export interface CheckForm {
   language: LanguageCode;
 }
 
-export const KIND_OPTIONS: Exclude<CheckKind, 'screen'>[] = ['job', 'message', 'link', 'shop', 'agency'];
+/** The four modes on the Check page. Not sure has no server kind of its own and goes as message. */
+export type CheckMode = 'message' | 'job' | 'shop' | 'general';
+export const CHECK_MODES: CheckMode[] = ['message', 'job', 'shop', 'general'];
+
+/** Share-intent and draft kinds land on a mode; agency checks run as a job offer. */
+export function modeForKind(kind: CheckKind): CheckMode {
+  if (kind === 'job' || kind === 'agency') return 'job';
+  if (kind === 'shop') return 'shop';
+  return 'message';
+}
+
+/** The server kind for a single-card mode. A pasted web address makes it a link check. */
+export function kindForMode(mode: Exclude<CheckMode, 'job'>, text: string): CheckKind {
+  if (mode === 'shop') return 'shop';
+  return looksLikeUrl(text) ? 'link' : 'message';
+}
 
 export function buildRequest(form: CheckForm): CheckRequest {
   const text = form.text.trim();

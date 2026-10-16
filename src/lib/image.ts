@@ -11,6 +11,8 @@ export interface PreparedImage {
   mimeType: 'image/jpeg';
   bytes: number;
   uri: string;
+  /** Original file name when the picker gives one. */
+  name?: string;
 }
 
 export function base64Bytes(base64: string): number {
@@ -63,5 +65,7 @@ export async function pickScreenshot(): Promise<PreparedImage | null> {
     quality: 1,
   });
   if (result.canceled || !result.assets[0]) return null;
-  return prepareImage(result.assets[0].uri, MAX_IMAGE_BYTES, undefined, result.assets[0].width);
+  const asset = result.assets[0];
+  const prepared = await prepareImage(asset.uri, MAX_IMAGE_BYTES, undefined, asset.width);
+  return asset.fileName ? { ...prepared, name: asset.fileName } : prepared;
 }

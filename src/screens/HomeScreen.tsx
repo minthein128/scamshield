@@ -67,7 +67,7 @@ export const HomeScreen: React.FC<TabScreenProps<'Home'>> = ({ navigation }) => 
     >
       <NoticeCard />
 
-      <BigShieldButton onDetails={() => navigation.navigate('Shield')} />
+      <BigShieldButton />
 
       {checkCard()}
 
