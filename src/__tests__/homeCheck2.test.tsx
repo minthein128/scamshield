@@ -1,11 +1,12 @@
 import React from 'react';
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { Linking } from 'react-native';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import * as Clipboard from 'expo-clipboard';
 import i18n from '../i18n';
 import { BigShieldButtonView } from '../components/BigShieldButton';
-import { SourceBlock } from '../components/SourceBlock';
 import { CheckScreen } from '../screens/CheckScreen';
 import type { ShieldControl } from '../hooks/useShieldControl';
-import type { PreparedImage } from '../lib/image';
+import { pickScreenshot, type PreparedImage } from '../lib/image';
 
 jest.mock('react-native-safe-area-context', () => {
   const { View } = jest.requireActual('react-native');
@@ -14,7 +15,10 @@ jest.mock('react-native-safe-area-context', () => {
 jest.mock('@react-navigation/native', () => ({
   ...jest.requireActual('@react-navigation/native'),
   useNavigation: () => ({ getParent: () => undefined, dispatch: jest.fn() }),
+  useFocusEffect: (cb: () => void) => require('react').useEffect(cb, []),
 }));
+jest.mock('expo-clipboard', () => ({ hasStringAsync: jest.fn(async () => false), getStringAsync: jest.fn(async () => 'copied text') }));
+jest.mock('../lib/image', () => ({ ...jest.requireActual('../lib/image'), pickScreenshot: jest.fn() }));
 jest.mock('../state/AppState', () => ({
   useAppState: () => ({ language: 'en', setLanguage: jest.fn(), profile: { destinationCountry: '', homeCountry: '', shareSignals: false } }),
 }));
@@ -51,12 +55,22 @@ describe('big shield button', () => {
     expect(c.setEnabled).toHaveBeenCalledWith(false);
   });
 
-  it('web: keeps the circle, explains it needs the Android app and has no toggle', () => {
+  it('web: the circle offers the Android app and opens the download page, with no toggle', () => {
+    const open = jest.spyOn(Linking, 'openURL').mockResolvedValue(true);
     const c = control({ support: 'web' });
     render(<BigShieldButtonView control={c} />);
-    expect(screen.getByTestId('shield-button').props.accessibilityState.disabled).toBe(true);
-    expect(textOf('shield-hint')).toBe('The shield works in the Android app.');
+    expect(textOf('shield-download')).toBe('Download the Android app');
     expect(screen.queryByText('Turn on')).toBeNull();
+    fireEvent.press(screen.getByTestId('shield-button'));
+    expect(open).toHaveBeenCalledWith(expect.stringContaining('/download'));
+    expect(c.setEnabled).not.toHaveBeenCalled();
+  });
+
+  it('unavailable build: same circle, disabled, with the existing status text', () => {
+    const c = control({ support: 'insecure-service' });
+    render(<BigShieldButtonView control={c} />);
+    expect(screen.getByTestId('shield-button').props.accessibilityState.disabled).toBe(true);
+    expect(textOf('shield-hint')).toContain('insecure service address');
     fireEvent.press(screen.getByTestId('shield-button'));
     expect(c.setEnabled).not.toHaveBeenCalled();
   });
@@ -67,62 +81,165 @@ describe('big shield button', () => {
     expect(textOf('shield-hint')).toContain('Step 3 of 4');
   });
 
+  it('busy: shows a spinner, disables the circle and shows the permission step', () => {
+    render(<BigShieldButtonView control={control({ step: 'overlay' })} />);
+    expect(screen.getByTestId('shield-busy')).toBeTruthy();
+    expect(screen.getByTestId('shield-button').props.accessibilityState.busy).toBe(true);
+  });
+
+  it('shows the existing error text when start fails', () => {
+    render(<BigShieldButtonView control={control({ error: 'The shield did not start. Try again.' })} />);
+    expect(textOf('shield-error')).toBe('The shield did not start. Try again.');
+  });
+
   it('renders nothing where the shield is unsupported', () => {
     render(<BigShieldButtonView control={control({ support: 'unsupported' })} />);
     expect(screen.queryByTestId('shield-card')).toBeNull();
   });
 });
 
-const IMAGE: PreparedImage = { uri: 'file:///a.jpg', base64: 'x', mimeType: 'image/jpeg', bytes: 250880 } as PreparedImage;
+const IMAGE = { uri: 'file:///a.jpg', base64: 'x', mimeType: 'image/jpeg', bytes: 250880, name: 'job-offer.jpg' } as PreparedImage;
 
-function block(patch: Partial<React.ComponentProps<typeof SourceBlock>> = {}) {
-  const props = { testID: 'job-ad', icon: 'briefcase' as const, title: 'The job ad', hint: 'Paste the post, or add a picture of it.', a11y: 'Text of the job ad', placeholder: 'Paste the job ad here', pickHint: 'A picture of the ad from your phone', text: '', image: null, busy: false, onText: jest.fn(), onPaste: jest.fn(), onPick: jest.fn(), onRemove: jest.fn(), ...patch };
-  render(<SourceBlock {...props} />);
-  return props;
-}
+const navigate = jest.fn();
+const renderCheck = (params?: object, mode: string | null = 'message') => {
+  const navigation = { navigate: jest.fn(), getParent: () => ({ navigate }) } as never;
+  render(<CheckScreen navigation={navigation} route={{ params } as never} />);
+  if (mode) fireEvent.press(screen.getByTestId(`check-mode-${mode}`));
+};
 
-describe('Check input blocks', () => {
-  it('empty: header, text box with Paste, or divider and the Pick a screenshot card', () => {
-    const p = block();
-    expect(screen.getByText('The job ad')).toBeTruthy();
-    expect(screen.getByText('or')).toBeTruthy();
-    expect(screen.getByText('Pick a screenshot')).toBeTruthy();
-    expect(screen.getByText('A picture of the ad from your phone')).toBeTruthy();
-    fireEvent.press(screen.getByTestId('job-ad-text-paste'));
-    expect(p.onPaste).toHaveBeenCalled();
-    fireEvent.press(screen.getByTestId('job-ad-pick'));
-    expect(p.onPick).toHaveBeenCalled();
-  });
-
-  it('filled screenshot: size, Change and Remove replace the picker', () => {
-    const p = block({ image: IMAGE });
-    expect(screen.getByText('245 KB, ready to send')).toBeTruthy();
-    expect(screen.queryByText('Pick a screenshot')).toBeNull();
-    fireEvent.press(screen.getByTestId('job-ad-pick-change'));
-    expect(p.onPick).toHaveBeenCalled();
-    fireEvent.press(screen.getByTestId('job-ad-pick-remove'));
-    expect(p.onRemove).toHaveBeenCalled();
-  });
-
-  it('optional block shows the Optional chip', () => {
-    block({ optional: true });
-    expect(screen.getByText('Optional')).toBeTruthy();
-  });
+beforeEach(() => {
+  navigate.mockClear();
+  (Clipboard.hasStringAsync as jest.Mock).mockResolvedValue(false);
+  (Clipboard.getStringAsync as jest.Mock).mockReset().mockResolvedValue('copied text');
 });
 
-describe('Check page submit', () => {
-  const renderCheck = () => {
-    const navigation = { navigate: jest.fn(), getParent: () => ({ navigate: jest.fn() }) } as never;
-    render(<CheckScreen navigation={navigation} route={{ params: undefined } as never} />);
-  };
+describe('Check page v3', () => {
+  it('every entry point opens the same Check page on the Message chip', async () => {
+    const layouts: string[] = [];
+    const entries: [string, object | undefined][] = [['tab', undefined], ['link', { intent: 'link', nonce: 1 }], ['image', { intent: 'image', nonce: 2 }], ['text', { intent: 'text', nonce: 3 }]];
+    for (const [name, params] of entries) {
+      (pickScreenshot as jest.Mock).mockClear();
+      const view = render(<CheckScreen navigation={{ navigate: jest.fn(), getParent: () => ({ navigate }) } as never} route={{ params } as never} />);
+      await waitFor(() => expect(screen.getByTestId('check-mode-message').props.accessibilityState.selected).toBe(true));
+      expect(screen.getByText('Your message')).toBeTruthy();
+      expect(screen.queryByText('1. Job offer')).toBeNull();
+      if (name !== 'link') layouts.push(JSON.stringify(screen.toJSON(), (k, v) => (k === 'value' || typeof v === 'function' ? undefined : v)));
+      if (name === 'image') expect(pickScreenshot).toHaveBeenCalledTimes(1);
+      else expect(pickScreenshot).not.toHaveBeenCalled();
+      expect(screen.getByTestId('check-text')).toBeTruthy();
+      if (name !== 'link') expect(screen.getByTestId('check-pick')).toBeTruthy();
+      expect(screen.getByTestId('check-more')).toBeTruthy();
+      view.unmount();
+    }
+    expect(layouts).toHaveLength(3);
+    for (const l of layouts) expect(l).toBe(layouts[0]);
+  });
 
-  it('Job offer: the button is disabled and the hint says why until something is added', () => {
+  it('Home Link pastes the clipboard into the Message text box and treats it as a link', async () => {
+    (Clipboard.getStringAsync as jest.Mock).mockResolvedValue('https://example.com/x');
+    renderCheck({ intent: 'link', nonce: 1 }, null);
+    await waitFor(() => expect(screen.getByTestId('check-text').props.value).toBe('https://example.com/x'));
+    fireEvent.press(screen.getByTestId('check-submit'));
+    expect(navigate.mock.calls[0][1].request.kind).toBe('link');
+  });
+
+  it('a chip the user picked stays selected', () => {
+    renderCheck({ intent: 'text', nonce: 3 }, 'shop');
+    expect(screen.getByTestId('check-mode-shop').props.accessibilityState.selected).toBe(true);
+  });
+
+  it('shows the four chips and the Message card', () => {
     renderCheck();
-    expect(textOf('check-submit-hint')).toBe('Add the job ad or the chat first');
+    for (const m of ['message', 'job', 'shop', 'general']) expect(screen.getByTestId(`check-mode-${m}`)).toBeTruthy();
+    expect(screen.getByText('Your message')).toBeTruthy();
+    expect(screen.getByText('Upload a screenshot or photo')).toBeTruthy();
+    expect(screen.getByText('Quick exit')).toBeTruthy();
+    expect(textOf('check-warn')).toContain('can miss scams');
+  });
+
+  it('each chip swaps the card title and placeholder', () => {
+    renderCheck();
+    fireEvent.press(screen.getByTestId('check-mode-shop'));
+    expect(screen.getByText('The shop or post')).toBeTruthy();
+    fireEvent.press(screen.getByTestId('check-mode-general'));
+    expect(screen.getByText('What you got')).toBeTruthy();
+    expect(screen.getByPlaceholderText('Paste anything here: a message, link or ad')).toBeTruthy();
+  });
+
+  it('disabled button with the reason until something is added', () => {
+    renderCheck();
+    expect(textOf('check-submit-hint')).toBe('Add a message, link or picture first');
     expect(screen.getByTestId('check-submit').props.accessibilityState.disabled).toBe(true);
-    expect(screen.getByText('Read these texts')).toBeTruthy();
-    fireEvent.changeText(screen.getByTestId('job-ad-text'), 'Factory workers needed');
+    fireEvent.changeText(screen.getByTestId('check-text'), 'hello');
     expect(screen.queryByTestId('check-submit-hint')).toBeNull();
-    expect(screen.getByTestId('check-submit').props.accessibilityState.disabled).toBe(false);
+  });
+
+  it('Not sure goes to the server as a message check', () => {
+    renderCheck();
+    fireEvent.press(screen.getByTestId('check-mode-general'));
+    fireEvent.changeText(screen.getByTestId('check-text'), 'Pay a fee to get the visa');
+    fireEvent.press(screen.getByTestId('check-submit'));
+    expect(navigate.mock.calls[0][1].request.kind).toBe('message');
+  });
+
+  it('a pasted web address becomes a link check; Shopping stays shop', () => {
+    renderCheck();
+    fireEvent.changeText(screen.getByTestId('check-text'), 'https://example.com/apply');
+    fireEvent.press(screen.getByTestId('check-submit'));
+    expect(navigate.mock.calls[0][1].request).toMatchObject({ kind: 'link', url: 'https://example.com/apply' });
+    navigate.mockClear();
+    fireEvent.press(screen.getByTestId('check-mode-shop'));
+    fireEvent.press(screen.getByTestId('check-submit'));
+    expect(navigate.mock.calls[0][1].request.kind).toBe('shop');
+  });
+
+  it('Job offer: two steps, hint, added bar and Check and compare', () => {
+    renderCheck(undefined, 'job');
+    expect(screen.getByText('1. Job offer')).toBeTruthy();
+    expect(textOf('job-chat')).toContain('optional');
+    expect(textOf('check-submit-hint')).toBe('Add the job offer first');
+    expect(screen.getByText('Check and compare')).toBeTruthy();
+    fireEvent.changeText(screen.getByTestId('job-ad-text'), 'Factory workers needed');
+    fireEvent.changeText(screen.getByTestId('job-chat-text'), 'Pay a deposit');
+    expect(screen.getByText('Job offer added')).toBeTruthy();
+    expect(screen.getByText('Messages added')).toBeTruthy();
+    fireEvent.press(screen.getByTestId('check-submit'));
+    expect(navigate.mock.calls[0][1].job.phase).toBe('extract');
+  });
+
+  it('added picture shows the file card with Replace and Remove', async () => {
+    (pickScreenshot as jest.Mock).mockResolvedValue(IMAGE);
+    renderCheck();
+    fireEvent.press(screen.getByTestId('check-pick'));
+    await waitFor(() => expect(screen.getByText('job-offer.jpg')).toBeTruthy());
+    expect(screen.getByText('Screenshot added')).toBeTruthy();
+    expect(screen.queryByText('Upload a screenshot or photo')).toBeNull();
+    fireEvent.press(screen.getByTestId('check-file-remove'));
+    expect(screen.getByText('Upload a screenshot or photo')).toBeTruthy();
+  });
+
+  it('no Paste chip and no clipboard read when the clipboard is empty', async () => {
+    renderCheck();
+    expect(screen.queryByText('Paste what you copied')).toBeNull();
+    expect(Clipboard.getStringAsync).not.toHaveBeenCalled();
+  });
+
+  it('with clipboard text the chip appears without reading, then fills the box on tap', async () => {
+    (Clipboard.hasStringAsync as jest.Mock).mockResolvedValue(true);
+    (Clipboard.getStringAsync as jest.Mock).mockClear();
+    renderCheck();
+    await waitFor(() => expect(screen.getByText('Paste what you copied')).toBeTruthy());
+    expect(Clipboard.getStringAsync).not.toHaveBeenCalled();
+    await act(async () => { fireEvent.press(screen.getByTestId('check-text-clip')); });
+    expect(screen.getByTestId('check-text').props.value).toBe('copied text');
+    expect(screen.queryByText('Paste what you copied')).toBeNull();
+  });
+
+  it('More details unfolds the two existing fields', () => {
+    renderCheck();
+    expect(screen.queryByTestId('check-destination')).toBeNull();
+    fireEvent.press(screen.getByTestId('check-more'));
+    expect(screen.getByTestId('check-destination')).toBeTruthy();
+    expect(screen.getByTestId('check-language')).toBeTruthy();
   });
 });

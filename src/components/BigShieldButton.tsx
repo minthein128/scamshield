@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Linking, StyleSheet, TouchableOpacity, View } from 'react-native';
 import Svg, { Circle, G } from 'react-native-svg';
 import { useTranslation } from 'react-i18next';
 import { Text } from './Text';
@@ -8,6 +8,7 @@ import { MarkShapes } from './BrandMark';
 import { MARK_COLORS, MARK_VIEW, markShapes, type MarkShape } from './dollMark';
 import { stepText, type ShieldControl } from '../hooks/useShieldControl';
 import { useHomeShield } from '../hooks/useHomeShield';
+import { STABLE_API_URL } from '../config/env';
 import theme from '../theme/theme';
 
 const { colors, fonts } = theme;
@@ -38,15 +39,18 @@ const Doll: React.FC<{ on: boolean }> = ({ on }) => (
   </Svg>
 );
 
-export const BigShieldButton: React.FC<{ onDetails?: () => void }> = ({ onDetails }) => <BigShieldButtonView control={useHomeShield()} onDetails={onDetails} />;
+export const BigShieldButton: React.FC = () => <BigShieldButtonView control={useHomeShield()} />;
+
+export const downloadUrl = (): string => process.env.EXPO_PUBLIC_APK_URL?.trim() || `${STABLE_API_URL}/download`;
 
 /** Status line, the round on/off button and one hint line. */
-export const BigShieldButtonView: React.FC<{ control: ShieldControl; onDetails?: () => void }> = ({ control, onDetails }) => {
+export const BigShieldButtonView: React.FC<{ control: ShieldControl }> = ({ control }) => {
   const { t } = useTranslation(['home', 'shield']);
   const { support, running, step, error, setEnabled } = control;
   if (support === 'unsupported') return null;
 
   const unavailable = support !== 'ready';
+  const web = support === 'web';
   const working = step !== 'idle';
   const on = !unavailable && running;
   const hint = unavailable
@@ -75,16 +79,20 @@ export const BigShieldButtonView: React.FC<{ control: ShieldControl; onDetails?:
       <View style={[styles.halo, on ? styles.haloOn : styles.haloOff]}>
         <TouchableOpacity
           testID="shield-button"
-          accessibilityRole="button"
-          accessibilityLabel={unavailable ? `${statusText}. ${hint}` : on ? t('home:shield.a11yOn') : t('home:shield.a11yOff')}
-          accessibilityState={{ disabled: unavailable || working, selected: on, busy: working }}
+          accessibilityRole={web ? 'link' : 'button'}
+          accessibilityLabel={web ? t('shield:download') : unavailable ? `${statusText}. ${hint}` : on ? t('home:shield.a11yOn') : t('home:shield.a11yOff')}
+          accessibilityState={{ disabled: (unavailable && !web) || working, selected: on, busy: working }}
           activeOpacity={0.85}
-          disabled={unavailable || working}
-          onPress={() => setEnabled(!running)}
-          style={[styles.disc, on ? styles.discOn : styles.discOff, unavailable && styles.discUnavailable]}
+          disabled={(unavailable && !web) || working}
+          onPress={() => (web ? Linking.openURL(downloadUrl()).catch(() => undefined) : setEnabled(!running))}
+          style={[styles.disc, on ? styles.discOn : styles.discOff, unavailable && !web && styles.discUnavailable]}
         >
           <Doll on={on} />
-          {unavailable ? null : (
+          {web ? (
+            <Text testID="shield-download" style={styles.download}>{t('shield:download')}</Text>
+          ) : working ? (
+            <ActivityIndicator testID="shield-busy" color={colors.textPrimary} />
+          ) : unavailable ? null : (
             <View style={styles.labelRow}>
               <BlockIcon name="power" size={16} color={on ? colors.white : colors.textPrimary} />
               <Text numberOfLines={1} style={[styles.label, { color: on ? colors.white : colors.textPrimary }]}>{label}</Text>
@@ -95,11 +103,6 @@ export const BigShieldButtonView: React.FC<{ control: ShieldControl; onDetails?:
 
       <Text testID="shield-hint" style={styles.hint}>{hint}</Text>
       {error ? <Text testID="shield-error" style={styles.error}>{error}</Text> : null}
-      {onDetails && !unavailable ? (
-        <TouchableOpacity testID="shield-details" accessibilityRole="button" accessibilityLabel={t('shield:detailsA11y')} activeOpacity={0.7} onPress={onDetails} style={styles.details}>
-          <Text style={styles.detailsText}>{t('shield:details')}</Text>
-        </TouchableOpacity>
-      ) : null}
     </View>
   );
 };
@@ -118,9 +121,8 @@ const styles = StyleSheet.create({
   discOn: { backgroundColor: colors.brandInk, shadowOpacity: 0.3 },
   discUnavailable: { opacity: 0.7 },
   labelRow: { flexDirection: 'row', alignItems: 'center', gap: 6, maxWidth: DISC - 24 },
+  download: { color: colors.textPrimary, fontSize: 15, lineHeight: 21, fontFamily: fonts.bold, textAlign: 'center', paddingHorizontal: 16, textDecorationLine: 'underline' },
   label: { fontSize: 17, lineHeight: 24, fontFamily: fonts.bold, includeFontPadding: false },
   hint: { color: colors.textSecondary, fontSize: 14, lineHeight: 21, fontFamily: fonts.regular, textAlign: 'center', paddingHorizontal: 12, maxWidth: 360 },
-  details: { minHeight: 48, justifyContent: 'center', paddingHorizontal: 8, marginTop: -8 },
-  detailsText: { color: colors.textPrimary, fontSize: 14, lineHeight: 20, fontFamily: fonts.semiBold, textDecorationLine: 'underline' },
   error: { color: colors.dangerDark, fontSize: 14, lineHeight: 20, fontFamily: fonts.semiBold, textAlign: 'center' },
 });

@@ -1,52 +1,92 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { View, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import * as Clipboard from 'expo-clipboard';
 import { Screen } from '../components/Screen';
 import { Text, TextInput } from '../components/Text';
 import { BlockIcon } from '../components/blockIcons';
+import { BrandLockup } from '../components/BrandMark';
+import { QuickExitButton } from '../components/QuickExit';
+import { AddedBar, CheckCard, FileCard, FoldRow, ModeChips, OrDivider, TextBox, UploadBox } from '../components/CheckBlocks';
 import { Button, Notice } from '../components/ui';
-import { Icon } from '../components/Icon';
-import { HeaderWithLeave } from '../components/LeaveQuickly';
 import { Select } from '../components/Select';
-import { SourceBlock } from '../components/SourceBlock';
-import { InputBlock, TextBox } from '../components/CheckBlocks';
 import { UI_LANGUAGES } from '../i18n/languages';
+import { APP_NAME } from '../config/brand';
 import { countryName } from '../lib/countries';
 import { hasInput } from '../api';
-import type { CheckKind } from '../api/types';
 import { PreparedImage, pickScreenshot, prepareImage } from '../lib/image';
-import { KIND_OPTIONS, buildJobRequest, buildRequest, jobSourceLabel, looksLikeUrl, sourceLabel } from '../lib/request';
+import { CHECK_MODES, CheckMode, buildJobRequest, buildRequest, jobSourceLabel, kindForMode, looksLikeUrl, modeForKind, sourceLabel } from '../lib/request';
+import { useClipboardHasText } from '../hooks/useClipboardText';
 import type { TabScreenProps } from '../navigation/types';
 import { useAppState } from '../state/AppState';
 import theme from '../theme/theme';
 
 const { colors, fonts } = theme;
 
+interface SourceProps {
+  id: string;
+  title: string;
+  optional?: string;
+  hint?: string;
+  a11y: string;
+  placeholder: string;
+  text: string;
+  image: PreparedImage | null;
+  busy: boolean;
+  hasClip: boolean;
+  focusKey?: number;
+  onText: (value: string) => void;
+  onClip: () => void;
+  onPick: () => void;
+  onRemove: () => void;
+}
+
+/** One card: a text box with an OR line and the upload box, or the picture and text once added. */
+const SourceCard: React.FC<SourceProps> = ({ id, title, optional, hint, a11y, placeholder, text, image, busy, hasClip, focusKey, onText, onClip, onPick, onRemove }) => {
+  const { t } = useTranslation(['check', 'common']);
+  const empty = !image && !text;
+  return (
+    <CheckCard testID={id} title={title} optional={optional} hint={image ? undefined : hint}>
+      {image ? (
+        <FileCard
+          testID={`${id}-file`}
+          image={image}
+          name={image.name ?? t('screenshot.ready', { kb: Math.round(image.bytes / 1024) })}
+          added={t('screenshot.added')}
+          replaceLabel={t('screenshot.replace')}
+          removeLabel={t('common:actions.remove')}
+          busy={busy}
+          onReplace={onPick}
+          onRemove={onRemove}
+        />
+      ) : null}
+      {!image || text ? <TextBox testID={`${id}-text`} a11y={a11y} placeholder={placeholder} value={text} onChange={onText} clipLabel={hasClip ? t('clip') : undefined} onClip={onClip} focusKey={focusKey} /> : null}
+      {empty ? (
+        <>
+          <OrDivider label={t('or')} />
+          <UploadBox testID={`${id}-pick`} label={busy ? t('screenshot.preparing') : t('upload')} busy={busy} onPress={onPick} />
+        </>
+      ) : null}
+    </CheckCard>
+  );
+};
+
 export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, route }) => {
   const { t } = useTranslation(['check', 'common']);
   const { language, setLanguage, profile } = useAppState();
-  const [kind, setKindState] = useState<CheckKind>('job');
-  const kindChosen = useRef(false);
+  const [mode, setMode] = useState<CheckMode>('message');
   const [moreOpen, setMoreOpen] = useState(false);
   const [text, setText] = useState('');
-  const [url, setUrl] = useState('');
   const [destination, setDestination] = useState(countryName(profile.destinationCountry));
   const [image, setImage] = useState<PreparedImage | null>(null);
   const [chatText, setChatText] = useState('');
   const [chatImage, setChatImage] = useState<PreparedImage | null>(null);
+  const [focusKey, setFocusKey] = useState(0);
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
-
-  const chooseKind = (next: CheckKind) => {
-    kindChosen.current = true;
-    setKindState(next);
-  };
-
-  const changeUrl = useCallback((value: string) => {
-    setUrl(value);
-    if (!kindChosen.current && looksLikeUrl(value)) setKindState('link');
-  }, []);
+  const clipHasText = useClipboardHasText();
+  const [clipUsed, setClipUsed] = useState(false);
+  const hasClip = clipHasText && !clipUsed;
 
   const attachImage = useCallback(async (loader: () => Promise<PreparedImage | null>, target: (image: PreparedImage) => void = setImage) => {
     setBusy(true);
@@ -61,17 +101,20 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
     }
   }, [t]);
 
-  const pasteInto = useCallback(async (target: 'text' | 'url' | 'chat') => {
+  const pasteInto = useCallback(async (target: (value: string) => void) => {
     const value = (await Clipboard.getStringAsync()).trim();
     if (!value) {
       setNotice(t('errors.clipboardEmpty'));
       return;
     }
     setNotice(null);
-    if (target === 'chat') setChatText(value);
-    else if (target === 'url' || (looksLikeUrl(value) && kind !== 'job')) changeUrl(value);
-    else setText(value);
-  }, [t, changeUrl, kind]);
+    setClipUsed(true);
+    target(value);
+  }, [t]);
+
+  useEffect(() => {
+    if (!clipHasText) setClipUsed(false);
+  }, [clipHasText]);
 
   const nonce = route.params?.nonce;
   useEffect(() => {
@@ -79,157 +122,142 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
     if (!params || !params.nonce) return;
     const { draft, intent } = params;
     if (draft) {
-      if (draft.kind) chooseKind(draft.kind);
-      if (draft.text) setText(draft.text);
-      if (draft.url) changeUrl(draft.url);
+      if (draft.kind) setMode(modeForKind(draft.kind));
+      const shared = [draft.text, draft.url].filter(Boolean).join(' ');
+      if (shared) setText(shared);
       if (draft.imageUri) {
         const uri = draft.imageUri;
         attachImage(() => prepareImage(uri));
       }
+    } else if (intent === 'text') {
+      setMode('message');
     } else if (intent === 'image') {
+      setMode('message');
       attachImage(pickScreenshot);
     } else if (intent === 'link') {
-      chooseKind('link');
-      pasteInto('url').catch(() => undefined);
+      setMode('message');
+      setFocusKey(k => k + 1);
+      pasteInto(setText).catch(() => undefined);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nonce]);
 
-  const form = { kind, text, url, destination, home: countryName(profile.homeCountry), shareSignals: profile.shareSignals, imageBase64: image?.base64, imageMimeType: image?.mimeType, language };
-  const isJob = kind === 'job';
+  const isJob = mode === 'job';
   const ready = isJob
     ? hasInput({ text, imageBase64: image?.base64 }) || hasInput({ text: chatText, imageBase64: chatImage?.base64 })
-    : hasInput({ text, url, imageBase64: image?.base64 });
+    : hasInput({ text, imageBase64: image?.base64 });
 
   const submit = () => {
+    const base = { destination, home: countryName(profile.homeCountry), shareSignals: profile.shareSignals, language };
     if (isJob) {
-      const jobForm = { ...form, chatText, chatImageBase64: chatImage?.base64, chatImageMimeType: chatImage?.mimeType };
+      const jobForm = { ...base, kind: 'job' as const, text, url: '', imageBase64: image?.base64, imageMimeType: image?.mimeType, chatText, chatImageBase64: chatImage?.base64, chatImageMimeType: chatImage?.mimeType };
       navigation.getParent()?.navigate('Checking', { job: { phase: 'extract', request: buildJobRequest(jobForm) }, source: jobSourceLabel(jobForm) });
       return;
     }
+    const asLink = looksLikeUrl(text);
+    const form = { ...base, kind: kindForMode(mode, text), text: asLink ? '' : text, url: asLink ? text.trim() : '', imageBase64: image?.base64, imageMimeType: image?.mimeType };
     navigation.getParent()?.navigate('Checking', { request: buildRequest(form), source: sourceLabel(form) });
   };
+
+  const common = { busy, hasClip };
+  const added = [hasInput({ text, imageBase64: image?.base64 }) ? t('job.added.ad') : '', hasInput({ text: chatText, imageBase64: chatImage?.base64 }) ? t('job.added.chat') : ''].filter(Boolean);
 
   return (
     <Screen
       header={
-        <>
-          <HeaderWithLeave title={t('title')} />
-          <Select
-            testID="check-kind"
-            label={t('whatIsIt')}
-            value={kind}
-            options={KIND_OPTIONS.map(k => ({ value: k, label: t(`kinds.${k}`) }))}
-            onChange={chooseKind}
-          />
-        </>
+        <View style={styles.headRow}>
+          <View style={{ flex: 1 }}>
+            <BrandLockup />
+          </View>
+          <QuickExitButton />
+        </View>
       }
       footer={
         <>
           {ready ? null : <Text testID="check-submit-hint" style={styles.hint}>{isJob ? t('job.submitHint') : t('submitHint')}</Text>}
-          <Button testID="check-submit" label={isJob ? t('job.submit') : t('submit')} leading={<BlockIcon name="search" size={22} color={ready && !busy ? colors.white : colors.textSecondary} />} onPress={submit} disabled={!ready || busy} mutedDisabled />
+          <Button testID="check-submit" label={isJob ? t('job.submit') : t('submit')} leading={<BlockIcon name="magnify" size={22} color={ready && !busy ? colors.white : colors.textSecondary} strokeWidth={2.2} />} onPress={submit} disabled={!ready || busy} mutedDisabled />
+          <Text testID="check-warn" style={styles.warn}>{t('warn', { app: APP_NAME })}</Text>
         </>
       }
     >
+      <View style={{ gap: 4 }}>
+        <Text accessibilityRole="header" style={styles.title}>{t('title')}</Text>
+        <Text style={styles.sub}>{t('sub')}</Text>
+      </View>
+      <View style={{ gap: 8 }}>
+        <Text style={styles.question}>{t('whatIsIt')}</Text>
+        <ModeChips testID="check-mode" value={mode} onChange={v => setMode(v as CheckMode)} options={CHECK_MODES.map(m => ({ value: m, label: t(`chips.${m}`) }))} />
+      </View>
+
       {isJob ? (
         <>
-          <SourceBlock
-            testID="job-ad"
-            icon="briefcase"
-            title={t('job.ad.title')}
-            hint={t('job.ad.hint')}
+          <SourceCard
+            {...common}
+            id="job-ad"
+            title={t('job.step1')}
+            hint={t('job.step1Hint')}
             a11y={t('job.ad.a11y')}
             placeholder={t('job.ad.placeholder')}
-            pickHint={t('job.ad.pickHint')}
             text={text}
             image={image}
-            busy={busy}
             onText={setText}
-            onPaste={() => pasteInto('text')}
+            onClip={() => pasteInto(setText)}
             onPick={() => attachImage(pickScreenshot)}
             onRemove={() => setImage(null)}
           />
-          <SourceBlock
-            testID="job-chat"
-            icon="chat"
-            title={t('job.chat.title')}
-            hint={t('job.chat.hint')}
+          <SourceCard
+            {...common}
+            id="job-chat"
+            title={t('job.step2')}
+            optional={t('job.optional')}
+            hint={t('job.step2Hint')}
             a11y={t('job.chat.a11y')}
             placeholder={t('job.chat.placeholder')}
-            pickHint={t('job.chat.pickHint')}
-            optional
             text={chatText}
             image={chatImage}
-            busy={busy}
             onText={setChatText}
-            onPaste={() => pasteInto('chat')}
+            onClip={() => pasteInto(setChatText)}
             onPick={() => attachImage(pickScreenshot, setChatImage)}
             onRemove={() => setChatImage(null)}
           />
+          {added.length ? <AddedBar testID="job-added" items={added} /> : null}
         </>
       ) : (
-        <>
-          <SourceBlock
-            testID="check"
-            icon="chat"
-            title={t('text.title')}
-            hint={t('text.hint')}
-            a11y={t('text.a11y')}
-            placeholder={t('text.placeholder')}
-            pickHint={t('screenshot.pickHint')}
-            text={text}
-            image={image}
-            busy={busy}
-            onText={setText}
-            onPaste={() => pasteInto('text')}
-            onPick={() => attachImage(pickScreenshot)}
-            onRemove={() => setImage(null)}
-          />
-          <InputBlock testID="check-link" icon="link" title={t('link.label')} hint={t('link.hint')}>
-            <TextBox testID="check-url" a11y={t('link.a11y')} placeholder="https://" value={url} onChange={changeUrl} onPaste={() => pasteInto('url')} pasteLabel={t('common:actions.paste')} multiline={false} url />
-          </InputBlock>
-        </>
+        <SourceCard
+          {...common}
+          id="check"
+          focusKey={focusKey}
+          title={t(`${mode}.title`)}
+          a11y={t('text.a11y')}
+          placeholder={t(`${mode}.placeholder`)}
+          text={text}
+          image={image}
+          onText={setText}
+          onClip={() => pasteInto(setText)}
+          onPick={() => attachImage(pickScreenshot)}
+          onRemove={() => setImage(null)}
+        />
       )}
 
-      <View style={styles.section}>
-        <TouchableOpacity
-          testID="check-more"
-          accessibilityRole="button"
-          accessibilityLabel={t('more.title')}
-          accessibilityState={{ expanded: moreOpen }}
-          activeOpacity={0.7}
-          onPress={() => setMoreOpen(open => !open)}
-          style={styles.moreRow}
-        >
-          <Text style={styles.moreText}>{t('more.title')}</Text>
-          <View style={{ transform: [{ rotate: moreOpen ? '-90deg' : '90deg' }] }}>
-            <Icon name="chevron" size={20} color={colors.textSecondary} />
-          </View>
-        </TouchableOpacity>
-        {moreOpen ? (
-          <View style={{ gap: 14 }}>
-            <View style={{ gap: 6 }}>
-              <Text style={styles.label}>{t('destination.label')}</Text>
-              <TextInput
-                testID="check-destination"
-                accessibilityLabel={t('destination.a11y')}
-                value={destination}
-                onChangeText={setDestination}
-                placeholder={t('destination.placeholder')}
-                placeholderTextColor={colors.textMuted}
-                style={styles.input}
-              />
-            </View>
-            <Select
-              testID="check-language"
-              label={t('optional.language')}
-              value={language}
-              options={UI_LANGUAGES.map(l => ({ value: l.code, label: l.label }))}
-              onChange={setLanguage}
-            />
-          </View>
-        ) : null}
-      </View>
+      <FoldRow testID="check-more" label={t('more.title')} open={moreOpen} onToggle={() => setMoreOpen(open => !open)}>
+        <Text style={styles.label}>{t('destination.label')}</Text>
+        <TextInput
+          testID="check-destination"
+          accessibilityLabel={t('destination.a11y')}
+          value={destination}
+          onChangeText={setDestination}
+          placeholder={t('destination.placeholder')}
+          placeholderTextColor="#8C847C"
+          style={styles.input}
+        />
+        <Select
+          testID="check-language"
+          label={t('optional.language')}
+          value={language}
+          options={UI_LANGUAGES.map(l => ({ value: l.code, label: l.label }))}
+          onChange={setLanguage}
+        />
+      </FoldRow>
 
       {notice ? <Notice message={notice} /> : null}
     </Screen>
@@ -237,12 +265,14 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
 };
 
 const styles = StyleSheet.create({
-  section: { gap: 8 },
-  label: { color: colors.textPrimary, fontSize: 14, lineHeight: 20, fontFamily: fonts.semiBold, includeFontPadding: false },
-  input: { minHeight: 46, borderRadius: 12, borderWidth: 1, borderColor: colors.borderLight, backgroundColor: colors.white, paddingHorizontal: 14, paddingVertical: 10, color: colors.textPrimary, fontSize: 14, lineHeight: 19, fontFamily: fonts.regular },
+  headRow: { flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 48 },
+  title: { color: colors.textPrimary, fontSize: 27, lineHeight: 36, fontFamily: fonts.extraBold, letterSpacing: -0.4, includeFontPadding: false },
+  sub: { color: colors.textSecondary, fontSize: 15, lineHeight: 22, fontFamily: fonts.regular },
+  question: { color: colors.textPrimary, fontSize: 15.5, lineHeight: 22, fontFamily: fonts.extraBold, includeFontPadding: false },
+  label: { color: colors.textPrimary, fontSize: 15, lineHeight: 21, fontFamily: fonts.bold, includeFontPadding: false },
+  input: { minHeight: 48, borderRadius: 14, borderWidth: 1, borderColor: colors.borderLight, backgroundColor: colors.background, paddingHorizontal: 12, paddingVertical: 12, color: colors.textPrimary, fontSize: 15, lineHeight: 21, fontFamily: fonts.regular },
   hint: { color: colors.textSecondary, fontSize: 14, lineHeight: 20, fontFamily: fonts.medium, textAlign: 'center' },
-  moreRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: 48 },
-  moreText: { color: colors.textPrimary, fontSize: 16, lineHeight: 22, fontFamily: fonts.bold },
+  warn: { color: colors.textSecondary, fontSize: 12.5, lineHeight: 18, fontFamily: fonts.regular, textAlign: 'center' },
 });
 
 export default CheckScreen;

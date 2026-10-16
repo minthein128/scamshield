@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { Linking, Switch, StyleSheet, View } from 'react-native';
+import { Linking, Switch, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { SITE_URL } from '../config/env';
 import Constants from 'expo-constants';
 import { ConnectionCard } from '../components/ConnectionCard';
 import { Screen } from '../components/Screen';
 import { Text } from '../components/Text';
+import { Icon } from '../components/Icon';
 import { Button, Card, Chip, LinkButton, Notice, ScreenHeader, SectionTitle } from '../components/ui';
 import { COUNTRIES, countryLabel, type CountryCode } from '../lib/countries';
 import { Select } from '../components/Select';
@@ -32,7 +33,7 @@ const NONE = 'none';
 export const PRIVACY_POINTS = ['privacy.p1', 'privacy.p2', 'privacy.p3', 'privacy.p4', 'privacy.p5'] as const;
 
 export const SettingsScreen: React.FC<RootScreenProps<'Settings'>> = ({ navigation }) => {
-  const { t } = useTranslation(['settings', 'common']);
+  const { t } = useTranslation(['settings', 'common', 'shield']);
   const { status, signOut, deleteAccount } = useAuth();
   const { profile, language, setLanguage, updateProfile, setKeepHistory, syncState, clearSyncedCopies, deleteLocalData } = useAppState();
   const countryOptions: { value: CountryCode | typeof NONE; label: string }[] = [{ value: NONE, label: t('notSet') }, ...COUNTRIES.map(c => ({ value: c.code, label: countryLabel(c.code) }))];
@@ -111,6 +112,14 @@ export const SettingsScreen: React.FC<RootScreenProps<'Settings'>> = ({ navigati
           {error ? <Notice message={error} /> : null}
         </Card>
       </View>
+
+      <TouchableOpacity testID="settings-shield" accessibilityRole="button" accessibilityLabel={`${t('shield:title')}. ${t('shield:details')}`} activeOpacity={0.7} onPress={() => navigation.navigate('Shield')} style={styles.row}>
+        <View style={{ flex: 1, gap: 2 }}>
+          <Text style={styles.strong}>{t('shield:title')}</Text>
+          <Text style={styles.body}>{t('shield:details')}</Text>
+        </View>
+        <Icon name="chevron" size={22} color={colors.textMuted} />
+      </TouchableOpacity>
 
       <View style={{ gap: 8 }}>
         <SectionTitle>{t('language.title')}</SectionTitle>
@@ -191,6 +200,7 @@ export const SettingsScreen: React.FC<RootScreenProps<'Settings'>> = ({ navigati
 const styles = StyleSheet.create({
   strong: { color: colors.textPrimary, fontSize: 15, lineHeight: 21, fontFamily: fonts.bold },
   body: { color: colors.textSecondary, fontSize: 14, lineHeight: 20, fontFamily: fonts.regular },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 64, paddingVertical: 12, paddingHorizontal: 16, borderRadius: 16, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.border },
   switchRow: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 44 },
   wrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   version: { color: colors.textMuted, fontSize: 12, textAlign: 'center', fontFamily: fonts.regular },

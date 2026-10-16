@@ -28,6 +28,7 @@ export const Text: React.FC<TextProps> = ({ style, children, ...rest }) => (
   </RNText>
 );
 
-export const TextInput: React.FC<TextInputProps> = ({ style, ...rest }) => (
-  <RNTextInput {...rest} style={localizedStyle(rest.value || rest.placeholder || '', style)} />
-);
+export const TextInput = React.forwardRef<RNTextInput, TextInputProps>(({ style, ...rest }, ref) => (
+  <RNTextInput ref={ref} {...rest} style={localizedStyle(rest.value || rest.placeholder || '', style)} />
+));
+TextInput.displayName = 'TextInput';
