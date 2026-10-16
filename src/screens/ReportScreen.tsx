@@ -283,11 +283,13 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
                     {link.registrar ? `, ${link.registrar}` : ''}
                   </Text>
                 </View>
-                <Pill
-                  label={t(`webRisk.${link.webRisk}`)}
-                  background={clean ? colors.safeBg : unchecked ? colors.borderLight : colors.dangerSoftBg}
-                  color={clean ? colors.safeText : unchecked ? colors.textSecondary : colors.dangerSoftText}
-                />
+                <View style={styles.linkPill}>
+                  <Pill
+                    label={t(`webRisk.${link.webRisk}`)}
+                    background={clean ? colors.safeBg : unchecked ? colors.borderLight : colors.dangerSoftBg}
+                    color={clean ? colors.safeText : unchecked ? colors.textSecondary : colors.dangerSoftText}
+                  />
+                </View>
               </View>
             );
           })}
@@ -404,6 +406,7 @@ const styles = StyleSheet.create({
   flagCard: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, paddingVertical: 16, paddingRight: 16, paddingLeft: 16, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.border, borderRadius: 16, overflow: 'hidden' },
   flagBar: { position: 'absolute', left: 0, top: 0, bottom: 0, width: 4 },
   flagIcon: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
+  linkPill: { maxWidth: '42%', flexShrink: 1, alignItems: 'flex-end' },
   sourceCard: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, paddingHorizontal: 16, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.border, borderRadius: 12 },
   flagLabel: { fontSize: 15, lineHeight: 22, fontFamily: fonts.bold, color: colors.textPrimary },
   flagEvidence: { fontSize: 14, lineHeight: 20, fontFamily: fonts.regular, color: colors.textSecondary },
