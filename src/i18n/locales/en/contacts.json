@@ -2,7 +2,7 @@
   "title": "Trusted contacts",
   "intro": "People you trust. When a check looks risky, warn them with one tap, or call them first.",
   "emptyTitle": "No trusted contacts yet",
-  "emptyBody": "Add a family member or friend below. Their number is saved with your account.",
+  "emptyBody": "Add a family member or friend above. Their number is saved with your account.",
   "emptyBodyGated": "Saving a trusted contact needs you to sign in. You can still share a warning without an account.",
   "call": "Call",
   "remove": "Remove",
