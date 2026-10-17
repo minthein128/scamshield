@@ -11,9 +11,10 @@ import {
   hasInternet,
   parseConfigUrls,
   resetRuntimeUrl,
+  pickHealthy,
   resolveApiUrl,
 } from '../config/runtime';
-import { CLOUD_RUN_API_URL, FALLBACK_API_URL, STABLE_API_URL } from '../config/env';
+import { AKKHAYAR_API_URL, CLOUD_RUN_API_URL, FALLBACK_API_URL, STABLE_API_URL } from '../config/env';
 import { readLog, resetDiagMemory } from '../lib/diagLog';
 import { ApiError, createRuntimeClient, type CheckClient, type CheckRequest } from '../api';
 
@@ -112,17 +113,17 @@ describe('config sources', () => {
     const stable = 'https://api.stable.test';
     await AsyncStorage.setItem(API_URL_CACHE_KEY, 'https://dead-tunnel.example');
     const { fetchImpl, calls } = fakeFetch({ [`${stable}/health`]: 'ok', [A]: 'hang', [B]: 'hang' });
-    expect(await resolveApiUrl({ ...base, stableUrl: stable, graceMs: 10, fetchImpl })).toBe(stable);
+    expect(await resolveApiUrl({ ...base, stableUrl: stable, fetchImpl })).toBe(stable);
     expect(calls).toContain(`${stable}/health`);
   });
 
-  it('orders candidates: stable run.app first, then the fallback, then the cache, while config.json answers', async () => {
+  it('probes the primary first and leaves the fallback alone while the primary answers', async () => {
     const stable = 'https://api.stable.test';
     const fallback = 'https://api.fallback.test';
     await AsyncStorage.setItem(API_URL_CACHE_KEY, 'https://cached.example');
-    const { fetchImpl, calls } = fakeFetch({ [A]: { apiUrl: fallback }, [B]: { apiUrl: fallback }, [`${stable}/health`]: 'ok', [`${fallback}/health`]: 'ok' });
-    expect(await resolveApiUrl({ ...base, stableUrl: stable, fallbackUrl: fallback, envUrl: '', graceMs: 10, fetchImpl })).toBe(stable);
-    expect(calls.slice(0, 3)).toEqual([`${stable}/health`, `${fallback}/health`, 'https://cached.example/health']);
+    const { fetchImpl, calls } = fakeFetch({ [A]: { apiUrl: fallback }, [`${stable}/health`]: 'ok', [`${fallback}/health`]: 'ok' });
+    expect(await resolveApiUrl({ ...base, stableUrl: stable, fallbackUrl: fallback, envUrl: '', fetchImpl })).toBe(stable);
+    expect(calls).toEqual([`${stable}/healthz`, `${stable}/health`]);
   });
 
   it('keeps run.app when config.json names the healthy legacy host, and replaces a cached legacy host with run.app', async () => {
@@ -139,25 +140,24 @@ describe('config sources', () => {
     expect(await AsyncStorage.getItem(API_URL_CACHE_KEY)).toBe(NEW);
   });
 
-  it('moves a running app from a cached legacy host back to run.app once run.app is healthy again', async () => {
+  it('moves a running app from the fallback back to the primary once the primary is healthy again', async () => {
     jest.useFakeTimers();
-    let stableUp = false;
+    let primaryUp = false;
     const impl = jest.fn((url: string) => {
-      const up = url === `${LEGACY}/health` || (stableUp && url === `${CLOUD_RUN_API_URL}/health`);
+      const up = url === `${CLOUD_RUN_API_URL}/health` || (primaryUp && url === `${AKKHAYAR_API_URL}/healthz`);
       return up ? Promise.resolve({ ok: true, status: 200, json: async () => ({}) }) : Promise.reject(new TypeError('Failed to fetch'));
     });
     const realFetch = global.fetch;
     global.fetch = impl as unknown as typeof fetch;
     try {
-      await AsyncStorage.setItem(API_URL_CACHE_KEY, LEGACY);
       resetRuntimeUrl();
       const first = ensureApiUrl();
-      await jest.advanceTimersByTimeAsync(9000);
-      expect(await first).toBe(LEGACY);
-      stableUp = true;
+      await jest.advanceTimersByTimeAsync(100);
+      expect(await first).toBe(CLOUD_RUN_API_URL);
+      primaryUp = true;
       await jest.advanceTimersByTimeAsync(STABLE_RECHECK_MS + 100);
-      expect(getResolvedApiUrl()).toBe(CLOUD_RUN_API_URL);
-      expect(await AsyncStorage.getItem(API_URL_CACHE_KEY)).toBe(CLOUD_RUN_API_URL);
+      expect(getResolvedApiUrl()).toBe(AKKHAYAR_API_URL);
+      expect(await AsyncStorage.getItem(API_URL_CACHE_KEY)).toBe(AKKHAYAR_API_URL);
     } finally {
       resetRuntimeUrl();
       global.fetch = realFetch;
@@ -172,9 +172,9 @@ describe('config sources', () => {
     expect(await resolveApiUrl({ ...base, stableUrl: stable, fallbackUrl: fallback, fetchImpl })).toBe(fallback);
   });
 
-  it('defaults to Cloud Run only: no fallback host, no legacy host in the config sources', () => {
-    expect(STABLE_API_URL).toBe('https://sg-dev-808112092414.asia-southeast1.run.app');
-    expect(FALLBACK_API_URL).toBe('');
+  it('defaults to akkhayar first with Cloud Run as the fallback', () => {
+    expect(STABLE_API_URL).toBe('https://saferoute-api.akkhayar.com');
+    expect(FALLBACK_API_URL).toBe('https://sg-dev-808112092414.asia-southeast1.run.app');
   });
 
   it('never fetches config.json from the legacy host by default', () => {
@@ -189,12 +189,12 @@ describe('config sources', () => {
     expect(report).toContain('online true');
   });
 
-  it('falls back to /healthz only when /health is 404', async () => {
-    const { fetchImpl, calls } = fakeFetch({ [`${OLD}/health`]: 'notfound', [`${OLD}/healthz`]: 'ok', [`${NEW}/health`]: 'down', [`${NEW}/healthz`]: 'ok' });
+  it('is healthy when either /healthz or /health answers, since each host serves only one', async () => {
+    const { fetchImpl, calls } = fakeFetch({ [`${OLD}/health`]: 'notfound', [`${OLD}/healthz`]: 'ok', [`${NEW}/health`]: 'ok', [`${NEW}/healthz`]: 'notfound' });
     expect(await checkHealth(OLD, fetchImpl)).toBe(true);
-    expect(calls).toEqual([`${OLD}/health`, `${OLD}/healthz`]);
-    expect(await checkHealth(NEW, fetchImpl)).toBe(false);
-    expect(calls).not.toContain(`${NEW}/healthz`);
+    expect(calls).toEqual([`${OLD}/healthz`, `${OLD}/health`]);
+    expect(await checkHealth(NEW, fetchImpl)).toBe(true);
+    expect(await checkHealth('https://none.example', fetchImpl)).toBe(false);
   });
 
   it('logs one health line with the outcome, not a 404 failure, when /healthz answers', async () => {
@@ -213,6 +213,67 @@ describe('config sources', () => {
     expect(await checkHealth(NEW, fetchImpl)).toBe(true);
     expect(await checkHealth(OLD, fetchImpl)).toBe(false);
     expect(apiHost('https://a-b.trycloudflare.com/v1?x=1')).toBe('a-b.trycloudflare.com');
+  });
+});
+
+describe('primary first, fast fallback', () => {
+  const PRIMARY = 'https://primary.test';
+  const FALLBACK = 'https://fallback.test';
+  const both = { ...base, envUrl: '', stableUrl: PRIMARY, fallbackUrl: FALLBACK };
+
+  it('goes straight to the fallback when the primary refuses at once', async () => {
+    const { fetchImpl, calls } = fakeFetch({ [`${FALLBACK}/health`]: 'ok' });
+    expect(await resolveApiUrl({ ...both, fetchImpl })).toBe(FALLBACK);
+    expect(calls[0]).toBe(`${PRIMARY}/healthz`);
+    expect(calls).toContain(`${FALLBACK}/health`);
+  });
+
+  it('starts the fallback after the hedge delay when the primary is silent, and takes the fallback if it answers', async () => {
+    jest.useFakeTimers();
+    try {
+      const { fetchImpl, calls } = fakeFetch({ [`${PRIMARY}/healthz`]: 'hang', [`${PRIMARY}/health`]: 'hang', [`${FALLBACK}/health`]: 'ok' });
+      let result: string | undefined;
+      const p = resolveApiUrl({ ...both, fetchImpl }).then(u => (result = u));
+      await jest.advanceTimersByTimeAsync(1400);
+      expect(calls.some(c => c.startsWith(FALLBACK))).toBe(false);
+      expect(result).toBeUndefined();
+      await jest.advanceTimersByTimeAsync(200);
+      await p;
+      expect(result).toBe(FALLBACK);
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it('keeps the primary when it answers after the fallback started but before the fallback', async () => {
+    const order: string[] = [];
+    const healthy = (u: string) =>
+      new Promise<boolean>(resolve => setTimeout(() => (order.push(u), resolve(true)), u === PRIMARY ? 20 : 40));
+    expect(await pickHealthy([PRIMARY, FALLBACK], healthy, 10)).toBe(PRIMARY);
+  });
+
+  it('prefers the higher priority host when both are healthy', async () => {
+    expect(await pickHealthy(['a', 'b', 'c'], async () => true, 5)).toBe('a');
+    expect(await pickHealthy(['a', 'b', 'c'], async u => u === 'c', 5)).toBe('c');
+    expect(await pickHealthy(['a', 'b'], async () => false, 5)).toBeNull();
+    expect(await pickHealthy([], async () => true, 5)).toBeNull();
+  });
+
+  it('puts an explicit EXPO_PUBLIC_API_URL override before the primary', async () => {
+    const { fetchImpl, calls } = fakeFetch({ [`${OLD}/health`]: 'ok', [`${PRIMARY}/health`]: 'ok' });
+    expect(await resolveApiUrl({ ...both, overrideUrl: OLD, fetchImpl })).toBe(OLD);
+    expect(calls[0]).toBe(`${OLD}/healthz`);
+  });
+
+  it('tries the host that just failed a request last', async () => {
+    const { fetchImpl } = fakeFetch({ [`${PRIMARY}/health`]: 'ok', [`${FALLBACK}/health`]: 'ok' });
+    expect(await resolveApiUrl({ ...both, avoid: PRIMARY, fetchImpl })).toBe(FALLBACK);
+    expect(await resolveApiUrl({ ...both, avoid: FALLBACK, fetchImpl })).toBe(PRIMARY);
+  });
+
+  it('still returns the avoided host when nothing else is healthy', async () => {
+    const { fetchImpl } = fakeFetch({ [`${PRIMARY}/health`]: 'ok' });
+    expect(await resolveApiUrl({ ...both, avoid: PRIMARY, fetchImpl })).toBe(PRIMARY);
   });
 });
 
@@ -259,8 +320,24 @@ describe('runtime client retry and classification', () => {
     expect(refresh).toHaveBeenCalledTimes(1);
   });
 
+  it('passes the failed url to the refresh so the other host is tried', async () => {
+    const makeClient = make({ [OLD]: 'network', [NEW]: 'ok' });
+    const refresh = jest.fn().mockResolvedValue(NEW);
+    const client = createRuntimeClient(async () => OLD, false, { refresh, internet: async () => true, makeClient });
+    await client.check(REQ);
+    expect(refresh).toHaveBeenCalledWith(OLD);
+  });
+
+  it('fails over on a 502 or 504 from the proxy but not on other HTTP errors', async () => {
+    const check = jest.fn().mockRejectedValueOnce(new ApiError('upstream', 'HTTP 502', 502)).mockResolvedValue({ verdict: 'ok' });
+    const refresh = jest.fn().mockResolvedValue(NEW);
+    const client = createRuntimeClient(async () => OLD, false, { refresh, makeClient: () => ({ check } as unknown as CheckClient) });
+    await expect(client.check(REQ)).resolves.toEqual({ verdict: 'ok' });
+    expect(refresh).toHaveBeenCalledWith(OLD);
+  });
+
   it('does not refresh for HTTP errors', async () => {
-    const check = jest.fn().mockRejectedValue(new ApiError('upstream', 'HTTP 502', 502));
+    const check = jest.fn().mockRejectedValue(new ApiError('upstream', 'HTTP 500', 500));
     const refresh = jest.fn();
     const client = createRuntimeClient(async () => OLD, false, { refresh, makeClient: () => ({ check } as unknown as CheckClient) });
     await expect(client.check(REQ)).rejects.toMatchObject({ code: 'upstream' });

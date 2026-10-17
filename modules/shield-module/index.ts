@@ -87,6 +87,8 @@ export type CompanionStringKey = (typeof COMPANION_STRING_KEYS)[number];
 export interface ShieldStartOptions {
   /** Defaults to EXPO_PUBLIC_API_URL. */
   apiUrl?: string;
+  /** Tried when apiUrl is unreachable. Defaults to the other built-in host. */
+  fallbackApiUrl?: string;
   language?: 'en' | 'id' | 'tl' | 'my' | 'th';
   /** Firebase ID token sent as a Bearer header. Optional; without it the server limits by IP. */
   authToken?: string;
@@ -195,11 +197,21 @@ export async function requestScreenCapturePermission(): Promise<boolean> {
   return true;
 }
 
+const PRIMARY_API_URL = (process.env.EXPO_PUBLIC_STABLE_API_URL?.trim() || 'https://saferoute-api.akkhayar.com').replace(/\/+$/, '');
+const FALLBACK_API_URL = (process.env.EXPO_PUBLIC_FALLBACK_API_URL?.trim() || 'https://sg-dev-808112092414.asia-southeast1.run.app').replace(/\/+$/, '');
+
+/** The built-in host that is not `apiUrl`. */
+export function defaultFallbackUrl(apiUrl: string): string {
+  const current = apiUrl.trim().replace(/\/+$/, '');
+  return [PRIMARY_API_URL, FALLBACK_API_URL].find(u => u !== current) ?? '';
+}
+
 export async function startShield(options?: ShieldStartOptions): Promise<boolean> {
   if (nativeShieldModule) {
     try {
       const apiUrl = options?.apiUrl || process.env.EXPO_PUBLIC_API_URL || '';
-      return await nativeShieldModule.startShield({ ...options, apiUrl });
+      const fallbackApiUrl = options?.fallbackApiUrl ?? defaultFallbackUrl(apiUrl);
+      return await nativeShieldModule.startShield({ ...options, apiUrl, fallbackApiUrl });
     } catch (e) {
       console.warn('Native startShield error:', e);
       return false;

@@ -89,6 +89,7 @@ class ShieldModule : Module() {
             val intent = Intent(context, ShieldService::class.java).apply {
                 action = ShieldService.ACTION_START
                 putExtra(ShieldService.EXTRA_API_URL, options?.get("apiUrl") as? String ?: "")
+                putExtra(ShieldService.EXTRA_FALLBACK_API_URL, options?.get("fallbackApiUrl") as? String ?: "")
                 (options?.get("language") as? String)?.let { putExtra(ShieldService.EXTRA_LANGUAGE, it) }
             }
             ContextCompat.startForegroundService(context, intent)

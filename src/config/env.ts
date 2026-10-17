@@ -23,10 +23,17 @@ export function readFirebaseConfig(env: Record<string, string | undefined> = {})
 /** Dev builds only: EXPO_PUBLIC_OFFLINE_MOCK=1 skips URL resolution so the offline mock answers. */
 export const OFFLINE_MOCK = __DEV__ && process.env.EXPO_PUBLIC_OFFLINE_MOCK === '1';
 export const CLOUD_RUN_API_URL = 'https://sg-dev-808112092414.asia-southeast1.run.app';
-export const STABLE_API_URL = (process.env.EXPO_PUBLIC_STABLE_API_URL?.trim() || CLOUD_RUN_API_URL).replace(/\/+$/, '');
-export const FALLBACK_API_URL = (process.env.EXPO_PUBLIC_FALLBACK_API_URL?.trim() ?? '').replace(/\/+$/, '');
+export const AKKHAYAR_API_URL = 'https://saferoute-api.akkhayar.com';
+const trimUrl = (v: string | undefined) => (v?.trim() ?? '').replace(/\/+$/, '');
+/** Tried first. Reachable in Myanmar without a VPN. */
+export const STABLE_API_URL = trimUrl(process.env.EXPO_PUBLIC_STABLE_API_URL) || AKKHAYAR_API_URL;
+/** Tried when the primary fails its health probe. */
+export const FALLBACK_API_URL = trimUrl(process.env.EXPO_PUBLIC_FALLBACK_API_URL) || CLOUD_RUN_API_URL;
+/** An explicit EXPO_PUBLIC_API_URL goes before the primary. */
+export const API_URL_OVERRIDE = trimUrl(process.env.EXPO_PUBLIC_API_URL);
+export const PRIMARY_API_URL = API_URL_OVERRIDE || STABLE_API_URL;
 // Dev builds without a URL keep using the offline mock.
-export const API_URL = process.env.EXPO_PUBLIC_API_URL?.trim() || (__DEV__ ? '' : STABLE_API_URL);
+export const API_URL = API_URL_OVERRIDE || (__DEV__ ? '' : STABLE_API_URL);
 
 // Metro only inlines literal process.env.EXPO_PUBLIC_* reads.
 export const FIREBASE_CONFIG = readFirebaseConfig({
