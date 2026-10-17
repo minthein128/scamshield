@@ -31,8 +31,8 @@ class CompanionUnitsTest {
         assertEquals("Speaking", s.speaking)
         assertEquals(ShieldStrings.MAX_LENGTH, s.endA11y.length)
         assertEquals("unknown", s["unknown"])
-        assertEquals("Pyit Taing Htaung", ShieldStrings.DEFAULT.name)
-        assertEquals("ပစ်တိုင်းထောင်", ShieldStrings.from(mapOf("name" to "ပစ်တိုင်းထောင်")).name)
+        assertEquals("Kakwe", ShieldStrings.DEFAULT.name)
+        assertEquals("ကာကွယ်", ShieldStrings.from(mapOf("name" to "ကာကွယ်")).name)
     }
 
     @Test

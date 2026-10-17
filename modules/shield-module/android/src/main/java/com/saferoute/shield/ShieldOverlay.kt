@@ -1131,7 +1131,7 @@ internal data class ResumeCard(val model: CardModel, val expanded: Boolean)
 
 /** TalkBack text for the bubble outside a voice session. The doll is the shield, so the name leads. */
 internal fun bubbleDescription(state: ShieldOverlay.State, strings: ShieldStrings): String {
-    val lead = "${strings.name}, ${strings["a11yShield"]}."
+    val lead = if (strings.name == strings["appName"]) "${strings["a11yShield"]}." else "${strings.name}, ${strings["a11yShield"]}."
     return when (state) {
         ShieldOverlay.State.IDLE -> "$lead ${strings["a11yCheckScreen"]}"
         ShieldOverlay.State.CHECKING -> "$lead ${strings["a11yChecking"]}"

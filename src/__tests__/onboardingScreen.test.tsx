@@ -42,8 +42,8 @@ describe('onboarding screen', () => {
     toAccount();
     expect(screen.getByTestId('onboarding-card-without')).toBeTruthy();
     expect(screen.getByTestId('onboarding-card-with')).toBeTruthy();
-    expect(screen.getByText('Talk with Pyit Taing Htaung by voice')).toBeTruthy();
-    expect(screen.getByText('Tap Pyit Taing Htaung on your screen to check what you see')).toBeTruthy();
+    expect(screen.getByText('Talk with Kakwe by voice')).toBeTruthy();
+    expect(screen.getByText('Tap the doll on your screen to check what you see')).toBeTruthy();
     expect(screen.getAllByText(/checks an hour/)).toHaveLength(1);
     expect(screen.getByText(`Up to ${CHECKS_PER_HOUR.account} checks an hour`)).toBeTruthy();
     expect(screen.queryByText(/new phone/)).toBeNull();

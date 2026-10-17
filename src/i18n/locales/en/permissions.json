@@ -6,7 +6,7 @@
   "explain": {
     "mic": {
       "title": "Allow the microphone",
-      "body": "To talk with Pyit Taing Htaung, $t(common:appName) needs your microphone. Your voice is sent to Google to answer. Nothing is recorded or saved."
+      "body": "To talk by voice, $t(common:appName) needs your microphone. Your voice is sent to Google to answer. Nothing is recorded or saved."
     },
     "overlay": {
       "title": "Show the shield over other apps",
@@ -28,7 +28,7 @@
   "help": {
     "mic": {
       "title": "The microphone is off",
-      "body": "To talk to Pyit Taing Htaung, open Settings, choose Permissions, then Microphone, and allow it. The rest of $t(common:appName) works without it."
+      "body": "To talk by voice, open Settings, choose Permissions, then Microphone, and allow it. The rest of $t(common:appName) works without it."
     },
     "overlay": {
       "title": "Display over other apps is off",
