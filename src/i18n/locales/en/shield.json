@@ -30,5 +30,13 @@
     "notStarted": "The shield did not start. Check that \"Display over other apps\" is allowed and try again.",
     "failed": "The shield did not start. Try again.",
     "checkFailed": "The check did not start. Turn the shield on and try again."
+  },
+  "tile": {
+    "title": "Quick settings",
+    "body": "Turn the shield on or off from the quick settings at the top of your screen.",
+    "add": "Add to quick settings",
+    "added": "$t(common:appName) shield is in your quick settings.",
+    "failed": "Could not add it. Edit your quick settings and drag $t(common:appName) shield in.",
+    "hint": "Swipe down from the top, tap the pencil to edit, and drag $t(common:appName) shield into your quick settings."
   }
 }

@@ -23,7 +23,10 @@ Expo module for Android. It draws a floating bubble over other apps. A tap captu
 | `CompanionClients.kt` | `/v1/speak` client, WAV to 24 kHz PCM, OkHttp `/v1/live` socket |
 | `CompanionPillView.kt` | Companion pill: status word, mute toggle, End (no transcript text) |
 | `ShieldStrings.kt` | Companion labels from the app (`startShield({ strings })`), English fallback |
-| `ShieldBridge.kt` | Shared state between module, service and activity |
+| `ShieldBridge.kt` | Shared state between module, service, activity and tile |
+| `ShieldTileService.kt` | "Kakwe shield" Quick Settings tile and its pure rules (`ShieldTileLogic`) |
+| `ShieldLauncher.kt` | Starts and stops the service; the app's switch and the tile share it |
+| `ShieldStartConfig.kt` | The app's last start options (no auth token) so the tile can start the shield with the app closed |
 
 ## Build and verify
 
@@ -253,6 +256,19 @@ So the service adds the microphone type while Kakwe is visible (`startShield`, a
 ## Signal sharing
 
 Scam-pattern sharing is opt-in. `startShield({ shareSignals })` and `setShieldShareSignals(enabled)` set it; native starts at false and every screen check sends `shareSignals` explicitly, `true` only after the user opted in. The app keeps it in step with the profile setting (`useShieldShareSync`).
+
+## Quick Settings tile
+
+`ShieldTileService` adds a "Kakwe shield" tile (monochrome doll, `res/drawable/ic_kakwe_tile.xml`, label in five languages) to the notification shade. It shows active while the service runs; while the shade is open it follows `onShieldState` through `ShieldBridge.addStateListener`.
+
+| Tap | Result |
+| --- | --- |
+| Shield on | Turns it off (`ShieldService.stopNow`), which releases the session's projection |
+| Shield off, no overlay permission or never started from the app | Opens `saferoute://shield` and collapses the shade (`startActivityAndCollapse(PendingIntent)` on Android 14+, the `Intent` overload before) |
+| Shield off, set up | Starts the service like the app's switch, from `ShieldStartConfig`; asks for no screen capture. A refused foreground-service start opens the Shield screen instead |
+| Any, on the lock screen | `unlockAndRun` first |
+
+`requestAddQuickSettingsTile(label)` calls `StatusBarManager.requestAddTileService` on Android 13+; `quickSettingsTileSupport()` returns `request`, `manual` (Android 7 to 12: the Shield screen shows a how-to) or `none`. A tile start has no auth token until the app opens and `useShieldTokenSync` pushes one, so those checks are limited by IP.
 
 ## Auth token
 

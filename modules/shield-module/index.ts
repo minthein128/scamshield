@@ -103,6 +103,11 @@ export interface ShieldStartOptions {
   strings?: Partial<Record<CompanionStringKey, string>>;
 }
 
+/** 'request': Android 13+ can show the system "Add tile" prompt. 'manual': the user edits quick settings. 'none': no tile. */
+export type QuickSettingsTileSupport = 'request' | 'manual' | 'none';
+
+export type AddTileResult = 'added' | 'already' | 'declined' | 'error' | 'unsupported';
+
 export interface ShieldSubscription {
   remove(): void;
 }
@@ -118,6 +123,8 @@ interface ShieldModuleType {
   checkScreenNow(): Promise<void>;
   getShieldResult(id: string): Promise<string | null>;
   takeUnsyncedResults(): Promise<string[]>;
+  quickSettingsTileSupport(): Promise<QuickSettingsTileSupport>;
+  requestAddTile(label: string | null): Promise<AddTileResult>;
   addListener(
     event: 'onShieldResult',
     listener: (e: { id: string; json: string }) => void
@@ -322,6 +329,26 @@ export async function takeUnsyncedResults(): Promise<ShieldCheckResult[]> {
   }
 }
 
+/** Whether the "Kakwe shield" Quick Settings tile can be offered, and how. */
+export async function quickSettingsTileSupport(): Promise<QuickSettingsTileSupport> {
+  if (!nativeShieldModule) return 'none';
+  try {
+    return await nativeShieldModule.quickSettingsTileSupport();
+  } catch {
+    return 'none';
+  }
+}
+
+/** Shows the Android 13+ system prompt that adds the shield tile to quick settings. Call it while the app is in front. */
+export async function requestAddQuickSettingsTile(label?: string): Promise<AddTileResult> {
+  if (!nativeShieldModule) return 'unsupported';
+  try {
+    return await nativeShieldModule.requestAddTile(label ?? null);
+  } catch {
+    return 'error';
+  }
+}
+
 export default {
   hasOverlayPermission,
   requestOverlayPermission,
@@ -335,4 +362,6 @@ export default {
   addShieldStateListener,
   getShieldResult,
   takeUnsyncedResults,
+  quickSettingsTileSupport,
+  requestAddQuickSettingsTile,
 };
