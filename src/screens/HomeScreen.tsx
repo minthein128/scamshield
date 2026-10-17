@@ -28,6 +28,7 @@ export const HomeScreen: React.FC<TabScreenProps<'Home'>> = ({ navigation }) => 
   const { t } = useTranslation('home');
   const { history, profile } = useAppState();
   const layout = useLayout();
+  const iconOnlyHelp = layout.width < 380;
   const [showAll, setShowAll] = useState(false);
   const startCheck = (intent: 'link' | 'image' | 'text') => navigation.navigate('Check', { intent, nonce: Date.now() });
 
@@ -52,12 +53,12 @@ export const HomeScreen: React.FC<TabScreenProps<'Home'>> = ({ navigation }) => 
       wide
       header={
         <View style={styles.brandRow}>
-          <View style={{ flex: 1 }}>
+          <View style={styles.brandSlot}>
             <BrandLockup header />
           </View>
-          <TouchableOpacity testID="home-get-help" accessibilityRole="button" accessibilityLabel={t('help.a11y')} activeOpacity={0.7} onPress={() => navigation.navigate('GetHelp')} style={styles.helpButton}>
+          <TouchableOpacity testID="home-get-help" accessibilityRole="button" accessibilityLabel={t('help.a11y')} activeOpacity={0.7} onPress={() => navigation.navigate('GetHelp')} style={[styles.helpButton, iconOnlyHelp && styles.helpButtonIcon]}>
             <Icon name="phone" size={20} color={colors.textPrimary} />
-            <Text style={styles.helpButtonText}>{t('help.title')}</Text>
+            {iconOnlyHelp ? null : <Text style={styles.helpButtonText} numberOfLines={1}>{t('help.title')}</Text>}
           </TouchableOpacity>
           <TouchableOpacity testID="open-settings" accessibilityRole="button" accessibilityLabel={t('settingsA11y')} activeOpacity={0.7} onPress={() => navigation.navigate('Settings')} style={styles.iconButton}>
             <Icon name="settings" size={24} />
@@ -132,6 +133,7 @@ const QuickAction: React.FC<{ label: string; icon: IconName; onPress: () => void
 );
 
 const styles = StyleSheet.create({
+  brandSlot: { flexGrow: 1, flexShrink: 0, flexBasis: 'auto', alignItems: 'flex-start' },
   brandRow: { flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 48 },
   iconButton: { width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center' },
   cardTitle: { color: colors.textPrimary, fontSize: 18, lineHeight: 24, fontFamily: fonts.bold, includeFontPadding: false },
@@ -146,6 +148,7 @@ const styles = StyleSheet.create({
   radarTitle: { color: colors.textPrimary, fontSize: 16, lineHeight: 22, fontFamily: fonts.bold },
   radarBody: { color: colors.textSecondary, fontSize: 14, lineHeight: 20, fontFamily: fonts.regular },
   helpButton: { flexDirection: 'row', alignItems: 'center', gap: 6, minHeight: 44, paddingHorizontal: 14, borderRadius: 22, borderWidth: 1, borderColor: colors.borderDark, backgroundColor: colors.white },
+  helpButtonIcon: { width: 48, height: 48, minHeight: 48, paddingHorizontal: 0, borderRadius: 24, justifyContent: 'center' },
   helpButtonText: { color: colors.textPrimary, fontSize: 14, lineHeight: 20, fontFamily: fonts.bold, includeFontPadding: false },
   verdict: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingVertical: 6, paddingHorizontal: 10, borderRadius: 999 },
   verdictText: { fontSize: 13, lineHeight: 18, fontFamily: fonts.bold, includeFontPadding: false },
