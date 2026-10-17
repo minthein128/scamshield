@@ -69,6 +69,7 @@ class ShieldService : Service(), ShieldOverlay.Listener {
                 it.show()
             }
             isRunning = true
+            ShieldBridge.publishRunning(true)
             if (ShieldBridge.pendingConsent != null) onConsentGranted()
         }
         overlay?.strings = ShieldBridge.strings
@@ -466,6 +467,7 @@ class ShieldService : Service(), ShieldOverlay.Listener {
         instance = null
         isRunning = false
         started = false
+        ShieldBridge.publishRunning(false)
     }
 
     companion object {

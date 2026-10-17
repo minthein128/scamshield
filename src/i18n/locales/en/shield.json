@@ -11,7 +11,8 @@
     "overlay": "Step 1 of 4: allow \"Display over other apps\", then come back to $t(common:appName).",
     "notifications": "Step 2 of 4: allow notifications so Android keeps the shield running.",
     "capture": "Step 3 of 4: allow $t(common:appName) to see your screen when you tap the doll.",
-    "starting": "Step 4 of 4: starting the shield."
+    "starting": "Step 4 of 4: starting the shield.",
+    "stopping": "Turning off the shield."
   },
   "needs": {
     "title": "What the shield needs",

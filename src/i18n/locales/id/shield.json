@@ -14,7 +14,8 @@
     "overlay": "Langkah 1 dari 4: izinkan \"Tampilkan di atas aplikasi lain\", lalu kembali ke $t(common:appName).",
     "notifications": "Langkah 2 dari 4: izinkan notifikasi agar Android tetap menjalankan shield.",
     "capture": "Langkah 3 dari 4: izinkan $t(common:appName) melihat layar Anda saat Anda mengetuk boneka.",
-    "starting": "Langkah 4 dari 4: memulai shield."
+    "starting": "Langkah 4 dari 4: memulai shield.",
+    "stopping": "Mematikan shield."
   },
   "needs": {
     "title": "Yang dibutuhkan shield",

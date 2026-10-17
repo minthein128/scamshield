@@ -11,6 +11,8 @@ object ShieldBridge {
     @Volatile var pendingConsent: Consent? = null
     @Volatile var consentCallback: ((Boolean) -> Unit)? = null
     @Volatile var eventSink: ((String, String) -> Unit)? = null
+    /** Told when the service has actually started or stopped. */
+    @Volatile var stateSink: ((Boolean) -> Unit)? = null
     @Volatile var authToken: String = ""
     /** The user's opt-in to share scam patterns from screen checks. Off until the app says otherwise. */
     @Volatile var shareSignals: Boolean = false
@@ -39,6 +41,10 @@ object ShieldBridge {
         } else {
             unsynced.add(json)
         }
+    }
+
+    fun publishRunning(running: Boolean) {
+        stateSink?.invoke(running)
     }
 
     @Synchronized
