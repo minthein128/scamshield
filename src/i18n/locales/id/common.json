@@ -60,6 +60,7 @@
     "marketplace_fraud": "Kemungkinan penipuan jual-beli online",
     "investment": "Kemungkinan penipuan investasi",
     "other": "Pesan mencurigakan",
+    "other_link": "Tautan mencurigakan",
     "none": "Tidak ditemukan tanda penipuan"
   },
   "countries": {

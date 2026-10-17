@@ -24,6 +24,7 @@
   "domainAgeUnknown": "Usia domain tidak diketahui",
   "webRisk": {
     "clean": "Tidak ada ancaman yang diketahui",
+    "notListed": "Tidak ada di daftar Google",
     "malware": "Peringatan malware",
     "social_engineering": "Peringatan phishing atau penipuan",
     "unwanted_software": "Peringatan aplikasi tak diinginkan",

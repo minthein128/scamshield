@@ -3,7 +3,7 @@ import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { afterEach, describe, expect, it } from 'vitest';
 import { COUNTRIES, HOTLINES } from '../src/data/hotlines.generated.js';
-import { buildActions, dialCountry, hotlineFor, setHotlineSource } from '../src/explain.js';
+import { buildActions, dialCountry, hotlineFocus, hotlineFor, setHotlineSource, traffickingCheck } from '../src/explain.js';
 
 const script = new URL('../../scripts/sync-hotlines.mjs', import.meta.url);
 
@@ -112,5 +112,57 @@ describe('hotlineFor with home and destination', () => {
     expect(dialCountry({ country: 'MM', dial: '+66948845484' })).toBe('TH');
     expect(dialCountry({ country: 'PH', dial: '+8562055535878' })).toBe('LA');
     expect(dialCountry({ country: 'TH', dial: '1599' })).toBe('TH');
+  });
+});
+
+describe('hotline by scam type', () => {
+  const callFor = (type: Parameters<typeof buildActions>[1], dest?: string, home?: string, trafficking = false) =>
+    buildActions('danger', type, 'en', dest, home, trafficking).find((a) => a.type === 'call')?.value;
+
+  it.each(['job_trafficking', 'fake_agency'] as const)('%s keeps the anti-trafficking line first', (type) => {
+    expect(callFor(type, 'Thailand', 'Myanmar')).toBe('1599');
+    expect(callFor(type, undefined, 'Philippines')).toBe('1343');
+  });
+
+  it.each(['parcel_phishing', 'marketplace_fraud', 'investment', 'romance_pig_butchering', 'other'] as const)(
+    '%s offers the scam or police line, not the trafficking line',
+    (type) => {
+      expect(callFor(type, 'Thailand', 'Myanmar')).toBe('1441');
+      expect(callFor(type, 'Malaysia', 'Philippines')).toBe('997');
+      expect(callFor(type, 'Vietnam', 'Thailand')).toBe('113');
+      expect(callFor(type, undefined, 'Myanmar')).toBe('199');
+      expect(callFor(type, undefined, 'Cambodia')).toBe('117');
+    },
+  );
+
+  it('uses the home consular line in the destination when the destination has no scam or police line', () => {
+    setHotlineSource(() => HOTLINES.filter((h) => !(h.country === 'TH' && (h.category === 'cybercrime' || h.category === 'police'))));
+    try {
+      expect(callFor('parcel_phishing', 'Mae Sot', 'Myanmar')).toBe('+66948845484');
+    } finally {
+      setHotlineSource(() => HOTLINES);
+    }
+  });
+
+  it('a trafficking sign on any type brings back the trafficking line', () => {
+    expect(callFor('other', 'Thailand', 'Myanmar', true)).toBe('1599');
+  });
+
+  it('reads the focus from the scam type, the check kind and the flags', () => {
+    expect(hotlineFocus('parcel_phishing')).toBe('fraud');
+    expect(hotlineFocus('fake_agency')).toBe('trafficking');
+    expect(hotlineFocus('other', true)).toBe('trafficking');
+    expect(traffickingCheck('job', [])).toBe(true);
+    expect(traffickingCheck('agency', [])).toBe(true);
+    expect(traffickingCheck('link', [{ family: 'link_risk' }])).toBe(false);
+    expect(traffickingCheck('message', [{ family: 'trafficking' }])).toBe(true);
+  });
+
+  it('never leaves the call action empty for a non-job scam', () => {
+    for (const home of COUNTRIES) {
+      for (const dest of [undefined, ...COUNTRIES]) {
+        expect(callFor('parcel_phishing', dest?.name, home.name), `${home.code} -> ${dest?.code}`).toBeTruthy();
+      }
+    }
   });
 });

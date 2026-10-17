@@ -12,7 +12,7 @@
     "remove": "Remove",
     "call": "Call",
     "tryAgain": "Try again",
-    "leave": "Leave quickly",
+    "leave": "Quick exit",
     "leaveA11y": "Leave this screen and go to Home"
   },
   "tabs": {
@@ -58,6 +58,7 @@
     "marketplace_fraud": "Possible marketplace fraud",
     "investment": "Possible investment scam",
     "other": "Suspicious message",
+    "other_link": "Suspicious link",
     "none": "No scam pattern found"
   },
   "countries": {

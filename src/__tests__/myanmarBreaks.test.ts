@@ -1,9 +1,19 @@
-import { breakMyanmar, syllableRuns } from '../theme/myanmarBreaks';
+import { breakMyanmar, joinMyanmarWords, syllableRuns } from '../theme/myanmarBreaks';
+import report from '../i18n/locales/my/report.json';
 import home from '../i18n/locales/my/home.json';
 import check from '../i18n/locales/my/check.json';
 
 const ZW = '​';
 const parts = (s: string) => breakMyanmar(s).split(ZW);
+
+describe('joinMyanmarWords', () => {
+  it('keeps the Report header compound whole and leaves the space as the only break', () => {
+    const joined = joinMyanmarWords(report.title);
+    expect(joined).not.toContain('\u200B');
+    expect(joined.split(' ').map(w => w.replace(/\u2060/g, ''))).toEqual(report.title.split(' '));
+    expect(joined).toContain('အ\u2060စီ\u2060ရင်\u2060ခံ\u2060စာ');
+  });
+});
 
 describe('breakMyanmar', () => {
   it('splits only at syllable boundaries for the reviewed words', () => {

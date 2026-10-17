@@ -24,6 +24,7 @@
   "domainAgeUnknown": "ไม่ทราบอายุเว็บไซต์",
   "webRisk": {
     "clean": "ไม่พบภัยคุกคามที่ทราบ",
+    "notListed": "ไม่อยู่ในรายการของ Google",
     "malware": "คำเตือนมัลแวร์",
     "social_engineering": "คำเตือนการหลอกลวงหรือขโมยข้อมูล",
     "unwanted_software": "คำเตือนโปรแกรมที่ไม่พึงประสงค์",

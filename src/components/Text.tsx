@@ -1,7 +1,7 @@
 import React, { Children, isValidElement, type ReactNode } from 'react';
 import { Platform, Text as RNText, TextInput as RNTextInput, type TextInputProps, type TextProps } from 'react-native';
 import { localizedStyle, plainText } from '../theme/localizedText';
-import { breakMyanmar, syllableRuns } from '../theme/myanmarBreaks';
+import { breakMyanmar, joinMyanmarWords, syllableRuns } from '../theme/myanmarBreaks';
 import { scriptOf } from '../theme/script';
 
 const NOWRAP = { whiteSpace: 'nowrap' } as const;
@@ -13,18 +13,27 @@ function webRuns(text: string): ReactNode {
   );
 }
 
-function breakChildren(children: ReactNode): ReactNode {
+/** Word mode on web: each space-separated word is one no-wrap run. */
+function webWords(text: string): ReactNode {
+  return text.split(/( )/).map((run, i) => (run === ' ' || !run ? run : <RNText key={i} style={NOWRAP as never}>{run}</RNText>));
+}
+
+export type WrapMode = 'syllable' | 'word';
+
+function breakChildren(children: ReactNode, wrap: WrapMode): ReactNode {
   if (typeof children === 'string') {
     if (scriptOf(children) !== 'myanmar') return children;
+    if (wrap === 'word') return Platform.OS === 'web' ? webWords(children) : joinMyanmarWords(children);
     return Platform.OS === 'web' ? webRuns(children) : breakMyanmar(children);
   }
-  if (Array.isArray(children)) return Children.map(children, c => (isValidElement(c) ? c : breakChildren(c)));
+  if (Array.isArray(children)) return Children.map(children, c => (isValidElement(c) ? c : breakChildren(c, wrap)));
   return children;
 }
 
-export const Text: React.FC<TextProps> = ({ style, children, ...rest }) => (
+/** `wrap="word"` keeps Burmese words whole for short headers; body text breaks between syllables. */
+export const Text: React.FC<TextProps & { wrap?: WrapMode }> = ({ style, children, wrap = 'syllable', ...rest }) => (
   <RNText {...rest} style={localizedStyle(plainText(children), style)}>
-    {breakChildren(children)}
+    {breakChildren(children, wrap)}
   </RNText>
 );
 

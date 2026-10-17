@@ -26,6 +26,7 @@
   "domainAgeUnknown": "Hindi alam ang edad ng domain",
   "webRisk": {
     "clean": "Walang nakitang banta",
+    "notListed": "Wala sa mga listahan ng Google",
     "malware": "Babala sa malware",
     "social_engineering": "Babala sa panlilinlang o phishing",
     "unwanted_software": "Babala sa hindi gustong software",
