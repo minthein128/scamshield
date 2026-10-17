@@ -33,6 +33,7 @@
     "share": "Share report",
     "clear": "Clear log",
     "copied": "Report copied. Paste it in a message to the $t(common:appName) team.",
+    "reportCopied": "Problem report copied",
     "clearTitle": "Clear the log?",
     "clearMessage": "This deletes all log entries on this phone.",
     "clearAction": "Clear",

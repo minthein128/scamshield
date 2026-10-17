@@ -218,6 +218,26 @@ describe('Check page v3', () => {
     expect(screen.getByText('Upload a screenshot or photo')).toBeTruthy();
   });
 
+  it('a failed pick shows the notice inside the card that was used, as a live region', async () => {
+    (pickScreenshot as jest.Mock).mockRejectedValue(new Error('bad'));
+    renderCheck();
+    fireEvent.press(screen.getByTestId('check-pick'));
+    const notice = await screen.findByTestId('check-notice');
+    expect(flat(notice)).toBe('We could not use that picture. Try another screenshot.');
+    expect(notice.props.accessibilityLiveRegion).toBe('assertive');
+    expect(screen.getByTestId('check').findByProps({ testID: 'check-notice' })).toBeTruthy();
+  });
+
+  it('an empty clipboard notice sits in the card and the Job offer chat card keeps its own', async () => {
+    (Clipboard.hasStringAsync as jest.Mock).mockResolvedValue(true);
+    (Clipboard.getStringAsync as jest.Mock).mockResolvedValue('');
+    renderCheck(undefined, 'job');
+    await waitFor(() => expect(screen.getAllByText('Paste what you copied').length).toBe(2));
+    await act(async () => { fireEvent.press(screen.getByTestId('job-chat-text-clip')); });
+    expect(flat(screen.getByTestId('job-chat-notice'))).toBe('Your clipboard is empty.');
+    expect(screen.queryByTestId('job-ad-notice')).toBeNull();
+  });
+
   it('no Paste chip and no clipboard read when the clipboard is empty', async () => {
     renderCheck();
     expect(screen.queryByText('Paste what you copied')).toBeNull();

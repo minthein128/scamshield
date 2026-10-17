@@ -62,7 +62,7 @@ export const DiagnosticsScreen: React.FC<RootScreenProps<'Diagnostics'>> = ({ na
       await Clipboard.setStringAsync(report);
       notify(t('diagnostics.copy'), t('diagnostics.copied'));
     });
-  const onShare = () => withReport(report => shareText(report));
+  const onShare = () => withReport(report => shareText(report, t('diagnostics.reportCopied')));
   const onClear = async () => {
     if (await confirmAction(t('diagnostics.clearTitle'), t('diagnostics.clearMessage'), t('diagnostics.clearAction'))) await clearLog();
   };
