@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { AppState, Platform } from 'react-native';
 import * as ShieldModule from 'shield-module';
@@ -8,6 +8,7 @@ import { companionStrings } from '../lib/companionStrings';
 import { diag, errorCode } from '../lib/diagLog';
 import { ensureNotifications, explainOnce, explainOnceEver, explainPermission, permissionApi, showPermissionHelp } from '../lib/permissions';
 import { isCleartext } from '../lib/shield';
+import { getShieldState, refreshShieldState, runShieldTransition, subscribeShieldState } from '../lib/shieldState';
 import { getAuthToken } from '../services/token';
 import { useAppState } from '../state/AppState';
 
@@ -22,7 +23,7 @@ export function shieldSupport(platform: string = Platform.OS, apiUrl: string | n
   return 'ready';
 }
 
-export type ShieldStep = 'idle' | 'overlay' | 'notifications' | 'capture' | 'starting';
+export type ShieldStep = 'idle' | 'overlay' | 'notifications' | 'capture' | 'starting' | 'stopping';
 
 export function stepText(step: ShieldStep): string {
   if (step === 'idle') return '';
@@ -44,18 +45,22 @@ export function useShieldControl(): ShieldControl {
   const shareSignals = profile.shareSignals === true;
   const apiUrl = useApiUrl();
   const support = shieldSupport(Platform.OS, apiUrl);
-  const [running, setRunning] = useState(false);
-  const [step, setStep] = useState<ShieldStep>('idle');
+  const shared = useSyncExternalStore(subscribeShieldState, getShieldState);
+  const running = shared.running;
+  const [ownStep, setStep] = useState<ShieldStep>('idle');
+  const step: ShieldStep = ownStep !== 'idle' ? ownStep : shared.transition ?? 'idle';
   const [error, setError] = useState<string | null>(null);
   const awaitingOverlay = useRef(false);
   const busy = useRef(false);
 
   const refresh = useCallback(async () => {
     if (support !== 'ready') return;
-    const on = await ShieldModule.isShieldRunning();
-    setRunning(on);
-    if (on) setError(null);
+    await refreshShieldState();
   }, [support]);
+
+  useEffect(() => {
+    if (running) setError(null);
+  }, [running]);
 
   useFocusEffect(
     useCallback(() => {
@@ -102,21 +107,27 @@ export function useShieldControl(): ShieldControl {
         setStep('idle');
         return;
       }
-      setStep('starting');
-      const token = await getAuthToken();
-      const ok = await ShieldModule.startShield({
-        apiUrl: apiUrl ?? '',
-        language,
-        strings: companionStrings(),
-        shareSignals,
-        ...(homeCountry ? { home: homeCountry } : {}),
-        ...(destinationCountry ? { destination: destinationCountry } : {}),
-        ...(token ? { authToken: token } : {}),
+      let ok = false;
+      let hasToken = false;
+      const started = runShieldTransition('starting', async () => {
+        const token = await getAuthToken();
+        hasToken = Boolean(token);
+        ok = await ShieldModule.startShield({
+          apiUrl: apiUrl ?? '',
+          language,
+          strings: companionStrings(),
+          shareSignals,
+          ...(homeCountry ? { home: homeCountry } : {}),
+          ...(destinationCountry ? { destination: destinationCountry } : {}),
+          ...(token ? { authToken: token } : {}),
+        });
+        return ok;
       });
-      diag[ok ? 'info' : 'warn']('shield', ok ? 'started' : 'not_started', { hasUrl: Boolean(apiUrl), hasToken: Boolean(token) });
-      if (!ok) setError(t('shield:errors.notStarted'));
       setStep('idle');
-      await refresh();
+      const on = await started;
+      if (on === null) return;
+      diag[on ? 'info' : 'warn']('shield', on ? 'started' : 'not_started', { hasUrl: Boolean(apiUrl), hasToken, accepted: ok });
+      if (!on) setError(t('shield:errors.notStarted'));
     } catch (e) {
       diag.error('shield', 'start_failed', { code: errorCode(e) });
       setError(t('shield:errors.failed'));
@@ -124,7 +135,7 @@ export function useShieldControl(): ShieldControl {
     } finally {
       busy.current = false;
     }
-  }, [language, refresh, apiUrl, homeCountry, destinationCountry, shareSignals]);
+  }, [language, apiUrl, homeCountry, destinationCountry, shareSignals]);
 
   useEffect(() => {
     refresh().catch(() => undefined);
@@ -153,11 +164,11 @@ export function useShieldControl(): ShieldControl {
         await turnOn();
         return;
       }
-      await ShieldModule.stopShield();
       setError(null);
-      await refresh();
+      const still = await runShieldTransition('stopping', () => ShieldModule.stopShield());
+      if (still) diag.warn('shield', 'not_stopped');
     },
-    [refresh, support, turnOn],
+    [support, turnOn],
   );
 
   const checkNow = useCallback(async () => {
