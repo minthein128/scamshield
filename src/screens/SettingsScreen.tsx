@@ -106,7 +106,7 @@ export const SettingsScreen: React.FC<RootScreenProps<'Settings'>> = ({ navigati
               <Text style={styles.strong}>{t('account.none')}</Text>
               <Text style={styles.body}>{t('account.noneBody')}</Text>
               <Button testID="settings-signup" label={t('account.create')} onPress={() => navigation.navigate('Account', { mode: 'signUp' })} />
-              <LinkButton label={t('account.signIn')} onPress={() => navigation.navigate('Account', { mode: 'signIn' })} />
+              <Button testID="settings-signin" label={t('account.signIn')} onPress={() => navigation.navigate('Account', { mode: 'signIn' })} />
             </>
           )}
           {error ? <Notice message={error} /> : null}

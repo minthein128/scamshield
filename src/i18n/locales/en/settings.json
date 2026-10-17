@@ -8,7 +8,7 @@
     "none": "No account",
     "noneBody": "Everything works without one. Create an account to keep your checks and contacts if you change phone, and to get a higher hourly check limit.",
     "create": "Create account",
-    "signIn": "Sign in"
+    "signIn": "Already have an account?"
   },
   "sync": {
     "syncing": "Syncing your checks and contacts...",
