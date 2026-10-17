@@ -96,6 +96,7 @@
     "errCapture": "Layar tidak bisa dibaca. Ketuk perisai untuk coba lagi.",
     "errCaptureDenied": "Tangkapan layar tidak diizinkan. Ketuk perisai untuk coba lagi.",
     "errFailed": "Pemeriksaan gagal. Coba lagi.",
-    "captureCancelled": "Tidak ada yang dibagikan. Ketuk boneka saat Anda ingin memeriksa."
+    "captureCancelled": "Tidak ada yang dibagikan. Ketuk boneka saat Anda ingin memeriksa.",
+    "sharingNotice": "$t(common:appName) dapat memeriksa layar Anda selama perisai aktif. Matikan perisai untuk berhenti."
   }
 }

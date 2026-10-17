@@ -93,6 +93,7 @@
     "errCapture": "Could not read the screen. Tap the shield to try again.",
     "errCaptureDenied": "Screen capture was not allowed. Tap the shield to try again.",
     "errFailed": "The check failed. Try again.",
-    "captureCancelled": "Nothing was shared. Tap the doll when you want a check."
+    "captureCancelled": "Nothing was shared. Tap the doll when you want a check.",
+    "sharingNotice": "$t(common:appName) can check your screen while the shield is on. Turn off the shield to stop."
   }
 }

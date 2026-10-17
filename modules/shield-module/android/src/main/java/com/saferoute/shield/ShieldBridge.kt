@@ -3,7 +3,7 @@ package com.saferoute.shield
 import android.content.Intent
 
 object ShieldBridge {
-    /** One screen-capture consent result. It opens one projection for one check and is then dropped. */
+    /** One screen-capture consent result. It opens the projection for one shield session and is then dropped. */
     class Consent(val resultCode: Int, val data: Intent)
 
     const val EXTRA_RESULT_JSON = "shieldResultJson"
@@ -40,8 +40,20 @@ object ShieldBridge {
         }
     }
 
+    private val stateListeners = java.util.concurrent.CopyOnWriteArraySet<(Boolean) -> Unit>()
+
+    /** Extra state listeners, such as the Quick Settings tile while the shade is open. */
+    fun addStateListener(listener: (Boolean) -> Unit) {
+        stateListeners.add(listener)
+    }
+
+    fun removeStateListener(listener: (Boolean) -> Unit) {
+        stateListeners.remove(listener)
+    }
+
     fun publishRunning(running: Boolean) {
         stateSink?.invoke(running)
+        stateListeners.forEach { it(running) }
     }
 
     @Synchronized

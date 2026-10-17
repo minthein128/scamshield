@@ -27,13 +27,13 @@ import org.robolectric.shadows.ShadowLooper
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-/** Screen-capture consent is asked on every bubble tap and the projection lives for one capture only. */
+/** Screen-capture consent is asked on the first bubble tap of a shield session and the projection lives until the session ends. */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 @Config(qualifiers = "w360dp-h800dp-xxhdpi")
 class ShieldConsentTest {
 
-    private class FakeSource(private val gate: CountDownLatch?) : ScreenSource {
+    private class FakeSource(@Volatile var gate: CountDownLatch?) : ScreenSource {
         @Volatile var released = false
         @Volatile var captures = 0
         override fun capture(notBefore: Long, waitMs: Long, masks: List<Rect>, onFrame: () -> Unit): ScreenCapturer.Capture {
@@ -129,10 +129,24 @@ class ShieldConsentTest {
 
     private fun checkFinished(service: ShieldService) = service.overlayForTest?.state == ShieldOverlay.State.ERROR
 
-    private fun assertOneCheckPerConsent(service: ShieldService) {
+    private fun notificationText(service: ShieldService): String? =
+        shadowOf(service).lastForegroundNotification?.extras?.getCharSequence(android.app.Notification.EXTRA_TEXT)?.toString()
+
+    /** Runs one tap after consent is held: no dialog, a capture on the same projection. */
+    private fun checkWithoutDialog(service: ShieldService, source: FakeSource, expectedCaptures: Int) {
+        service.overlayForTest?.reset()
+        assertEquals("no dialog once consent is held", 0, tap(service).size)
+        waitFor("check $expectedCaptures") { checkFinished(service) && source.captures == expectedCaptures }
+        assertEquals("the same projection serves every check", 1, opened.size)
+        assertFalse("the projection stays for the session", source.released)
+        assertTrue(service.hasProjection())
+    }
+
+    private fun assertOneConsentPerSession(service: ShieldService) {
         assertTrue("no dialog and no projection at start", consentDialogs().isEmpty() && opened.isEmpty())
         assertFalse(service.hasProjection())
         assertFalse("idle service has no mediaProjection type", hasProjectionType(service))
+        assertEquals(ShieldNotification.TEXT, notificationText(service))
 
         val first = tap(service)
         assertEquals("the first tap asks", 1, first.size)
@@ -141,46 +155,92 @@ class ShieldConsentTest {
         assertEquals(listOf(c1), opened)
         assertTrue("mediaProjection type is on while the projection opens", typesAtOpen.single() and ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION != 0)
         waitFor("the first check") { checkFinished(service) }
-        assertEquals(1, sources[0].captures)
-        assertTrue("the projection stops after one capture", sources[0].released)
-        assertFalse(service.hasProjection())
-        assertFalse("the type goes back to idle", hasProjectionType(service))
+        val source = sources.single()
+        assertEquals(1, source.captures)
+        assertFalse("the projection is kept after the first check", source.released)
+        assertTrue(service.hasProjection())
+        assertTrue("the type stays while the projection is held", hasProjectionType(service))
+        assertEquals("the notification says sharing is on", ShieldStrings.DEFAULT.sharingNotice, notificationText(service))
 
-        val second = tap(service)
-        assertEquals("the next tap asks again", 1, second.size)
-        assertNotEquals(first.single(), second.single())
-        assertEquals("no projection opens from the old consent", 1, opened.size)
-        val c2 = grant(service, second.single())
-        assertEquals(2, opened.size)
-        assertSame(c2, opened[1])
-        assertFalse("a consent is never reused", opened[0] === opened[1])
-        waitFor("the second check") { checkFinished(service) }
-        assertTrue(sources[1].released)
-        assertFalse(service.hasProjection())
-        assertFalse(hasProjectionType(service))
+        checkWithoutDialog(service, source, 2)
+        checkWithoutDialog(service, source, 3)
     }
 
     @Test
     @Config(sdk = [31])
-    fun android12AsksOnEveryTapAndStopsTheProjectionAfterEachCapture() {
+    fun android12AsksOncePerSessionAndKeepsTheProjection() {
         val service = startShield()
         assertEquals("Android 10 to 13 idle without a foreground type", 0, service.foregroundType())
-        assertOneCheckPerConsent(service)
+        assertOneConsentPerSession(service)
     }
 
     @Test
     @Config(sdk = [33])
-    fun android13AsksOnEveryTapAndStopsTheProjectionAfterEachCapture() {
-        assertOneCheckPerConsent(startShield())
+    fun android13AsksOncePerSessionAndKeepsTheProjection() {
+        assertOneConsentPerSession(startShield())
     }
 
     @Test
     @Config(sdk = [34])
-    fun android14AsksOnEveryTapAndStopsTheProjectionAfterEachCapture() {
+    fun android14AsksOncePerSessionAndKeepsTheProjection() {
         val service = startShield()
         assertEquals(ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE, service.foregroundType())
-        assertOneCheckPerConsent(service)
-        assertEquals(ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE, service.foregroundType())
+        assertOneConsentPerSession(service)
+        assertEquals(ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION, service.foregroundType())
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun turningTheShieldOffReleasesTheProjectionAndTheNextSessionAsksAgain() {
+        val service = startShield()
+        grant(service, tap(service).single())
+        waitFor("the check") { checkFinished(service) }
+        val source = sources.single()
+        service.stopNow()
+        assertTrue("stop releases the projection at once", source.released)
+        assertFalse(service.hasProjection())
+        controller?.destroy()
+        controller = null
+        idle()
+
+        val next = startShield()
+        assertFalse("a new session holds no consent", next.hasProjection())
+        assertEquals(ShieldNotification.TEXT, notificationText(next))
+        assertEquals("the new session asks again", 1, tap(next).size)
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun closingTheBubbleReleasesTheProjection() {
+        val service = startShield()
+        grant(service, tap(service).single())
+        waitFor("the check") { checkFinished(service) }
+        service.overlayForTest!!.reset()
+        service.overlayForTest!!.bubbleViewForTest.performLongClick()
+        ShadowLooper.idleMainLooper(ShieldMotion.EXIT_MS + 20, TimeUnit.MILLISECONDS)
+        assertFalse(ShieldService.isRunning)
+        assertTrue(sources.single().released)
+        assertFalse(service.hasProjection())
+    }
+
+    @Test
+    @Config(sdk = [31])
+    fun stoppingSharingFromTheSystemDropsTheConsentAndTheNextTapAsks() {
+        val service = startShield()
+        grant(service, tap(service).single())
+        waitFor("the check") { checkFinished(service) }
+        stopCallbacks.single().invoke()
+        idle()
+        assertFalse(service.hasProjection())
+        assertFalse(hasProjectionType(service))
+        assertTrue(sources.single().released)
+        assertEquals("the notification goes back to idle", ShieldNotification.TEXT, notificationText(service))
+        assertTrue("the shield stays on", ShieldService.isRunning)
+        val again = tap(service)
+        assertEquals("the next tap asks again", 1, again.size)
+        grant(service, again.single())
+        assertEquals(2, opened.size)
+        assertTrue(service.hasProjection())
     }
 
     @Test
@@ -237,8 +297,34 @@ class ShieldConsentTest {
         gate!!.countDown()
         waitFor("the check") { checkFinished(service) }
         assertEquals(1, opened.size)
-        assertTrue(sources.single().released)
-        assertEquals("a tap after the check asks again", 1, tap(service).size)
+        assertEquals("ignored taps start no capture", 1, sources.single().captures)
+        assertFalse(sources.single().released)
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun rapidTapsWithConsentHeldRunOneCheck() {
+        val service = startShield()
+        grant(service, tap(service).single())
+        waitFor("the first check") { checkFinished(service) }
+        val source = sources.single()
+        gate = CountDownLatch(1)
+        source.gate = gate
+        service.overlayForTest!!.reset()
+        service.requestCheck()
+        service.requestCheck()
+        service.requestCheck()
+        idle()
+        assertEquals("no dialog", 0, consentDialogs().size)
+        waitFor("the second capture") { source.captures == 2 }
+        service.onBallTap()
+        idle()
+        gate!!.countDown()
+        waitFor("the second check") { checkFinished(service) }
+        Thread.sleep(50)
+        idle()
+        assertEquals("three quick taps, one capture", 2, source.captures)
+        assertEquals(1, opened.size)
     }
 
     @Test
@@ -260,7 +346,7 @@ class ShieldConsentTest {
         grant(service, second)
         assertEquals(1, opened.size)
         waitFor("the check") { checkFinished(service) }
-        assertFalse(service.hasProjection())
+        assertTrue(service.hasProjection())
     }
 
     @Test
