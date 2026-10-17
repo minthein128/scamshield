@@ -27,7 +27,13 @@ describe('app', () => {
     const res = await make().request('/config.json');
     expect(res.status).toBe(200);
     expect(res.headers.get('cache-control')).toBe('no-cache');
-    expect(await res.json()).toEqual({ apiUrl: 'https://saferoute-api.akkhayar.com' });
+    expect(await res.json()).toEqual({ apiUrl: 'https://sg-dev-808112092414.asia-southeast1.run.app' });
+  });
+
+  it('serves the same health body at /health', async () => {
+    const res = await make().request('/health');
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual(await (await make().request('/healthz')).json());
   });
 
   it('healthz reports mock mode', async () => {

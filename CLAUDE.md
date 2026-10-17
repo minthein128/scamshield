@@ -1,4 +1,4 @@
-# SafeRoute app
+# Kakwe app
 
 Expo SDK 52 / React Native, TypeScript strict. Android anti-scam app. The Expo web build is also deployed (Firebase Hosting) for judges.
 
@@ -13,7 +13,7 @@ Expo SDK 52 / React Native, TypeScript strict. Android anti-scam app. The Expo w
 - `src/api/` contract types (`types.ts`, from `docs/api-contract.md`), HTTP client, mock backend, error mapping. Import from `src/api`.
 - `src/lib/` pure helpers: image compression, speech, history storage, report mapping, request building, share-intent mapping.
 - `src/state/AppState.tsx` profile (language, home and destination country, onboarded), history, trusted contacts; syncs to Firestore when signed in. `AuthState.tsx` wraps Firebase Auth (anonymous by default, email/password, Google and Facebook through `src/services/social.ts` (popup on web) and `social.native.ts` (google-signin and expo-auth-session on Android); Google needs `EXPO_PUBLIC_GOOGLE_SIGNIN=1` and `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID`, Facebook needs `EXPO_PUBLIC_FACEBOOK_APP_ID`; `public/privacy` and `public/delete-account` ship in the web build.
-- `src/config/runtime.ts` resolves the API URL: `EXPO_PUBLIC_CONFIG_URLS` (comma list; default `https://saferoute-api.akkhayar.com/config.json`, then the web.app and firebaseapp.com `config.json`) are tried in parallel with a short stagger, 6 s each. Each candidate (source, cache, `EXPO_PUBLIC_API_URL`, `https://saferoute-api.akkhayar.com`) is health-checked at `/healthz` (3 s) before it is trusted. A network error on a check re-resolves once and retries; the app also re-resolves after 5 minutes in the background. Settings > Connection shows the host and health.
+- `src/config/runtime.ts` resolves the API URL: `EXPO_PUBLIC_CONFIG_URLS` (comma list; default the web.app then the firebaseapp.com `config.json`) are tried in parallel with a short stagger, 6 s each. Each candidate (primary `EXPO_PUBLIC_STABLE_API_URL`, default the run.app URL; optional fallback `EXPO_PUBLIC_FALLBACK_API_URL`, unset by default; cache; `EXPO_PUBLIC_API_URL`; remote source) is health-checked at `/health`, then `/healthz` on a 404, before it is trusted. A network error on a check re-resolves once and retries; the app also re-resolves after 5 minutes in the background. Settings > Connection shows the host and health.
 - `src/lib/diagLog.ts` local diagnostics log (last 300 entries, 7 days, AsyncStorage only). Call `diag.info/warn/error(area, event, details)` with codes, statuses, durations, counts and booleans only; the sanitiser redacts anything else. Never pass message text, URLs, names, numbers, emails, tokens or uids. Settings > Connection > Diagnostics log shows it and builds the one shareable report (`src/lib/diagReport.ts`). `scripts/e2e-diagnostics.mjs` takes its screenshots.
 - `src/data/hotlines.ts` verified hotlines with source URLs; the server reads a generated copy (`pnpm sync:hotlines`).
 - `firestore.rules`, `firestore-tests/`: per-user rules and the emulator test (`pnpm test:rules`).
@@ -35,11 +35,16 @@ Other env vars: `EXPO_PUBLIC_APK_URL` (download link on web), `EXPO_PUBLIC_FIREB
 
 ## Shield overlay (Android)
 
-- `src/screens/ShieldScreen.tsx` asks for POST_NOTIFICATIONS (Android 13+), then screen capture, then calls `startShield({ apiUrl, language, authToken })`. The same flow runs from the switch on Home (`useShieldControl`). "Check this screen now" calls `checkScreenNow()`.
+- `src/screens/ShieldScreen.tsx` explains and asks for "Display over other apps", then POST_NOTIFICATIONS (Android 13+, optional), then screen capture, then calls `startShield({ apiUrl, language, authToken })`. The same flow runs from the switch on Home (`useShieldControl`). "Check this screen now" calls `checkScreenNow()`.
 - Overlay results are saved to recent checks by `useShieldSync` (listener plus `takeUnsyncedResults()` on start). `saferoute://report/<id>` opens the report through `useShieldDeepLink`.
 - The native client is blocked from cleartext `http://` by Android. `EXPO_PUBLIC_API_URL` must be `https://` for the shield. Cleartext is not enabled. The web build and `pnpm web` may use `http://localhost`.
 - The shield needs `EXPO_PUBLIC_API_URL`; it does not use the mock.
 - After editing `modules/shield-module`, run `rm -rf node_modules/shield-module node_modules/live-audio && pnpm install (or copy modules/<name> into node_modules/<name> if pnpm skips the link)` (the `file:` dependency is copied).
+
+## Permissions
+
+- Nothing is requested at app start or in onboarding. Each permission is asked when its feature is used, after a short reason dialog (`src/components/PermissionHost.tsx`, strings in the `permissions` namespace). Use `ensureMicrophone`, `ensureNotifications`, `ensureContacts`, `explainPermission` and `showPermissionHelp` from `src/lib/permissions.ts`; never call `PermissionsAndroid.request` directly.
+- Photos use the system photo picker (no permission). `plugins/with-minimal-permissions.js` strips CAMERA, storage, media and WRITE_CONTACTS from the merged manifest. Add a permission to its list only with a feature that needs it.
 
 ## Rules
 

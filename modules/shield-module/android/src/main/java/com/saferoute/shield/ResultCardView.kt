@@ -2,6 +2,9 @@ package com.saferoute.shield
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
+import android.animation.PropertyValuesHolder
 import android.animation.ValueAnimator
 import android.content.Context
 import android.content.res.ColorStateList
@@ -45,7 +48,7 @@ internal data class CardModel(
     val previewLabel: String = "This is what we checked",
     /** A voice notice rather than a check result. Dismissing it keeps the result. */
     val notice: Boolean = false,
-    /** Notice pill: a tap opens SafeRoute. */
+    /** Notice pill: a tap opens Kakwe. */
     val opensApp: Boolean = false,
 ) {
     val canExpand: Boolean get() = state != ShieldOverlay.State.ERROR
@@ -304,8 +307,8 @@ internal class ResultCardView(
             return
         }
         morph = ValueAnimator.ofFloat(fraction, target).apply {
-            duration = 220
-            interpolator = EASE
+            duration = if (expand) ShieldMotion.STEP_MS else ShieldMotion.FADE_MS
+            interpolator = ShieldMotion.OUT
             addUpdateListener { apply(it.animatedValue as Float) }
             addListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
@@ -327,7 +330,7 @@ internal class ResultCardView(
         layoutParams = lp
         if (model.canExpand) {
             details.visibility = if (t > 0f) VISIBLE else GONE
-            details.alpha = t
+            details.alpha = ((t - DETAILS_FADE_FROM) / (1f - DETAILS_FADE_FROM)).coerceIn(0f, 1f)
             val dlp = details.layoutParams
             dlp.height = (detailsHeight * t).toInt()
             details.layoutParams = dlp
@@ -522,7 +525,33 @@ internal class ResultCardView(
         }
     }
 
+    /** Grows out of the bubble: fades in fast, scales up with a restrained overshoot. Set the pivot first. */
+    fun enterAnimator(): Animator = popIn(this, ENTER_SCALE)
+
     companion object {
+        const val ENTER_SCALE = 0.8f
+        const val EXIT_SCALE = 0.85f
+        private const val DETAILS_FADE_FROM = 0.35f
+
+        fun popIn(view: View, from: Float): Animator {
+            view.alpha = 0f
+            view.scaleX = from
+            view.scaleY = from
+            val fade = ObjectAnimator.ofFloat(view, View.ALPHA, 0f, 1f).apply {
+                duration = ShieldMotion.EXIT_MS
+                interpolator = ShieldMotion.OUT
+            }
+            val grow = ObjectAnimator.ofPropertyValuesHolder(
+                view,
+                PropertyValuesHolder.ofFloat(View.SCALE_X, from, 1f),
+                PropertyValuesHolder.ofFloat(View.SCALE_Y, from, 1f)
+            ).apply {
+                duration = ShieldMotion.STEP_MS
+                interpolator = ShieldMotion.POP
+            }
+            return AnimatorSet().apply { playTogether(fade, grow) }
+        }
+
         const val PILL_RADIUS_DP = 24f
         const val PREVIEW_DP = 72
         const val SHEET_RADIUS_DP = 20f

@@ -12,4 +12,4 @@ export interface LiveAudio {
 
 export const CAPTURE_RATE = 16000;
 export const PLAYBACK_RATE = 24000;
-export const NOT_AVAILABLE = 'Talk to SafeRoute audio is not available in this build.';
+export const NOT_AVAILABLE = 'Talk to Kakwe audio is not available in this build.';

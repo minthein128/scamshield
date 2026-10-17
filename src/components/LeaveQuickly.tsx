@@ -3,6 +3,7 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { CommonActions, useNavigation } from '@react-navigation/native';
 import { Text } from './Text';
+import { BlockIcon } from './blockIcons';
 import { ScreenHeader } from './ui';
 import { stopSpeaking } from '../lib/speech';
 import theme from '../theme/theme';
@@ -29,6 +30,7 @@ export const LeaveQuicklyButton: React.FC = () => {
       style={styles.button}
     >
       <Text numberOfLines={1} style={styles.label}>{t('actions.leave')}</Text>
+      <BlockIcon name="exit" size={18} />
     </TouchableOpacity>
   );
 };
@@ -45,6 +47,6 @@ export const HeaderWithLeave: React.FC<{ title: string; onBack?: () => void }> =
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   title: { flex: 1, minWidth: 0 },
-  button: { minHeight: 44, justifyContent: 'center', paddingHorizontal: 12, borderRadius: 22, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.white },
-  label: { color: colors.textPrimary, fontSize: 14, fontFamily: fonts.semiBold },
+  button: { minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, borderRadius: 22, borderWidth: 1.5, borderColor: colors.brandInk, backgroundColor: colors.white },
+  label: { flexShrink: 1, color: colors.textPrimary, fontSize: 14, lineHeight: 20, fontFamily: fonts.bold, includeFontPadding: false },
 });

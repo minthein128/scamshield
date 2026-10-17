@@ -2,7 +2,7 @@
   "_meta": {
     "reviewed": false
   },
-  "seen_other": "Dilaporkan {{count}} kali oleh pengguna SafeRoute lain dalam 30 hari terakhir",
+  "seen_other": "Dilaporkan {{count}} kali oleh pengguna $t(common:appName) lain dalam 30 hari terakhir",
   "title": "Laporan risiko",
   "a11yVerdict": "{{verdict}}. Tingkat {{step}} dari 3.",
   "warn": "Beri tahu keluarga saya",
@@ -24,6 +24,7 @@
   "domainAgeUnknown": "Usia domain tidak diketahui",
   "webRisk": {
     "clean": "Tidak ada ancaman yang diketahui",
+    "notListed": "Tidak ada di daftar Google",
     "malware": "Peringatan malware",
     "social_engineering": "Peringatan phishing atau penipuan",
     "unwanted_software": "Peringatan aplikasi tak diinginkan",
@@ -34,8 +35,8 @@
     "withValue": "Blokir {{value}} di aplikasi tempat Anda menemukannya.",
     "generic": "Blokir dan laporkan pengirim di aplikasi tempat Anda menemukannya."
   },
-  "shareMessage": "Pemeriksaan SafeRoute: {{title}}\n{{summary}}\nSkor risiko {{score}}/100.",
-  "warnMessage": "Peringatan SafeRoute ({{verdict}}): {{title}}. {{summary}} Mohon jangan kirim uang atau berkas apa pun. Hubungi saya dulu.",
+  "shareMessage": "Pemeriksaan $t(common:appName): {{title}}\n{{summary}}\nSkor risiko {{score}}/100.",
+  "warnMessage": "Peringatan $t(common:appName) ({{verdict}}): {{title}}. {{summary}} Mohon jangan kirim uang atau berkas apa pun. Hubungi saya dulu.",
   "thanks": "Terima kasih, ini membantu melindungi orang lain",
   "attention": {
     "word": {

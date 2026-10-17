@@ -24,6 +24,7 @@ const ENDPOINT_NAMES: Record<string, string> = {
   '/v1/insights': 'insights',
   '/v1/job/extract': 'jobExtract',
   '/v1/job/assess': 'jobAssess',
+  '/health': 'health',
   '/healthz': 'health',
 };
 
@@ -203,7 +204,12 @@ export function createHttpClient(config: HttpClientConfig): CheckClient {
       return normalizeJobResponse(body as JobAssessResponse);
     },
     async health(options?: RequestOptions): Promise<HealthResponse> {
-      return (await send('/healthz', { method: 'GET' }, options)) as HealthResponse;
+      try {
+        return (await send('/health', { method: 'GET' }, options)) as HealthResponse;
+      } catch (e) {
+        if (!(e instanceof ApiError) || e.status !== 404) throw e;
+        return (await send('/healthz', { method: 'GET' }, options)) as HealthResponse;
+      }
     },
   };
 }

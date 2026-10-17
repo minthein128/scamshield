@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, TouchableOpacity, StyleSheet, StyleProp, ViewStyle } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { NoticeCard } from '../components/NoticeCard';
@@ -8,7 +8,7 @@ import { Text } from '../components/Text';
 import { Screen } from '../components/Screen';
 import { Grid } from '../components/Grid';
 import { useLayout } from '../hooks/useLayout';
-import { ShieldCard } from '../components/ShieldCard';
+import { BigShieldButton } from '../components/BigShieldButton';
 import { Button, Card, EmptyState, SectionTitle } from '../components/ui';
 import type { TabScreenProps } from '../navigation/types';
 import { useAppState } from '../state/AppState';
@@ -20,12 +20,15 @@ import theme from '../theme/theme';
 
 const { colors, fonts } = theme;
 
+const RECENT_SHOWN = 6;
+
 const VERDICT_GLYPH = { safe: 'checkCircle', careful: 'alert', danger: 'octagon' } as const;
 
 export const HomeScreen: React.FC<TabScreenProps<'Home'>> = ({ navigation }) => {
   const { t } = useTranslation('home');
   const { history, profile } = useAppState();
   const layout = useLayout();
+  const [showAll, setShowAll] = useState(false);
   const startCheck = (intent: 'link' | 'image' | 'text') => navigation.navigate('Check', { intent, nonce: Date.now() });
 
   const checkCard = (style?: StyleProp<ViewStyle>) => (
@@ -64,8 +67,20 @@ export const HomeScreen: React.FC<TabScreenProps<'Home'>> = ({ navigation }) => 
     >
       <NoticeCard />
 
+      <BigShieldButton />
+
       {checkCard()}
-      <ShieldCard compact onDetails={() => navigation.navigate('Shield')} />
+
+      <TouchableOpacity testID="home-radar" accessibilityRole="button" accessibilityLabel={t('radar.a11y')} activeOpacity={0.7} onPress={() => navigation.navigate('Radar')} style={styles.radar}>
+        <View style={styles.rowIcon}>
+          <Icon name="radar" size={24} color={colors.accent} />
+        </View>
+        <View style={{ flex: 1, gap: 2 }}>
+          <Text style={styles.radarTitle}>{t('radar.title')}</Text>
+          <Text style={styles.radarBody}>{t('radar.body')}</Text>
+        </View>
+        <Icon name="chevron" size={22} color={colors.textMuted} />
+      </TouchableOpacity>
 
       <View style={{ gap: 8 }}>
         <SectionTitle>{t('recent.title')}</SectionTitle>
@@ -73,7 +88,7 @@ export const HomeScreen: React.FC<TabScreenProps<'Home'>> = ({ navigation }) => 
           <EmptyState testID="recent-empty" title={t('recent.emptyTitle')} body={profile.keepHistory ? t('recent.emptyBody') : t('recent.historyOff')} />
         ) : (
           <Grid columns={Math.min(layout.columns, 2)} gap={layout.isTablet ? 12 : 8}>
-            {history.slice(0, layout.isTablet ? 6 : 5).map(entry => {
+            {history.slice(0, showAll ? undefined : RECENT_SHOWN).map(entry => {
             const v = VERDICT_STYLES[entry.result.verdict];
             return (
               <TouchableOpacity
@@ -98,18 +113,13 @@ export const HomeScreen: React.FC<TabScreenProps<'Home'>> = ({ navigation }) => 
             })}
           </Grid>
         )}
+        {history.length > RECENT_SHOWN && !showAll ? (
+          <TouchableOpacity testID="recent-older" accessibilityRole="button" accessibilityLabel={t('recent.older')} activeOpacity={0.7} onPress={() => setShowAll(true)} style={styles.older}>
+            <Text style={styles.olderText}>{t('recent.older')}</Text>
+          </TouchableOpacity>
+        ) : null}
       </View>
 
-      <TouchableOpacity testID="home-radar" accessibilityRole="button" accessibilityLabel={t('radar.a11y')} activeOpacity={0.7} onPress={() => navigation.navigate('Radar')} style={styles.radar}>
-        <View style={styles.rowIcon}>
-          <Icon name="radar" size={24} color={colors.accent} />
-        </View>
-        <View style={{ flex: 1, gap: 2 }}>
-          <Text style={styles.radarTitle}>{t('radar.title')}</Text>
-          <Text style={styles.radarBody}>{t('radar.body')}</Text>
-        </View>
-        <Icon name="chevron" size={22} color={colors.textMuted} />
-      </TouchableOpacity>
     </Screen>
   );
 };
@@ -139,6 +149,8 @@ const styles = StyleSheet.create({
   helpButtonText: { color: colors.textPrimary, fontSize: 14, lineHeight: 20, fontFamily: fonts.bold, includeFontPadding: false },
   verdict: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingVertical: 6, paddingHorizontal: 10, borderRadius: 999 },
   verdictText: { fontSize: 13, lineHeight: 18, fontFamily: fonts.bold, includeFontPadding: false },
+  older: { minHeight: 48, alignSelf: 'center', justifyContent: 'center', paddingHorizontal: 8 },
+  olderText: { color: colors.textPrimary, fontSize: 15, lineHeight: 22, fontFamily: fonts.bold, textDecorationLine: 'underline' },
   rowIcon: { width: 48, height: 48, borderRadius: 24, backgroundColor: colors.brandGoldSoft, alignItems: 'center', justifyContent: 'center' },
 });
 

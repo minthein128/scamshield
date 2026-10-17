@@ -430,7 +430,7 @@ export const HOTLINES: Hotline[] = [
     "name": "Myanmar Labour Attache Office, Bangkok (for Myanmar workers in Thailand)",
     "number": "+66 94 884 5484",
     "dial": "+66948845484",
-    "notes": "Mobile and Viber. Myanmar Ministry of Labour list; the Bangkok embassy site shows the same number. Email: labourattacheofficebkk@gmail.com. A Sept 2025 news report prints 061810845 for the Labour Attache, Bangkok; it has 9 digits where Thai mobiles have 10, so it is not listed.",
+    "notes": "Mobile and Viber. Email: labourattacheofficebkk@gmail.com.",
     "sourceUrl": "https://www.mol.gov.mm/wp-content/uploads/2023/11/labour-attache.pdf",
     "asOf": "2023-11",
     "verifiedOn": "2026-10-15"
@@ -442,7 +442,6 @@ export const HOTLINES: Hotline[] = [
     "name": "Myanmar Labour Officer, Bangkok (for Myanmar workers in Thailand)",
     "number": "+66 65 220 6952",
     "dial": "+66652206952",
-    "notes": "Listed in a Sept 2025 news report; the Bangkok embassy site shows the same number.",
     "sourceUrl": "https://www.gnlm.com.mm/myanmar-labour-offices-provide-services-for-migrants-rights-in-thailand/",
     "asOf": "2025-09-19",
     "verifiedOn": "2026-10-15"
@@ -455,7 +454,7 @@ export const HOTLINES: Hotline[] = [
     "number": "+66 2 003 0015",
     "dial": "+6620030015",
     "domesticOnly": false,
-    "notes": "General call centre for Myanmar workers in Thailand; listed in a Sept 2025 news report.",
+    "notes": "General call centre for Myanmar workers in Thailand.",
     "sourceUrl": "https://www.gnlm.com.mm/myanmar-labour-offices-provide-services-for-migrants-rights-in-thailand/",
     "asOf": "2025-09-19",
     "verifiedOn": "2026-10-15"
@@ -467,7 +466,7 @@ export const HOTLINES: Hotline[] = [
     "name": "Myanmar Labour Attache Office, Mae Sot",
     "number": "+66 65 220 6953",
     "dial": "+66652206953",
-    "notes": "Mobile and Viber. Myanmar Ministry of Labour list; the Bangkok embassy site shows the same number. Also confirmed by a Sept 2025 news report (gnlm.com.mm).",
+    "notes": "Mobile and Viber.",
     "sourceUrl": "https://www.gnlm.com.mm/myanmar-labour-offices-provide-services-for-migrants-rights-in-thailand/",
     "asOf": "2025-09-19",
     "verifiedOn": "2026-10-15"
@@ -479,7 +478,7 @@ export const HOTLINES: Hotline[] = [
     "name": "Myanmar Labour Attache Office, Ranong",
     "number": "+66 63 481 8121",
     "dial": "+66634818121",
-    "notes": "Mobile. Sept 2025 news report. The 2023 Ministry of Labour list differs (2023 list: +66 65 220 6951; Viber +66 81 562 8563).",
+    "notes": "Mobile.",
     "sourceUrl": "https://www.gnlm.com.mm/myanmar-labour-offices-provide-services-for-migrants-rights-in-thailand/",
     "asOf": "2025-09-19",
     "verifiedOn": "2026-10-15"
@@ -491,7 +490,7 @@ export const HOTLINES: Hotline[] = [
     "name": "Myanmar Labour Attache Office, Chiang Mai",
     "number": "+66 94 586 6607",
     "dial": "+66945866607",
-    "notes": "Mobile. Sept 2025 news report. The 2023 Ministry of Labour list differs (2023 list: +66 99 059 2352; Viber +95 9 420 199 634).",
+    "notes": "Mobile.",
     "sourceUrl": "https://www.gnlm.com.mm/myanmar-labour-offices-provide-services-for-migrants-rights-in-thailand/",
     "asOf": "2025-09-19",
     "verifiedOn": "2026-10-15"
@@ -527,7 +526,7 @@ export const HOTLINES: Hotline[] = [
     "name": "Myanmar Embassy Bangkok",
     "number": "+66 2 234 0320",
     "dial": "+6622340320",
-    "notes": "Internet Archive snapshot of the embassy site. Other lines: +66 2 637 9404, +66 62 628 3892.",
+    "notes": "Other lines: +66 2 637 9404, +66 62 628 3892.",
     "sourceUrl": "https://web.archive.org/web/20240302105117/https://mebangkok.org/labour-contact.html",
     "asOf": "2024-03-02",
     "verifiedOn": "2026-10-14"
@@ -539,7 +538,7 @@ export const HOTLINES: Hotline[] = [
     "name": "Myanmar Embassy Vientiane",
     "number": "+856 21 314 910",
     "dial": "+85621314910",
-    "notes": "Other lines: +856 21 314 911, +856 21 353 491. The embassy website lists no date.",
+    "notes": "Other lines: +856 21 314 911, +856 21 353 491.",
     "sourceUrl": "https://www.myanmarembassy-vte.org/index.php/en/contact-us",
     "verifiedOn": "2026-10-15"
   },
@@ -563,7 +562,7 @@ export const HOTLINES: Hotline[] = [
     "number": "067-412555",
     "dial": "+9567412555",
     "domesticOnly": true,
-    "notes": "Listed as a 24 hour help line. From abroad dial +95 67 412555. The source is a JICA pamphlet dated October 2019, from before the current administration, so the line may have changed.",
+    "notes": "24 hour help line. From abroad dial +95 67 412555. The number may have changed.",
     "sourceUrl": "https://www.jica.go.jp/Resource/project/myanmar/032/materials/ku57pq00003sz6yz-att/ICTP_pamphlet.pdf",
     "asOf": "2019-10",
     "verifiedOn": "2026-10-15"
@@ -576,7 +575,7 @@ export const HOTLINES: Hotline[] = [
     "number": "09-49555888",
     "dial": "+95949555888",
     "domesticOnly": true,
-    "notes": "Listed as a 24 hour help line. From abroad dial +95 9 49555888. The source is a JICA pamphlet dated October 2019, from before the current administration, so the line may have changed.",
+    "notes": "24 hour help line. From abroad dial +95 9 49555888. The number may have changed.",
     "sourceUrl": "https://www.jica.go.jp/Resource/project/myanmar/032/materials/ku57pq00003sz6yz-att/ICTP_pamphlet.pdf",
     "asOf": "2019-10",
     "verifiedOn": "2026-10-15"
@@ -600,7 +599,7 @@ export const HOTLINES: Hotline[] = [
     "name": "Cambodian National Police, scam reporting portal (24/7)",
     "reportUrl": "https://hotline.police.gov.kh/",
     "hours": "Open 24 hours",
-    "notes": "Online complaint form for investment, loan, social media and banking scams. The site lists no phone number.",
+    "notes": "Online complaint form for investment, loan, social media and banking scams. There is no phone line.",
     "sourceUrl": "https://hotline.police.gov.kh/",
     "asOf": "2026-10-14",
     "verifiedOn": "2026-10-14"
@@ -624,7 +623,6 @@ export const HOTLINES: Hotline[] = [
     "name": "Indonesian Embassy Phnom Penh (KBRI), citizen protection line",
     "number": "+855 12 813 282",
     "dial": "+85512813282",
-    "notes": "Listed as the embassy phone number by the Ministry of Foreign Affairs citizen portal.",
     "sourceUrl": "https://peduliwni.kemlu.go.id/informasi_pelayanan/app/detail_kbri/.html?perwakilan_id=MTE2MA%3D%3D",
     "asOf": "2026-10-14",
     "verifiedOn": "2026-10-14"
@@ -636,7 +634,7 @@ export const HOTLINES: Hotline[] = [
     "name": "Philippine Embassy Phnom Penh, emergency hotline (Filipinos in Cambodia)",
     "number": "+855 98 888 771",
     "dial": "+85598888771",
-    "notes": "Emergency cases only. Embassy lines: +855 23 333 303 and +855 23 222 304. Internet Archive snapshot of the embassy site.",
+    "notes": "Emergency cases only. Embassy lines: +855 23 333 303 and +855 23 222 304.",
     "sourceUrl": "https://web.archive.org/web/20260427172256/https://phnompenhpe.dfa.gov.ph/contact-us",
     "asOf": "2026-04-27",
     "verifiedOn": "2026-10-14"
@@ -649,7 +647,7 @@ export const HOTLINES: Hotline[] = [
     "number": "1362",
     "dial": "1362",
     "domesticOnly": true,
-    "notes": "Counselling and protection for women and children. Also listed in the UN Women Spotlight Initiative service directory (April 2021).",
+    "notes": "Counselling and protection for women and children.",
     "sourceUrl": "https://lao.unfpa.org/en/video/hotline-lao-womens-unionlwu-1362-psycho-social-support-you-covid19",
     "asOf": "2020-05-14",
     "verifiedOn": "2026-10-14"
@@ -673,7 +671,7 @@ export const HOTLINES: Hotline[] = [
     "name": "Philippine Embassy Vientiane, hotline (Filipinos in Laos)",
     "number": "+856 20 555 358 78",
     "dial": "+8562055535878",
-    "notes": "Internet Archive snapshot of the embassy site. Trunk line: +856 21 452 490.",
+    "notes": "Trunk line: +856 21 452 490.",
     "sourceUrl": "https://web.archive.org/web/20221006234158/https://vientianepe.dfa.gov.ph/contact-us",
     "asOf": "2022-10-06",
     "verifiedOn": "2026-10-14"
@@ -685,7 +683,7 @@ export const HOTLINES: Hotline[] = [
     "name": "PNP Anti-Cybercrime Group",
     "number": "(02) 8723 0401 local 7491",
     "dial": "+63287230401",
-    "notes": "Ask for local 7491 after the call connects. The group does not take payments or file cases on Telegram. Source is a GMA News report quoting the PNP-ACG.",
+    "notes": "Ask for local 7491 after the call connects. The group does not take payments or file cases on Telegram.",
     "sourceUrl": "https://www.gmanetwork.com/news/topstories/nation/931990/pnp-acg-warns-vs-fraud-account-on-telegram/story/",
     "asOf": "2025-01-06",
     "verifiedOn": "2026-10-14"
@@ -699,7 +697,7 @@ export const HOTLINES: Hotline[] = [
     "dial": "1326",
     "domesticOnly": true,
     "hours": "Open 24 hours",
-    "notes": "Report online scams. Other lines: 0947 714 7105 (Smart), 0966 976 5971 (Globe), 0991 481 4225 (DITO). Source is a Philippine News Agency report.",
+    "notes": "Report online scams. Other lines: 0947 714 7105 (Smart), 0966 976 5971 (Globe), 0991 481 4225 (DITO).",
     "sourceUrl": "https://web.archive.org/web/20250124192445/https://www.pna.gov.ph/articles/1207775",
     "asOf": "2023-08-14",
     "verifiedOn": "2026-10-14"
@@ -711,7 +709,7 @@ export const HOTLINES: Hotline[] = [
     "name": "DFA Assistance to Nationals (Manila home office)",
     "number": "(02) 8834 4000 local 4031",
     "dial": "+63288344000",
-    "notes": "Ask for local 4031 after the call connects. From abroad dial +63 2 8834 4000. The page does not state the hours. Internet Archive snapshot.",
+    "notes": "Ask for local 4031 after the call connects. From abroad dial +63 2 8834 4000.",
     "sourceUrl": "https://web.archive.org/web/20251124002318/https://dfa.gov.ph/",
     "asOf": "2025-11-24",
     "verifiedOn": "2026-10-14"
@@ -723,7 +721,7 @@ export const HOTLINES: Hotline[] = [
     "name": "Philippine Embassy Bangkok, Assistance-to-Nationals hotline",
     "number": "+66 81 989 7116",
     "dial": "+66819897116",
-    "notes": "For relatives of Filipinos who may be trapped in scam hubs. Internet Archive snapshot of the embassy site.",
+    "notes": "For relatives of Filipinos who may be trapped in scam hubs.",
     "sourceUrl": "https://web.archive.org/web/20260103083613/https://bangkokpe.dfa.gov.ph/",
     "asOf": "2026-01-03",
     "verifiedOn": "2026-10-14"

@@ -1,4 +1,5 @@
 {
+  "appName": "Kakwe",
   "_meta": {
     "reviewed": false
   },
@@ -14,7 +15,7 @@
     "remove": "Alisin",
     "call": "Tawagan",
     "tryAgain": "Subukan muli",
-    "leave": "Umalis agad",
+    "leave": "Mabilis na labas",
     "leaveA11y": "Umalis sa screen na ito at pumunta sa Home"
   },
   "tabs": {
@@ -24,7 +25,7 @@
     "contactsA11y": "Mga pinagkakatiwalaang contact",
     "learn": "Matuto"
   },
-  "loading": "Naglo-load ang SafeRoute...",
+  "loading": "Naglo-load ang $t(common:appName)...",
   "offlineDemo": "Offline demo mode",
   "copied": {
     "title": "Nakopya na",
@@ -60,6 +61,7 @@
     "marketplace_fraud": "Posibleng panloloko sa marketplace",
     "investment": "Posibleng panloloko sa investment",
     "other": "Kahina-hinalang mensahe",
+    "other_link": "Kahina-hinalang link",
     "none": "Walang nakitang senyales ng panloloko"
   },
   "countries": {

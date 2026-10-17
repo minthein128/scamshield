@@ -1,4 +1,5 @@
 {
+  "appName": "Kakwe",
   "actions": {
     "back": "Go back",
     "close": "Close",
@@ -11,7 +12,7 @@
     "remove": "Remove",
     "call": "Call",
     "tryAgain": "Try again",
-    "leave": "Leave quickly",
+    "leave": "Quick exit",
     "leaveA11y": "Leave this screen and go to Home"
   },
   "tabs": {
@@ -21,7 +22,7 @@
     "contactsA11y": "Trusted contacts",
     "learn": "Learn"
   },
-  "loading": "Loading SafeRoute...",
+  "loading": "Loading $t(common:appName)...",
   "offlineDemo": "Offline demo mode",
   "copied": {
     "title": "Copied",
@@ -57,6 +58,7 @@
     "marketplace_fraud": "Possible marketplace fraud",
     "investment": "Possible investment scam",
     "other": "Suspicious message",
+    "other_link": "Suspicious link",
     "none": "No scam pattern found"
   },
   "countries": {

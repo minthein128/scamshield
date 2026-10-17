@@ -38,7 +38,7 @@ if (!cfg.geminiApiKey && !(cfg.useVertex && cfg.project)) {
 }
 const model = str(flags.model) ?? 'gemini-3.8-flash';
 
-const INSTRUCTIONS = `You help label a benchmark for SafeRoute, an anti-scam app for migrant workers in Southeast Asia.
+const INSTRUCTIONS = `You help label a benchmark for Kakwe, an anti-scam app for migrant workers in Southeast Asia.
 Read the screenshot and return JSON:
 - source_text: every word visible in the screenshot, in reading order, exactly as written (keep the original language and script, one line per message or line). Do not translate or fix spelling.
 - content_language: ISO 639-1 code of the text.

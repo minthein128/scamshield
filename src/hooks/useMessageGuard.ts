@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { AppState, PermissionsAndroid, Platform } from 'react-native';
+import { AppState, Platform } from 'react-native';
 import * as ShieldModule from 'shield-module';
 import type { MessageGuardApp, MessageGuardLogEntry } from 'shield-module';
 import { t } from '../i18n';
 import { diag, errorCode } from '../lib/diagLog';
+import { ensureNotifications } from '../lib/permissions';
 import { useApiUrl } from '../config/runtime';
 import { useAppState } from '../state/AppState';
 import { shieldSupport, type ShieldSupport } from './useShieldControl';
+import { syncMessageGuardActivity } from '../lib/messageGuardActivity';
 
 /** What the consent screen asks for: turning Message Guard on, or adding one more app. */
 export type MessageGuardConsentRequest = { mode: 'enable' } | { mode: 'addApp'; app: MessageGuardApp };
@@ -26,7 +28,10 @@ export interface MessageGuardControl {
   turnOffAndRevoke: () => Promise<void>;
 }
 
-/** Keeps the background listener's server address, language, notice text and signal sharing opt-in current. */
+/**
+ * Keeps the background listener's server address, language, notice text and signal sharing opt-in
+ * current, and copies its decisions into the Diagnostics log when the app comes to the front.
+ */
 export function useMessageGuardConfigSync(): void {
   const { language, profile, ready } = useAppState();
   const apiUrl = useApiUrl();
@@ -39,9 +44,19 @@ export function useMessageGuardConfigSync(): void {
       // Native sharing stays off until the stored opt-in has loaded.
       ...(ready ? { shareSignals } : {}),
       noticeBody: t('shield:messageGuard.notice.body'),
+      noticeTitle: t('common:appName'),
       noticeOpen: t('shield:messageGuard.notice.open'),
     }).catch(e => diag.error('messageGuard', 'configure_failed', { code: errorCode(e) }));
   }, [apiUrl, language, ready, shareSignals]);
+
+  useEffect(() => {
+    if (Platform.OS !== 'android') return;
+    syncMessageGuardActivity().catch(() => undefined);
+    const sub = AppState.addEventListener('change', state => {
+      if (state === 'active') syncMessageGuardActivity().catch(() => undefined);
+    });
+    return () => sub.remove();
+  }, []);
 }
 
 export function useMessageGuard(): MessageGuardControl {
@@ -74,9 +89,7 @@ export function useMessageGuard(): MessageGuardControl {
   }, [support]);
 
   const turnOn = useCallback(async () => {
-    if (Number(Platform.Version) >= 33) {
-      await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
-    }
+    await ensureNotifications('guardNotifications');
     await ShieldModule.setMessageGuardEnabled(true);
     diag.info('messageGuard', 'enabled');
     setError(null);

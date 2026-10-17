@@ -6,40 +6,37 @@
   "skipA11y": "Lewati penyiapan",
   "language": {
     "title": "Pilih bahasa Anda",
-    "body": "SafeRoute menampilkan aplikasi dan menuliskan laporan serta peringatan suara dalam bahasa ini. Anda bisa mengubahnya nanti.",
-    "age": "SafeRoute untuk orang berusia 18 tahun ke atas.",
+    "body": "$t(common:appName) menampilkan aplikasi dan menuliskan laporan serta peringatan suara dalam bahasa ini. Anda bisa mengubahnya nanti.",
+    "age": "$t(common:appName) untuk orang berusia 18 tahun ke atas.",
     "tagline": "Seperti boneka Pyit Taing Htaung, kami membantu Anda tetap tegak berdiri.",
-    "heroA11y": "SafeRoute, dengan boneka Pyit Taing Htaung"
+    "heroA11y": "$t(common:appName), dengan boneka Pyit Taing Htaung"
   },
   "countries": {
     "fromTitle": "Dari mana asal Anda?",
-    "fromBody": "Ini berguna agar nomor bantuan yang tepat muncul lebih dulu.",
-    "toTitle": "Ke mana Anda akan bekerja atau bepergian?",
-    "toBody": "Boleh dilewati. Lewati jika Anda belum tahu."
+    "fromBody": "Ini berguna agar nomor bantuan yang tepat muncul lebih dulu."
   },
   "how": {
-    "title": "Cara SafeRoute membantu",
-    "body": "Tiga hal, tidak perlu pengaturan apa pun.",
+    "title": "Yang dilakukan $t(common:appName)",
     "check": {
-      "title": "Periksa sebelum setuju",
-      "body": "Tempel tawaran kerja, pesan, atau tautan, atau bagikan tangkapan layar. SafeRoute mencari tanda-tanda peringatan perdagangan orang dan penipuan."
+      "title": "Periksa sebelum berangkat",
+      "body": "Tunjukkan iklan kerja, pesan, atau tautan."
     },
-    "explain": {
-      "title": "Lihat alasannya, dalam bahasa Anda",
-      "body": "Anda mendapat hasil penilaian yang jelas, alasan di baliknya, dan peringatan suara dalam bahasa yang Anda pilih."
+    "doll": {
+      "title": "Ketuk boneka",
+      "body": "Boneka memeriksa layar Anda di aplikasi apa pun."
+    },
+    "call": {
+      "title": "Minta bantuan",
+      "body": "Nomor bantuan untuk negara Anda."
     },
     "warn": {
-      "title": "Beri tahu keluarga dan dapatkan bantuan",
-      "body": "Kirim peringatan ke orang yang Anda percayai dan temukan nomor bantuan resmi untuk negara yang penting bagi Anda."
+      "title": "Peringatkan keluarga",
+      "body": "Kirim peringatan ke orang yang Anda percaya."
     }
-  },
-  "shield": {
-    "title": "Nyalakan Screen shield",
-    "body": "Boleh dilewati. Anda juga bisa menyalakannya nanti dari layar utama."
   },
   "sharing": {
     "title": "Bantu sesama: bagikan pola penipuan tanpa nama",
-    "body": "Saat suatu pemeriksaan terlihat berisiko, SafeRoute dapat membagikan polanya agar orang lain bisa mendapat peringatan lebih awal. Ini tidak wajib.",
+    "body": "Saat suatu pemeriksaan terlihat berisiko, $t(common:appName) dapat membagikan polanya agar orang lain bisa mendapat peringatan lebih awal. Ini tidak wajib.",
     "p1": "Tanpa tangkapan layar dan tanpa teks pesan. Hanya pola singkat yang disimpan.",
     "p2": "Nama dan data pribadi lainnya dihapus terlebih dahulu.",
     "p3": "Nomor telepon dan akun hanya disimpan sebagai kode satu arah yang tidak bisa diubah kembali menjadi nomor aslinya.",
@@ -49,9 +46,23 @@
     "no": "Tidak, terima kasih"
   },
   "account": {
-    "title": "Gunakan SafeRoute sesuai kebutuhan Anda",
-    "body": "Semua fitur bisa digunakan tanpa akun. Hasil pemeriksaan Anda tetap tersimpan di perangkat ini.",
-    "note": "Akun bersifat pilihan. Akun menyimpan riwayat dan Kontak tepercaya agar tidak hilang jika berganti ponsel, serta menambah batas periksa per jam.",
+    "title": "Mau membuat akun?",
+    "without": {
+      "heading": "Tanpa akun, Anda bisa:",
+      "check": "Memeriksa tawaran kerja, pesan, tautan, dan gambar",
+      "voice": "Bicara dengan boneka lewat suara",
+      "doll": "Memakai boneka di layar Anda (Android)",
+      "call": "Menelepon nomor bantuan dan membagikan peringatan",
+      "limit": "Hingga {{n}} pemeriksaan per jam"
+    },
+    "with": {
+      "heading": "Dengan akun, Anda juga mendapat:",
+      "contacts": "Menyimpan kontak darurat",
+      "warn": "Mengirim peringatan siap pakai dengan satu ketukan",
+      "restore": "Memulihkan pemeriksaan dan kontak di ponsel baru",
+      "limit": "Hingga {{n}} pemeriksaan per jam"
+    },
+    "free": "Gratis",
     "anonymous": "Lanjutkan tanpa akun",
     "signUp": "Buat akun",
     "signIn": "Saya sudah punya akun"

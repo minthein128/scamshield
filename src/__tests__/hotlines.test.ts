@@ -1,6 +1,6 @@
 import { COUNTRIES } from '../data/countries';
 import { HOTLINES } from '../data/hotlines';
-import { allSections, helpSections, hotlineByDial, hotlinesForCountry, primaryHotline, resolveCallTarget } from '../lib/hotlines';
+import { allSections, helpSections, hotlineByDial, hotlineFocus, hotlinesForCountry, primaryHotline, resolveCallTarget } from '../lib/hotlines';
 import { defaultScope, seenLine, reportCountText } from '../lib/radar';
 import { countryFromText } from '../lib/countries';
 import { smsUrl, telLink, validateContact, normalizePhone } from '../lib/contacts';
@@ -88,6 +88,24 @@ describe('call target', () => {
     expect(resolveCallTarget(undefined, undefined, undefined)).toBeUndefined();
   });
 
+  it('offers the scam or police line, not the trafficking line, for non-job scams', () => {
+    expect(primaryHotline('TH', 'MM', 'fraud')?.id).toBe('th-aoc-1441');
+    expect(primaryHotline('MY', 'PH', 'fraud')?.id).toBe('my-nsrc-997');
+    expect(primaryHotline(undefined, 'MM', 'fraud')?.id).toBe('mm-police-199');
+    expect(resolveCallTarget(undefined, 'TH', 'MM', 'fraud')?.id).toBe('th-aoc-1441');
+  });
+
+  it('picks the focus from the check kind, scam type and flags', () => {
+    const base = { kind: 'message' as const, flags: [] };
+    expect(hotlineFocus({ ...base, scamType: 'parcel_phishing' })).toBe('fraud');
+    expect(hotlineFocus({ ...base, scamType: 'marketplace_fraud' })).toBe('fraud');
+    expect(hotlineFocus({ ...base, kind: 'link', scamType: 'other' })).toBe('fraud');
+    expect(hotlineFocus({ ...base, scamType: 'job_trafficking' })).toBe('trafficking');
+    expect(hotlineFocus({ ...base, scamType: 'fake_agency' })).toBe('trafficking');
+    expect(hotlineFocus({ ...base, kind: 'job', scamType: 'other' })).toBe('trafficking');
+    expect(hotlineFocus({ ...base, scamType: 'other', flags: [{ family: 'trafficking', label: 'x', evidence: '', severity: 'high' }] })).toBe('trafficking');
+  });
+
   it('maps free-text destinations to countries', () => {
     expect(countryFromText('Bangkok, Thailand')).toBe('TH');
     expect(countryFromText('somewhere')).toBeUndefined();
@@ -114,7 +132,7 @@ describe('radar helpers', () => {
     expect(defaultScope('TH', 'MM')).toBe('TH');
     expect(defaultScope(undefined, 'MM')).toBe('MM');
     expect(defaultScope()).toBe('GLOBAL');
-    expect(seenLine(19)).toBe('Reported 19 times by other SafeRoute users in the last 30 days');
+    expect(seenLine(19)).toBe('Reported 19 times by other Kakwe users in the last 30 days');
     expect(seenLine(1)).toMatch(/1 time by/);
     expect(seenLine(undefined)).toBeNull();
     expect(reportCountText(1)).toBe('1 report in 30 days');

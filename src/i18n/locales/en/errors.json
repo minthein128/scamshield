@@ -21,7 +21,7 @@
       "message": "Check your internet connection and try again."
     },
     "server_unreachable": {
-      "title": "SafeRoute cannot be reached",
+      "title": "$t(common:appName) cannot be reached",
       "message": "Your internet works, but our check service does not answer right now. Try again in a moment."
     },
     "timeout": {

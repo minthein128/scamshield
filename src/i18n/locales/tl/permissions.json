@@ -1,0 +1,53 @@
+{
+  "_meta": {
+    "reviewed": false
+  },
+  "continue": "Magpatuloy",
+  "notNow": "Huwag muna",
+  "openSettings": "Buksan ang Settings",
+  "close": "Isara",
+  "explain": {
+    "mic": {
+      "title": "Payagan ang mikropono",
+      "body": "Para makipag-usap kay Pyit Taing Htaung, kailangan ng $t(common:appName) ang mikropono mo. Ipinapadala ang boses mo sa Google para sumagot. Walang nire-record o sine-save."
+    },
+    "overlay": {
+      "title": "Ipakita ang shield sa ibabaw ng ibang app",
+      "body": "Lumulutang ang shield doll sa ibabaw ng ibang app para ma-tap mo ito kapag may kahina-hinala. Magbubukas ang Android ng settings page kung saan mo ito io-on."
+    },
+    "screen": {
+      "title": "Payagan ang $t(common:appName) na makita ang screen mo",
+      "body": "Kapag tinap mo ang doll, binabasa ng $t(common:appName) ang nasa screen mo para suriin ito. Kapag nag-tap ka lang. Hihingi ng kumpirmasyon ang Android."
+    },
+    "notifications": {
+      "title": "Payagan ang mga notification",
+      "body": "Nagpapakita ang Android ng maliit na abiso habang tumatakbo ang shield. Gumagana ang shield kahit wala ito, pero maaaring hindi mo makita na naka-on ito."
+    },
+    "guardNotifications": {
+      "title": "Payagan ang mga notification",
+      "body": "Binabalaan ka ng Message Guard sa pamamagitan ng abiso kapag mukhang mapanganib ang isang mensahe. Kung wala ang pahintulot na ito, hindi ito makakapagpakita ng babala."
+    },
+    "contacts": {
+      "title": "Payagan ang contacts",
+      "body": "Binabasa lang ng $t(common:appName) ang isang contact kapag pinili mo ito, para punan ang pangalan at numero."
+    }
+  },
+  "help": {
+    "mic": {
+      "title": "Naka-off ang mikropono",
+      "body": "Para makipag-usap kay Pyit Taing Htaung, buksan ang Settings, piliin ang Permissions, tapos Microphone, at payagan ito. Gumagana pa rin ang ibang bahagi ng $t(common:appName) kahit wala ito."
+    },
+    "overlay": {
+      "title": "Naka-off ang Display over other apps",
+      "body": "Para magamit ang shield, buksan ang Settings, hanapin ang Display over other apps, at payagan ang $t(common:appName). Gumagana pa rin ang ibang bahagi ng $t(common:appName) kahit wala ito."
+    },
+    "screen": {
+      "title": "Hindi pinayagan ang access sa screen",
+      "body": "Kailangan ito ng shield para makita ang gusto mong suriin. I-on muli ang shield at piliin ang Start now. Gumagana pa rin ang ibang bahagi ng $t(common:appName) kahit wala ito."
+    },
+    "contacts": {
+      "title": "Naka-off ang contacts",
+      "body": "Para pumili ng contact, buksan ang Settings, piliin ang Permissions, tapos Contacts, at payagan ito. Maaari mo ring i-type ang numero."
+    }
+  }
+}

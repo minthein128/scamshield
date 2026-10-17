@@ -10,6 +10,31 @@
   <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
   <uses-permission android:name="android.permission.VIBRATE" />
 
+  <queries>
+    <package android:name="com.google.android.apps.messaging" />
+    <package android:name="com.whatsapp" />
+    <package android:name="com.whatsapp.w4b" />
+    <package android:name="com.viber.voip" />
+    <package android:name="org.telegram.messenger" />
+    <package android:name="org.telegram.messenger.web" />
+    <package android:name="org.thunderdog.challegram" />
+    <package android:name="jp.naver.line.android" />
+    <package android:name="com.facebook.orca" />
+    <package android:name="com.zing.zalo" />
+    <package android:name="org.thoughtcrime.securesms" />
+    <package android:name="com.samsung.android.messaging" />
+    <package android:name="com.android.mms" />
+    <package android:name="com.android.messaging" />
+    <package android:name="com.oneplus.mms" />
+    <package android:name="com.sonyericsson.conversations" />
+    <package android:name="com.motorola.messaging" />
+    <package android:name="com.htc.sense.mms" />
+    <intent>
+      <action android:name="android.intent.action.SENDTO" />
+      <data android:scheme="smsto" />
+    </intent>
+  </queries>
+
   <application>
     <service
       android:name="com.saferoute.shield.ShieldService"
@@ -17,11 +42,11 @@
       android:foregroundServiceType="specialUse|mediaProjection|microphone">
       <property
         android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-        android:value="Floating overlay button that checks the screen for scams on tap and lets the user talk to SafeRoute about the result" />
+        android:value="Floating overlay button that checks the screen for scams on tap and lets the user talk to Kakwe about the result" />
     </service>
     <service
       android:name="com.saferoute.shield.MessageGuardListener"
-      android:label="SafeRoute Message Guard"
+      android:label="Kakwe Message Guard"
       android:exported="true"
       android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
       <intent-filter>

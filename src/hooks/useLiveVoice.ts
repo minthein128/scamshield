@@ -4,6 +4,7 @@ import type { CheckResponse, LanguageCode } from '../api/types';
 import { ensureApiUrl } from '../config/runtime';
 import { createLiveAudio } from '../lib/liveAudio';
 import { createLiveSession, type LiveAction, type LiveSessionDeps, type LiveView, type SocketLike } from '../lib/liveSession';
+import { ensureMicrophone } from '../lib/permissions';
 import { speak, stopSpeaking } from '../lib/speech';
 import { getAuthToken } from '../services/token';
 
@@ -38,11 +39,12 @@ export const realDeps: LiveSessionDeps = {
   getToken: getAuthToken,
   playWarning,
   stopWarning: stopSpeaking,
+  ensureMic: () => ensureMicrophone(),
 };
 
 const IDLE: LiveView = { state: 'idle', caption: '', userCaption: '', remainingSec: 120, muted: false, error: null, fallback: false, warning: false, endedBy: null };
 
-/** Talk to SafeRoute: plays the approved warning, then runs a live voice session over /v1/live. */
+/** Talk to Kakwe: plays the approved warning, then runs a live voice session over /v1/live. */
 export function useLiveVoice(options: Options, deps: LiveSessionDeps = realDeps) {
   const [view, setView] = useState<LiveView>(IDLE);
   const session = useRef<ReturnType<typeof createLiveSession> | null>(null);
@@ -69,7 +71,7 @@ export function useLiveVoice(options: Options, deps: LiveSessionDeps = realDeps)
   const changeMode = useCallback(
     (mode: Options['mode']) => {
       const s = session.current;
-      if (s && s.view.state !== 'idle' && !s.view.warning && s.view.state !== 'connecting' && s.view.state !== 'ended' && s.view.state !== 'error') launch(mode, true);
+      if (s && s.view.state !== 'idle' && !s.view.warning && s.view.state !== 'connecting' && s.view.state !== 'ended' && s.view.state !== 'error' && s.view.state !== 'declined') launch(mode, true);
       else s?.setMode(mode);
     },
     [launch],

@@ -10,3 +10,8 @@ export function breakMyanmar(text: string): string {
 export function syllableRuns(text: string): string[] {
   return breakMyanmar(text).split(/([\u200B ])/).filter(Boolean);
 }
+
+/** Joins the syllables of each word with U+2060 so a short header wraps only at spaces. */
+export function joinMyanmarWords(text: string): string {
+  return breakMyanmar(text).replace(/\u200B/g, '\u2060');
+}

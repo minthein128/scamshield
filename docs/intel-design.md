@@ -1,4 +1,4 @@
-# SafeRoute network intelligence
+# Kakwe network intelligence
 
 TLDR: every risky check leaves one anonymous, redacted signal. Signals feed counters. Counters rank risk types, and they warn the next person who meets the same number, link or script. No image, raw text, uid or IP is ever stored.
 

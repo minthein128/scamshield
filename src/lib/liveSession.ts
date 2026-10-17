@@ -2,7 +2,8 @@ import type { CheckResponse, LanguageCode } from '../api/types';
 import { diag } from './diagLog';
 import type { LiveAudio } from './liveAudio.types';
 
-export type LiveState = 'idle' | 'connecting' | 'listening' | 'speaking' | 'ended' | 'error';
+/** 'declined' means the user tapped Not now on the microphone reason; Try again asks again. */
+export type LiveState = 'idle' | 'connecting' | 'listening' | 'speaking' | 'ended' | 'error' | 'declined';
 export type LiveAction = 'WARN_FAMILY' | 'HOTLINES';
 export type LiveErrorCode = 'mic_denied' | 'unavailable' | 'rate_limited' | 'busy' | 'not_found' | 'upstream' | 'bad_request' | 'audio';
 
@@ -48,6 +49,8 @@ export interface LiveSessionDeps {
   /** Plays the approved spoken warning and resolves when it ends. */
   playWarning: (text: string, language: LanguageCode) => Promise<void>;
   stopWarning: () => void;
+  /** Explains and requests the microphone. Resolves 'granted' when it is on. */
+  ensureMic?: () => Promise<'granted' | 'declined' | 'denied' | 'blocked'>;
 }
 
 export const DEFAULT_CAP_MS = 120_000;
@@ -73,7 +76,7 @@ export function reportPayload(r: CheckResponse) {
 const knownError = (code: unknown): LiveErrorCode =>
   code === 'rate_limited' || code === 'busy' || code === 'not_found' || code === 'bad_request' ? code : 'upstream';
 
-/** Owns the WebSocket, the mic and the state machine of one Talk to SafeRoute session. */
+/** Owns the WebSocket, the mic and the state machine of one Talk to Kakwe session. */
 export function createLiveSession(options: LiveSessionOptions, deps: LiveSessionDeps, onChange: (v: LiveView) => void) {
   let view: LiveView = { state: 'idle', caption: '', userCaption: '', remainingSec: Math.round(DEFAULT_CAP_MS / 1000), muted: false, error: null, fallback: false, warning: false, endedBy: null };
   let audio: LiveAudio | null = null;
@@ -123,6 +126,7 @@ export function createLiveSession(options: LiveSessionOptions, deps: LiveSession
     if (finished) return;
     finished = true;
     if (next.state === 'error') diag.error('live', 'error', { code: next.error ?? 'unknown', fallback: Boolean(next.fallback), ms: Date.now() - openedAt });
+    else if (next.state === 'declined') diag.info('live', 'mic_declined', { ms: Date.now() - openedAt });
     else diag.info('live', 'end', { by: next.endedBy ?? 'unknown', ms: Date.now() - openedAt });
     teardown();
     set(next);
@@ -247,6 +251,9 @@ export function createLiveSession(options: LiveSessionOptions, deps: LiveSession
       } catch {
         return fail('audio');
       }
+      const mic = deps.ensureMic ? await deps.ensureMic().catch(() => 'denied' as const) : 'granted';
+      if (mic === 'declined') return finish({ state: 'declined' });
+      if (mic !== 'granted') return fail('mic_denied');
       if (!(await audio.requestPermission().catch(() => false))) return fail('mic_denied');
       if (cancelled || finished) return;
       if (!opts.skipWarning) {

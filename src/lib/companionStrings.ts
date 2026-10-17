@@ -7,6 +7,7 @@ const REUSED: Partial<Record<CompanionStringKey, string>> = {
   verdictCareful: 'common:verdict.careful',
   verdictDanger: 'common:verdict.danger',
   dismiss: 'home:notice.dismiss',
+  appName: 'common:appName',
 };
 
 /** Labels for the native overlay (chips, card buttons, voice companion), in the current UI language. */

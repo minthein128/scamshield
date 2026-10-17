@@ -108,6 +108,7 @@ describe('live session', () => {
   it('builds the socket url from the api base', () => {
     expect(liveWsUrl('https://x.trycloudflare.com/')).toBe('wss://x.trycloudflare.com/v1/live');
     expect(liveWsUrl('http://localhost:8080')).toBe('ws://localhost:8080/v1/live');
+    expect(liveWsUrl('https://sg-dev-808112092414.asia-southeast1.run.app')).toBe('wss://sg-dev-808112092414.asia-southeast1.run.app/v1/live');
   });
 
   it('sends mic chunks, drops them when muted', async () => {
@@ -212,6 +213,25 @@ describe('live session', () => {
     await h.session.start();
     expect(h.session.view).toMatchObject({ state: 'error', error: 'mic_denied' });
     expect(h.sockets).toHaveLength(0);
+  });
+
+  it('ends in declined, not mic_denied, when the user taps Not now on the reason', async () => {
+    const ensureMic = jest.fn(async () => 'declined' as const);
+    const h = setup({ ensureMic });
+    await h.session.start();
+    expect(ensureMic).toHaveBeenCalled();
+    expect(h.session.view).toMatchObject({ state: 'declined', error: null });
+    expect(h.sockets).toHaveLength(0);
+    expect(h.audio.dispose).toHaveBeenCalled();
+  });
+
+  it('stops at mic_denied when the system dialog is refused or blocked', async () => {
+    for (const answer of ['denied', 'blocked'] as const) {
+      const h = setup({ ensureMic: jest.fn(async () => answer) });
+      await h.session.start();
+      expect(h.session.view).toMatchObject({ state: 'error', error: 'mic_denied' });
+      expect(h.sockets).toHaveLength(0);
+    }
   });
 
   it('falls back to Listen when the socket cannot open', async () => {

@@ -1,4 +1,4 @@
-// Builds the SafeRoute brand set around the pyit taing htaung doll: concept SVGs, the contact sheet, and the final assets.
+// Builds the Kakwe brand set around the pyit taing htaung doll: concept SVGs, the contact sheet, and the final assets.
 // Run from the repo root on Node 23.6+ (imports TypeScript): node scripts/render-brand.mjs
 // Needs sharp and opentype.js. Install outside the repo: npm i sharp opentype.js
 // then set BRAND_TOOLS=<dir with node_modules> (SHARP_PATH is still honoured).
@@ -95,11 +95,11 @@ function wordmark(x, baseline, size, safeColor, routeColor) {
   let pen = x;
   let prev = null;
   let out = '';
-  [...'SafeRoute'].forEach((ch, i) => {
+  [...'Kakwe'].forEach((ch, i) => {
     const g = FONT.charToGlyph(ch);
     if (prev) pen += FONT.getKerningValue(prev, g) * k;
     const d = [2, 3, 1].map(dp => g.getPath(pen, baseline, size).toPathData(dp)).find(p => !p.includes('NaN')) ?? g.getPath(pen + 0.01, baseline, size).toPathData(2);
-    out += `<path d="${d}" fill="${i < 4 ? safeColor : routeColor}"/>`;
+    out += `<path d="${d}" fill="${i < 3 ? safeColor : routeColor}"/>`;
     pen += g.advanceWidth * k;
     prev = g;
   });
@@ -138,7 +138,7 @@ async function buildSheet(measures) {
   const embed = async (svg, size, x, y) => `<image x="${x}" y="${y}" width="${size}" height="${size}" href="data:image/png;base64,${(await png(svg, size)).toString('base64')}"/>`;
   const inline = (svg, x, y, scale) => `<g transform="translate(${x} ${y}) scale(${scale})">${svg.replace(/^<svg[^>]*>/, '').replace('</svg>', '')}</g>`;
   let body = `<rect width="${W}" height="${head + rowH * 4}" fill="${PAPER}"/>` +
-    T(40, 58, 'SafeRoute mark concepts: pyit taing htaung', 30, INK, 700) +
+    T(40, 58, 'Kakwe mark concepts: pyit taing htaung', 30, INK, 700) +
     T(40, 92, '1024 (dashed = Android 66 dp safe zone)  |  192 / 48 / 24 on light  |  on dark  |  themed icon (monochrome) light and dark  |  lockups', 18);
   let i = 0;
   for (const [key, c] of Object.entries(concepts)) {

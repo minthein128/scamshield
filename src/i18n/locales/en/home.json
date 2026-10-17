@@ -15,7 +15,8 @@
     "title": "Recent checks",
     "emptyTitle": "No checks yet",
     "emptyBody": "Your checks are saved on this device and show up here.",
-    "historyOff": "History is off. Checks are not saved on this phone."
+    "historyOff": "History is off. Checks are not saved on this phone.",
+    "older": "Show older checks"
   },
   "radar": {
     "title": "Scam radar",
@@ -30,5 +31,16 @@
   },
   "notice": {
     "dismiss": "Dismiss"
+  },
+  "shield": {
+    "statusOff": "Shield is OFF",
+    "statusOn": "Shield is ON",
+    "turnOn": "Turn on",
+    "on": "On",
+    "hintOff": "Tap the circle. The doll will stay on top of your other apps.",
+    "hintOn": "See a job ad or a chat? Tap the doll on your screen.",
+    "a11yOff": "Shield is off. Double tap to turn it on.",
+    "a11yOn": "Shield is on. Double tap to turn it off.",
+    "web": "The shield works in the Android app."
   }
 }

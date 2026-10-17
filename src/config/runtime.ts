@@ -1,9 +1,10 @@
+import { appName } from './brand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useState } from 'react';
 import { diag } from '../lib/diagLog';
-import { API_URL, OFFLINE_MOCK, STABLE_API_URL } from './env';
+import { API_URL, FALLBACK_API_URL, OFFLINE_MOCK, STABLE_API_URL } from './env';
 
-const DEFAULT_CONFIG_URLS = [`${STABLE_API_URL}/config.json`, 'https://saferoute-aibc.web.app/config.json', 'https://saferoute-aibc.firebaseapp.com/config.json'];
+const DEFAULT_CONFIG_URLS = ['https://saferoute-aibc.web.app/config.json', 'https://saferoute-aibc.firebaseapp.com/config.json'];
 
 export function parseConfigUrls(raw: string | undefined): string[] {
   const urls = (raw ?? '')
@@ -28,6 +29,7 @@ export const INTERNET_PROBE_URLS = [
 ];
 const RECENT_REACH_MS = 30_000;
 export const FOREGROUND_REFRESH_MS = 5 * 60 * 1000;
+export const STABLE_RECHECK_MS = 5 * 60 * 1000;
 
 export function validApiUrl(value: unknown): string | null {
   if (typeof value !== 'string') return null;
@@ -73,7 +75,7 @@ async function timedFetch(fetchImpl: typeof fetch, url: string, timeoutMs: numbe
   const ok = kind === 'probe' ? res !== null : Boolean(res?.ok);
   const ms = Date.now() - started;
   trace.push({ kind, target: traceTarget(url), ok, ms, ...(res ? { status: res.status } : {}) });
-  if (kind !== 'probe') diag[ok ? 'info' : 'warn']('connection', kind, { host: apiHost(url), ok, ms, ...(res ? { status: res.status } : {}) });
+  if (kind === 'config') diag[ok ? 'info' : 'warn']('connection', kind, { host: apiHost(url), ok, ms, ...(res ? { status: res.status } : {}) });
   return res;
 }
 
@@ -128,9 +130,22 @@ export function fetchFirstApiUrl(
   });
 }
 
+/** Probes /health, then /healthz on a 404, and logs one line with the outcome. */
 export async function checkHealth(url: string, fetchImpl: typeof fetch = fetch, timeoutMs = HEALTH_TIMEOUT_MS): Promise<boolean> {
-  const res = await timedFetch(fetchImpl, `${url.replace(/\/+$/, '')}/healthz`, timeoutMs, 'health');
-  return Boolean(res?.ok);
+  const root = url.replace(/\/+$/, '');
+  const started = Date.now();
+  let res = await timedFetch(fetchImpl, `${root}/health`, timeoutMs, 'health');
+  const viaHealthz = res?.status === 404;
+  if (viaHealthz) res = await timedFetch(fetchImpl, `${root}/healthz`, timeoutMs, 'health');
+  const ok = Boolean(res?.ok);
+  diag[ok ? 'info' : 'warn']('connection', 'health', {
+    host: apiHost(url),
+    ok,
+    ms: Date.now() - started,
+    ...(res ? { status: res.status } : {}),
+    ...(viaHealthz ? { via: 'healthz' } : {}),
+  });
+  return ok;
 }
 
 /** True when any reliable public endpoint answers, whatever the status. */
@@ -147,6 +162,7 @@ export interface ResolveDeps {
   configUrls?: string[];
   staggerMs?: number;
   stableUrl?: string;
+  fallbackUrl?: string;
   graceMs?: number;
 }
 
@@ -165,7 +181,8 @@ async function resolveUrlInner(deps: ResolveDeps): Promise<string> {
   const cached = validApiUrl(await AsyncStorage.getItem(API_URL_CACHE_KEY).catch(() => null));
   const baked = validApiUrl(deps.envUrl ?? API_URL);
   const stable = validApiUrl(deps.stableUrl ?? STABLE_API_URL);
-  const known = [stable, cached, baked].filter((u, i, a): u is string => Boolean(u) && a.indexOf(u) === i);
+  const fallback = validApiUrl(deps.fallbackUrl ?? FALLBACK_API_URL);
+  const known = [stable, fallback, cached, baked].filter((u, i, a): u is string => Boolean(u) && a.indexOf(u) === i);
 
   const memo = new Map<string, Promise<boolean>>();
   const healthy = (u: string) => {
@@ -177,7 +194,14 @@ async function resolveUrlInner(deps: ResolveDeps): Promise<string> {
     for (const u of known) if (await healthy(u)) return u;
     return null;
   };
+  const remember = (u: string) => AsyncStorage.setItem(API_URL_CACHE_KEY, u).catch(() => undefined);
   known.forEach(healthy);
+
+  // A healthy stable URL wins over config.json, which may still name an older host.
+  if (stable && (await healthy(stable))) {
+    if (cached !== stable) await remember(stable);
+    return stable;
+  }
 
   const remoteP = fetchFirstApiUrl(fetchImpl, deps.configUrls ?? CONFIG_URLS, { staggerMs: deps.staggerMs });
   const grace = firstAlive().then(u => (u ? new Promise<null>(r => setTimeout(() => r(null), deps.graceMs ?? CONFIG_GRACE_MS)) : new Promise<null>(() => undefined)));
@@ -185,12 +209,12 @@ async function resolveUrlInner(deps: ResolveDeps): Promise<string> {
 
   if (remote) {
     if (await healthy(remote)) {
-      await AsyncStorage.setItem(API_URL_CACHE_KEY, remote).catch(() => undefined);
+      await remember(remote);
       return remote;
     }
     const alive = await firstAlive();
     if (alive) return alive;
-    await AsyncStorage.setItem(API_URL_CACHE_KEY, remote).catch(() => undefined);
+    await remember(remote);
     return remote;
   }
   return (await firstAlive()) ?? known[0] ?? '';
@@ -199,12 +223,32 @@ async function resolveUrlInner(deps: ResolveDeps): Promise<string> {
 let pending: Promise<string> | null = null;
 let current: string | null = null;
 let refreshing: Promise<string> | null = null;
+let stableTimer: ReturnType<typeof setTimeout> | null = null;
 const listeners = new Set<(url: string) => void>();
 
+/** While the app runs on another host, retries the stable URL and moves back once it is healthy. */
+function scheduleStableRecheck(url: string): void {
+  if (stableTimer) clearTimeout(stableTimer);
+  stableTimer = null;
+  const stable = validApiUrl(STABLE_API_URL);
+  if (!stable || !url || url === stable || OFFLINE_MOCK) return;
+  stableTimer = setTimeout(() => {
+    stableTimer = null;
+    void checkHealth(stable)
+      .then(ok => {
+        if (ok) return refreshApiUrl();
+        scheduleStableRecheck(url);
+        return url;
+      })
+      .catch(() => undefined);
+  }, STABLE_RECHECK_MS);
+}
+
 function publish(url: string): string {
-    const changed = url !== current;
+  const changed = url !== current;
   current = url;
   if (changed) listeners.forEach(l => l(url));
+  scheduleStableRecheck(url);
   return url;
 }
 
@@ -247,6 +291,8 @@ export function useApiUrl(): string | null {
 
 /** Test helper. */
 export function resetRuntimeUrl(): void {
+  if (stableTimer) clearTimeout(stableTimer);
+  stableTimer = null;
   pending = null;
   current = null;
   refreshing = null;
@@ -259,7 +305,7 @@ export async function connectionReport(info: { version: string; os: string }, fe
   const probes = trace.filter(e => e.kind === 'probe');
   const line = (e: TraceEntry) => `${e.kind} ${e.target} ${e.ok ? 'ok' : 'fail'} ${e.status ?? '-'} ${e.ms}ms`;
   return [
-    `SafeRoute ${info.version} (${info.os})`,
+    `${appName('en')} ${info.version} (${info.os})`,
     `time ${new Date().toISOString()}`,
     `chosen ${url ? apiHost(url) : 'none'}`,
     `baked ${apiHost(API_URL) || 'none'}`,

@@ -106,8 +106,13 @@ export function buildGroundingRequest(x: Pick<Extraction, 'entities'>, lang: Lan
     '- General advisories that scammers use a brand name (Tokopedia, Shopee, DHL, a bank) say nothing about the message you are checking. Never report them in any family. A well-known brand with a normal, specific listing or notice needs no finding.',
     '- identity: the entity cannot be found, has no licence, or the claimed identity does not match.',
     '- Add a finding only when search results support it. If everything checks out, return {"findings":[]}.',
-    '- Use likelihood language. Say "We could not find a licence record for X", never "X is unlicensed" or "X is a scammer". Say "Reports online describe similar messages as scams", never "X is a scam". Never call a named company or website a criminal. Never use "definitely", "confirmed" or "100%". In Thai, write "เราไม่พบข้อมูลใบอนุญาตของ X" or "มีรายงานออนไลน์ว่าข้อความคล้ายกันถูกใช้หลอกลวง", never "เป็นการหลอกลวง", "เป็นมิจฉาชีพ", "แน่นอน", "ชัวร์" or "ยืนยันแล้ว".',
-    `- Write label in ${LANG_NAMES[lang]}. Keep evidence to one short sentence naming the source.`,
+    '- Use likelihood language. Say "We could not find a licence record for X", never "X is unlicensed" or "X is a scammer". Say "Reports online describe similar messages as scams", never "X is a scam". Never call a named company or website a criminal. Never use "definitely", "confirmed" or "100%".',
+    ...(lang === 'th'
+      ? [
+          '- In Thai, write "เราไม่พบข้อมูลใบอนุญาตของ X" or "มีรายงานออนไลน์ว่าข้อความคล้ายกันถูกใช้หลอกลวง", never "เป็นการหลอกลวง", "เป็นมิจฉาชีพ", "แน่นอน", "ชัวร์" or "ยืนยันแล้ว".',
+        ]
+      : []),
+    `- Write label and evidence in ${LANG_NAMES[lang]} only, whatever the language of the search results. Keep evidence to one short sentence naming the source.`,
     ...(opts.companyCheck
       ? [
           '- Also add "companyFound" to the JSON object: true only if the search results show a real company or agency with this exact name (in the stated country, if one is given), otherwise false. A company existing says nothing about whether a recruiter works for it.',
@@ -157,6 +162,20 @@ export function searched(res: GroundedResponse): boolean {
   return (g?.groundingChunks?.length ?? 0) > 0 || (g?.webSearchQueries?.length ?? 0) > 0;
 }
 
+const REDIRECT_HOST = /(^|\.)(vertexaisearch\.cloud\.google\.com|google\.[a-z.]+)$/;
+
+/** Host of a source URL, or of its redirect target; undefined for a bare Google redirect. */
+export function sourceHost(url: string): string | undefined {
+  try {
+    const u = new URL(url);
+    if (!REDIRECT_HOST.test(u.hostname)) return u.hostname;
+    const target = u.searchParams.get('q') ?? u.searchParams.get('url');
+    return target && /^https?:\/\//i.test(target) ? new URL(target).hostname : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 export function extractSources(res: GroundedResponse): Source[] {
   const seen = new Set<string>();
   const out: Source[] = [];
@@ -164,7 +183,9 @@ export function extractSources(res: GroundedResponse): Source[] {
     const url = c.web?.uri;
     if (!url || seen.has(url)) continue;
     seen.add(url);
-    out.push({ title: c.web?.title || new URL(url).hostname, url });
+    const title = c.web?.title?.trim() || sourceHost(url);
+    if (!title) continue;
+    out.push({ title, url });
     if (out.length >= MAX_SOURCES) break;
   }
   return out;

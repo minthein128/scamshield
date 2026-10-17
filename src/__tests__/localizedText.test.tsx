@@ -29,11 +29,11 @@ describe('localized text style', () => {
 
   it('adds a Latin fallback font on web only', () => {
     const style = { fontFamily: 'PlusJakartaSans-Regular', fontSize: 14, lineHeight: 20 };
-    expect(flat(localizedStyle('SafeRoute မြန်မာ', style)).fontFamily).toBe('A10YoeShin-Regular');
+    expect(flat(localizedStyle('Kakwe မြန်မာ', style)).fontFamily).toBe('A10YoeShin-Regular');
     const os = Platform.OS;
     Platform.OS = 'web';
     try {
-      expect(flat(localizedStyle('SafeRoute မြန်မာ', style)).fontFamily).toBe('A10YoeShin-Regular, PlusJakartaSans-Regular');
+      expect(flat(localizedStyle('Kakwe မြန်မာ', style)).fontFamily).toBe('A10YoeShin-Regular, PlusJakartaSans-Regular');
     } finally {
       Platform.OS = os;
     }

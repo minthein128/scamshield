@@ -200,7 +200,7 @@ class MessageGuardPrivacyTest {
         val title = n.extras.getCharSequence(Notification.EXTRA_TITLE).toString()
         val text = n.extras.getCharSequence(Notification.EXTRA_TEXT).toString()
         val big = n.extras.getCharSequence(Notification.EXTRA_BIG_TEXT).toString()
-        assertEquals("SafeRoute", title)
+        assertEquals("Kakwe", title)
         assertEquals("A message may need a second look. Open to see why.", text)
         assertEquals(text, big)
         assertNull(n.extras.getCharSequence(Notification.EXTRA_SUB_TEXT))
@@ -211,7 +211,7 @@ class MessageGuardPrivacyTest {
         assertEquals(NotificationCompat.VISIBILITY_PRIVATE, n.visibility)
         val public = n.publicVersion
         assertNotNull(public)
-        assertEquals("SafeRoute", public!!.extras.getCharSequence(Notification.EXTRA_TITLE).toString())
+        assertEquals("Kakwe", public!!.extras.getCharSequence(Notification.EXTRA_TITLE).toString())
         assertNull(public.extras.getCharSequence(Notification.EXTRA_TEXT))
 
         val intent = shadowOf(n.contentIntent).savedIntent
@@ -223,7 +223,7 @@ class MessageGuardPrivacyTest {
     fun notice_uses_the_app_language_text_and_skips_safe_results() {
         val result = JSONObject().put("id", "chk_2").put("verdict", "careful")
         val n = MessageGuardNotifier.build(context, result, "Pesan ini mungkin perlu dicek lagi.", "Buka")!!
-        assertEquals("SafeRoute", n.extras.getCharSequence(Notification.EXTRA_TITLE).toString())
+        assertEquals("Kakwe", n.extras.getCharSequence(Notification.EXTRA_TITLE).toString())
         assertEquals("Pesan ini mungkin perlu dicek lagi.", n.extras.getCharSequence(Notification.EXTRA_TEXT).toString())
         assertEquals("Buka", n.actions.single().title.toString())
         assertNull(MessageGuardNotifier.build(context, JSONObject().put("id", "chk_3").put("verdict", "safe")))

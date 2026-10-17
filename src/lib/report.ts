@@ -1,4 +1,4 @@
-import type { CheckResponse, FlagFamily, Severity, Verdict, Flag } from '../api/types';
+import type { CheckResponse, FlagFamily, LinkCheck, Severity, Source, Verdict, Flag, WebRisk } from '../api/types';
 import { t } from '../i18n';
 import { familyLabel } from './labels';
 import { resultWord } from './attention';
@@ -63,4 +63,52 @@ export function shareMessage(result: CheckResponse): string {
 export function warnMessage(result: CheckResponse): string {
   const summary = result.summary.length > 280 ? `${result.summary.slice(0, 277)}...` : result.summary;
   return t('report:warnMessage', { verdict: resultWord(result).toLowerCase(), title: result.title, summary });
+}
+
+const NEW_DOMAIN_DAYS = 30;
+const SERIOUS_LINK_FAMILIES: FlagFamily[] = ['link_risk', 'known_bad'];
+
+function hostOf(url: string): string {
+  try {
+    return new URL(/^[a-z][a-z\d+.-]*:\/\//i.test(url) ? url : `https://${url}`).hostname.replace(/^www\./, '').toLowerCase();
+  } catch {
+    return url.toLowerCase();
+  }
+}
+
+export type LinkStatus = WebRisk | 'notListed';
+
+/** A clean Google result reads "Not on Google's lists" when the report has a serious sign about the link. */
+export function linkStatus(link: LinkCheck, flags: Flag[], links: LinkCheck[] = [link]): LinkStatus {
+  if (link.webRisk !== 'clean') return link.webRisk;
+  if (link.domainAgeDays !== undefined && link.domainAgeDays < NEW_DOMAIN_DAYS) return 'notListed';
+  const mentions = (f: Flag, l: LinkCheck) => `${f.evidence} ${f.label}`.toLowerCase().includes(hostOf(l.url));
+  const serious = flags.filter(f => f.severity === 'high' && SERIOUS_LINK_FAMILIES.includes(f.family));
+  return serious.some(f => mentions(f, link) || !links.some(l => mentions(f, l))) ? 'notListed' : 'clean';
+}
+
+const REDIRECT_HOSTS = /(^|\.)(vertexaisearch\.cloud\.google\.com|google\.[a-z.]+)$/;
+const DOMAIN_LIKE = /^[a-z\d-]+(\.[a-z\d-]+)+$/i;
+
+/** The real site behind a source: the redirect target, the title when it is a domain, else the URL host. */
+export function sourceDomain(src: Source): string | undefined {
+  let url: URL;
+  try {
+    url = new URL(src.url);
+  } catch {
+    return undefined;
+  }
+  const host = url.hostname.replace(/^www\./, '');
+  if (!REDIRECT_HOSTS.test(host)) return host;
+  const target = url.searchParams.get('q') ?? url.searchParams.get('url');
+  if (target && /^https?:\/\//i.test(target)) return hostOf(target);
+  const title = src.title.trim().replace(/^www\./, '');
+  return DOMAIN_LIKE.test(title) ? title.toLowerCase() : undefined;
+}
+
+/** Title and second line for a source card; never a raw redirect URL. */
+export function sourceLines(src: Source): { title: string; domain?: string } {
+  const domain = sourceDomain(src);
+  const title = src.title.trim() || domain || hostOf(src.url);
+  return { title, domain: domain && domain !== title.toLowerCase() ? domain : undefined };
 }

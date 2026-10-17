@@ -1,26 +1,14 @@
 {
-  "title": "Check something",
-  "whatIsIt": "What is it?",
-  "kinds": {
-    "job": "Job offer",
-    "message": "Message",
-    "link": "Link",
-    "shop": "Shop",
-    "agency": "Agency"
-  },
+  "title": "Check for warning signs",
+  "whatIsIt": "What do you want to check?",
   "text": {
-    "title": "Text message",
-    "a11y": "Text or chat to check",
-    "placeholder": "Job post, chat messages or SMS"
-  },
-  "link": {
-    "label": "Link",
-    "a11y": "Link to check"
+    "a11y": "Text or chat to check"
   },
   "screenshot": {
-    "label": "Screenshot",
     "ready": "{{kb}} KB, ready to send",
     "preparing": "Preparing picture...",
+    "added": "Screenshot added",
+    "replace": "Replace",
     "upload": "Upload a screenshot",
     "pick": "Pick a screenshot"
   },
@@ -32,7 +20,7 @@
   "optional": {
     "language": "Report language"
   },
-  "submit": "Check now",
+  "submit": "Check for warning signs",
   "errors": {
     "image": "We could not use that picture. Try another screenshot.",
     "clipboardEmpty": "Your clipboard is empty."
@@ -43,25 +31,20 @@
     "fallback": "Check"
   },
   "more": {
-    "title": "More detail (optional)"
+    "title": "Add more details (optional)"
   },
-  "submitHint": "Add a message, link or screenshot first",
+  "submitHint": "Add a message, link or picture first",
   "job": {
     "ad": {
-      "title": "The job ad",
-      "hint": "Paste the post, or add a picture of it.",
       "a11y": "Text of the job ad",
       "placeholder": "Paste the job ad here"
     },
     "chat": {
-      "title": "What the recruiter asked you",
-      "optional": "Optional",
-      "hint": "Paste the messages, or add a picture. This may help us notice details that do not match the ad.",
       "a11y": "Text of the recruiter chat",
       "placeholder": "Paste the chat with the recruiter here"
     },
-    "submit": "Read these texts",
-    "submitHint": "Add the job ad or the chat first",
+    "submit": "Check and compare",
+    "submitHint": "Add the job offer first",
     "notMentioned": "Not mentioned",
     "source": {
       "ad": "Job ad",
@@ -171,6 +154,38 @@
         "yes": "Asked to keep it secret",
         "no": "Not asked to keep it secret"
       }
+    },
+    "step1": "1. Job offer",
+    "step1Hint": "The ad or post. A picture or the words.",
+    "step2": "2. Recruiter messages",
+    "optional": "optional",
+    "step2Hint": "We compare the offer with what they ask you to do.",
+    "added": {
+      "ad": "Job offer added",
+      "chat": "Messages added"
     }
-  }
+  },
+  "or": "or",
+  "sub": "Add a message, link or screenshot. One is enough.",
+  "chips": {
+    "message": "Message",
+    "job": "Job offer",
+    "shop": "Shopping",
+    "general": "Not sure"
+  },
+  "message": {
+    "title": "Your message",
+    "placeholder": "Paste the message or link here"
+  },
+  "shop": {
+    "title": "The shop or post",
+    "placeholder": "Paste the shop link or the seller message here"
+  },
+  "general": {
+    "title": "What you got",
+    "placeholder": "Paste anything here: a message, link or ad"
+  },
+  "clip": "Paste what you copied",
+  "upload": "Upload a screenshot or photo",
+  "warn": "{{app}} can miss scams. Low risk does not mean guaranteed safe."
 }

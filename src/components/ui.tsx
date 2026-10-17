@@ -23,7 +23,7 @@ export const BackButton: React.FC<{ onPress: () => void }> = ({ onPress }) => {
 export const ScreenHeader: React.FC<{ title: string; onBack?: () => void }> = ({ title, onBack }) => (
   <View style={styles.header}>
     {onBack ? <BackButton onPress={onBack} /> : null}
-    <Text style={styles.headerTitle}>{title}</Text>
+    <Text wrap="word" style={styles.headerTitle}>{title}</Text>
   </View>
 );
 
@@ -47,12 +47,15 @@ interface ButtonProps {
   maxLines?: number;
   /** Sub label lines before it is ellipsized. */
   subMaxLines?: number;
+  /** When disabled, show a flat sand button with muted text instead of a faded one. */
+  mutedDisabled?: boolean;
 }
 
 const LABEL_LINE = 20;
 
-export const Button: React.FC<ButtonProps> = ({ label, subLabel, onPress, variant = 'primary', disabled, style, testID, icon, leading, trailing, accessibilityLabel, maxLines = 2, subMaxLines = 2 }) => {
-  const v = BUTTON_VARIANTS[variant];
+export const Button: React.FC<ButtonProps> = ({ label, subLabel, onPress, variant = 'primary', disabled, style, testID, icon, leading, trailing, accessibilityLabel, maxLines = 2, subMaxLines = 2, mutedDisabled }) => {
+  const muted = Boolean(disabled && mutedDisabled);
+  const v = muted ? { container: { backgroundColor: colors.border }, color: colors.textSecondary } : BUTTON_VARIANTS[variant];
   const firstLine = Math.round((scriptStyle(label, 'bold', LABEL_LINE).lineHeight ?? LABEL_LINE) * PixelRatio.getFontScale());
   return (
     <TouchableOpacity
@@ -63,7 +66,7 @@ export const Button: React.FC<ButtonProps> = ({ label, subLabel, onPress, varian
       activeOpacity={0.7}
       disabled={disabled}
       onPress={onPress}
-      style={[styles.button, v.container, disabled && { opacity: 0.45 }, style]}
+      style={[styles.button, v.container, disabled && !muted && { opacity: 0.45 }, style]}
     >
       <View style={[styles.buttonRow, leading ? styles.buttonRowCentered : null, trailing ? styles.buttonRowFull : null]}>
         {leading ? (
@@ -168,7 +171,7 @@ export const Notice: React.FC<{ title?: string; message: string; tone?: 'error' 
 
 export const Divider: React.FC = () => <View accessibilityRole="none" style={styles.divider} />;
 
-export const SectionTitle: React.FC<{ children: string }> = ({ children }) => <Text accessibilityRole="header" style={styles.sectionTitle}>{children}</Text>;
+export const SectionTitle: React.FC<{ children: string }> = ({ children }) => <Text wrap="word" accessibilityRole="header" style={styles.sectionTitle}>{children}</Text>;
 
 const styles = StyleSheet.create({
   linkButton: { minHeight: 48, paddingHorizontal: 4, justifyContent: 'center' },

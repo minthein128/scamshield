@@ -3,7 +3,7 @@
   "signedInAs": "Signed in as",
   "unavailable": {
     "title": "Accounts are not available",
-    "body": "This build is not connected to the account service. SafeRoute still works fully without an account."
+    "body": "This build is not connected to the account service. $t(common:appName) still works fully without an account."
   },
   "createTitle": "Create account",
   "signInTitle": "Sign in",

@@ -1,4 +1,4 @@
-# SafeRoute admin console
+# Kakwe admin console
 
 Vite + React + TypeScript web app for managing runtime configuration: hotlines, notices and content copy, with AI assist. It follows `docs/admin-contract.md`. Live at https://saferoute-admin.web.app.
 

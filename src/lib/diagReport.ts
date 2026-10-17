@@ -1,3 +1,4 @@
+import { appName } from '../config/brand';
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 import { connectionReport } from '../config/runtime';
@@ -24,7 +25,7 @@ export function formatEntry(e: DiagEntry): string {
 
 function deviceLine(): string {
   const model = (Platform.constants as { Model?: string } | undefined)?.Model;
-  return [model, `${Platform.OS} ${Platform.Version}`].filter(Boolean).join(', ');
+  return [model, [Platform.OS, Platform.Version].filter(v => v !== undefined && v !== '').join(' ')].filter(Boolean).join(', ');
 }
 
 export function buildLogLines(entries: DiagEntry[]): string[] {
@@ -40,7 +41,7 @@ export async function buildDiagnosticsReport(language: string, connection?: () =
   ]);
   const lines = buildLogLines(entries);
   return [
-    `SafeRoute diagnostics report`,
+    `${appName('en')} diagnostics report`,
     `app ${version}`,
     `device ${deviceLine()}`,
     `language ${language}`,

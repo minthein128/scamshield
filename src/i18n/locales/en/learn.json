@@ -3,7 +3,7 @@
   "tagline": "Know the signs before you reply, pay or travel.",
   "scamsHeading": "Common scams",
   "flagsHeading": "The 7 red flags",
-  "flagsHint": "SafeRoute looks for these signs. Tap one to learn more.",
+  "flagsHint": "$t(common:appName) looks for these signs. Tap one to learn more.",
   "flagsHintA11y": "Opens an explanation",
   "shieldRow": {
     "title": "How the Screen shield works",
@@ -45,7 +45,7 @@
       "body": "Real jobs, shops and banks rarely ask for money or your passport first."
     },
     "check": {
-      "title": "Check it with SafeRoute",
+      "title": "Check it with $t(common:appName)",
       "body": "Paste the text or link, or add a screenshot."
     },
     "help": {
@@ -126,12 +126,12 @@
         "caption": "The doll sees the post on your screen. It asks to open the hidden text."
       },
       "e3": {
-        "title": "SafeRoute checks it",
+        "title": "$t(common:appName) checks it",
         "caption": "It reads the whole post and looks for the red flags."
       },
       "e4": {
         "title": "The result",
-        "caption": "SafeRoute shows a high-risk result, with the reasons and what to do next."
+        "caption": "$t(common:appName) shows a high-risk result, with the reasons and what to do next."
       }
     },
     "romance": {
@@ -141,7 +141,7 @@
       },
       "e2": {
         "title": "Tap the doll",
-        "caption": "SafeRoute needs the older messages to see the full story."
+        "caption": "$t(common:appName) needs the older messages to see the full story."
       },
       "e3": {
         "title": "Scroll up and tap again",
@@ -155,7 +155,7 @@
     "parcel": {
       "e1": {
         "title": "A message arrives",
-        "caption": "SafeRoute warns you before you open the link."
+        "caption": "$t(common:appName) warns you before you open the link."
       },
       "e2": {
         "title": "Tap to see why",
@@ -168,7 +168,7 @@
         "caption": "It says \"official\" and shows a licence number."
       },
       "e2": {
-        "title": "SafeRoute checks it",
+        "title": "$t(common:appName) checks it",
         "caption": "It looks for the licence and for reports about the agency."
       }
     },
@@ -179,7 +179,7 @@
       },
       "e2": {
         "title": "Tap the seller name",
-        "caption": "Ask SafeRoute to look at who is selling."
+        "caption": "Ask $t(common:appName) to look at who is selling."
       },
       "e3": {
         "title": "Open the seller page",
@@ -187,7 +187,7 @@
       },
       "e4": {
         "title": "The result",
-        "caption": "SafeRoute shows the signs that make this deal look risky."
+        "caption": "$t(common:appName) shows the signs that make this deal look risky."
       }
     }
   },

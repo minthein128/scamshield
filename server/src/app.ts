@@ -39,6 +39,7 @@ export const createLimits = (cfg: Config): Limits => ({
 });
 
 const errorBody = (code: string, message: string) => ({ error: { code, message } });
+const HOSTED_APK_URL = 'https://saferoute-aibc.web.app/saferoute.apk';
 
 export function createApp(
   cfg: Config,
@@ -72,7 +73,10 @@ export function createApp(
     }),
   );
 
-  app.get('/healthz', (c) => c.json({ ok: true, model: cfg.model, mock: cfg.mock }));
+  const health = (c: Context) => c.json({ ok: true, model: cfg.model, mock: cfg.mock });
+  app.get('/healthz', health);
+  // Cloud Run's front end reserves /healthz on run.app URLs.
+  app.get('/health', health);
 
   app.get('/config.json', (c) => c.json({ apiUrl: cfg.publicApiUrl }, 200, { 'cache-control': 'no-cache' }));
 
@@ -88,7 +92,13 @@ export function createApp(
 
   const versionedName = cfg.apkVersion ? `saferoute-${encodeURIComponent(cfg.apkVersion)}.apk` : undefined;
 
+  const hostedApk = (c: Context) => {
+    c.header('cache-control', 'no-store');
+    return c.redirect(HOSTED_APK_URL, 302);
+  };
+
   app.get('/download', async (c) => {
+    if (!cfg.apkPath) return hostedApk(c);
     const st = await apkFile();
     return c.html(
       downloadPage({ version: cfg.apkVersion, bytes: st?.size, href: versionedName ? `/download/${versionedName}` : undefined }),
@@ -109,7 +119,7 @@ export function createApp(
     if (!st || !cfg.apkPath) return c.json(errorBody('bad_request', 'APK not available'), 404 as never);
     const headers = {
       'content-type': 'application/vnd.android.package-archive',
-      'content-disposition': 'attachment; filename="SafeRoute.apk"',
+      'content-disposition': 'attachment; filename="Kakwe.apk"',
       'content-length': String(st.size),
       'cache-control': immutable ? 'public, max-age=31536000, immutable' : 'no-cache',
       etag: `"${Math.floor(st.mtimeMs).toString(16)}-${st.size.toString(16)}"`,
@@ -120,6 +130,7 @@ export function createApp(
   };
 
   app.on(['GET', 'HEAD'], '/download/saferoute.apk', async (c) => {
+    if (!cfg.apkPath) return hostedApk(c);
     if (!versionedName || !(await apkFile())) return serveApk(c, false);
     c.header('cache-control', 'no-store');
     return c.redirect(`/download/${versionedName}`, 302);

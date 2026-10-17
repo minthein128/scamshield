@@ -1,3 +1,4 @@
+import { APP_NAMES } from '../brand.js';
 import type { Lang } from '../types.js';
 
 type Subject = 'phone' | 'handle' | 'account' | 'domain';
@@ -29,15 +30,15 @@ export function reportedLabel(lang: Lang, subject: Subject, n: number): string {
 export function reportedEvidence(lang: Lang, n: number): string {
   switch (lang) {
     case 'id':
-      return `Jaringan SafeRoute: ${n} laporan terpisah`;
+      return `Jaringan ${APP_NAMES.id}: ${n} laporan terpisah`;
     case 'tl':
-      return `SafeRoute network: ${n} magkakahiwalay na ulat`;
+      return `${APP_NAMES.tl} network: ${n} magkakahiwalay na ulat`;
     case 'th':
-      return `เครือข่าย SafeRoute: ${n} รายงานแยกกัน`;
+      return `เครือข่าย ${APP_NAMES.th}: ${n} รายงานแยกกัน`;
     case 'my':
-      return `SafeRoute ကွန်ရက်: သီးခြားတိုင်ကြားမှု ${n} ခု`;
+      return `${APP_NAMES.my} ကွန်ရက်: သီးခြားတိုင်ကြားမှု ${n} ခု`;
     default:
-      return `SafeRoute network: ${n} separate reports`;
+      return `${APP_NAMES.en} network: ${n} separate reports`;
   }
 }
 

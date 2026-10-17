@@ -1,3 +1,4 @@
+import { appName } from '../config/brand';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
@@ -8,7 +9,6 @@ import { TabIcon } from './TabIcons';
 import { TabRail } from './TabRail';
 import { useLayout } from '../hooks/useLayout';
 import type { RootStackParamList, TabParamList } from './types';
-import type { AfterOnboarding } from '../lib/onboarding';
 import HomeScreen from '../screens/HomeScreen';
 import CheckScreen from '../screens/CheckScreen';
 import CheckingScreen from '../screens/CheckingScreen';
@@ -24,6 +24,7 @@ import GetHelpScreen from '../screens/GetHelpScreen';
 import RadarScreen from '../screens/RadarScreen';
 import { navigationRef } from './ref';
 import { useAppState } from '../state/AppState';
+import { PermissionHost } from '../components/PermissionHost';
 import { useMessageGuardConfigSync } from '../hooks/useMessageGuard';
 import { useShieldTokenSync } from '../hooks/useShieldTokenSync';
 import LearnScreen from '../screens/LearnScreen';
@@ -77,7 +78,7 @@ const ShareIntentBridge: React.FC<{ ready: boolean }> = ({ ready }) => {
   return null;
 };
 
-const NEUTRAL_TITLE = { formatter: () => 'SafeRoute' };
+const NEUTRAL_TITLE = { formatter: () => appName() };
 
 const openReport = (result: CheckResponse, language: LanguageCode) => navigationRef.navigate('Report', { result, language });
 
@@ -94,9 +95,6 @@ export const RootNavigator: React.FC = () => {
   useShieldTokenSync();
   useShieldShareSync();
   useMessageGuardConfigSync();
-  const onOnboardingDone = (next?: AfterOnboarding) => {
-    if (next) setTimeout(() => navigationRef.navigate('Account', { mode: next }), 150);
-  };
   if (!loaded) return null;
   const inApp = profile.onboarded && profile.sharingAsked;
   return (
@@ -119,11 +117,15 @@ export const RootNavigator: React.FC = () => {
             <Stack.Screen name="ShieldHowTo" component={ShieldHowToScreen} />
           </>
         ) : (
-          <Stack.Screen name="Onboarding">{() => <OnboardingScreen onDone={onOnboardingDone} />}</Stack.Screen>
+          <>
+            <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+            <Stack.Screen name="Account" component={AccountScreen} />
+          </>
         )}
       </Stack.Navigator>
       <ShareIntentBridge ready={ready && inApp} />
       <DeepLinkBridge ready={ready && inApp} />
+      <PermissionHost />
     </NavigationContainer>
   );
 };

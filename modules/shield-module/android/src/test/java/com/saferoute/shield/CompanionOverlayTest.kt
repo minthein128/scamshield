@@ -232,7 +232,7 @@ class CompanionOverlayTest {
     fun aNoticeKeepsTheResultBehindIt() {
         overlay.setResult(result("careful"))
         advance(400)
-        overlay.showNotice("Open SafeRoute once to allow voice", opensApp = true)
+        overlay.showNotice("Open Kakwe once to allow voice", opensApp = true)
         advance(400)
         assertTrue(overlay.cardModelForTest!!.notice)
         overlay.closeNotice()

@@ -8,6 +8,7 @@ import { useLayout } from '../hooks/useLayout';
 import { Text } from '../components/Text';
 import { Button, Card, EmptyState, Field, LinkButton, Notice, ScreenHeader } from '../components/ui';
 import { callNumber } from '../lib/warn';
+import { ensureContacts, showPermissionHelp } from '../lib/permissions';
 import { useAppState } from '../state/AppState';
 import { ContactsGate } from '../components/ContactsGate';
 import { useOpenSignIn } from '../hooks/useOpenSignIn';
@@ -37,9 +38,17 @@ export const ContactsScreen: React.FC = () => {
   const pick = async () => {
     setError(null);
     try {
+      const asked = await ensureContacts();
+      if (asked === 'declined') return;
+      if (asked === 'denied' || asked === 'blocked') {
+        setError(t('errors.permission'));
+        showPermissionHelp('contacts');
+        return;
+      }
       const { granted } = await Contacts.requestPermissionsAsync();
       if (!granted) {
         setError(t('errors.permission'));
+        showPermissionHelp('contacts');
         return;
       }
       const picked = await Contacts.presentContactPickerAsync();

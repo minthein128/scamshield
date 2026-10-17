@@ -1,5 +1,5 @@
 import { COUNTRIES, HOTLINES, type Hotline, type HotlineCategory } from './data/hotlines.generated.js';
-import type { Action, Lang, LinkCheck, ScamType, Verdict } from './types.js';
+import type { Action, Flag, Kind, Lang, LinkCheck, ScamType, Verdict } from './types.js';
 
 const TITLES: Record<Verdict, Record<Lang, string>> = {
   danger: {
@@ -95,17 +95,46 @@ export function dialCountry(h: Pick<Hotline, 'country' | 'dial'>): string | unde
 
 const callableFrom = (h: Hotline, where: string | undefined) => !h.domesticOnly || h.dial?.startsWith('+') || where === h.country;
 
-/** Destination trafficking or police line, else a home consular line there, else a home line. */
-export function hotlineFor(destination: string | undefined, env: NodeJS.ProcessEnv = process.env, home?: string): string | undefined {
+export type HotlineFocus = 'trafficking' | 'fraud';
+
+const TRAFFICKING_TYPES: ReadonlySet<ScamType> = new Set(['job_trafficking', 'fake_agency']);
+
+/** Trafficking lines for job and agency scams; scam, cybercrime and police lines for everything else. */
+export function hotlineFocus(scamType: ScamType, trafficking = false): HotlineFocus {
+  return trafficking || TRAFFICKING_TYPES.has(scamType) ? 'trafficking' : 'fraud';
+}
+
+/** Job and agency checks, or any trafficking sign, keep the anti-trafficking line first. */
+export function traffickingCheck(kind: Kind, flags: Pick<Flag, 'family'>[]): boolean {
+  return kind === 'job' || kind === 'agency' || flags.some((f) => f.family === 'trafficking');
+}
+
+const DEST_ORDER: Record<HotlineFocus, HotlineCategory[]> = {
+  trafficking: ['trafficking', 'police'],
+  fraud: ['cybercrime', 'police'],
+};
+
+const HOME_ORDER: Record<HotlineFocus, HotlineCategory[]> = {
+  trafficking: ['trafficking', 'police', 'consular', 'cybercrime', 'ngo'],
+  fraud: ['cybercrime', 'police', 'consular', 'ngo', 'trafficking'],
+};
+
+/** Destination line for the focus, else a home consular line there, else a home line. */
+export function hotlineFor(
+  destination: string | undefined,
+  env: NodeJS.ProcessEnv = process.env,
+  home?: string,
+  focus: HotlineFocus = 'trafficking',
+): string | undefined {
   const dest = countryOf(destination);
   const own = countryOf(home);
   const list = hotlineSource().filter((h) => h.dial);
   const first = (pred: (h: Hotline) => boolean) => list.find(pred);
   const of = (country: string | undefined, category: HotlineCategory) => (h: Hotline) => h.country === country && h.category === category;
   const where = dest ?? own;
-  const homeOrder: HotlineCategory[] = ['trafficking', 'police', 'consular', 'cybercrime', 'ngo'];
+  const homeOrder = HOME_ORDER[focus];
   const hit =
-    (dest && (first(of(dest, 'trafficking')) ?? first(of(dest, 'police')))) ||
+    (dest && DEST_ORDER[focus].map((c) => first(of(dest, c))).find(Boolean)) ||
     (dest && own && dest !== own && first((h) => h.country === own && h.category === 'consular' && dialCountry(h) === dest)) ||
     (own &&
       (homeOrder.map((c) => first((h) => of(own, c)(h) && callableFrom(h, where))).find(Boolean) ??
@@ -125,10 +154,17 @@ export function withWebRiskNote(summary: string, links: LinkCheck[], lang: Lang)
   return unchecked ? `${summary} ${UNCHECKED_NOTE[lang]}`.trim() : summary;
 }
 
-export function buildActions(verdict: Verdict, scamType: ScamType, lang: Lang, destination?: string, home?: string): Action[] {
+export function buildActions(
+  verdict: Verdict,
+  scamType: ScamType,
+  lang: Lang,
+  destination?: string,
+  home?: string,
+  trafficking = false,
+): Action[] {
   if (verdict === 'safe') return [{ label: LABELS.learn[lang], type: 'learn', value: 'scam_basics' }];
   const actions: Action[] = [];
-  const hotline = hotlineFor(destination, process.env, home);
+  const hotline = hotlineFor(destination, process.env, home, hotlineFocus(scamType, trafficking));
   if (verdict === 'danger' || scamType === 'job_trafficking') {
     actions.push(hotline ? { label: LABELS.call[lang], type: 'call', value: hotline } : { label: LABELS.call[lang], type: 'call' });
   }

@@ -310,3 +310,14 @@ describe('still unclear', () => {
     expect(stillUnclear(null, null, 'my').text[0]).toBe('အလုပ်နေရာလိပ်စာ မပေးထားပါ');
   });
 });
+
+describe('evidence for facts the user typed', () => {
+  it('names the source without an empty quote', () => {
+    const ad = facts({ contract: f('official' as const, 'Official contract') });
+    const chat = facts({ contract: { ...f('later' as const, ''), edited: true } });
+    const flags = collectFlags(ad, chat, detectConflicts(ad, chat));
+    const ev = flags.find((x) => x.field === 'contract')?.evidence;
+    expect(ev).toBe('Ad: "Official contract" / Chat');
+    expect(flags.every((x) => !x.evidence.includes('""'))).toBe(true);
+  });
+});

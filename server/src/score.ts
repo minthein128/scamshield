@@ -1,4 +1,4 @@
-import type { Family, Flag, LinkCheck, ScamType, Severity, Verdict } from './types.js';
+import type { Family, Flag, Lang, LinkCheck, ScamType, Severity, Verdict } from './types.js';
 
 export const FAMILY_WEIGHT: Record<Family, number> = {
   too_good: 1.4,
@@ -22,6 +22,7 @@ export interface ScoreInput {
   unsolicited: boolean;
   llmVerdict?: Verdict;
   scamType?: ScamType;
+  language?: Lang;
 }
 
 export interface ScoreResult {
@@ -40,17 +41,33 @@ export function verdictFor(score: number): Verdict {
   return score >= 70 ? 'danger' : score >= 35 ? 'careful' : 'safe';
 }
 
+const UNSAFE_LINK: Record<Lang, string> = {
+  en: 'Google lists this link as unsafe',
+  id: 'Google menandai tautan ini tidak aman',
+  tl: 'Minarkahan ng Google na hindi ligtas ang link na ito',
+  my: 'Google က ဤလင့်ခ်ကို မလုံခြုံဟု သတ်မှတ်ထားသည်',
+  th: 'Google ระบุว่าลิงก์นี้ไม่ปลอดภัย',
+};
+
+const DOMAIN_AGE: Record<Lang, (days: number) => string> = {
+  en: (d) => `Website registered ${d} days ago`,
+  id: (d) => `Situs web didaftarkan ${d} hari yang lalu`,
+  tl: (d) => `Nairehistro ang website ${d} araw pa lang ang nakalipas`,
+  my: (d) => `ဤဝက်ဘ်ဆိုက်ကို လွန်ခဲ့သော ${d} ရက်ကမှ မှတ်ပုံတင်ထားသည်`,
+  th: (d) => `เว็บไซต์นี้จดทะเบียนเมื่อ ${d} วันที่แล้ว`,
+};
+
 /** Flags that the correlate stage proves, added on top of what the model extracted. */
-export function derivedFlags(linkChecks: LinkCheck[]): Flag[] {
+export function derivedFlags(linkChecks: LinkCheck[], lang: Lang = 'en'): Flag[] {
   const out: Flag[] = [];
   for (const l of linkChecks) {
     if (l.webRisk !== 'clean' && l.webRisk !== 'unknown') {
-      out.push({ family: 'known_bad', label: 'Google lists this link as unsafe', evidence: `${l.url} (${l.webRisk})`, severity: 'high' });
+      out.push({ family: 'known_bad', label: UNSAFE_LINK[lang], evidence: l.url, severity: 'high' });
     }
     if (l.domainAgeDays !== undefined && l.domainAgeDays < YOUNG_DOMAIN_DAYS) {
       out.push({
         family: 'link_risk',
-        label: `Website registered ${l.domainAgeDays} days ago`,
+        label: DOMAIN_AGE[lang](l.domainAgeDays),
         evidence: l.url,
         severity: l.domainAgeDays < NEW_DOMAIN_DAYS ? 'high' : 'medium',
       });
@@ -60,7 +77,7 @@ export function derivedFlags(linkChecks: LinkCheck[]): Flag[] {
 }
 
 export function score(input: ScoreInput): ScoreResult {
-  const flags = [...input.flags, ...derivedFlags(input.linkChecks)];
+  const flags = [...input.flags, ...derivedFlags(input.linkChecks, input.language)];
   const strongest = new Map<Family, Severity>();
   for (const f of flags) {
     const cur = strongest.get(f.family);

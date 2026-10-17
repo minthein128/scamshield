@@ -7,7 +7,7 @@ const CHUNK_SAMPLES = 1600;
 const LEAD_S = 0.04;
 
 const WORKLET_SRC = `
-class SafeRouteCapture extends AudioWorkletProcessor {
+class KakweCapture extends AudioWorkletProcessor {
   constructor(options) {
     super();
     this.ratio = sampleRate / ${CAPTURE_RATE};
@@ -32,7 +32,7 @@ class SafeRouteCapture extends AudioWorkletProcessor {
     return true;
   }
 }
-registerProcessor('saferoute-capture', SafeRouteCapture);
+registerProcessor('kakwe-capture', KakweCapture);
 `;
 
 type AnyAudioContext = AudioContext;
@@ -102,7 +102,7 @@ export function createLiveAudio(): LiveAudio {
         try {
           workletUrl ??= URL.createObjectURL(new Blob([WORKLET_SRC], { type: 'application/javascript' }));
           await c.audioWorklet.addModule(workletUrl);
-          const worklet = new AudioWorkletNode(c, 'saferoute-capture', { numberOfInputs: 1, numberOfOutputs: 1, channelCount: 1 });
+          const worklet = new AudioWorkletNode(c, 'kakwe-capture', { numberOfInputs: 1, numberOfOutputs: 1, channelCount: 1 });
           worklet.port.onmessage = (e: MessageEvent<Float32Array>) => emit(e.data, onChunk);
           source.connect(worklet);
           worklet.connect(mute);

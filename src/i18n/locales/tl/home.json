@@ -18,7 +18,8 @@
     "title": "Mga kamakailang pagsusuri",
     "emptyTitle": "Wala pang pagsusuri",
     "emptyBody": "Naka-save ang iyong mga pagsusuri sa device na ito at makikita rito.",
-    "historyOff": "Naka-off ang history. Hindi naitatabi ang mga pagsusuri sa teleponong ito."
+    "historyOff": "Naka-off ang history. Hindi naitatabi ang mga pagsusuri sa teleponong ito.",
+    "older": "Ipakita ang mga lumang check"
   },
   "radar": {
     "title": "Scam radar",
@@ -33,5 +34,16 @@
   },
   "notice": {
     "dismiss": "Isara"
+  },
+  "shield": {
+    "statusOff": "Naka-OFF ang shield",
+    "statusOn": "Naka-ON ang shield",
+    "turnOn": "I-on",
+    "on": "Naka-on",
+    "hintOff": "Pindutin ang bilog. Mananatili ang manika sa ibabaw ng iba mong app.",
+    "hintOn": "May nakitang job ad o chat? Pindutin ang manika sa screen mo.",
+    "a11yOff": "Naka-off ang shield. I-double tap para i-on.",
+    "a11yOn": "Naka-on ang shield. I-double tap para i-off.",
+    "web": "Gumagana ang shield sa Android app."
   }
 }

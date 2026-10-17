@@ -4,19 +4,28 @@
   },
   "title": "Screen shield",
   "status": {
-    "web": "Gumagana sa SafeRoute Android app.",
+    "web": "Gumagana sa $t(common:appName) Android app.",
     "insecure": "Gumagamit ang bersyong ito ng hindi ligtas na service address, kaya naka-off ang shield.",
     "unavailable": "Hindi available sa bersyong ito.",
     "on": "Naka-on. Pindutin ang manika sa anumang kahina-hinala.",
     "off": "Naka-off. I-on ito para suriin kung ano ang nasa iyong screen."
   },
   "steps": {
-    "overlay": "Hakbang 1 ng 4: payagan ang \"Display over other apps\", pagkatapos ay bumalik sa SafeRoute.",
+    "overlay": "Hakbang 1 ng 4: payagan ang \"Display over other apps\", pagkatapos ay bumalik sa $t(common:appName).",
     "notifications": "Hakbang 2 ng 4: payagan ang mga notification para mapanatiling gumagana ng Android ang shield.",
-    "capture": "Hakbang 3 ng 4: payagan ang SafeRoute na makita ang iyong screen kapag pinindot mo ang manika.",
+    "capture": "Hakbang 3 ng 4: payagan ang $t(common:appName) na makita ang iyong screen kapag pinindot mo ang manika.",
     "starting": "Hakbang 4 ng 4: sinisimulan ang shield."
   },
-  "body": "Isang maliit na manikang Pyit Taing Htaung ang lulutang sa ibabaw ng iba pang app. Pindutin ito sa isang post ng trabaho, chat, o listahan at susuriin ng SafeRoute ang nasa iyong screen.",
+  "needs": {
+    "title": "Mga kailangan ng shield",
+    "overlay": "Payagan ang \"Display over other apps\" para makalutang ang manika sa ibang apps.",
+    "notifications": "Payagan ang mga notification para mapanatiling gumagana ng Android ang shield.",
+    "capture": "Payagan ang screen capture. Tinitingnan lang ng $t(common:appName) ang iyong screen kapag pinindot mo ang manika.",
+    "privacy": "Ipinapadala ang screenshot sa check service para lang masuri. Hindi ito sine-save."
+  },
+  "checkNow": "Suriin ang screen na ito ngayon",
+  "checkingNow": "Sinusuri ang iyong screen...",
+  "body": "Isang maliit na manikang Pyit Taing Htaung ang lulutang sa ibabaw ng iba pang app. Pindutin ito sa isang post ng trabaho, chat, o listahan at susuriin ng $t(common:appName) ang nasa iyong screen.",
   "download": "I-download ang Android app",
   "details": "Mga detalye at pahintulot",
   "detailsA11y": "Mga detalye ng shield",
@@ -31,7 +40,7 @@
     "privacy": "Naka-off maliban kung bubuksan mo. Ang mga mensaheng mukhang delikado lang ang lumalabas sa phone mo, at inaalis muna ang mga pangalan, numero at code.",
     "a11y": "Message Guard",
     "status": {
-      "web": "Gumagana sa SafeRoute Android app.",
+      "web": "Gumagana sa $t(common:appName) Android app.",
       "unavailable": "Hindi available sa build na ito.",
       "on": "Naka-on. May tahimik na abiso ang mga mensaheng mukhang delikado mula sa mga app na pinili mo.",
       "off": "Naka-off",
@@ -45,7 +54,7 @@
       "recommended": "Inirerekomenda"
     },
     "errors": {
-      "accessOff": "Naka-off pa rin ang notification access. Kung kulay abo ang switch, buksan ang SafeRoute sa App info, pindutin ang tatlong tuldok at piliin ang \"Allow restricted settings\".",
+      "accessOff": "Naka-off pa rin ang notification access. Kung kulay abo ang switch, buksan ang $t(common:appName) sa App info, pindutin ang tatlong tuldok at piliin ang \"Allow restricted settings\".",
       "cannotOpen": "Hindi mabuksan ang mga setting ng notification access."
     },
     "consent": {
@@ -64,7 +73,7 @@
       },
       "who": {
         "title": "Sino ang nagche-check",
-        "body": "Ang server ng SafeRoute at ang AI ng Google ang nagche-check ng mensahe at nagbabalik ng resulta."
+        "body": "Ang server ng $t(common:appName) at ang AI ng Google ang nagche-check ng mensahe at nagbabalik ng resulta."
       },
       "control": {
         "title": "Ikaw pa rin ang may kontrol",
@@ -72,7 +81,7 @@
       },
       "phone": {
         "title": "Maaaring makita ng iba ang mga abiso",
-        "body": "Maaaring makita ng sinumang may hawak ng phone mo ang mga abiso at resulta ng SafeRoute."
+        "body": "Maaaring makita ng sinumang may hawak ng phone mo ang mga abiso at resulta ng $t(common:appName)."
       },
       "apps": "Piliin ang mga app",
       "chooseOne": "Pumili ng kahit isang app.",
@@ -91,11 +100,39 @@
     },
     "kill": {
       "label": "I-off at alisin ang access",
-      "hint": "Ino-off ang Message Guard at binubuksan ang Android settings, kung saan maaalis mo ang notification access ng SafeRoute."
+      "hint": "Ino-off ang Message Guard at binubuksan ang Android settings, kung saan maaalis mo ang notification access ng $t(common:appName)."
     },
     "notice": {
       "body": "Maaaring kailangang tingnan ulit ang isang mensahe. Buksan para makita kung bakit.",
       "open": "Buksan"
+    },
+    "activity": {
+      "waiting": "Naghihintay ng mga mensahe mula sa mga app na pinili mo.",
+      "last": "Huling mensahe mula sa {{app}}, {{time}}: {{outcome}}",
+      "outcome": {
+        "paused": "hindi na-check, naka-pause ang Message Guard",
+        "self": "sarili mong mensahe, hindi na-check",
+        "noText": "walang text na ma-check",
+        "hiddenPreview": "itinago ng app ang text kaya hindi ito na-check. I-on ang message preview sa app na iyon.",
+        "tooShort": "masyadong maikli para i-check, hindi ipinadala",
+        "otp": "one-time code, nanatili sa phone mo",
+        "notRisky": "mukhang normal, hindi ipinadala",
+        "duplicate": "kapareho ng naunang mensahe, hindi na ipinadala ulit",
+        "rateLimited": "hindi ipinadala, naabot na ang limit kada oras o kada araw",
+        "sent": "ipinadala para i-check, hinihintay ang resulta",
+        "checkFailed": "hindi natapos ang check. Tingnan ang internet connection mo.",
+        "resultSafe": "na-check, mababa ang panganib",
+        "resultWarned": "na-check, nagpadala ng abiso ang $t(common:appName)",
+        "noticeBlocked": "na-check, pero naka-off ang notifications ng $t(common:appName) kaya hindi lumabas ang abiso"
+      }
+    },
+    "health": {
+      "accessOff": "Naka-off ang notification access, kaya hindi mabasa ng Message Guard ang mga bagong mensahe.",
+      "notConnected": "Hindi pa sinisimulan ng Android ang Message Guard. I-off at i-on ulit, o i-restart ang phone.",
+      "notificationsOff": "Naka-off ang notifications ng $t(common:appName), kaya hindi mo makikita ang mga babala.",
+      "missingApps": "Hindi naka-install sa phone na ito: {{apps}}.",
+      "battery": "Maaaring ihinto ng Android ang Message Guard para makatipid ng baterya.",
+      "batteryAction": "Payagang tumakbo sa background"
     }
   }
 }

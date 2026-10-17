@@ -30,6 +30,7 @@ export interface ShieldCheckResult {
 /** Labels the overlay shows: verdict and error chips, card buttons and the voice companion. Missing keys fall back to English. */
 export const COMPANION_STRING_KEYS = [
   'name',
+  'appName',
   'verdictSafe',
   'verdictCareful',
   'verdictDanger',
@@ -113,6 +114,8 @@ export interface MessageGuardConfig {
   shareSignals?: boolean;
   /** Neutral notification body in the user's language. */
   noticeBody?: string;
+  /** App name for the notice title in the user's language. */
+  noticeTitle?: string;
   /** Notification button label in the user's language. */
   noticeOpen?: string;
 }
@@ -123,6 +126,45 @@ export interface MessageGuardStatus {
   consent: boolean;
   /** Set when Message Guard paused itself, for example 'daily_limit'. */
   pausedReason: string | null;
+  /** Android has the notification listener bound. Builds before 1.0.199 leave it out. */
+  listenerConnected?: boolean;
+  /** A notice posted now would show: app notifications and the notice channel are on. */
+  notificationsEnabled?: boolean;
+  /** Android may stop Kakwe in the background to save battery. */
+  batteryOptimized?: boolean;
+  /** Labels of chosen apps that are not installed. */
+  missingApps?: string[];
+  /** The newest decision, or null before the first notification from a messaging app. */
+  last?: MessageGuardEvent | null;
+}
+
+/**
+ * One Message Guard decision for one notification from a messaging app. Codes only: never the
+ * message text, the sender or the title.
+ */
+export interface MessageGuardEvent {
+  /** Increasing number; pass the last one seen to getMessageGuardActivity() to read only newer events. */
+  seq: number;
+  /** Epoch milliseconds. */
+  at: number;
+  /** Short app id: 'viber', 'whatsapp', 'sms' and so on. */
+  app: string;
+  /** App name for display. */
+  label: string | null;
+  /**
+   * skipped_paused, skipped_self, skipped_no_text, skipped_hidden_preview,
+   * skipped_too_short, skipped_otp, skipped_not_risky, skipped_duplicate, skipped_rate_limited, sent,
+   * check_failed:<kind>, result:<verdict> or result:<verdict>:notice_blocked.
+   */
+  outcome: string;
+}
+
+export interface MessageGuardActivity {
+  events: MessageGuardEvent[];
+  /** Totals per outcome, including skipped_summary and skipped_ongoing, which add no event. */
+  counts: Record<string, number>;
+  /** The seq the next event gets. Older native builds leave it out. */
+  nextSeq?: number;
 }
 
 /** One check Message Guard sent, kept on the phone only. */
@@ -163,6 +205,8 @@ interface ShieldModuleType {
   grantMessageGuardConsent(ids: string[]): Promise<boolean>;
   getMessageGuardLog(): Promise<MessageGuardLogEntry[]>;
   clearMessageGuardLog(): Promise<boolean>;
+  getMessageGuardActivity(afterSeq: number): Promise<MessageGuardActivity | null>;
+  openBatteryOptimizationSettings(): Promise<boolean>;
   addListener(
     event: 'onShieldResult',
     listener: (e: { id: string; json: string }) => void
@@ -364,7 +408,7 @@ export async function takeUnsyncedResults(): Promise<ShieldCheckResult[]> {
   }
 }
 
-/** True when the user has granted SafeRoute notification access in system Settings. */
+/** True when the user has granted Kakwe notification access in system Settings. */
 export async function hasNotificationAccess(): Promise<boolean> {
   if (nativeShieldModule) {
     try {
@@ -376,7 +420,7 @@ export async function hasNotificationAccess(): Promise<boolean> {
   return mockNotificationAccess;
 }
 
-/** Opens the system notification access screen. The user turns SafeRoute on there. */
+/** Opens the system notification access screen. The user turns Kakwe on there. */
 export async function openNotificationAccessSettings(): Promise<boolean> {
   if (nativeShieldModule) {
     try {
@@ -460,6 +504,33 @@ export async function clearMessageGuardLog(): Promise<boolean> {
   }
   mockGuardLog = [];
   return true;
+}
+
+/** Message Guard decisions newer than afterSeq (use -1 for all), oldest first. Codes only. */
+export async function getMessageGuardActivity(afterSeq = -1): Promise<MessageGuardActivity> {
+  const none: MessageGuardActivity = { events: [], counts: {} };
+  if (nativeShieldModule) {
+    try {
+      if (typeof nativeShieldModule.getMessageGuardActivity !== 'function') return none;
+      return (await nativeShieldModule.getMessageGuardActivity(afterSeq)) ?? none;
+    } catch {
+      return none;
+    }
+  }
+  return none;
+}
+
+/** Opens Android's battery optimisation settings, or Kakwe's App info where a phone hides them. */
+export async function openBatteryOptimizationSettings(): Promise<boolean> {
+  if (nativeShieldModule) {
+    try {
+      if (typeof nativeShieldModule.openBatteryOptimizationSettings !== 'function') return false;
+      return await nativeShieldModule.openBatteryOptimizationSettings();
+    } catch {
+      return false;
+    }
+  }
+  return false;
 }
 
 export async function isMessageGuardEnabled(): Promise<boolean> {

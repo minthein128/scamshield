@@ -4,19 +4,28 @@
   },
   "title": "Screen shield",
   "status": {
-    "web": "Berfungsi di aplikasi Android SafeRoute.",
+    "web": "Berfungsi di aplikasi Android $t(common:appName).",
     "insecure": "Versi ini memakai alamat layanan yang tidak aman, jadi shield dimatikan.",
     "unavailable": "Tidak tersedia di versi ini.",
     "on": "Aktif. Ketuk boneka pada hal yang mencurigakan.",
     "off": "Mati. Nyalakan untuk memeriksa apa yang ada di layar Anda."
   },
   "steps": {
-    "overlay": "Langkah 1 dari 4: izinkan \"Tampilkan di atas aplikasi lain\", lalu kembali ke SafeRoute.",
+    "overlay": "Langkah 1 dari 4: izinkan \"Tampilkan di atas aplikasi lain\", lalu kembali ke $t(common:appName).",
     "notifications": "Langkah 2 dari 4: izinkan notifikasi agar Android tetap menjalankan shield.",
-    "capture": "Langkah 3 dari 4: izinkan SafeRoute melihat layar Anda saat Anda mengetuk boneka.",
+    "capture": "Langkah 3 dari 4: izinkan $t(common:appName) melihat layar Anda saat Anda mengetuk boneka.",
     "starting": "Langkah 4 dari 4: memulai shield."
   },
-  "body": "Boneka kecil Pyit Taing Htaung melayang di atas aplikasi lain. Ketuk boneka pada info lowongan kerja, chat, atau iklan dan SafeRoute akan memeriksa isi layar Anda.",
+  "needs": {
+    "title": "Yang dibutuhkan shield",
+    "overlay": "Izinkan \"Tampilkan di atas aplikasi lain\" agar boneka bisa melayang di atas aplikasi lain.",
+    "notifications": "Izinkan notifikasi agar Android tetap menjalankan shield.",
+    "capture": "Izinkan perekaman layar. $t(common:appName) hanya melihat layar Anda saat Anda mengetuk boneka.",
+    "privacy": "Tangkapan layar dikirim ke layanan pemeriksaan hanya untuk diperiksa. Tangkapan layar tidak disimpan."
+  },
+  "checkNow": "Periksa layar ini sekarang",
+  "checkingNow": "Memeriksa layar Anda...",
+  "body": "Boneka kecil Pyit Taing Htaung melayang di atas aplikasi lain. Ketuk boneka pada info lowongan kerja, chat, atau iklan dan $t(common:appName) akan memeriksa isi layar Anda.",
   "download": "Unduh aplikasi Android",
   "details": "Detail dan izin",
   "detailsA11y": "Detail shield",
@@ -31,7 +40,7 @@
     "privacy": "Mati kecuali Anda menyalakannya. Hanya pesan yang tampak berisiko yang keluar dari ponsel, setelah nama, nomor, dan kode dihapus.",
     "a11y": "Message Guard",
     "status": {
-      "web": "Berfungsi di aplikasi Android SafeRoute.",
+      "web": "Berfungsi di aplikasi Android $t(common:appName).",
       "unavailable": "Tidak tersedia pada versi ini.",
       "on": "Aktif. Pesan yang tampak berisiko dari aplikasi pilihan Anda mendapat pemberitahuan singkat.",
       "off": "Mati",
@@ -45,7 +54,7 @@
       "recommended": "Disarankan"
     },
     "errors": {
-      "accessOff": "Akses notifikasi masih nonaktif. Jika tombol berwarna abu-abu, buka SafeRoute di Info aplikasi, ketuk titik tiga dan pilih \"Izinkan setelan terbatas\".",
+      "accessOff": "Akses notifikasi masih nonaktif. Jika tombol berwarna abu-abu, buka $t(common:appName) di Info aplikasi, ketuk titik tiga dan pilih \"Izinkan setelan terbatas\".",
       "cannotOpen": "Tidak dapat membuka pengaturan akses notifikasi."
     },
     "consent": {
@@ -64,7 +73,7 @@
       },
       "who": {
         "title": "Siapa yang memeriksa",
-        "body": "Server SafeRoute dan AI Google memeriksa pesan lalu mengirim hasilnya."
+        "body": "Server $t(common:appName) dan AI Google memeriksa pesan lalu mengirim hasilnya."
       },
       "control": {
         "title": "Anda tetap memegang kendali",
@@ -72,7 +81,7 @@
       },
       "phone": {
         "title": "Orang lain mungkin melihat pemberitahuan",
-        "body": "Siapa pun yang memegang ponsel Anda mungkin melihat pemberitahuan dan hasil SafeRoute."
+        "body": "Siapa pun yang memegang ponsel Anda mungkin melihat pemberitahuan dan hasil $t(common:appName)."
       },
       "apps": "Pilih aplikasi",
       "chooseOne": "Pilih minimal satu aplikasi.",
@@ -91,11 +100,39 @@
     },
     "kill": {
       "label": "Matikan dan cabut akses",
-      "hint": "Mematikan Message Guard dan membuka pengaturan Android, tempat Anda bisa mencabut akses notifikasi SafeRoute."
+      "hint": "Mematikan Message Guard dan membuka pengaturan Android, tempat Anda bisa mencabut akses notifikasi $t(common:appName)."
     },
     "notice": {
       "body": "Sebuah pesan mungkin perlu dicek lagi. Buka untuk melihat alasannya.",
       "open": "Buka"
+    },
+    "activity": {
+      "waiting": "Menunggu pesan dari aplikasi pilihan Anda.",
+      "last": "Pesan terakhir dari {{app}}, {{time}}: {{outcome}}",
+      "outcome": {
+        "paused": "tidak diperiksa, Message Guard dijeda",
+        "self": "pesan Anda sendiri, tidak diperiksa",
+        "noText": "tidak ada teks untuk diperiksa",
+        "hiddenPreview": "aplikasi menyembunyikan teksnya, jadi tidak bisa diperiksa. Nyalakan pratinjau pesan di aplikasi itu.",
+        "tooShort": "terlalu pendek untuk diperiksa, tidak dikirim",
+        "otp": "kode sekali pakai, tetap di ponsel Anda",
+        "notRisky": "tampak biasa, tidak dikirim",
+        "duplicate": "sama dengan pesan sebelumnya, tidak dikirim lagi",
+        "rateLimited": "tidak dikirim, batas per jam atau per hari sudah tercapai",
+        "sent": "dikirim untuk diperiksa, menunggu hasil",
+        "checkFailed": "pemeriksaan tidak selesai. Periksa koneksi internet Anda.",
+        "resultSafe": "sudah diperiksa, risiko rendah",
+        "resultWarned": "sudah diperiksa, $t(common:appName) mengirim pemberitahuan",
+        "noticeBlocked": "sudah diperiksa, tetapi notifikasi $t(common:appName) mati, jadi pemberitahuan tidak muncul"
+      }
+    },
+    "health": {
+      "accessOff": "Akses notifikasi mati, jadi Message Guard tidak bisa membaca pesan baru.",
+      "notConnected": "Android belum menjalankan Message Guard. Matikan lalu nyalakan lagi, atau mulai ulang ponsel.",
+      "notificationsOff": "Notifikasi $t(common:appName) mati, jadi Anda tidak akan melihat peringatan.",
+      "missingApps": "Tidak terpasang di ponsel ini: {{apps}}.",
+      "battery": "Android bisa menghentikan Message Guard untuk menghemat baterai.",
+      "batteryAction": "Izinkan berjalan di latar belakang"
     }
   }
 }

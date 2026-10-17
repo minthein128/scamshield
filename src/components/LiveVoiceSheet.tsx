@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Modal, Pressable, StyleSheet, Switch, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { Linking, Modal, Platform, Pressable, StyleSheet, Switch, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import type { CheckResponse, LanguageCode } from '../api/types';
 import { useLiveVoice, type LiveAction, type LiveState } from '../hooks/useLiveVoice';
@@ -57,6 +57,7 @@ export function useSampledLevel(read: (() => number) | null): number {
 
 export const LiveVoiceSheet: React.FC<Props> = ({ visible, result, language, home, destination, onClose, onAction, onGetHelp }) => {
   const { t } = useTranslation('live');
+  const { t: tp } = useTranslation('permissions');
   const { height } = useWindowDimensions();
   const sheet = useSheetLayout();
   const [family, setFamily] = useState(false);
@@ -83,8 +84,11 @@ export const LiveVoiceSheet: React.FC<Props> = ({ visible, result, language, hom
   const level = useSampledLevel(
     visible && avatarState === 'speaking' && !live.warning ? live.outputLevel : visible && avatarState === 'listening' ? live.inputLevel : null,
   );
-  const over = live.state === 'ended' || live.state === 'error';
+  const over = live.state === 'ended' || live.state === 'error' || live.state === 'declined';
+  const micDenied = live.state === 'error' && live.error === 'mic_denied';
   const status = (() => {
+    if (live.state === 'declined') return t('declined');
+    if (micDenied && Platform.OS === 'web') return t('errors.mic_denied_web');
     if (live.state === 'error') return t(`errors.${live.error ?? 'upstream'}`);
     if (live.state === 'ended') return t(`ended.${live.endedBy ?? 'server'}`);
     if (live.warning) return t('state.warning');
@@ -129,6 +133,9 @@ export const LiveVoiceSheet: React.FC<Props> = ({ visible, result, language, hom
           {over ? (
             <View style={{ gap: 10 }}>
               {live.state === 'error' && live.fallback ? null : <Button testID="live-retry" label={t('retry')} onPress={() => start()} />}
+              {micDenied && Platform.OS !== 'web' ? (
+                <Button testID="live-open-settings" label={tp('openSettings')} variant="secondary" onPress={() => Linking.openSettings().catch(() => undefined)} />
+              ) : null}
               <Button testID="live-close" label={t('close')} variant="secondary" onPress={close} />
             </View>
           ) : (

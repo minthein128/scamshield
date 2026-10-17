@@ -1,6 +1,6 @@
 {
-  "seen_one": "Reported {{count}} time by other SafeRoute users in the last 30 days",
-  "seen_other": "Reported {{count}} times by other SafeRoute users in the last 30 days",
+  "seen_one": "Reported {{count}} time by other $t(common:appName) users in the last 30 days",
+  "seen_other": "Reported {{count}} times by other $t(common:appName) users in the last 30 days",
   "title": "Risk report",
   "a11yVerdict": "{{verdict}}. Step {{step}} of 3.",
   "warn": "Warn my family",
@@ -23,6 +23,7 @@
   "domainAgeUnknown": "Domain age unknown",
   "webRisk": {
     "clean": "No known threats",
+    "notListed": "Not on Google's lists",
     "malware": "Malware warning",
     "social_engineering": "Phishing or deception warning",
     "unwanted_software": "Unwanted software warning",
@@ -33,8 +34,8 @@
     "withValue": "Block {{value}} in the app where you found it.",
     "generic": "Block and report the sender in the app where you found it."
   },
-  "shareMessage": "SafeRoute check: {{title}}\n{{summary}}\nRisk score {{score}}/100.",
-  "warnMessage": "SafeRoute warning ({{verdict}}): {{title}}. {{summary}} Please do not pay money or send documents. Call me first.",
+  "shareMessage": "$t(common:appName) check: {{title}}\n{{summary}}\nRisk score {{score}}/100.",
+  "warnMessage": "$t(common:appName) warning ({{verdict}}): {{title}}. {{summary}} Please do not pay money or send documents. Call me first.",
   "thanks": "Thanks, this helps protect others",
   "attention": {
     "word": {

@@ -97,7 +97,7 @@ describe('buildSystemInstruction', () => {
     expect(p).not.toContain('Speak ONLY');
     expect(p).toContain('Answer in the language the listener is speaking, if it is one of these');
     expect(p).toContain('Start in Burmese (Myanmar script)');
-    expect(p).toContain('SafeRoute can talk in မြန်မာ, English, ไทย, Bahasa Indonesia, Tagalog');
+    expect(p).toContain('Kakwe can talk in မြန်မာ, English, ไทย, Bahasa Indonesia, Tagalog');
     expect(p).toContain('ဒီအလုပ်ကမ်းလှမ်းချက်မှာ');
     expect(p).toContain('Two or three short sentences');
     const narrow = prompt({ allowed: ['en', 'my'] });
@@ -105,10 +105,10 @@ describe('buildSystemInstruction', () => {
     expect(narrow).not.toContain('ไทย');
   });
 
-  it('forbids promising actions SafeRoute cannot take, in every mode', () => {
+  it('forbids promising actions Kakwe cannot take, in every mode', () => {
     for (const mode of ['self', 'family', 'companion'] as const) {
       const p = prompt({ mode, language: 'en' });
-      expect(p).toContain('Never promise anything SafeRoute cannot do');
+      expect(p).toContain('Never promise anything Kakwe cannot do');
       expect(p).toContain('Never say "we will send"');
       expect(p).toContain('Warn my family');
     }

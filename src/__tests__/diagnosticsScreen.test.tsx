@@ -53,7 +53,7 @@ describe('DiagnosticsScreen', () => {
     await waitFor(() => expect(Clipboard.setStringAsync).toHaveBeenCalledWith(expect.stringContaining('chosen api.example.com')));
     expect((Clipboard.setStringAsync as jest.Mock).mock.calls[0][0]).toContain('auth.failed');
     fireEvent.press(screen.getByTestId('diagnostics-share'));
-    await waitFor(() => expect(notify.shareText).toHaveBeenCalledWith(expect.stringContaining('SafeRoute diagnostics report')));
+    await waitFor(() => expect(notify.shareText).toHaveBeenCalledWith(expect.stringContaining('Kakwe diagnostics report')));
   });
 
   it('clears the log after confirmation and shows the empty state', async () => {

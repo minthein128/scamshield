@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { score, verdictFor } from '../src/score.js';
+import { derivedFlags, score, verdictFor } from '../src/score.js';
 import type { Flag, LinkCheck } from '../src/types.js';
 
 const f = (family: Flag['family'], severity: Flag['severity'] = 'medium'): Flag => ({ family, label: family, evidence: 'x', severity });
@@ -102,5 +102,16 @@ describe('score', () => {
       f(x, 'high'),
     );
     expect(score({ flags: all, linkChecks: [], unsolicited: false }).score).toBe(100);
+  });
+});
+
+describe('derivedFlags', () => {
+  const bad: LinkCheck = { url: 'http://x.test/p', webRisk: 'social_engineering', domainAgeDays: 3 };
+  it('writes the labels in the report language without raw threat codes', () => {
+    const my = derivedFlags([bad], 'my');
+    expect(my.map((f) => f.label)).toEqual(['Google က ဤလင့်ခ်ကို မလုံခြုံဟု သတ်မှတ်ထားသည်', 'ဤဝက်ဘ်ဆိုက်ကို လွန်ခဲ့သော 3 ရက်ကမှ မှတ်ပုံတင်ထားသည်']);
+    expect(my[0]?.evidence).toBe('http://x.test/p');
+    expect(derivedFlags([bad])[0]?.label).toBe('Google lists this link as unsafe');
+    for (const lang of ['id', 'tl', 'th'] as const) expect(derivedFlags([bad], lang)[0]?.label).not.toMatch(/Google lists/);
   });
 });

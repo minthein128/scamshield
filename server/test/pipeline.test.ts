@@ -184,6 +184,49 @@ describe('pipeline language guard', () => {
     expect(r.summary).not.toMatch(/is a scam/i);
   });
 
+  it('re-asks when a Burmese report contains Thai or Tamil letters', async () => {
+    const mock = createMockExtractor();
+    let calls = 0;
+    const extractor = {
+      extract: async (_r: unknown, opts?: { hedgeRetry?: boolean }) => {
+        calls++;
+        const x = await mock.extract({ kind: 'message', language: 'my', text: 'm' });
+        return opts?.hedgeRetry ? { ...x, summary: 'ပါဆယ်လိမ်လည်မှု ဖြစ်နိုင်သည်။' } : { ...x, summary: 'ပါဆယ်ဖิชရှ် டெစ့်ဆိုဒ်' };
+      },
+    };
+    const p = createPipeline({
+      extractor: extractor as never,
+      correlator: createMockCorrelator(),
+      grounder: createMockGrounder(),
+      model: 'm',
+    });
+    const r = await p.run({ kind: 'message', language: 'my', text: 'm' });
+    expect(calls).toBe(2);
+    expect(r.summary).toBe('ပါဆယ်လိမ်လည်မှု ဖြစ်နိုင်သည်။');
+  });
+
+  it('drops grounded findings written in another language', async () => {
+    const grounder = {
+      ground: async () => ({
+        flags: [
+          { family: 'identity' as const, label: 'เว็บไซต์แอบอ้างบริการจัดส่งสินค้า', evidence: 'มีรายงานออนไลน์', severity: 'medium' as const },
+          { family: 'identity' as const, label: 'လိုင်စင်မှတ်တမ်း မတွေ့ပါ', evidence: 'DICA', severity: 'medium' as const },
+        ],
+        sources: [],
+      }),
+    };
+    const p = createPipeline({
+      extractor: createMockExtractor(),
+      correlator: createMockCorrelator(),
+      grounder: grounder as never,
+      model: 'm',
+    });
+    const r = await p.run({ kind: 'agency', language: 'my', text: 'Sunrise Overseas Agency, deposit 5000' });
+    const labels = r.flags.map((f) => f.label);
+    expect(labels).toContain('လိုင်စင်မှတ်တမ်း မတွေ့ပါ');
+    expect(labels.some((l) => /[\u0E00-\u0E7F]/.test(l))).toBe(false);
+  });
+
   it('rewrites light certainty without a second call', async () => {
     const mock = createMockExtractor();
     let calls = 0;

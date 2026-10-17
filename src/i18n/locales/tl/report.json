@@ -2,8 +2,8 @@
   "_meta": {
     "reviewed": false
   },
-  "seen_one": "Iniulat nang {{count}} beses ng iba pang gumagamit ng SafeRoute sa nakaraang 30 araw",
-  "seen_other": "Iniulat nang {{count}} beses ng iba pang gumagamit ng SafeRoute sa nakaraang 30 araw",
+  "seen_one": "Iniulat nang {{count}} beses ng iba pang gumagamit ng $t(common:appName) sa nakaraang 30 araw",
+  "seen_other": "Iniulat nang {{count}} beses ng iba pang gumagamit ng $t(common:appName) sa nakaraang 30 araw",
   "title": "Ulat sa panganib",
   "a11yVerdict": "{{verdict}}. Antas {{step}} sa 3.",
   "warn": "Balaan ang pamilya ko",
@@ -26,6 +26,7 @@
   "domainAgeUnknown": "Hindi alam ang edad ng domain",
   "webRisk": {
     "clean": "Walang nakitang banta",
+    "notListed": "Wala sa mga listahan ng Google",
     "malware": "Babala sa malware",
     "social_engineering": "Babala sa panlilinlang o phishing",
     "unwanted_software": "Babala sa hindi gustong software",
@@ -36,8 +37,8 @@
     "withValue": "I-block ang {{value}} sa app kung saan mo ito nakita.",
     "generic": "I-block at i-report ang nagpadala sa app kung saan mo ito nakita."
   },
-  "shareMessage": "Pagsusuri ng SafeRoute: {{title}}\n{{summary}}\nRisk score na {{score}}/100.",
-  "warnMessage": "Babala mula sa SafeRoute ({{verdict}}): {{title}}. {{summary}} Huwag munang magbayad ng pera o magpadala ng mga dokumento. Tawagan muna ako.",
+  "shareMessage": "Pagsusuri ng $t(common:appName): {{title}}\n{{summary}}\nRisk score na {{score}}/100.",
+  "warnMessage": "Babala mula sa $t(common:appName) ({{verdict}}): {{title}}. {{summary}} Huwag munang magbayad ng pera o magpadala ng mga dokumento. Tawagan muna ako.",
   "thanks": "Salamat, nakakatulong ito na maprotektahan ang iba",
   "attention": {
     "word": {

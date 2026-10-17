@@ -1,6 +1,15 @@
 import { describe, expect, it, vi } from 'vitest';
 import { loadConfig } from '../src/config.js';
-import { buildGroundingRequest, createGrounder, groundingQuery, needsGrounding, parseCompanyFound, parseFindings } from '../src/ground.js';
+import {
+  buildGroundingRequest,
+  createGrounder,
+  extractSources,
+  groundingQuery,
+  needsGrounding,
+  parseCompanyFound,
+  parseFindings,
+  sourceHost,
+} from '../src/ground.js';
 import type { Extraction } from '../src/types.js';
 
 const cfg = loadConfig({ GEMINI_API_KEY: 'g' });
@@ -58,6 +67,29 @@ describe('grounding', () => {
     ]);
     expect(out.flags).toHaveLength(1);
     expect(out.flags[0]?.severity).toBe('low');
+  });
+
+  it('names redirect sources by the site behind them, never the redirect host', () => {
+    const redirect = 'https://vertexaisearch.cloud.google.com/grounding-api-redirect/AbC123';
+    const res = {
+      candidates: [
+        {
+          groundingMetadata: {
+            groundingChunks: [
+              { web: { title: 'thaipost.net', uri: redirect } },
+              { web: { uri: 'https://www.google.com/url?q=https://www.dsi.go.th/x&sa=U' } },
+              { web: { uri: `${redirect}2` } },
+            ],
+          },
+        },
+      ],
+    };
+    expect(extractSources(res)).toEqual([
+      { title: 'thaipost.net', url: redirect },
+      { title: 'www.dsi.go.th', url: 'https://www.google.com/url?q=https://www.dsi.go.th/x&sa=U' },
+    ]);
+    expect(sourceHost('https://dmw.gov.ph/a')).toBe('dmw.gov.ph');
+    expect(sourceHost(redirect)).toBeUndefined();
   });
 
   it('drops findings when the model ran no search', async () => {
@@ -129,6 +161,8 @@ describe('grounding', () => {
     expect(p).toContain('Acme Recruit');
     expect(p).toContain('Thailand');
     expect(p).toContain('Burmese');
+    expect(p).not.toMatch(/[\u0E00-\u0E7F]/);
+    expect(buildGroundingRequest(base, 'th').system).toMatch(/[\u0E00-\u0E7F]/);
     expect(p).not.toContain('USD 3000');
     expect(p).not.toContain('cook');
   });

@@ -2,7 +2,7 @@
   "_meta": {
     "reviewed": false
   },
-  "seen_other": "มีรายงานจากผู้ใช้ SafeRoute คนอื่น {{count}} ครั้งใน 30 วันที่ผ่านมา",
+  "seen_other": "มีรายงานจากผู้ใช้ $t(common:appName) คนอื่น {{count}} ครั้งใน 30 วันที่ผ่านมา",
   "title": "รายงานความเสี่ยง",
   "a11yVerdict": "{{verdict}} ระดับ {{step}} จาก 3",
   "warn": "เตือนครอบครัว",
@@ -24,6 +24,7 @@
   "domainAgeUnknown": "ไม่ทราบอายุเว็บไซต์",
   "webRisk": {
     "clean": "ไม่พบภัยคุกคามที่ทราบ",
+    "notListed": "ไม่อยู่ในรายการของ Google",
     "malware": "คำเตือนมัลแวร์",
     "social_engineering": "คำเตือนการหลอกลวงหรือขโมยข้อมูล",
     "unwanted_software": "คำเตือนโปรแกรมที่ไม่พึงประสงค์",
@@ -34,8 +35,8 @@
     "withValue": "บล็อก {{value}} ในแอปที่คุณพบ",
     "generic": "บล็อกและรายงานผู้ส่งในแอปที่คุณพบ"
   },
-  "shareMessage": "SafeRoute ตรวจสอบ: {{title}}\n{{summary}}\nคะแนนความเสี่ยง {{score}}/100",
-  "warnMessage": "คำเตือนจาก SafeRoute ({{verdict}}): {{title}}. {{summary}} โปรดอย่าโอนเงินหรือส่งเอกสาร โทรหาฉันก่อนนะ",
+  "shareMessage": "$t(common:appName) ตรวจสอบ: {{title}}\n{{summary}}\nคะแนนความเสี่ยง {{score}}/100",
+  "warnMessage": "คำเตือนจาก $t(common:appName) ({{verdict}}): {{title}}. {{summary}} โปรดอย่าโอนเงินหรือส่งเอกสาร โทรหาฉันก่อนนะ",
   "thanks": "ขอบคุณ ข้อมูลนี้ช่วยปกป้องคนอื่นได้",
   "attention": {
     "word": {

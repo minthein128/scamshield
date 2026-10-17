@@ -1,6 +1,6 @@
 # shield-module
 
-Expo module for Android. It draws a floating bubble over other apps. A tap captures the screen with MediaProjection, posts one JPEG to `${apiUrl}/v1/check` (kind `screen`, see `docs/api-contract.md`) and shows the verdict on the bubble and in a compact result pill that expands into a sheet. A double tap (or "Ask" on a result) starts the voice companion: the user talks to SafeRoute about the screen while they keep using the other app.
+Expo module for Android. It draws a floating bubble over other apps. A tap captures the screen with MediaProjection, posts one JPEG to `${apiUrl}/v1/check` (kind `screen`, see `docs/api-contract.md`) and shows the verdict on the bubble and in a compact result pill that expands into a sheet. A double tap (or "Ask" on a result) starts the voice companion: the user talks to Kakwe about the screen while they keep using the other app.
 
 ## Layout
 
@@ -173,7 +173,7 @@ Bubble gesture, with a result card showing:
 
 ## Notifications
 
-The foreground-service notification is neutral: title "SafeRoute", text "Ready when you need it", channel "SafeRoute", `VISIBILITY_PRIVATE` with a public version that shows only "SafeRoute" (`ShieldNotification.kt`). It never names a check, a verdict or a scam. Message Guard warnings are separate (`MessageGuardNotifier.kt`).
+The foreground-service notification is neutral: title "Kakwe", text "Ready when you need it", channel "Kakwe", `VISIBILITY_PRIVATE` with a public version that shows only "Kakwe" (`ShieldNotification.kt`). It never names a check, a verdict or a scam. Message Guard warnings are separate (`MessageGuardNotifier.kt`).
 
 ## Message Guard
 
@@ -181,11 +181,16 @@ Off by default. Turning it on is a three-step opt-in: the in-app consent screen 
 
 Flow for each notification:
 
-1. Drop it unless the package belongs to an app the user picked: the default SMS app (`Telephony.Sms.getDefaultSmsPackage`), Google Messages, WhatsApp (and Business), Viber, Telegram, LINE, Messenger, Zalo or Signal. No app is on by default. Email and banking apps are never in the list. Group summaries and ongoing notifications are dropped too.
-2. Score it on the device. Signals and weights are in `message_guard_keywords.json` (link 2, shortener +1, payment 2, OTP 2, account 2, urgency 1, parcel 2, bank 2, job 2, chat-app move 1, unknown sender 1). A score of 3 or more passes. English, Bahasa, Tagalog and Burmese lists are scanned for every message, whatever the app language.
-3. A short message with a code word, a 4 to 8 digit code, no link and no phone number is a genuine OTP. It is skipped before scoring and never leaves the device.
-4. Redact (below), log the redacted text on the device, then send `{ kind: "message", text, language, shareSignals }` with the Firebase token if the app set one.
-5. `careful` or `danger`: post a discreet notice (below). `safe` shows nothing. The result also goes through `ShieldBridge.publishResult`, so it reaches `onShieldResult` and `takeUnsyncedResults` with `kind: "message"`, and is stored in the no-backup directory so the deep link still works after the process was killed.
+1. Drop it unless the package belongs to an app the user picked: the SMS app, Google Messages, WhatsApp (and Business), Viber, Telegram (and Telegram X), LINE, Messenger, Zalo or Signal. "SMS" covers the default SMS app (`Telephony.Sms.getDefaultSmsPackage`) when it is not in the list above, plus phone makers' SMS apps (`MessageApps.oemSms`: Samsung, AOSP/Xiaomi/Huawei `com.android.mms`, OnePlus, Sony, Motorola, HTC). No app is on by default. Email and banking apps are never in the list. Ongoing and foreground-service notifications are dropped. A group summary is dropped when the app also posted a child; otherwise it is read.
+2. Read the newest message: the last MessagingStyle message (skipped when it is the user's own reply: no sender, or the `EXTRA_MESSAGING_PERSON` / self display name), then `EXTRA_BIG_TEXT`, then the last `EXTRA_TEXT_LINES` line, then `EXTRA_TEXT`. Placeholders an app shows when its preview is off ("New message", "3 new messages", "Pesan baru", "ข้อความใหม่" and others in `MessageGuardExtractor`) are skipped as hidden previews.
+3. Score it on the device. Signals and weights are in `message_guard_keywords.json` (link 2, shortener +1, payment 2, OTP 2, account 2, urgency 1, parcel 2, bank 2, job 2, chat-app move 1, unknown sender 1). A score of 3 or more passes. English, Bahasa, Tagalog, Burmese and Thai lists are scanned for every message, whatever the app language. Thai has no spaces between words, so Thai entries are whole phrases ("บัญชีของคุณ", "ไม่ต้องมีประสบการณ์"), never single short words.
+4. A short message with a code word, a 4 to 8 digit code, no link and no phone number is a genuine OTP. It is skipped before scoring and never leaves the device.
+5. Redact (below), log the redacted text on the device, then send `{ kind: "message", text, language, shareSignals }` with the Firebase token if the app set one.
+6. `careful` or `danger`: post a discreet notice (below). `safe` shows nothing. The result also goes through `ShieldBridge.publishResult`, so it reaches `onShieldResult` and `takeUnsyncedResults` with `kind: "message"`, and is stored in the no-backup directory so the deep link still works after the process was killed.
+
+### Decision record
+
+Every notification from an app the user chose gets one outcome code while Message Guard is on or paused (`MessageGuardActivity.kt`, `activity.json` in the no-backup directory, last 100 events, 7 days). Notifications from any other app leave no record: no code, no time, no count. Codes: `skipped_paused`, `skipped_self`, `skipped_no_text`, `skipped_hidden_preview`, `skipped_too_short`, `skipped_otp`, `skipped_not_risky`, `skipped_duplicate`, `skipped_rate_limited`, `sent`, then `check_failed:<kind>` (`no_server`, `bad_url`, `timeout`, `no_connection`, `network`, `server_<status>`, `unreadable`, `unknown`) or `result:<verdict>`, with `:notice_blocked` when Android would not show the notice. Group summaries and ongoing notifications only add to the counts. An event holds the time, the app id (`viber`, `sms`) and the code; never text, sender or title. Turning Message Guard off clears it. `getMessageGuardActivity(afterSeq)` returns new events and the counts; the app copies them into the Diagnostics log (area `messageGuard`). `getMessageGuardStatus()` also returns `listenerConnected`, `notificationsEnabled`, `batteryOptimized`, `missingApps` and `last`, which the card shows. `openBatteryOptimizationSettings()` opens the battery optimisation list (no `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` permission). A safe result posts no notice by design; the card's "Last activity" line shows that a message was seen.
 
 The Burmese lists are Unicode text. Zawgyi-encoded messages do not match. Tune the JSON, then run `./gradlew :shield-module:testDebugUnitTest`.
 
@@ -193,18 +198,18 @@ The Burmese lists are Unicode text. Zawgyi-encoded messages do not match. Tune t
 
 | Topic | Rule |
 | --- | --- |
-| Consent | Shown in the app before the system screen: what it reads, what leaves the phone, what never leaves, who processes it (SafeRoute's server and Google's AI), that it can be turned off, and that anyone holding the phone may see notices. "Turn on" and "Not now" have equal weight. Turning an extra app on asks again. Turning Message Guard off withdraws consent and clears the app list. Installs from before consent existed stay off. |
+| Consent | Shown in the app before the system screen: what it reads, what leaves the phone, what never leaves, who processes it (Kakwe's server and Google's AI), that it can be turned off, and that anyone holding the phone may see notices. "Turn on" and "Not now" have equal weight. Turning an extra app on asks again. Turning Message Guard off withdraws consent and clears the app list. Installs from before consent existed stay off. |
 | Sender | The notification title, sender, chat title and other participants never leave the device. A `Name:` prefix is cut from the text; a two-word or longer sender name is replaced with `[NAME]` anywhere in the text. A one-word title such as a brand name stays in the body. |
 | Redaction | Emails `[EMAIL]`, phone numbers `[PHONE]`, other runs of 6 or more digits `[NUMBER]`, a code next to a code word `[CODE]`. Account and card numbers become `[ACCOUNT]`: numbers after an account word (account, card, rekening, a/c, ending in, บัญชี, အကောင့် and others), masked cards (`**** 1234`), 13 to 19 digit runs and IBANs. Links keep scheme and host; path, query and user info become `/[PATH]`. Amounts like `1.500.000` and dates stay. |
 | Names | Conservative heuristic, `[NAME]` replaces the name and keeps the title: capitalised words after Hi, Hello, Dear, Mr, Mrs, Ms, Miss, Dr, Ko, Ma, U, Daw, Khun, Pak, Bu, Kuya, Ate, a.n.; Burmese ဒေါ် and ဦး followed by a space and a name, ကို and မ only after a greeting, at the start of a sentence or before the vocative ရေ; Thai คุณ followed by a name, but not when คุณ is the pronoun ("you") or part of a word such as ขอบคุณ or คุณสมบัติ. Generic words (Customer, Sir, Valued) stay. Names without such a marker are not detected. |
 | Length | Text is cut to 600 characters after redaction. |
 | Limits | The same message (ignoring digits and spacing) is checked once per 10 minutes. At most 20 checks per hour and 60 per day leave the device. The 61st check in a day is not sent; Message Guard pauses itself and the card shows why. Turning it on again resumes it without a new consent. |
 | Transparency log | The last 50 checks, at most 7 days old: time, app name, the exact redacted text and the verdict. Stored in `noBackupFilesDir`, so Android backup does not copy it. Never synced. "What Message Guard sent" on the card shows it and has "Delete all". |
-| Notice | Title "SafeRoute", body "A message may need a second look. Open to see why." in the app language, one "Open" action for `saferoute://report/<id>`. No verdict, no scam words, no quoted text. `VISIBILITY_PRIVATE`; the lock-screen version says only "SafeRoute". One default-importance channel, one gentle vibration for every verdict. |
+| Notice | Title "Kakwe", body "A message may need a second look. Open to see why." in the app language, one "Open" action for `saferoute://report/<id>`. No verdict, no scam words, no quoted text. `VISIBILITY_PRIVATE`; the lock-screen version says only "Kakwe". One default-importance channel, one gentle vibration for every verdict. |
 | Kill switch | "Turn off and remove access" on the card turns Message Guard off and opens Android's notification access screen, so the user can revoke access at the system level. |
 | Auth | The auth token is held in memory only, so a check after the app process died goes out without it and the server limits by IP. |
 
-Tests: `MessageRedactionTest` (multilingual fixtures; asserts that no fixture name, number or email survives), `MessageGuardPrivacyTest` (consent gating, empty default app list, log retention, neutral notice, caps) and `MessageGuardTest` (prefilter, OTP, extractor, request body).
+Tests: `MessageRedactionTest` (multilingual fixtures; asserts that no fixture name, number or email survives), `MessageGuardPrivacyTest` (consent gating, empty default app list, log retention, neutral notice, caps), `MessageGuardTest` (prefilter, OTP, extractor, SMS packages, request body) and `MessageGuardActivityTest` (decision codes, listener paths, status).
 
 ### Google Play declaration
 
@@ -212,7 +217,7 @@ Notification access (`BIND_NOTIFICATION_LISTENER_SERVICE`) is a sensitive permis
 
 ## Voice companion
 
-The user talks to Pyit Taing Htaung (ပစ်တိုင်းထောင်), SafeRoute's roly-poly doll companion, through the bubble while another app stays in front. The overlay windows stay `NOT_FOCUSABLE`, so touches still reach the app below. Rules: `memory live-voice-rules` and `docs/live-audio-contract.md` (companion mode).
+The user talks to Pyit Taing Htaung (ပစ်တိုင်းထောင်), Kakwe's roly-poly doll companion, through the bubble while another app stays in front. The overlay windows stay `NOT_FOCUSABLE`, so touches still reach the app below. Rules: `memory live-voice-rules` and `docs/live-audio-contract.md` (companion mode).
 
 ### Start and end
 
@@ -274,7 +279,7 @@ The doll is `res/drawable-nodpi/companion_doll.png` (192 px, rendered from `asse
 
 The service type is `specialUse|mediaProjection|microphone`. Starting a while-in-use type (microphone) needs the app to be visible: [developer.android.com, restrictions on starting a foreground service from the background](https://developer.android.com/develop/background-work/services/fgs/restrictions-bg-start). The `SYSTEM_ALERT_WINDOW` exemption on that page covers starting a service from the background, not while-in-use access; on Android 14 `startForeground` with type microphone throws `SecurityException` without it.
 
-So the service adds the microphone type while SafeRoute is visible (`startShield`, and `OnActivityEntersForeground` in the module) whenever `RECORD_AUDIO` is granted, and only calls `startForeground` again at session start if the type is missing. If that call throws, the pill shows "Open SafeRoute once to allow voice"; a tap opens the Shield screen, which re-arms the type. On Android 11 to 13 a blocked mic records silence instead of throwing: 4 s of digital silence ends the session with the same notice. Missing `RECORD_AUDIO` shows "Open SafeRoute to allow the microphone". The app asks for it as an optional step when the shield turns on and from the "Talk to Pyit Taing Htaung from the bubble" card.
+So the service adds the microphone type while Kakwe is visible (`startShield`, and `OnActivityEntersForeground` in the module) whenever `RECORD_AUDIO` is granted, and only calls `startForeground` again at session start if the type is missing. If that call throws, the pill shows "Open Kakwe once to allow voice"; a tap opens the Shield screen, which re-arms the type. On Android 11 to 13 a blocked mic records silence instead of throwing: 4 s of digital silence ends the session with the same notice. Missing `RECORD_AUDIO` shows "Open Kakwe to allow the microphone". The app asks for it, after a short reason dialog, from the "Talk to Pyit Taing Htaung from the bubble" card and when the user starts a voice chat. Turning the shield on does not ask for it.
 
 ### Strings
 
@@ -291,8 +296,8 @@ So the service adds the microphone type while SafeRoute is visible (`startShield
 - [ ] Tap the bubble: Muted, the mic indicator goes off; tap again: Listening.
 - [ ] Incoming call or music app: Paused; after the call the session resumes.
 - [ ] End on the pill and a long press both end the session and keep the shield; drag to the close target closes both.
-- [ ] Android 14: kill SafeRoute from recents, start the shield from the Home switch, leave the app, double tap: voice works; if not, the pill says "Open SafeRoute once to allow voice".
-- [ ] "Ask me for the hotline" opens SafeRoute on Get help; TalkBack offers "Talk to Pyit Taing Htaung".
+- [ ] Android 14: kill Kakwe from recents, start the shield from the Home switch, leave the app, double tap: voice works; if not, the pill says "Open Kakwe once to allow voice".
+- [ ] "Ask me for the hotline" opens Kakwe on Get help; TalkBack offers "Talk to Pyit Taing Htaung".
 
 ## Signal sharing
 

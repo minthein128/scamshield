@@ -11,13 +11,15 @@ import type { CheckAction, Verdict } from '../api/types';
 import {
   VERDICT_STYLES,
   groupFlags,
+  linkStatus,
   shareMessage,
+  sourceLines,
   warnMessage,
 } from '../lib/report';
 import { callLabel } from '../lib/callLabel';
 import { scamTypeLabel } from '../lib/labels';
 import { TIER_VERDICT, resultWord, stepWord, tierHeadline } from '../lib/attention';
-import { resolveCallTarget } from '../lib/hotlines';
+import { hotlineFocus, resolveCallTarget } from '../lib/hotlines';
 import { useLayout } from '../hooks/useLayout';
 import { useRuntimeConfig } from '../lib/runtimeConfig';
 import { seenLine } from '../lib/radar';
@@ -97,7 +99,7 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
 
   useRuntimeConfig();
   const callAction = result.actions.find(a => a.type === 'call');
-  const hotline = resolveCallTarget(callAction?.value, profile.destinationCountry, profile.homeCountry);
+  const hotline = resolveCallTarget(callAction?.value, profile.destinationCountry, profile.homeCountry, hotlineFocus(result));
 
   const call = hotline ? callLabel(hotline, { call: number => t('call', { number }), ext: ext => t('callExt', { ext }) }) : { label: '' };
   const talkLabel = t('live:button');
@@ -134,8 +136,8 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
           <BrandMark size={narrow ? 64 : 80} medallion="#FCEFD2" mood={VERDICT_MOOD[level]} />
         </View>
         <View style={styles.bannerText}>
-          <Text style={styles.bannerTitle}>{word}</Text>
-          {result.scamType !== 'none' && !tier ? <Text style={[styles.bannerSub, { color: style.subtle }]}>{scamTypeLabel(result.scamType)}</Text> : null}
+          <Text wrap="word" style={styles.bannerTitle}>{word}</Text>
+          {result.scamType !== 'none' && !tier ? <Text style={[styles.bannerSub, { color: style.subtle }]}>{scamTypeLabel(result.scamType, result.kind)}</Text> : null}
         </View>
       </View>
       <View style={styles.meter} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
@@ -257,14 +259,17 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
       {sources.length > 0 ? (
         <View style={{ gap: 8 }}>
           <SectionTitle>{t('sources')}</SectionTitle>
-          {sources.map(src => (
-            <TouchableOpacity key={src.url} accessibilityRole="link" activeOpacity={0.7} onPress={() => Linking.openURL(src.url).catch(() => undefined)} style={styles.sourceCard}>
-              <View style={{ flex: 1, gap: 4 }}>
-                <Text numberOfLines={2} style={styles.flagLabel}>{src.title}</Text>
-                <Text numberOfLines={1} style={styles.link}>{src.url}</Text>
-              </View>
-            </TouchableOpacity>
-          ))}
+          {sources.map(src => {
+            const lines = sourceLines(src);
+            return (
+              <TouchableOpacity key={src.url} testID="report-source" accessibilityRole="link" activeOpacity={0.7} onPress={() => Linking.openURL(src.url).catch(() => undefined)} style={styles.sourceCard}>
+                <View style={{ flex: 1, gap: 4 }}>
+                  <Text numberOfLines={2} style={styles.flagLabel}>{lines.title}</Text>
+                  {lines.domain ? <Text numberOfLines={1} style={styles.link}>{lines.domain}</Text> : null}
+                </View>
+              </TouchableOpacity>
+            );
+          })}
         </View>
       ) : null}
 
@@ -272,8 +277,9 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
         <View style={{ gap: 8 }}>
           <SectionTitle>{t('linkChecks')}</SectionTitle>
           {result.linkChecks.map(link => {
-            const clean = link.webRisk === 'clean';
-            const unchecked = link.webRisk === 'unknown';
+            const status = linkStatus(link, result.flags, result.linkChecks);
+            const clean = status === 'clean';
+            const unchecked = status === 'unknown' || status === 'notListed';
             return (
               <View key={link.url} style={styles.sourceCard}>
                 <View style={{ flex: 1, gap: 4 }}>
@@ -283,11 +289,13 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
                     {link.registrar ? `, ${link.registrar}` : ''}
                   </Text>
                 </View>
-                <Pill
-                  label={t(`webRisk.${link.webRisk}`)}
-                  background={clean ? colors.safeBg : unchecked ? colors.borderLight : colors.dangerSoftBg}
-                  color={clean ? colors.safeText : unchecked ? colors.textSecondary : colors.dangerSoftText}
-                />
+                <View testID={`link-status-${status}`} style={styles.linkPill}>
+                  <Pill
+                    label={t(`webRisk.${status}`)}
+                    background={clean ? colors.safeBg : unchecked ? colors.borderLight : colors.dangerSoftBg}
+                    color={clean ? colors.safeText : unchecked ? colors.textSecondary : colors.dangerSoftText}
+                  />
+                </View>
               </View>
             );
           })}
@@ -404,6 +412,7 @@ const styles = StyleSheet.create({
   flagCard: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, paddingVertical: 16, paddingRight: 16, paddingLeft: 16, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.border, borderRadius: 16, overflow: 'hidden' },
   flagBar: { position: 'absolute', left: 0, top: 0, bottom: 0, width: 4 },
   flagIcon: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
+  linkPill: { maxWidth: '42%', flexShrink: 1, alignItems: 'flex-end' },
   sourceCard: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, paddingHorizontal: 16, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.border, borderRadius: 12 },
   flagLabel: { fontSize: 15, lineHeight: 22, fontFamily: fonts.bold, color: colors.textPrimary },
   flagEvidence: { fontSize: 14, lineHeight: 20, fontFamily: fonts.regular, color: colors.textSecondary },

@@ -1,6 +1,12 @@
-# SafeRoute brand
+# Kakwe brand
 
 TLDR: the mark is the Pyit Taing Htaung, the Myanmar roly-poly doll that always gets back up. Lacquer red and gold belong to the doll and the logo. Buttons and links are lacquer black. Verdict colours keep their meaning, and high risk is a deep crimson that never appears as branding.
+
+## Name
+
+The app is named Kakwe. When the app language is Burmese the UI, spoken lines and share text say ကာကွယ်. The single source is the i18n key `common:appName` (`src/config/brand.ts` reads it; native overlay and notification text receive it through `ShieldStrings.appName`; the server uses `server/src/brand.ts`). The Android launcher label is "Kakwe", with ကာကွယ် for a Burmese device locale through `plugins/with-localized-app-name.js`. The launcher follows the device locale, not the in-app language.
+
+The old name stays in identifiers that would break installs, sign-in or links: the Android package `com.saferoute.antifraud`, the Kotlin package `com.saferoute.shield`, the `saferoute://` link scheme, storage keys, the Firebase project `saferoute-aibc`, the domains `saferoute-aibc.web.app` and `saferoute-api.akkhayar.com`, and env var names. The doll stays "Pyit Taing Htaung".
 
 ## Mark
 
@@ -12,7 +18,7 @@ The app icon is the doll on a gold medallion on a lacquer-black tile (concept B 
 | Android themed icon | One-colour silhouette with the face window, eyes and smile cut out |
 | Light grounds (header, onboarding, empty states) | The doll standing free |
 | Dark grounds (Screen shield card, Checking screen, dark logo) | The doll on a gold medallion |
-| Logo lockup | Doll + "Safe" in ink and "Route" in lacquer red (white and gold on dark) |
+| Logo lockup | Doll + "Kak" in ink and "we" in lacquer red (white and gold on dark). In Burmese the app shows ကာကွယ် in one colour |
 
 The doll geometry lives in `src/components/dollMark.ts`. `BrandMark` draws it in the app, and `scripts/render-brand.mjs` renders every asset and the contact sheet from the same paths (`BRAND_TOOLS=<dir with sharp and opentype.js> node scripts/render-brand.mjs`).
 

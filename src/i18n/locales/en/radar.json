@@ -1,7 +1,7 @@
 {
   "title": "Scam radar",
-  "intro_one": "What other SafeRoute users reported in the last 30 days. Only patterns seen at least {{count}} time are shown.",
-  "intro_other": "What other SafeRoute users reported in the last 30 days. Only patterns seen at least {{count}} times are shown.",
+  "intro_one": "What other $t(common:appName) users reported in the last 30 days. Only patterns seen at least {{count}} time are shown.",
+  "intro_other": "What other $t(common:appName) users reported in the last 30 days. Only patterns seen at least {{count}} times are shown.",
   "global": "Global",
   "empty": {
     "title": "Not enough reports yet",

@@ -26,11 +26,19 @@ function appOf(env: Record<string, string>) {
 }
 
 describe('apk download', () => {
-  it('returns 404 JSON when APK_PATH is unset or the file is missing', async () => {
-    for (const env of [{} as Record<string, string>, { APK_PATH: join(dir, 'missing.apk') }]) {
-      const res = await appOf(env).request('/download/saferoute.apk');
-      expect(res.status).toBe(404);
-      expect(((await res.json()) as { error: { code: string } }).error.code).toBe('bad_request');
+  it('returns 404 JSON when the APK file is missing', async () => {
+    const res = await appOf({ APK_PATH: join(dir, 'missing.apk') }).request('/download/saferoute.apk');
+    expect(res.status).toBe(404);
+    expect(((await res.json()) as { error: { code: string } }).error.code).toBe('bad_request');
+  });
+
+  it('redirects to the hosted APK with no-store when APK_PATH is unset', async () => {
+    const app = appOf({});
+    for (const path of ['/download', '/download/saferoute.apk']) {
+      const res = await app.request(path);
+      expect(res.status).toBe(302);
+      expect(res.headers.get('location')).toBe('https://saferoute-aibc.web.app/saferoute.apk');
+      expect(res.headers.get('cache-control')).toBe('no-store');
     }
   });
 
@@ -38,7 +46,7 @@ describe('apk download', () => {
     const res = await appOf({ APK_PATH: file }).request('/download/saferoute.apk');
     expect(res.status).toBe(200);
     expect(res.headers.get('content-type')).toBe('application/vnd.android.package-archive');
-    expect(res.headers.get('content-disposition')).toBe('attachment; filename="SafeRoute.apk"');
+    expect(res.headers.get('content-disposition')).toBe('attachment; filename="Kakwe.apk"');
     expect(res.headers.get('content-length')).toBe('5000');
     expect(res.headers.get('cache-control')).toBe('no-cache');
     expect(res.headers.get('etag')).toMatch(/^"[0-9a-f]+-1388"$/);

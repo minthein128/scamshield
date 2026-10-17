@@ -143,8 +143,13 @@ function signal(
   lang: Lang,
   geographic = false,
 ): JobFlag {
-  const evidence = f.quote ? `${SOURCE_NAME[source][lang]}: "${f.quote}"` : SOURCE_NAME[source][lang];
+  const evidence = sourceEvidence(source, f.quote, lang);
   return { family, label: SIGNAL_LABEL[code][lang], evidence, severity, field, source, ...(geographic ? { geographic } : {}) };
+}
+
+/** `Ad: "quote"`, or only the source name when the user typed the fact and there is no quote. */
+function sourceEvidence(source: 'ad' | 'chat', quote: string, lang: Lang): string {
+  return quote.trim() ? `${SOURCE_NAME[source][lang]}: "${quote}"` : SOURCE_NAME[source][lang];
 }
 
 /** Signals one source shows on its own: passport, documents, secrecy, payment, visa, pickup, border route. */
@@ -209,8 +214,8 @@ export function collectFlags(ad: JobFacts | null, chat: JobFacts | null, conflic
     family: c.family,
     label: c.description,
     evidence: c.adQuote
-      ? `${SOURCE_NAME.ad[lang]}: "${c.adQuote}" / ${SOURCE_NAME.chat[lang]}: "${c.chatQuote}"`
-      : `${SOURCE_NAME.chat[lang]}: "${c.chatQuote}"`,
+      ? `${sourceEvidence('ad', c.adQuote, lang)} / ${sourceEvidence('chat', c.chatQuote, lang)}`
+      : sourceEvidence('chat', c.chatQuote, lang),
     severity: c.severity,
     field: c.field,
     source: 'both',
