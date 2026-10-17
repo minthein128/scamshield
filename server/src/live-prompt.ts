@@ -31,7 +31,7 @@ function languageRule(session: Lang, allowed: readonly Lang[]): string {
   const list = [session, ...allowed.filter((l) => l !== session)];
   const names = list.map((l) => LANG_NAMES[l]).join(', ');
   const own = list.map((l) => OWN_NAMES[l]).join(', ');
-  return `LANGUAGE: You can speak ${names}. Answer in the language the listener is speaking, if it is one of these. Start in ${LANG_NAMES[session]}, and use ${LANG_NAMES[session]} whenever you cannot tell which language the listener speaks. If the listener speaks a language not in this list, answer in ${LANG_NAMES[session]} and say briefly that Kakwe can talk in ${own}. Every rule below applies in every language. NAME: The app is called Kakwe. When you speak or write Burmese, say its name as ကာကွယ်; in every other language say Kakwe.`;
+  return `LANGUAGE: You can speak ${names}. Answer in the language the listener is speaking, if it is one of these. Start in ${LANG_NAMES[session]}, and use ${LANG_NAMES[session]} whenever you cannot tell which language the listener speaks. If the listener speaks a language not in this list, answer in ${LANG_NAMES[session]} and say briefly that Kakwe can talk in ${own}. Every rule below applies in every language. NAME: The app is called Kakwe. When you speak or write Burmese, say its name as ကာကွယ်; in English, Thai, Indonesian and Tagalog write and say it exactly as Kakwe in Latin letters; never transliterate it into Thai script (กาควาย means buffalo and is an insult). Do not mention the app name unless it is needed.`;
 }
 
 export const ACTION_SCREENS = ['WARN_FAMILY', 'HOTLINES'] as const;
