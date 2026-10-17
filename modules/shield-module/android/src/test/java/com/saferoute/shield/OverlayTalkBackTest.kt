@@ -26,7 +26,8 @@ class OverlayTalkBackTest {
         fun json(ns: String) = org.json.JSONObject(File(root, "src/i18n/locales/$lang/$ns.json").readText())
         val companion = json("live").getJSONObject("companion")
         val map = HashMap<String, Any?>()
-        companion.keys().forEach { map[it] = companion.getString(it) }
+        val appName = json("common").getString("appName")
+        companion.keys().forEach { map[it] = companion.getString(it).replace("\$t(common:appName)", appName) }
         val verdict = json("common").getJSONObject("verdict")
         map["verdictSafe"] = verdict.getString("safe")
         map["verdictCareful"] = verdict.getString("careful")
