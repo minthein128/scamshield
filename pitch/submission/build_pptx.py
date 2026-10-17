@@ -188,22 +188,23 @@ def delete_slide(prs, index):
 def team_details(s):
     tb = find_shape(s, 'Team Details')
     tb.width = Inches(8.0)
+    tb.top = Inches(3.0)
+    blank = tb.text_frame.paragraphs[1]
+    if not ''.join(r.text for r in blank.runs).strip():
+        blank._p.getparent().remove(blank._p)
     pars = tb.text_frame.paragraphs
     for p in pars:
         t = ''.join(r.text for r in p.runs)
         if t.startswith('Team name'):
-            append_after(p, 'Kakwe (', bold=False)
-            r = append_after(p, 'ကာကွယ်', bold=False)
-            set_typeface(r._r.find(qn('a:rPr')), MY_FONT)
-            r2 = append_after(p, ')', bold=False)
-            set_typeface(r2._r.find(qn('a:rPr')), FONT)
+            append_after(p, 'Super Power Rangers')
         elif t.startswith('Team leader'):
-            append_after(p, 'Ricky')
+            append_after(p, 'Pyae Sone Myo (Ricky)')
+            append_after(p, '   Members: Min Thein Kyaw, May Myat Noe Aung', size=12)
         elif t.startswith('Problem Statement'):
             append_after(p, 'Recruitment ads on Facebook, Viber and Telegram lure young job seekers from Myanmar and '
                             'the region into forced online scam work; OHCHR says at least 120,000 people in Myanmar may '
-                            'be held in it. They need to see the warning signs, in their own language, before they pay, '
-                            'send documents or travel.', size=12.5)
+                            'be held in it. Kakwe helps them see the warning signs, in their own language, before they '
+                            'pay, send documents or travel.', size=12)
     picture(s, 'medallion', 8.55, 3.15, w=1.05)
 
 
@@ -262,7 +263,7 @@ def features(s):
         ('Check anything', 'Paste a message or link, or share a screenshot. Get Low risk, Be careful or High risk, with the quoted words.'),
         ('Job Shield', 'Compares the job ad with what the recruiter asks in chat and shows each gap.'),
         ('Screen bubble', 'Android. A floating doll checks whatever is on screen, in any app, with one tap.'),
-        ('Message Guard', 'Android, opt-in. Watches the chat apps you choose and flags risky messages.'),
+        ('Scam radar', 'Shows which scams people are reporting right now, from opt-in anonymous signals.'),
         ('Voice companion', 'Talk to Pyit Taing Htaung about a report, in your language, on Gemini Live.'),
         ('Warn my family', 'Sends the warning to a trusted contact by SMS or the share sheet.'),
         ('Scam network', 'Opt-in. Repeat numbers and handles, kept as keyed hashes, raise the next warning.'),
@@ -352,7 +353,7 @@ def technologies(s):
         ('Cloud Run, asia-southeast1', 'Hosts the check API and the voice relay'),
         ('Expo 52, React Native 0.76, TypeScript', 'The Android app and the web demo'),
         ('Hono on Node 22, TypeScript', 'The check API, the rules engine and the voice relay'),
-        ('Kotlin Android module', 'The screen bubble and Message Guard'),
+        ('Kotlin Android module', 'The screen bubble overlay'),
     ]
     shape = s.shapes.add_table(len(rows) + 1, 2, Inches(LEFT), Inches(TOP), Inches(9.26), Inches(0.33 * (len(rows) + 1)))
     tbl = shape.table
@@ -405,9 +406,9 @@ def cost(s):
 
 
 def snapshots(s):
-    items = [('ph-check', 'Check: pick what to check'), ('ph-danger-en', 'High risk report'),
-             ('ph-jobshield', "Job Shield: what doesn't match"), ('ph-bubble', 'Screen bubble (Android)'),
-             ('ph-report-my', 'Burmese report, voice and family')]
+    items = [('ph-home', 'Home: the shield circle'), ('ph-check', 'Check: pick what to check'),
+             ('ph-danger-en', 'High risk report'), ('ph-jobshield', "Job Shield: what doesn't match"),
+             ('ph-bubble', 'Screen bubble (Android)')]
     h = 3.3
     iw, ih = Image.open(ART / 'ph-danger-en.png').size
     w = h * iw / ih
@@ -416,7 +417,7 @@ def snapshots(s):
         x = LEFT + i * (w + gap)
         picture(s, name, x, TOP - 0.02, w=w, h=h)
         text(s, x - 0.15, TOP + h + 0.04, w + 0.3, 0.42, [[(cap, {'bold': True})]], size=10, align=PP_ALIGN.CENTER)
-    note(s, 'Web build captures with fictional inputs and the built-in demo data. The bubble shows the Android '
+    note(s, 'Web build of the release commit against the live API, with fictional inputs. The bubble shows the Android '
             'overlay views on a drawn chat.')
 
 
@@ -449,7 +450,7 @@ def future(s):
             'More languages for the region', 'Pilots with migrant worker NGOs']
     limits = ['Burmese app strings are machine translated and not yet reviewed by a native speaker.',
               'Real-screenshot labels are drafts from two models, so that score is provisional.',
-              'The web demo has no screen bubble or Message Guard; both need Android.']
+              'The web demo has no screen bubble; it needs the Android app.']
     text(s, LEFT, TOP, 4.4, 0.3, [[('Next', {'bold': True, 'size': 13})]])
     for i, t in enumerate(road):
         y = TOP + 0.42 + i * 0.68
@@ -482,7 +483,8 @@ def links(s):
     text(s, LEFT + 0.2, y + 0.14, 8.9, 1.3, [
         ([('Public dataset: ', {'bold': True}), ('https://huggingface.co/datasets/Rickaym/saferoute-scam-screenshots',
           {'link': 'https://huggingface.co/datasets/Rickaym/saferoute-scam-screenshots', 'color': INK2})], {}),
-        ([('Team: ', {'bold': True}), ('Ricky (team leader), Min Thein Kyaw', {'color': INK2})], {'space': 8}),
+        ([('Team: ', {'bold': True}), ('Super Power Rangers. Pyae Sone Myo (Ricky), team leader; Min Thein Kyaw; '
+          'May Myat Noe Aung', {'color': INK2})], {'space': 8}),
         ([('Contact: ', {'bold': True}), ('support@akkhayar.com', {'color': INK2, 'link': 'mailto:support@akkhayar.com'})], {'space': 8}),
     ], size=12)
     picture(s, 'medallion', 8.4, 2.8, w=0.95)
@@ -496,7 +498,7 @@ def safety(s, heading_src):
     rules = [
         ('Likelihood words', '"Shows signs of", never "is a scam". A guard rewrites certainty phrases in all five languages.'),
         ('No accusations', 'No named person, company, number or handle is called a criminal.'),
-        ('Consent first', 'Signal sharing and Message Guard stay off until the user turns them on.'),
+        ('Consent first', 'Sharing is off until turned on. Overlay, screen capture, microphone, notifications and contacts are asked only when needed.'),
         ('Hashed indicators', 'Phone numbers and handles are kept as one-way hashes; signals expire after 90 days.'),
         ('Leave quickly', 'One button on every report clears the screen back to Home and stops audio.'),
         ('Slim sync, 18+', 'History keeps the verdict, a score band, the title and the summary, and can be turned off.'),

@@ -28,7 +28,7 @@ The script uses Chromium from the Playwright or Puppeteer cache (set `CHROME` to
 pitch/submission/build.sh
 ```
 
-Needs uv, headless Chromium, LibreOffice Impress and Google Sans Flex in `~/.local/share/fonts`. The wireframe slide uses the approved Home and Check v3 mockups from `~/work/home-check-v2-handoff/home` and `check` (set `MOCK_DIR` to override). Its screenshots are `verdict-report-danger-390x844-*`, `kakwe-check-en`, `kakwe-report-my`, `kakwe-settings-en`, `jobshield-result-conflicts-pause-en-390x844` and `bubble-doll-states`; none shows the old name.
+Needs uv, headless Chromium, LibreOffice Impress and Google Sans Flex in `~/.local/share/fonts`. The wireframe slide uses the approved Home and Check v3 mockups from `~/work/home-check-v2-handoff/home` and `check` (set `MOCK_DIR` to override). Its phone screens are `deck-*` (Home, Check, High risk report, Job Shield), captured by `scripts/e2e-deck.mjs` from the release commit against the live API, plus `kakwe-settings-en` and `bubble-doll-states`; none shows the old name or Message Guard.
 
 ## Screens in the deck
 

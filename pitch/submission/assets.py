@@ -51,11 +51,11 @@ def phone(name, src, screen_h=None, top=0, width=330):
     shot(name, body, width + 26, h + 26)
 
 
-phone('ph-danger-en', e2e('verdict-report-danger-390x844-en.png'), 694)
-phone('ph-danger-my', e2e('verdict-report-danger-390x844-my.png'), 694)
-phone('ph-jobshield', e2e('jobshield-result-conflicts-pause-en-390x844.png'), 694, -20)
-phone('ph-check', e2e('kakwe-check-en.png'), 694, -20)
-phone('ph-report-my', e2e('kakwe-report-my.png'), 694, -20)
+phone('ph-danger-en', e2e('deck-report-danger-en.png'), 694)
+phone('ph-danger-my', e2e('deck-report-danger-my.png'), 694)
+phone('ph-jobshield', e2e('deck-job-conflicts-en.png'), 694)
+phone('ph-check', e2e('deck-check-message-en.png'), 694)
+phone('ph-home', e2e('deck-home-on-en.png'), 694)
 phone('ph-settings', e2e('kakwe-settings-en.png'), 640, -262)
 bubble = """<div class="phone"><div class="screen schem" style="width:330px;height:694px;position:relative">
 <div class="bar" style="left:28px;top:34px;width:150px;height:22px;background:#CFC5B9"></div>
