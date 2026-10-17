@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { View, StyleSheet, ScrollView } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import * as Clipboard from 'expo-clipboard';
 import { Screen } from '../components/Screen';
@@ -35,6 +35,7 @@ interface SourceProps {
   busy: boolean;
   hasClip: boolean;
   notice?: string | null;
+  onReveal?: (node: View | null) => void;
   focusKey?: number;
   onText: (value: string) => void;
   onClip: () => void;
@@ -51,12 +52,17 @@ async function readClipboard(): Promise<string> {
 }
 
 /** One card: a text box with an OR line and the upload box, or the picture and text once added. */
-const SourceCard: React.FC<SourceProps> = ({ id, title, optional, hint, a11y, placeholder, text, image, busy, hasClip, notice, focusKey, onText, onClip, onPick, onRemove }) => {
+const SourceCard: React.FC<SourceProps> = ({ id, title, optional, hint, a11y, placeholder, text, image, busy, hasClip, notice, onReveal, focusKey, onText, onClip, onPick, onRemove }) => {
   const { t } = useTranslation(['check', 'common']);
   const empty = !image && !text;
+  const noticeRef = useRef<View>(null);
   return (
     <CheckCard testID={id} title={title} optional={optional} hint={image ? undefined : hint}>
-      {notice ? <Notice testID={`${id}-notice`} message={notice} /> : null}
+      {notice ? (
+        <View ref={noticeRef} onLayout={() => onReveal?.(noticeRef.current)}>
+          <Notice testID={`${id}-notice`} message={notice} />
+        </View>
+      ) : null}
       {image ? (
         <FileCard
           testID={`${id}-file`}
@@ -95,6 +101,14 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<{ id: string; message: string } | null>(null);
   const hasClip = useClipboardHasText();
+  const scrollRef = useRef<ScrollView>(null);
+
+  const reveal = useCallback((node: View | null) => {
+    const scroller = scrollRef.current;
+    const inner = scroller?.getInnerViewNode?.();
+    if (!node || !scroller || !inner) return;
+    node.measureLayout(inner, (_x, y) => scroller.scrollTo({ y: Math.max(0, y - 150), animated: true }), () => undefined);
+  }, []);
 
   const attachImage = useCallback(async (loader: () => Promise<PreparedImage | null>, target: (image: PreparedImage) => void = setImage, cardId = 'check') => {
     setBusy(true);
@@ -171,11 +185,12 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
     navigation.getParent()?.navigate('Checking', { request: buildRequest(form), source: sourceLabel(form) });
   };
 
-  const common = { busy, hasClip };
+  const common = { busy, hasClip, onReveal: reveal };
   const added = [hasInput({ text, imageBase64: image?.base64 }) ? t('job.added.ad') : '', hasInput({ text: chatText, imageBase64: chatImage?.base64 }) ? t('job.added.chat') : ''].filter(Boolean);
 
   return (
     <Screen
+      scrollRef={scrollRef}
       header={
         <View style={styles.headRow}>
           <View style={{ flex: 1 }}>

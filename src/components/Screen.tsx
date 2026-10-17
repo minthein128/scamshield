@@ -19,9 +19,10 @@ interface ScreenProps {
   footerRow?: boolean;
   /** Overrides the footer spacing for screens that need a tighter footer. */
   footerStyle?: StyleProp<ViewStyle>;
+  scrollRef?: React.Ref<ScrollView>;
 }
 
-export const Screen: React.FC<ScreenProps> = ({ children, footer, edges = ['top'], background = theme.colors.background, contentStyle, scroll = true, wide, footerRow, header, footerStyle }) => {
+export const Screen: React.FC<ScreenProps> = ({ children, footer, edges = ['top'], background = theme.colors.background, contentStyle, scroll = true, wide, footerRow, header, footerStyle, scrollRef }) => {
   const layout = useLayout();
   const [lifted, setLifted] = useState(false);
   const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -50,6 +51,7 @@ export const Screen: React.FC<ScreenProps> = ({ children, footer, edges = ['top'
       ) : null}
       {scroll ? (
         <ScrollView
+          ref={scrollRef}
           style={styles.flex}
           contentContainerStyle={tablet ? [styles.tabletContent, padX, topPad] : [styles.content, contentStyle, topPad]}
           keyboardShouldPersistTaps="handled"
