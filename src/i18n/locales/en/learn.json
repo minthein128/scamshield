@@ -155,10 +155,10 @@
     "parcel": {
       "e1": {
         "title": "A message arrives",
-        "caption": "$t(common:appName) warns you before you open the link."
+        "caption": "Tap the doll before you open the link."
       },
       "e2": {
-        "title": "Tap to see why",
+        "title": "The result",
         "caption": "You see the reasons. Do not open the link."
       }
     },

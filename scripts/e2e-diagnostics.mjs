@@ -26,7 +26,6 @@ const SAMPLE = [
   e(25, 'warn', 'api', 'request_failed', { endpoint: 'check', kind: 'rate_limited', ms: 310, status: 429 }),
   e(18, 'error', 'api', 'request_failed', { endpoint: 'jobExtract', kind: 'timeout', ms: 75000 }),
   e(18, 'error', 'jobShield', 'extract_failed', { code: 'timeout', unreadable: false }),
-  e(12, 'warn', 'messageGuard', 'paused', { reason: 'daily_limit' }),
   e(9, 'error', 'live', 'error', { code: 'unavailable', fallback: true, ms: 8001 }),
   e(5, 'error', 'sync', 'pull_failed', { code: 'permission-denied' }),
   e(2, 'info', 'connection', 'health', { host: 'saferoute-api.akkhayar.com', ok: true, ms: 188, status: 200 }),

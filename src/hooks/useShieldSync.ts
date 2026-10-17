@@ -4,14 +4,14 @@ import { addShieldResultListener, takeUnsyncedResults } from 'shield-module';
 import type { LanguageCode } from '../api/types';
 import type { CheckResponse } from '../api/types';
 import { diag, errorCode } from '../lib/diagLog';
-import { sourceLabel, toCheckResponse } from '../lib/shield';
+import { SCREEN_SOURCE, toCheckResponse } from '../lib/shield';
 
 export function useShieldSync(save: (result: CheckResponse, language: LanguageCode, source?: string) => Promise<void>, language: LanguageCode): void {
   useEffect(() => {
     if (Platform.OS !== 'android') return;
     const saveResult = (r: Parameters<typeof toCheckResponse>[0]) => {
       diag.info('shield', 'result', { kind: r.kind, verdict: r.verdict });
-      return save(toCheckResponse(r), language, sourceLabel(r.kind)).catch(() => diag.error('shield', 'result_save_failed', { kind: r.kind }));
+      return save(toCheckResponse(r), language, SCREEN_SOURCE).catch(() => diag.error('shield', 'result_save_failed', { kind: r.kind }));
     };
     takeUnsyncedResults()
       .then(list => {

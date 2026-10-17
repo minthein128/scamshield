@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 
-export type DiagArea = 'auth' | 'api' | 'connection' | 'shield' | 'messageGuard' | 'live' | 'jobShield' | 'sync' | 'app';
+export type DiagArea = 'auth' | 'api' | 'connection' | 'shield' | 'live' | 'jobShield' | 'sync' | 'app';
 export type DiagLevel = 'info' | 'warn' | 'error';
 export type DiagValue = string | number | boolean;
 export type DiagDetails = Record<string, DiagValue>;
@@ -107,12 +107,11 @@ function notify(): void {
   });
 }
 
-function record(level: DiagLevel, area: DiagArea, event: string, details?: DiagDetails, at?: number): void {
+function record(level: DiagLevel, area: DiagArea, event: string, details?: DiagDetails): void {
   try {
     const clean = sanitizeValue(event);
-    const now = Date.now();
     const entry: DiagEntry = {
-      t: at !== undefined && Number.isFinite(at) && at <= now ? at : now,
+      t: Date.now(),
       v: String(Constants.expoConfig?.version ?? ''),
       p: Platform.OS,
       level,
@@ -122,9 +121,7 @@ function record(level: DiagLevel, area: DiagArea, event: string, details?: DiagD
     };
     void enqueue(async () => {
       const list = await load();
-      const merged = [...list, entry];
-      if (list.length > 0 && list[list.length - 1].t > entry.t) merged.sort((a, b) => a.t - b.t);
-      cache = pruneEntries(merged, now);
+      cache = pruneEntries([...list, entry], entry.t);
       await AsyncStorage.setItem(DIAG_KEY, JSON.stringify(cache)).catch(() => undefined);
       notify();
     });
@@ -137,8 +134,6 @@ export const diag = {
   info: (area: DiagArea, event: string, details?: DiagDetails) => record('info', area, event, details),
   warn: (area: DiagArea, event: string, details?: DiagDetails) => record('warn', area, event, details),
   error: (area: DiagArea, event: string, details?: DiagDetails) => record('error', area, event, details),
-  /** Records an event that happened earlier, for example one read from native code. */
-  at: (t: number, level: DiagLevel, area: DiagArea, event: string, details?: DiagDetails) => record(level, area, event, details, t),
 };
 
 /** Entries from oldest to newest, with expired ones dropped. */

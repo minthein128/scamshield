@@ -158,10 +158,10 @@
     "parcel": {
       "e1": {
         "title": "May dumating na mensahe",
-        "caption": "Binabalaan ka ng $t(common:appName) bago mo buksan ang link."
+        "caption": "Pindutin ang manika bago mo buksan ang link."
       },
       "e2": {
-        "title": "Pindutin para makita kung bakit",
+        "title": "Ang resulta",
         "caption": "Makikita mo ang mga dahilan. Huwag buksan ang link."
       }
     },
