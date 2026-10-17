@@ -1,7 +1,7 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { createTtlLru } from './cache.js';
 import type { Correlator } from './correlate.js';
-import { buildActions, titleFor, withWebRiskNote } from './explain.js';
+import { buildActions, titleFor, traffickingCheck, withWebRiskNote } from './explain.js';
 import type { Extractor } from './extract.js';
 import type { StreamOpts } from './extract-stream.js';
 import type { Feedback } from './feedback/service.js';
@@ -269,7 +269,14 @@ export function createPipeline(deps: PipelineDeps): Pipeline {
           flags: s.flags,
           linkChecks,
           sources,
-          actions: buildActions(s.verdict, scamType, req.language, req.context?.destination, req.context?.home),
+          actions: buildActions(
+            s.verdict,
+            scamType,
+            req.language,
+            req.context?.destination,
+            req.context?.home,
+            traffickingCheck(req.kind, s.flags),
+          ),
           model: deps.model,
           ...(network.network ? { network: network.network } : {}),
         };

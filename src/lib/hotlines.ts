@@ -2,6 +2,7 @@ import { t } from '../i18n';
 import { HOTLINES, type Hotline, type HotlineCategory } from '../data/hotlines';
 import { COUNTRIES, type CountryCode } from '../data/countries';
 import { runtimeHotlines } from './runtimeConfig';
+import type { CheckResponse } from '../api/types';
 
 export { HOTLINES };
 export type { Hotline, HotlineCategory };
@@ -53,9 +54,32 @@ export function allSections(list: Hotline[] = currentHotlines()): HelpSection[] 
 
 const dialable = (h: Hotline) => Boolean(h.dial);
 
-export function primaryHotline(destination?: CountryCode, home?: CountryCode, list: Hotline[] = currentHotlines()): Hotline | undefined {
+export type HotlineFocus = 'trafficking' | 'fraud';
+
+/** Job, agency and trafficking results lead with anti-trafficking lines; other scams with scam or police lines. */
+export function hotlineFocus(result: Pick<CheckResponse, 'kind' | 'scamType' | 'flags'>): HotlineFocus {
+  const trafficking =
+    result.kind === 'job' ||
+    result.kind === 'agency' ||
+    result.scamType === 'job_trafficking' ||
+    result.scamType === 'fake_agency' ||
+    result.flags.some(f => f.family === 'trafficking');
+  return trafficking ? 'trafficking' : 'fraud';
+}
+
+export function primaryHotline(
+  destination?: CountryCode,
+  home?: CountryCode,
+  focus: HotlineFocus = 'trafficking',
+  list: Hotline[] = currentHotlines(),
+): Hotline | undefined {
   const pick = (country: CountryCode | undefined, category: HotlineCategory) =>
     country ? list.find(h => h.country === country && h.category === category && dialable(h)) : undefined;
+  if (focus === 'fraud') {
+    return (
+      pick(destination, 'cybercrime') ?? pick(destination, 'police') ?? pick(home, 'cybercrime') ?? pick(home, 'police') ?? pick(home, 'consular')
+    );
+  }
   return (
     pick(destination, 'trafficking') ?? pick(home, 'trafficking') ?? pick(destination, 'police') ?? pick(home, 'consular') ?? pick(home, 'police')
   );
@@ -69,6 +93,12 @@ export function hotlineByDial(dial: string | undefined, list: Hotline[] = curren
   return list.find(h => h.dial && digits(h.dial) === wanted);
 }
 
-export function resolveCallTarget(actionValue: string | undefined, destination?: CountryCode, home?: CountryCode, list: Hotline[] = currentHotlines()): Hotline | undefined {
-  return hotlineByDial(actionValue, list) ?? primaryHotline(destination, home, list);
+export function resolveCallTarget(
+  actionValue: string | undefined,
+  destination?: CountryCode,
+  home?: CountryCode,
+  focus: HotlineFocus = 'trafficking',
+  list: Hotline[] = currentHotlines(),
+): Hotline | undefined {
+  return hotlineByDial(actionValue, list) ?? primaryHotline(destination, home, focus, list);
 }
