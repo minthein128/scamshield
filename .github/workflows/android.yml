@@ -52,6 +52,8 @@ jobs:
       CCACHE_DIR: ${{ github.workspace }}/.ccache
       CCACHE_MAXSIZE: 1G
       CCACHE_COMPRESS: "1"
+      CCACHE_BASEDIR: ${{ github.workspace }}
+      CCACHE_SLOPPINESS: include_file_mtime,include_file_ctime,time_macros,pch_defines
       REQUIRE_RELEASE_SIGNING: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/feat/production' }}
       ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
       ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
@@ -100,8 +102,9 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: .ccache
-          key: ccache-${{ runner.os }}-${{ env.SAFEROUTE_ABIS }}-${{ hashFiles('pnpm-lock.yaml') }}
+          key: ccache-${{ runner.os }}-${{ env.SAFEROUTE_ABIS }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.run_id }}
           restore-keys: |
+            ccache-${{ runner.os }}-${{ env.SAFEROUTE_ABIS }}-${{ hashFiles('pnpm-lock.yaml') }}-
             ccache-${{ runner.os }}-${{ env.SAFEROUTE_ABIS }}-
 
       - run: pnpm install --frozen-lockfile
@@ -119,7 +122,7 @@ jobs:
         run: ./gradlew assembleRelease -PreactNativeArchitectures=${SAFEROUTE_ABIS} --no-daemon --build-cache --parallel --stacktrace -Dorg.gradle.jvmargs="-Xmx4g -XX:MaxMetaspaceSize=512m"
 
       - name: ccache stats
-        run: ccache -s
+        run: ccache -sv
 
       - name: Sign APK
         id: sign
