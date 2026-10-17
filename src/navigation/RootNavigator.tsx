@@ -36,6 +36,8 @@ import { useShieldDeepLink } from '../hooks/useShieldDeepLink';
 import { useShieldShareSync } from '../hooks/useShieldShareSync';
 import { Text } from '../components/Text';
 import theme from '../theme/theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { tabBarStyle, TAB_MIN_TOUCH } from './tabBarMetrics';
 
 const Tab = createBottomTabNavigator<TabParamList>();
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -46,6 +48,7 @@ const Tabs: React.FC = () => {
   const { t, i18n } = useTranslation();
   const tall = i18n.language === 'my' || i18n.language === 'th';
   const rail = useLayout().isExpanded;
+  const insetBottom = useSafeAreaInsets().bottom;
   return (
   <Tab.Navigator
     tabBar={rail ? props => <TabRail {...props} /> : undefined}
@@ -54,9 +57,9 @@ const Tabs: React.FC = () => {
       tabBarPosition: rail ? 'left' : 'bottom',
       tabBarActiveTintColor: theme.colors.accent,
       tabBarInactiveTintColor: theme.colors.textSecondary,
-      tabBarLabel: ({ color, children }) => <Text style={{ color, fontFamily: theme.fonts.semiBold, fontSize: 12, lineHeight: 18, textAlign: 'center' }}>{children}</Text>,
-      tabBarStyle: { height: tall ? 88 : 72, paddingTop: 8, paddingBottom: 12 },
-      tabBarItemStyle: { minHeight: tall ? 68 : 52 },
+      tabBarLabel: ({ color, children }) => <Text style={{ color, fontFamily: theme.fonts.semiBold, fontSize: 12, lineHeight: 16, textAlign: 'center' }}>{children}</Text>,
+      tabBarStyle: tabBarStyle(insetBottom, tall),
+      tabBarItemStyle: { minHeight: TAB_MIN_TOUCH },
       tabBarIcon: ({ color }) => <TabIcon name={route.name} color={color} />,
     })}
   >
