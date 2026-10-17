@@ -8,6 +8,13 @@
   "warn": "Beri tahu keluarga saya",
   "call": "Hubungi {{number}}",
   "callExt": "lalu minta sambungan lokal {{ext}}",
+  "callCategory": {
+    "trafficking": "Hotline anti-perdagangan orang",
+    "police": "Darurat polisi",
+    "cybercrime": "Pelaporan penipuan dan kejahatan siber",
+    "consular": "Bantuan tenaga kerja dan konsuler",
+    "ngo": "Organisasi bantuan"
+  },
   "help": "Minta bantuan",
   "share": "Bagikan peringatan ini",
   "flagsRisky": "Tanda peringatan yang kami temukan",

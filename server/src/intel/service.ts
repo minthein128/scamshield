@@ -146,7 +146,7 @@ export function createIntel(opts: { store: IntelStore; pepper: string; cacheMs?:
             seen.push({ n: countIn(days, now, 30), first: firstDay(days) });
             flags.push({
               family: 'known_bad',
-              label: campaignLabel(lang, top.label, week),
+              label: campaignLabel(lang, top.label, top.scamType, week),
               evidence: reportedEvidence(lang, week),
               severity: 'low',
             });

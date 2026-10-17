@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { buildActions } from '../explain.js';
 import type { Grounder, GroundResult } from '../ground.js';
-import { guardJobText } from '../language-guard.js';
+import { groundEvidence, guardJobText } from '../language-guard.js';
 import { log } from '../log.js';
 import { ApiError, type Flag, type Lang, type Source } from '../types.js';
 import { normalizeEmployer } from './parse.js';
@@ -122,7 +122,9 @@ export async function assessJobOffer(req: JobAssessRequest, deps: AssessDeps = {
   const sources: Source[] = grounded?.sources ?? [];
   if (grounded) {
     const label = (f: Flag) => (f.family in GROUND_LABEL ? GROUND_LABEL[f.family as keyof typeof GROUND_LABEL][lang] : f.label);
-    flags.push(...grounded.flags.map((f) => ({ ...f, label: label(f), evidence: guardJobText(f.evidence, lang).text })));
+    flags.push(
+      ...grounded.flags.map((f) => ({ ...f, label: label(f), evidence: guardJobText(groundEvidence(f.evidence, lang), lang).text })),
+    );
   }
 
   const scored = scoreJob(flags, conflicts);

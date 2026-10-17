@@ -19,7 +19,7 @@ import {
 import { callLabel } from '../lib/callLabel';
 import { scamTypeLabel } from '../lib/labels';
 import { TIER_VERDICT, resultWord, stepWord, tierHeadline } from '../lib/attention';
-import { hotlineFocus, resolveCallTarget } from '../lib/hotlines';
+import { type HotlineCategory, hotlineFocus, resolveCallTarget } from '../lib/hotlines';
 import { useLayout } from '../hooks/useLayout';
 import { useRuntimeConfig } from '../lib/runtimeConfig';
 import { seenLine } from '../lib/radar';
@@ -68,7 +68,7 @@ const FAMILY_ICONS: Record<string, IconName> = {
 };
 
 export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, route }) => {
-  const { t } = useTranslation(['report', 'common', 'live']);
+  const { t, i18n } = useTranslation(['report', 'common', 'live']);
   const { result, language, fresh, reported } = route.params;
   const tier = result.attention;
   const level: Verdict = tier ? TIER_VERDICT[tier] : result.verdict;
@@ -101,7 +101,12 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
   const callAction = result.actions.find(a => a.type === 'call');
   const hotline = resolveCallTarget(callAction?.value, profile.destinationCountry, profile.homeCountry, hotlineFocus(result));
 
-  const call = hotline ? callLabel(hotline, { call: number => t('call', { number }), ext: ext => t('callExt', { ext }) }) : { label: '' };
+  const callTexts = {
+    call: (number: string) => t('call', { number }),
+    ext: (ext: string) => t('callExt', { ext }),
+    category: i18n.language.startsWith('en') ? undefined : (c: HotlineCategory) => t(`callCategory.${c}`),
+  };
+  const call = hotline ? callLabel(hotline, callTexts) : { label: '' };
   const talkLabel = t('live:button');
   const footerButton = tablet ? styles.footerButton : undefined;
 

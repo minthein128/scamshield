@@ -9,6 +9,13 @@
   "warn": "Balaan ang pamilya ko",
   "call": "Tawagan ang {{number}}",
   "callExt": "tapos hingin ang local {{ext}}",
+  "callCategory": {
+    "trafficking": "Hotline laban sa human trafficking",
+    "police": "Emergency ng pulisya",
+    "cybercrime": "Pag-uulat ng scam at cybercrime",
+    "consular": "Tulong sa manggagawa at konsulado",
+    "ngo": "Organisasyong tumutulong"
+  },
   "help": "Humingi ng tulong",
   "share": "Ibahagi ang babalang ito",
   "flagsRisky": "Mga babalang napansin namin",
