@@ -270,31 +270,39 @@ export function createLiveSession(options: LiveSessionOptions, deps: LiveSession
     };
   };
 
+  const run = async (opts: { skipWarning?: boolean }) => {
+    if (view.state !== 'idle') return;
+    diag.info('live', 'start', { mode: options.mode, skipWarning: Boolean(opts.skipWarning) });
+    set({ state: 'connecting', caption: opts.skipWarning ? '' : options.result.spokenWarning });
+    try {
+      audio = deps.createAudio();
+    } catch {
+      return fail('audio');
+    }
+    const mic = deps.ensureMic ? await Promise.resolve().then(deps.ensureMic).catch(() => 'denied' as const) : 'granted';
+    if (mic === 'declined') return finish({ state: 'declined' });
+    if (mic !== 'granted') return fail('mic_denied');
+    if (!(await audio.requestPermission().catch(() => false))) return fail('mic_denied');
+    if (cancelled || finished) return;
+    if (!opts.skipWarning) {
+      set({ state: 'speaking', warning: true });
+      await deps.playWarning(options.result.spokenWarning, options.language).catch(() => undefined);
+      if (cancelled || finished) return;
+    }
+    set({ state: 'connecting', warning: false, caption: '' });
+    await connect();
+  };
+
   return {
     get view() {
       return view;
     },
     async start(opts: { skipWarning?: boolean } = {}) {
-      if (view.state !== 'idle') return;
-      diag.info('live', 'start', { mode: options.mode, skipWarning: Boolean(opts.skipWarning) });
-      set({ state: 'connecting', caption: opts.skipWarning ? '' : options.result.spokenWarning });
       try {
-        audio = deps.createAudio();
+        await run(opts);
       } catch {
-        return fail('audio');
+        fail('audio');
       }
-      const mic = deps.ensureMic ? await deps.ensureMic().catch(() => 'denied' as const) : 'granted';
-      if (mic === 'declined') return finish({ state: 'declined' });
-      if (mic !== 'granted') return fail('mic_denied');
-      if (!(await audio.requestPermission().catch(() => false))) return fail('mic_denied');
-      if (cancelled || finished) return;
-      if (!opts.skipWarning) {
-        set({ state: 'speaking', warning: true });
-        await deps.playWarning(options.result.spokenWarning, options.language).catch(() => undefined);
-        if (cancelled || finished) return;
-      }
-      set({ state: 'connecting', warning: false, caption: '' });
-      await connect();
     },
     end() {
       cancelled = true;
