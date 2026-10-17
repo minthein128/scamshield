@@ -36,7 +36,7 @@ import { useShieldShareSync } from '../hooks/useShieldShareSync';
 import { Text } from '../components/Text';
 import theme from '../theme/theme';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { tabBarStyle, TAB_MIN_TOUCH } from './tabBarMetrics';
+import { tabBarStyle, TAB_ICON_LABEL_GAP, TAB_LABEL_LINE, TAB_LABEL_LINE_TALL, TAB_LABEL_SIZE, TAB_MIN_TOUCH } from './tabBarMetrics';
 
 const Tab = createBottomTabNavigator<TabParamList>();
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -56,7 +56,7 @@ const Tabs: React.FC = () => {
       tabBarPosition: rail ? 'left' : 'bottom',
       tabBarActiveTintColor: theme.colors.accent,
       tabBarInactiveTintColor: theme.colors.textSecondary,
-      tabBarLabel: ({ color, children }) => <Text style={{ color, fontFamily: theme.fonts.semiBold, fontSize: 12, lineHeight: 16, textAlign: 'center' }}>{children}</Text>,
+      tabBarLabel: ({ color, children }) => <Text style={{ color, fontFamily: theme.fonts.semiBold, fontSize: TAB_LABEL_SIZE, lineHeight: tall ? TAB_LABEL_LINE_TALL : TAB_LABEL_LINE, marginTop: TAB_ICON_LABEL_GAP, textAlign: 'center' }}>{children}</Text>,
       tabBarStyle: tabBarStyle(insetBottom, tall),
       tabBarItemStyle: { minHeight: TAB_MIN_TOUCH },
       tabBarIcon: ({ color }) => <TabIcon name={route.name} color={color} />,
