@@ -5,7 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 patchedDependencies:
-  expo-share-intent@3.2.3: 41ee21119ab877b3817cea20cc90d4353f3c3e5c41a5c0436856ade1b3c79b57
+  expo-share-intent@3.2.3:
+    hash: 41ee21119ab877b3817cea20cc90d4353f3c3e5c41a5c0436856ade1b3c79b57
+    path: patches/expo-share-intent@3.2.3.patch
 
 importers:
 
