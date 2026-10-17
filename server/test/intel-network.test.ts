@@ -3,6 +3,7 @@ import { createApp } from '../src/app.js';
 import { loadConfig } from '../src/config.js';
 import type { Extractor } from '../src/extract.js';
 import { buildInsights } from '../src/intel/insights.js';
+import { campaignLabel } from '../src/intel/messages.js';
 import { decayedCount, rankOf } from '../src/intel/rank.js';
 import { runSeed } from '../src/intel/seed-data.js';
 import { createIntel, type Intel, severityForCount } from '../src/intel/service.js';
@@ -99,6 +100,30 @@ describe('network lookup', () => {
     expect(r.flags[0]).toMatchObject({ family: 'known_bad', severity: 'low' });
   });
 
+  it('names the scam type, not the English campaign key, in a non-English report', async () => {
+    const intel = createIntel({ store: createMemoryStore(), pepper: 'p', now: () => NOW });
+    for (const [i, phone] of ['0811111111', '0822222222', '0833333333', '0844444444'].entries()) {
+      await reportPhone(intel, phone, [i]);
+    }
+    const text = 'Urgent data entry jobs in Mae Sot, send your passport photo today now';
+    const expected = {
+      my: 'နိုင်ငံခြား အလုပ်ကမ်းလှမ်းချက်',
+      th: 'ชวนไปทำงานต่างประเทศ',
+      id: 'Lowongan kerja luar negeri',
+      tl: 'Alok na trabaho sa ibang bansa',
+    } as const;
+    for (const [lang, type] of Object.entries(expected) as Array<[keyof typeof expected, string]>) {
+      const p = intel.prepare({ kind: 'job', language: lang }, extraction('0899999999', text));
+      const r = await intel.lookup(p, lang);
+      const label = r.flags.find((f) => f.severity === 'low')?.label ?? '';
+      expect(label).toContain(type);
+      expect(label).not.toContain('Mae Sot');
+      expect(r.network?.campaign?.name).toBe('Mae Sot data-entry job');
+    }
+    const en = await intel.lookup(intel.prepare({ kind: 'job', language: 'en' }, extraction('0899999999', text)), 'en');
+    expect(en.flags.find((f) => f.severity === 'low')?.label).toContain('"Mae Sot data-entry job"');
+  });
+
   it('matches a campaign by the model campaign name when the wording differs', async () => {
     const intel = createIntel({ store: createMemoryStore(), pepper: 'p', now: () => NOW });
     for (const [i, phone] of ['0811111111', '0822222222', '0833333333'].entries()) await reportPhone(intel, phone, [i]);
@@ -117,6 +142,18 @@ describe('network lookup', () => {
       extraction('0899999999', 'Your parcel is held at customs, pay a small release fee at the link', 'Courier parcel fee link'),
     );
     expect((await intel.lookup(p, 'en')).network).toBeUndefined();
+  });
+});
+
+describe('campaign line', () => {
+  it('falls back to a generic pattern line without a named scam type', () => {
+    for (const lang of ['my', 'th', 'id', 'tl'] as const) {
+      for (const t of ['other', undefined] as const) {
+        const line = campaignLabel(lang, 'Like-and-rate task top-up scam', t, 5);
+        expect(line).not.toMatch(/Like-and-rate|"/);
+        expect(line).toMatch(/5/);
+      }
+    }
   });
 });
 

@@ -10,7 +10,6 @@ export const LANG_NAMES = {
 export const GLOSSARY: Record<string, Record<string, string | null>> = {
   Kakwe: { my: 'ကာကွယ်', id: 'Kakwe', tl: 'Kakwe', th: 'Kakwe' },
   'Screen shield': { all: null },
-  'Message Guard': { all: null },
   'Low risk (the safe verdict; never "Safe", it must read as a likelihood)': {
     my: 'အန္တရာယ်နည်း',
     id: 'Risiko rendah',

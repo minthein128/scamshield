@@ -14,7 +14,8 @@
     "overlay": "Langkah 1 dari 4: izinkan \"Tampilkan di atas aplikasi lain\", lalu kembali ke $t(common:appName).",
     "notifications": "Langkah 2 dari 4: izinkan notifikasi agar Android tetap menjalankan shield.",
     "capture": "Langkah 3 dari 4: izinkan $t(common:appName) melihat layar Anda saat Anda mengetuk boneka.",
-    "starting": "Langkah 4 dari 4: memulai shield."
+    "starting": "Langkah 4 dari 4: memulai shield.",
+    "stopping": "Mematikan shield."
   },
   "needs": {
     "title": "Yang dibutuhkan shield",
@@ -34,105 +35,5 @@
     "notStarted": "Shield tidak berjalan. Pastikan izin \"Tampilkan di atas aplikasi lain\" aktif, lalu coba lagi.",
     "failed": "Shield tidak berjalan. Coba lagi.",
     "checkFailed": "Pemeriksaan tidak berjalan. Nyalakan shield dan coba lagi."
-  },
-  "messageGuard": {
-    "title": "Message Guard: memberi Anda peringatan tentang pesan yang tampak berisiko saat pesan tiba",
-    "privacy": "Mati kecuali Anda menyalakannya. Hanya pesan yang tampak berisiko yang keluar dari ponsel, setelah nama, nomor, dan kode dihapus.",
-    "a11y": "Message Guard",
-    "status": {
-      "web": "Berfungsi di aplikasi Android $t(common:appName).",
-      "unavailable": "Tidak tersedia pada versi ini.",
-      "on": "Aktif. Pesan yang tampak berisiko dari aplikasi pilihan Anda mendapat pemberitahuan singkat.",
-      "off": "Mati",
-      "needsAccess": "Mati. Saat dinyalakan, kami jelaskan dulu apa yang dibacanya.",
-      "paused": "Dijeda. Sudah 60 pemeriksaan dalam sehari, batas maksimalnya. Nyalakan lagi untuk melanjutkan."
-    },
-    "apps": {
-      "show": "Pilih aplikasi ({{count}} aktif)",
-      "hide": "Sembunyikan aplikasi ({{count}} aktif)",
-      "a11y": "Aplikasi yang diawasi Message Guard, {{count}} aktif",
-      "recommended": "Disarankan"
-    },
-    "errors": {
-      "accessOff": "Akses notifikasi masih nonaktif. Jika tombol berwarna abu-abu, buka $t(common:appName) di Info aplikasi, ketuk titik tiga dan pilih \"Izinkan setelan terbatas\".",
-      "cannotOpen": "Tidak dapat membuka pengaturan akses notifikasi."
-    },
-    "consent": {
-      "title": "Sebelum Anda menyalakan Message Guard",
-      "reads": {
-        "title": "Apa yang dibaca",
-        "body": "Notifikasi baru dari aplikasi yang Anda pilih di bawah. Aplikasi lain tidak dibaca."
-      },
-      "leaves": {
-        "title": "Apa yang keluar dari ponsel",
-        "body": "Hanya pesan yang tampak berisiko. Nomor, email, kode, nama, dan bagian tautan setelah nama situs dihapus dulu."
-      },
-      "never": {
-        "title": "Apa yang tidak pernah keluar",
-        "body": "Kode sekali pakai (OTP), pengirim pesan, dan semua pesan yang tidak tampak berisiko."
-      },
-      "who": {
-        "title": "Siapa yang memeriksa",
-        "body": "Server $t(common:appName) dan AI Google memeriksa pesan lalu mengirim hasilnya."
-      },
-      "control": {
-        "title": "Anda tetap memegang kendali",
-        "body": "Anda bisa mematikannya kapan saja. \"Yang dikirim Message Guard\" menampilkan setiap pesan yang dikirim."
-      },
-      "phone": {
-        "title": "Orang lain mungkin melihat pemberitahuan",
-        "body": "Siapa pun yang memegang ponsel Anda mungkin melihat pemberitahuan dan hasil $t(common:appName)."
-      },
-      "apps": "Pilih aplikasi",
-      "chooseOne": "Pilih minimal satu aplikasi.",
-      "turnOn": "Nyalakan",
-      "notNow": "Nanti saja",
-      "addTitle": "Izinkan Message Guard membaca {{app}}?",
-      "addBody": "Message Guard juga akan membaca notifikasi baru dari {{app}}. Hal lain di bawah tetap sama."
-    },
-    "log": {
-      "title": "Yang dikirim Message Guard",
-      "body": "Teks persis yang keluar dari ponsel Anda. Hanya disimpan di ponsel ini, selama 7 hari.",
-      "empty": "Belum ada yang dikirim.",
-      "deleteAll": "Hapus semua",
-      "pending": "Menunggu hasil",
-      "failed": "Tidak diperiksa"
-    },
-    "kill": {
-      "label": "Matikan dan cabut akses",
-      "hint": "Mematikan Message Guard dan membuka pengaturan Android, tempat Anda bisa mencabut akses notifikasi $t(common:appName)."
-    },
-    "notice": {
-      "body": "Sebuah pesan mungkin perlu dicek lagi. Buka untuk melihat alasannya.",
-      "open": "Buka"
-    },
-    "activity": {
-      "waiting": "Menunggu pesan dari aplikasi pilihan Anda.",
-      "last": "Pesan terakhir dari {{app}}, {{time}}: {{outcome}}",
-      "outcome": {
-        "paused": "tidak diperiksa, Message Guard dijeda",
-        "self": "pesan Anda sendiri, tidak diperiksa",
-        "noText": "tidak ada teks untuk diperiksa",
-        "hiddenPreview": "aplikasi menyembunyikan teksnya, jadi tidak bisa diperiksa. Nyalakan pratinjau pesan di aplikasi itu.",
-        "tooShort": "terlalu pendek untuk diperiksa, tidak dikirim",
-        "otp": "kode sekali pakai, tetap di ponsel Anda",
-        "notRisky": "tampak biasa, tidak dikirim",
-        "duplicate": "sama dengan pesan sebelumnya, tidak dikirim lagi",
-        "rateLimited": "tidak dikirim, batas per jam atau per hari sudah tercapai",
-        "sent": "dikirim untuk diperiksa, menunggu hasil",
-        "checkFailed": "pemeriksaan tidak selesai. Periksa koneksi internet Anda.",
-        "resultSafe": "sudah diperiksa, risiko rendah",
-        "resultWarned": "sudah diperiksa, $t(common:appName) mengirim pemberitahuan",
-        "noticeBlocked": "sudah diperiksa, tetapi notifikasi $t(common:appName) mati, jadi pemberitahuan tidak muncul"
-      }
-    },
-    "health": {
-      "accessOff": "Akses notifikasi mati, jadi Message Guard tidak bisa membaca pesan baru.",
-      "notConnected": "Android belum menjalankan Message Guard. Matikan lalu nyalakan lagi, atau mulai ulang ponsel.",
-      "notificationsOff": "Notifikasi $t(common:appName) mati, jadi Anda tidak akan melihat peringatan.",
-      "missingApps": "Tidak terpasang di ponsel ini: {{apps}}.",
-      "battery": "Android bisa menghentikan Message Guard untuk menghemat baterai.",
-      "batteryAction": "Izinkan berjalan di latar belakang"
-    }
   }
 }

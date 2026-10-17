@@ -23,10 +23,6 @@
       "title": "Izinkan notifikasi",
       "body": "Android menampilkan pemberitahuan kecil saat perisai berjalan. Perisai tetap berfungsi tanpanya, tetapi Anda mungkin tidak melihat bahwa perisai aktif."
     },
-    "guardNotifications": {
-      "title": "Izinkan notifikasi",
-      "body": "Penjaga Pesan memperingatkan Anda lewat pemberitahuan saat ada pesan yang berisiko. Tanpa izin ini, peringatan tidak bisa ditampilkan."
-    },
     "contacts": {
       "title": "Izinkan kontak",
       "body": "$t(common:appName) membaca kontak hanya saat Anda memilihnya, untuk mengisi nama dan nomor."

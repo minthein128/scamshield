@@ -20,10 +20,6 @@
       "title": "Allow notifications",
       "body": "Android shows a small notice while the shield runs. The shield works without it, but you may not see that it is on."
     },
-    "guardNotifications": {
-      "title": "Allow notifications",
-      "body": "Message Guard warns you with a notice when a message looks risky. Without this permission it cannot show warnings."
-    },
     "contacts": {
       "title": "Allow contacts",
       "body": "$t(common:appName) reads a contact only when you pick it, to fill in the name and number."

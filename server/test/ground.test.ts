@@ -4,6 +4,7 @@ import {
   buildGroundingRequest,
   createGrounder,
   extractSources,
+  GROUND_EXAMPLES,
   groundingQuery,
   needsGrounding,
   parseCompanyFound,
@@ -165,6 +166,18 @@ describe('grounding', () => {
     expect(buildGroundingRequest(base, 'th').system).toMatch(/[\u0E00-\u0E7F]/);
     expect(p).not.toContain('USD 3000');
     expect(p).not.toContain('cook');
+  });
+
+  it('gives the evidence example sentences in the report language only', () => {
+    for (const lang of ['my', 'th', 'id', 'tl'] as const) {
+      const { system } = buildGroundingRequest(base, lang);
+      expect(system).toContain(GROUND_EXAMPLES[lang].reports);
+      expect(system).not.toContain(GROUND_EXAMPLES.en.reports);
+      expect(system).not.toContain(GROUND_EXAMPLES.en.licence);
+      expect(system).toMatch(/Evidence is your own note about the source/);
+    }
+    expect(buildGroundingRequest(base, 'my').system).toMatch(/one short Burmese sentence/);
+    expect(buildGroundingRequest(base, 'en').system).toContain(GROUND_EXAMPLES.en.reports);
   });
 
   it('sends no phone number, chat handle, account number or person name to search', async () => {

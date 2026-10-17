@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { PermissionsAndroid, Platform, type Permission } from 'react-native';
 
-export type PermissionKind = 'mic' | 'overlay' | 'screen' | 'notifications' | 'guardNotifications' | 'contacts';
+export type PermissionKind = 'mic' | 'overlay' | 'screen' | 'notifications' | 'contacts';
 export type HelpKind = 'mic' | 'overlay' | 'screen' | 'contacts';
 export type PermissionResult = 'granted' | 'declined' | 'denied' | 'blocked';
 
@@ -94,13 +94,10 @@ export async function ensureAndroidPermission(
 export const ensureMicrophone = (api?: AndroidPermissionApi) =>
   ensureAndroidPermission('mic', PermissionsAndroid.PERMISSIONS.RECORD_AUDIO, api);
 
-/** Asks only on Android 13+. Features that post notices still run when this is refused. */
-export async function ensureNotifications(
-  kind: 'notifications' | 'guardNotifications',
-  api: AndroidPermissionApi = permissionApi(),
-): Promise<PermissionResult> {
+/** Asks only on Android 13+. The shield still runs when this is refused. */
+export async function ensureNotifications(api: AndroidPermissionApi = permissionApi()): Promise<PermissionResult> {
   if (api.platform !== 'android' || Number(api.version) < 33) return 'granted';
-  return ensureAndroidPermission(kind, PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS, api);
+  return ensureAndroidPermission('notifications', PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS, api);
 }
 
 export const ensureContacts = (api?: AndroidPermissionApi) =>

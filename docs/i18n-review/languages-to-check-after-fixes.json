@@ -1,30 +1,29 @@
 {
   "generated": "2026-10-15T09:57:02.000Z",
   "commit": "3d1bf79ac321d599c39aa4113b5e8c02778f4317",
-  "instructions": "For each item, compare english with translation. back_translation is an independent machine translation of the translation back to English (made without seeing the English); use it as a hint only.\nSet reviewer_verdict to \"ok\" when the translation is right, or \"corrected\" when you fixed it (then put the full replacement text in reviewer_correction). Leave both null if you skip the item. reviewer_note is free text for anything you want us to know.\nKeep {{placeholders}} exactly as they are in reviewer_correction. Keep SafeRoute, Screen shield and Message Guard in English.\nDo safety items first (priority \"safety\": verdict labels, red flags, report actions, hotlines and Get help, Learn scam guide, Message Guard, privacy and consent, error messages that say what to do). The app must say \"looks risky\" or \"shows warning signs\", never \"is a scam\".\nmachine_flag is a Gemini pre-screen plus automatic checks: ok, check or likely_wrong. A flag of ok does not mean the string is correct. machine_severity (0-10) ranks how bad the model thinks the problem is. auto_checks lists the deterministic checks that fired (length, latin, identical, placeholder, glossary, empty, zawgyi, mmorder).\nMerge answers back with: node scripts/i18n-apply-review.mjs docs/i18n-review/languages-to-check.json (dry run) and add --write to apply. A namespace file is marked reviewed only when every key in it has an answer.\nAfter-fixes copy: rows with reviewer_verdict \"corrected\" were changed by a model cross-check (Muse AI and Gemini). They are not native-reviewed. A native reviewer can set reviewer_verdict to \"ok\" to confirm, or give a new reviewer_correction.",
+  "instructions": "For each item, compare english with translation. back_translation is an independent machine translation of the translation back to English (made without seeing the English); use it as a hint only.\nSet reviewer_verdict to \"ok\" when the translation is right, or \"corrected\" when you fixed it (then put the full replacement text in reviewer_correction). Leave both null if you skip the item. reviewer_note is free text for anything you want us to know.\nKeep {{placeholders}} exactly as they are in reviewer_correction. Keep SafeRoute and Screen shield in English.\nDo safety items first (priority \"safety\": verdict labels, red flags, report actions, hotlines and Get help, Learn scam guide, privacy and consent, error messages that say what to do). The app must say \"looks risky\" or \"shows warning signs\", never \"is a scam\".\nmachine_flag is a Gemini pre-screen plus automatic checks: ok, check or likely_wrong. A flag of ok does not mean the string is correct. machine_severity (0-10) ranks how bad the model thinks the problem is. auto_checks lists the deterministic checks that fired (length, latin, identical, placeholder, glossary, empty, zawgyi, mmorder).\nMerge answers back with: node scripts/i18n-apply-review.mjs docs/i18n-review/languages-to-check.json (dry run) and add --write to apply. A namespace file is marked reviewed only when every key in it has an answer.\nAfter-fixes copy: rows with reviewer_verdict \"corrected\" were changed by a model cross-check (Muse AI and Gemini). They are not native-reviewed. A native reviewer can set reviewer_verdict to \"ok\" to confirm, or give a new reviewer_correction.",
   "languages": {
     "my": {
       "name": "Burmese",
       "reviewers": [],
       "stats": {
-        "items": 529,
-        "safety_items": 255,
+        "items": 516,
+        "safety_items": 242,
         "ui_items": 274,
         "flags": {
-          "ok": 396,
+          "ok": 395,
           "check": 118,
-          "likely_wrong": 15
+          "likely_wrong": 3
         },
         "safety_flags": {
-          "ok": 177,
+          "ok": 176,
           "check": 65,
-          "likely_wrong": 13
+          "likely_wrong": 1
         },
         "auto_check_hits": {
           "length": 65,
           "mmorder": 2,
-          "latin": 25,
-          "identical": 12
+          "latin": 13
         },
         "reviewed_namespaces": 0,
         "namespaces": 15
@@ -3925,7 +3924,7 @@
             "latin"
           ],
           "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text.",
+          "context": "Screen: Screen shield screen. Element: label or short text.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -3943,7 +3942,7 @@
             "latin"
           ],
           "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text.",
+          "context": "Screen: Screen shield screen. Element: label or short text.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -3961,7 +3960,7 @@
             "latin"
           ],
           "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text.",
+          "context": "Screen: Screen shield screen. Element: label or short text.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -3979,266 +3978,10 @@
             "latin"
           ],
           "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text.",
+          "context": "Screen: Screen shield screen. Element: label or short text.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
-        },
-        {
-          "id": "shield.messageGuard.title",
-          "namespace": "shield",
-          "english": "Message Guard: warns you about risky messages as they arrive",
-          "translation": "Message Guard: အန္တရာယ်ရှိနိုင်သော မက်ဆေ့ဂျ်များ ဝင်လာချိန်တွင် သတိပေးပါသည်",
-          "back_translation": "Message Guard: warns you about risky messages as they arrive",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Left entirely untranslated in English. | Auto: untranslated Latin text left in: warns, you, about, risky, messages, as; identical to English (left untranslated)",
-          "machine_severity": 9,
-          "auto_checks": [
-            "latin",
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: heading or title. Message Guard (notification scanning) copy and permission text..",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "Message Guard: အန္တရာယ်ရှိနိုင်သော မက်ဆေ့ဂျ်များ ဝင်လာချိန်တွင် သတိပေးပါသည်",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI text is cut off in the PDF; completed with Gemini.",
-          "previous_translation": "Message Guard: warns you about risky messages as they arrive"
-        },
-        {
-          "id": "shield.messageGuard.privacy",
-          "namespace": "shield",
-          "english": "Only messages that look risky are checked. Codes and personal numbers are removed first.",
-          "translation": "အန္တရာယ်ရှိပုံပေါ်သော မက်ဆေ့ဂျ်များကိုသာ စစ်ဆေးပါသည်။ ကုဒ်များနှင့် ကိုယ်ရေးကိုယ်တာ နံပါတ်များကို ဦးစွာ ဖယ်ရှားပါသည်။",
-          "back_translation": "Only messages that look risky are checked. Codes and personal numbers are removed first.",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Left entirely untranslated in English. | Auto: untranslated Latin text left in: Only, messages, that, look, risky, are; identical to English (left untranslated)",
-          "machine_severity": 9,
-          "auto_checks": [
-            "latin",
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text. Message Guard (notification scanning) copy and permission text..",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "အန္တရာယ်ရှိပုံပေါ်သော မက်ဆေ့ဂျ်များကိုသာ စစ်ဆေးပါသည်။ ကုဒ်များနှင့် ကိုယ်ရေးကိုယ်တာ နံပါတ်များကို ဦးစွာ ဖယ်ရှားပါသည်။",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI text is cut off in the PDF; completed with Gemini.",
-          "previous_translation": "Only messages that look risky are checked. Codes and personal numbers are removed first."
-        },
-        {
-          "id": "shield.messageGuard.a11y",
-          "namespace": "shield",
-          "english": "Message Guard",
-          "translation": "Message Guard",
-          "back_translation": "Message Guard",
-          "machine_flag": "ok",
-          "machine_note": "",
-          "machine_severity": 0,
-          "auto_checks": [],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: screen reader label. Message Guard (notification scanning) copy and permission text.. Short UI text: aim for at most 24 characters (English is 13).",
-          "reviewer_verdict": null,
-          "reviewer_correction": null,
-          "reviewer_note": null
-        },
-        {
-          "id": "shield.messageGuard.status.web",
-          "namespace": "shield",
-          "english": "Works in the SafeRoute Android app.",
-          "translation": "SafeRoute Android အက်ပ်တွင် အသုံးပြုနိုင်ပါသည်။",
-          "back_translation": "Works in the SafeRoute Android app.",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Left entirely untranslated in English. | Auto: untranslated Latin text left in: Works, in, the, app.; identical to English (left untranslated)",
-          "machine_severity": 8,
-          "auto_checks": [
-            "latin",
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text. Message Guard (notification scanning) copy and permission text..",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "SafeRoute Android အက်ပ်တွင် အသုံးပြုနိုင်ပါသည်။",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI full text (complete in PDF).",
-          "previous_translation": "Works in the SafeRoute Android app."
-        },
-        {
-          "id": "shield.messageGuard.status.unavailable",
-          "namespace": "shield",
-          "english": "Not available in this build.",
-          "translation": "ဤဗားရှင်းတွင် မရနိုင်သေးပါ။",
-          "back_translation": "Not available in this build.",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Left entirely untranslated in English. | Auto: untranslated Latin text left in: Not, available, in, this, build.; identical to English (left untranslated)",
-          "machine_severity": 8,
-          "auto_checks": [
-            "latin",
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text. Message Guard (notification scanning) copy and permission text.. Short UI text: aim for at most 51 characters (English is 28).",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "ဤဗားရှင်းတွင် မရနိုင်သေးပါ။",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI full text (complete in PDF).",
-          "previous_translation": "Not available in this build."
-        },
-        {
-          "id": "shield.messageGuard.status.on",
-          "namespace": "shield",
-          "english": "On. Risky messages from your chat and SMS apps get a warning.",
-          "translation": "ဖွင့်ထားသည်။ သင့် ချက်တင်နှင့် SMS အက်ပ်များမှ အန္တရာယ်ရှိနိုင်သော မက်ဆေ့ဂျ်များအတွက် သတိပေးပါမည်။",
-          "back_translation": "On. Risky messages from your chat and SMS apps get a warning.",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Left entirely untranslated in English. | Auto: untranslated Latin text left in: On., Risky, messages, from, your, chat; identical to English (left untranslated)",
-          "machine_severity": 8,
-          "auto_checks": [
-            "latin",
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text. Message Guard (notification scanning) copy and permission text..",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "ဖွင့်ထားသည်။ သင့် ချက်တင်နှင့် SMS အက်ပ်များမှ အန္တရာယ်ရှိနိုင်သော မက်ဆေ့ဂျ်များအတွက် သတိပေးပါမည်။",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI text is cut off in the PDF; completed with Gemini.",
-          "previous_translation": "On. Risky messages from your chat and SMS apps get a warning."
-        },
-        {
-          "id": "shield.messageGuard.status.off",
-          "namespace": "shield",
-          "english": "Off.",
-          "translation": "ပိတ်ထားသည်။",
-          "back_translation": "Off.",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Left untranslated in English; should be translated to Burmese such as 'ပိတ်ထားသည်'. | Auto: untranslated Latin text left in: Off.; identical to English (may be an accepted loanword)",
-          "machine_severity": 7,
-          "auto_checks": [
-            "latin",
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text. Message Guard (notification scanning) copy and permission text.. Short UI text: aim for at most 12 characters (English is 4).",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "ပိတ်ထားသည်။",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI full text (complete in PDF).",
-          "previous_translation": "Off."
-        },
-        {
-          "id": "shield.messageGuard.status.needsAccess",
-          "namespace": "shield",
-          "english": "Off. Turning it on opens Android notification access.",
-          "translation": "ပိတ်ထားသည်။ ဖွင့်လိုက်ပါက Android အသိပေးချက် ရယူခွင့်ကို ဖွင့်ပေးပါမည်။",
-          "back_translation": "Off. Turning it on opens Android notification access.",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Left entirely untranslated in English. | Auto: untranslated Latin text left in: Off., Turning, it, on, opens, notification; identical to English (left untranslated)",
-          "machine_severity": 8,
-          "auto_checks": [
-            "latin",
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text. Message Guard (notification scanning) copy and permission text..",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "ပိတ်ထားသည်။ ဖွင့်လိုက်ပါက Android အသိပေးချက် ရယူခွင့်ကို ဖွင့်ပေးပါမည်။",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI text is cut off in the PDF; completed with Gemini.",
-          "previous_translation": "Off. Turning it on opens Android notification access."
-        },
-        {
-          "id": "shield.messageGuard.apps.show",
-          "namespace": "shield",
-          "english": "Choose apps ({{count}} on)",
-          "translation": "အက်ပ်များ ရွေးရန် ({{count}} ခု ဖွင့်ထားသည်)",
-          "back_translation": "Choose apps ({{count}} on)",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Left entirely untranslated in English. | Auto: untranslated Latin text left in: Choose, apps, on; identical to English (left untranslated)",
-          "machine_severity": 8,
-          "auto_checks": [
-            "latin",
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text. Message Guard (notification scanning) copy and permission text.. Placeholders (keep unchanged): {{count}}. Short UI text: aim for at most 47 characters (English is 26).",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "အက်ပ်များ ရွေးရန် ({{count}} ခု ဖွင့်ထားသည်)",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI full text (complete in PDF).",
-          "previous_translation": "Choose apps ({{count}} on)"
-        },
-        {
-          "id": "shield.messageGuard.apps.hide",
-          "namespace": "shield",
-          "english": "Hide apps ({{count}} on)",
-          "translation": "အက်ပ်များ ဝှက်ရန် ({{count}} ခု ဖွင့်ထားသည်)",
-          "back_translation": "Hide apps ({{count}} on)",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Untranslated English string left completely unchanged. Must be translated into Burmese. | Auto: untranslated Latin text left in: Hide, apps, on; identical to English (left untranslated)",
-          "machine_severity": 8,
-          "auto_checks": [
-            "latin",
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text. Message Guard (notification scanning) copy and permission text.. Placeholders (keep unchanged): {{count}}. Short UI text: aim for at most 44 characters (English is 24).",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "အက်ပ်များ ဝှက်ရန် ({{count}} ခု ဖွင့်ထားသည်)",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Own translation (Gemini 3.8), fallback if Muse text fails checks.",
-          "previous_translation": "Hide apps ({{count}} on)"
-        },
-        {
-          "id": "shield.messageGuard.apps.a11y",
-          "namespace": "shield",
-          "english": "Apps Message Guard watches, {{count}} on",
-          "translation": "Message Guard စောင့်ကြည့်နေသော အက်ပ်များ၊ {{count}} ခု ဖွင့်ထားသည်",
-          "back_translation": "Apps Message Guard watches, {{count}} on",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Untranslated English accessibility string left completely unchanged. Must be translated into Burmese. | Auto: untranslated Latin text left in: Apps, watches, on; identical to English (left untranslated)",
-          "machine_severity": 8,
-          "auto_checks": [
-            "latin",
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: screen reader label. Message Guard (notification scanning) copy and permission text.. Placeholders (keep unchanged): {{count}}.",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "Message Guard စောင့်ကြည့်နေသော အက်ပ်များ၊ {{count}} ခု ဖွင့်ထားသည်",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI text is cut off in the PDF; completed with Gemini.",
-          "previous_translation": "Apps Message Guard watches, {{count}} on"
-        },
-        {
-          "id": "shield.messageGuard.errors.accessOff",
-          "namespace": "shield",
-          "english": "Notification access is still off. If the switch is greyed out, open SafeRoute in App info, tap the three dots and choose \"Allow restricted settings\".",
-          "translation": "အသိပေးချက် ရယူခွင့် ပိတ်ထားဆဲ ဖြစ်ပါသည်။ ခလုတ်ကို နှိပ်မရဘဲ မီးခိုးရောင် ဖြစ်နေပါက App info တွင် SafeRoute ကို ဖွင့်ပါ၊ အစက်သုံးစက်ကို နှိပ်ပြီး \"Allow restricted settings\" ကို ရွေးပါ။",
-          "back_translation": "Notification access is still off. If the switch is greyed out, open SafeRoute in App info, tap the three dots and choose \"Allow restricted settings\".",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Untranslated English instructional text left completely unchanged. Crucial setup guidance must be translated into Burmese. | Auto: untranslated Latin text left in: Notification, access, is, still, off., If; identical to English (left untranslated)",
-          "machine_severity": 9,
-          "auto_checks": [
-            "latin",
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text. Message Guard (notification scanning) copy and permission text..",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "အသိပေးချက် ရယူခွင့် ပိတ်ထားဆဲ ဖြစ်ပါသည်။ ခလုတ်ကို နှိပ်မရဘဲ မီးခိုးရောင် ဖြစ်နေပါက App info တွင် SafeRoute ကို ဖွင့်ပါ၊ အစက်သုံးစက်ကို နှိပ်ပြီး \"Allow restricted settings\" ကို ရွေးပါ။",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI text is cut off in the PDF; completed with Gemini.",
-          "previous_translation": "Notification access is still off. If the switch is greyed out, open SafeRoute in App info, tap the three dots and choose \"Allow restricted settings\"."
-        },
-        {
-          "id": "shield.messageGuard.errors.cannotOpen",
-          "namespace": "shield",
-          "english": "Could not open the notification access settings.",
-          "translation": "အသိပေးချက် ရယူခွင့် ဆက်တင်ကို ဖွင့်၍မရပါ။",
-          "back_translation": "Could not open the notification access settings.",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Untranslated English error message left completely unchanged. Must be translated into Burmese. | Auto: untranslated Latin text left in: Could, not, open, the, notification, access; identical to English (left untranslated)",
-          "machine_severity": 8,
-          "auto_checks": [
-            "latin",
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text. Message Guard (notification scanning) copy and permission text..",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "အသိပေးချက် ရယူခွင့် ဆက်တင်ကို ဖွင့်၍မရပါ။",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI text is cut off in the PDF; completed with Gemini.",
-          "previous_translation": "Could not open the notification access settings."
         },
         {
           "id": "account.title",
@@ -8493,7 +8236,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: heading or title. Short UI text: aim for at most 24 characters (English is 13).",
+          "context": "Screen: Screen shield screen. Element: heading or title. Short UI text: aim for at most 24 characters (English is 13).",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -8509,7 +8252,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text.",
+          "context": "Screen: Screen shield screen. Element: label or short text.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -8525,7 +8268,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text.",
+          "context": "Screen: Screen shield screen. Element: label or short text.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -8541,7 +8284,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text. Short UI text: aim for at most 51 characters (English is 28).",
+          "context": "Screen: Screen shield screen. Element: label or short text. Short UI text: aim for at most 51 characters (English is 28).",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -8557,7 +8300,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text.",
+          "context": "Screen: Screen shield screen. Element: label or short text.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -8573,7 +8316,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text.",
+          "context": "Screen: Screen shield screen. Element: label or short text.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -8589,7 +8332,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text.",
+          "context": "Screen: Screen shield screen. Element: label or short text.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -8605,7 +8348,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text.",
+          "context": "Screen: Screen shield screen. Element: label or short text.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -8621,7 +8364,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text.",
+          "context": "Screen: Screen shield screen. Element: label or short text.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -8637,7 +8380,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: button or link label.",
+          "context": "Screen: Screen shield screen. Element: button or link label.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -8653,7 +8396,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: sentence or paragraph.",
+          "context": "Screen: Screen shield screen. Element: sentence or paragraph.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -8669,7 +8412,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: button or link label. Short UI text: aim for at most 44 characters (English is 24).",
+          "context": "Screen: Screen shield screen. Element: button or link label. Short UI text: aim for at most 44 characters (English is 24).",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -8685,7 +8428,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: button or link label. Short UI text: aim for at most 42 characters (English is 23).",
+          "context": "Screen: Screen shield screen. Element: button or link label. Short UI text: aim for at most 42 characters (English is 23).",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -8703,7 +8446,7 @@
             "latin"
           ],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: screen reader label. Short UI text: aim for at most 26 characters (English is 14).",
+          "context": "Screen: Screen shield screen. Element: screen reader label. Short UI text: aim for at most 26 characters (English is 14).",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -8714,22 +8457,22 @@
       "name": "Bahasa Indonesia",
       "reviewers": [],
       "stats": {
-        "items": 529,
-        "safety_items": 255,
+        "items": 516,
+        "safety_items": 242,
         "ui_items": 274,
         "flags": {
-          "ok": 479,
+          "ok": 478,
           "check": 38,
-          "likely_wrong": 12
+          "likely_wrong": 0
         },
         "safety_flags": {
-          "ok": 221,
+          "ok": 220,
           "check": 22,
-          "likely_wrong": 12
+          "likely_wrong": 0
         },
         "auto_check_hits": {
           "length": 10,
-          "identical": 14
+          "identical": 2
         },
         "reviewed_namespaces": 0,
         "namespaces": 15
@@ -12559,7 +12302,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text.",
+          "context": "Screen: Screen shield screen. Element: label or short text.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -12575,7 +12318,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text.",
+          "context": "Screen: Screen shield screen. Element: label or short text.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -12591,7 +12334,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text.",
+          "context": "Screen: Screen shield screen. Element: label or short text.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -12607,254 +12350,10 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text.",
+          "context": "Screen: Screen shield screen. Element: label or short text.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
-        },
-        {
-          "id": "shield.messageGuard.title",
-          "namespace": "shield",
-          "english": "Message Guard: warns you about risky messages as they arrive",
-          "translation": "Message Guard: memberi Anda peringatan tentang pesan yang tampak berisiko saat pesan tiba",
-          "back_translation": "Message Guard: warns you about risky messages as they arrive",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Sentence left entirely untranslated in English. | Auto: identical to English (left untranslated)",
-          "machine_severity": 7,
-          "auto_checks": [
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: heading or title. Message Guard (notification scanning) copy and permission text..",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "Message Guard: memberi Anda peringatan tentang pesan yang tampak berisiko saat pesan tiba",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI text is cut off in the PDF; completed with Gemini.",
-          "previous_translation": "Message Guard: warns you about risky messages as they arrive"
-        },
-        {
-          "id": "shield.messageGuard.privacy",
-          "namespace": "shield",
-          "english": "Only messages that look risky are checked. Codes and personal numbers are removed first.",
-          "translation": "Hanya pesan yang tampak berisiko yang diperiksa. Kode dan nomor pribadi dihapus terlebih dahulu.",
-          "back_translation": "Only messages that look risky are checked. Codes and personal numbers are removed first.",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Sentence left entirely untranslated in English. | Auto: identical to English (left untranslated)",
-          "machine_severity": 7,
-          "auto_checks": [
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text. Message Guard (notification scanning) copy and permission text..",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "Hanya pesan yang tampak berisiko yang diperiksa. Kode dan nomor pribadi dihapus terlebih dahulu.",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI text is cut off in the PDF; completed with Gemini.",
-          "previous_translation": "Only messages that look risky are checked. Codes and personal numbers are removed first."
-        },
-        {
-          "id": "shield.messageGuard.a11y",
-          "namespace": "shield",
-          "english": "Message Guard",
-          "translation": "Message Guard",
-          "back_translation": "Message Guard",
-          "machine_flag": "ok",
-          "machine_note": "",
-          "machine_severity": 0,
-          "auto_checks": [],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: screen reader label. Message Guard (notification scanning) copy and permission text.. Short UI text: aim for at most 24 characters (English is 13).",
-          "reviewer_verdict": null,
-          "reviewer_correction": null,
-          "reviewer_note": null
-        },
-        {
-          "id": "shield.messageGuard.status.web",
-          "namespace": "shield",
-          "english": "Works in the SafeRoute Android app.",
-          "translation": "Berfungsi di aplikasi Android SafeRoute.",
-          "back_translation": "Works in the SafeRoute Android app.",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Sentence left entirely untranslated in English. | Auto: identical to English (left untranslated)",
-          "machine_severity": 6,
-          "auto_checks": [
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text. Message Guard (notification scanning) copy and permission text..",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "Berfungsi di aplikasi Android SafeRoute.",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI text is cut off in the PDF; completed with Gemini.",
-          "previous_translation": "Works in the SafeRoute Android app."
-        },
-        {
-          "id": "shield.messageGuard.status.unavailable",
-          "namespace": "shield",
-          "english": "Not available in this build.",
-          "translation": "Tidak tersedia pada versi ini.",
-          "back_translation": "Not available in this build.",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Text left entirely untranslated in English. | Auto: identical to English (left untranslated)",
-          "machine_severity": 6,
-          "auto_checks": [
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text. Message Guard (notification scanning) copy and permission text.. Short UI text: aim for at most 51 characters (English is 28).",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "Tidak tersedia pada versi ini.",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI full text (complete in PDF).",
-          "previous_translation": "Not available in this build."
-        },
-        {
-          "id": "shield.messageGuard.status.on",
-          "namespace": "shield",
-          "english": "On. Risky messages from your chat and SMS apps get a warning.",
-          "translation": "Aktif. Pesan yang tampak berisiko dari aplikasi chat dan SMS Anda akan diberi peringatan.",
-          "back_translation": "On. Risky messages from your chat and SMS apps get a warning.",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Sentence left entirely untranslated in English. | Auto: identical to English (left untranslated)",
-          "machine_severity": 7,
-          "auto_checks": [
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text. Message Guard (notification scanning) copy and permission text..",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "Aktif. Pesan yang tampak berisiko dari aplikasi chat dan SMS Anda akan diberi peringatan.",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI text is cut off in the PDF; completed with Gemini.",
-          "previous_translation": "On. Risky messages from your chat and SMS apps get a warning."
-        },
-        {
-          "id": "shield.messageGuard.status.off",
-          "namespace": "shield",
-          "english": "Off.",
-          "translation": "Mati",
-          "back_translation": "Off.",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Left untranslated in English; use plain Indonesian like 'Mati' or 'Nonaktif' for low-literacy users. | Auto: identical to English (may be an accepted loanword)",
-          "machine_severity": 5,
-          "auto_checks": [
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text. Message Guard (notification scanning) copy and permission text.. Short UI text: aim for at most 12 characters (English is 4).",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "Mati",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI full text (complete in PDF).",
-          "previous_translation": "Off."
-        },
-        {
-          "id": "shield.messageGuard.status.needsAccess",
-          "namespace": "shield",
-          "english": "Off. Turning it on opens Android notification access.",
-          "translation": "Mati. Mengaktifkannya akan membuka akses notifikasi Android.",
-          "back_translation": "Off. Turning it on opens Android notification access.",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Sentence left entirely untranslated in English. | Auto: identical to English (left untranslated)",
-          "machine_severity": 7,
-          "auto_checks": [
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text. Message Guard (notification scanning) copy and permission text..",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "Mati. Mengaktifkannya akan membuka akses notifikasi Android.",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI text is cut off in the PDF; completed with Gemini.",
-          "previous_translation": "Off. Turning it on opens Android notification access."
-        },
-        {
-          "id": "shield.messageGuard.apps.show",
-          "namespace": "shield",
-          "english": "Choose apps ({{count}} on)",
-          "translation": "Pilih aplikasi ({{count}} aktif)",
-          "back_translation": "Choose apps ({{count}} on)",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Text left entirely untranslated in English. | Auto: identical to English (left untranslated)",
-          "machine_severity": 7,
-          "auto_checks": [
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text. Message Guard (notification scanning) copy and permission text.. Placeholders (keep unchanged): {{count}}. Short UI text: aim for at most 47 characters (English is 26).",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "Pilih aplikasi ({{count}} aktif)",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI full text (complete in PDF).",
-          "previous_translation": "Choose apps ({{count}} on)"
-        },
-        {
-          "id": "shield.messageGuard.apps.hide",
-          "namespace": "shield",
-          "english": "Hide apps ({{count}} on)",
-          "translation": "Sembunyikan aplikasi ({{count}} aktif)",
-          "back_translation": "Hide apps ({{count}} on)",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Left untranslated in English. Should be translated to Indonesian, such as 'Sembunyikan aplikasi ({{count}} aktif)'. | Auto: identical to English (left untranslated)",
-          "machine_severity": 6,
-          "auto_checks": [
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text. Message Guard (notification scanning) copy and permission text.. Placeholders (keep unchanged): {{count}}. Short UI text: aim for at most 44 characters (English is 24).",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "Sembunyikan aplikasi ({{count}} aktif)",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI full text (complete in PDF).",
-          "previous_translation": "Hide apps ({{count}} on)"
-        },
-        {
-          "id": "shield.messageGuard.apps.a11y",
-          "namespace": "shield",
-          "english": "Apps Message Guard watches, {{count}} on",
-          "translation": "Aplikasi yang diawasi Message Guard, {{count}} aktif",
-          "back_translation": "Apps Message Guard watches, {{count}} on",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Left untranslated in English. Screen reader label should be translated into Indonesian. | Auto: identical to English (left untranslated)",
-          "machine_severity": 6,
-          "auto_checks": [
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: screen reader label. Message Guard (notification scanning) copy and permission text.. Placeholders (keep unchanged): {{count}}.",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "Aplikasi yang diawasi Message Guard, {{count}} aktif",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI text is cut off in the PDF; completed with Gemini.",
-          "previous_translation": "Apps Message Guard watches, {{count}} on"
-        },
-        {
-          "id": "shield.messageGuard.errors.accessOff",
-          "namespace": "shield",
-          "english": "Notification access is still off. If the switch is greyed out, open SafeRoute in App info, tap the three dots and choose \"Allow restricted settings\".",
-          "translation": "Akses notifikasi masih nonaktif. Jika tombol berwarna abu-abu, buka SafeRoute di Info aplikasi, ketuk titik tiga dan pilih \"Izinkan setelan terbatas\".",
-          "back_translation": "Notification access is still off. If the switch is greyed out, open SafeRoute in App info, tap the three dots and choose \"Allow restricted settings\".",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Left completely untranslated in English. Low-literacy users will not understand how to enable restricted settings. | Auto: identical to English (left untranslated)",
-          "machine_severity": 7,
-          "auto_checks": [
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text. Message Guard (notification scanning) copy and permission text..",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "Akses notifikasi masih nonaktif. Jika tombol berwarna abu-abu, buka SafeRoute di Info aplikasi, ketuk titik tiga dan pilih \"Izinkan setelan terbatas\".",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI text is cut off in the PDF; completed with Gemini.",
-          "previous_translation": "Notification access is still off. If the switch is greyed out, open SafeRoute in App info, tap the three dots and choose \"Allow restricted settings\"."
-        },
-        {
-          "id": "shield.messageGuard.errors.cannotOpen",
-          "namespace": "shield",
-          "english": "Could not open the notification access settings.",
-          "translation": "Tidak dapat membuka pengaturan akses notifikasi.",
-          "back_translation": "Could not open the notification access settings.",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Left untranslated in English. Error message should be translated into Indonesian. | Auto: identical to English (left untranslated)",
-          "machine_severity": 6,
-          "auto_checks": [
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text. Message Guard (notification scanning) copy and permission text..",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "Tidak dapat membuka pengaturan akses notifikasi.",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI text is cut off in the PDF; completed with Gemini.",
-          "previous_translation": "Could not open the notification access settings."
         },
         {
           "id": "account.title",
@@ -17046,7 +16545,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: heading or title. Short UI text: aim for at most 24 characters (English is 13).",
+          "context": "Screen: Screen shield screen. Element: heading or title. Short UI text: aim for at most 24 characters (English is 13).",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -17062,7 +16561,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text.",
+          "context": "Screen: Screen shield screen. Element: label or short text.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -17078,7 +16577,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text.",
+          "context": "Screen: Screen shield screen. Element: label or short text.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -17094,7 +16593,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text. Short UI text: aim for at most 51 characters (English is 28).",
+          "context": "Screen: Screen shield screen. Element: label or short text. Short UI text: aim for at most 51 characters (English is 28).",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -17110,7 +16609,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text.",
+          "context": "Screen: Screen shield screen. Element: label or short text.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -17126,7 +16625,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text.",
+          "context": "Screen: Screen shield screen. Element: label or short text.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -17142,7 +16641,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text.",
+          "context": "Screen: Screen shield screen. Element: label or short text.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -17158,7 +16657,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text.",
+          "context": "Screen: Screen shield screen. Element: label or short text.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -17174,7 +16673,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text.",
+          "context": "Screen: Screen shield screen. Element: label or short text.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -17190,7 +16689,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: button or link label.",
+          "context": "Screen: Screen shield screen. Element: button or link label.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -17206,7 +16705,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: sentence or paragraph.",
+          "context": "Screen: Screen shield screen. Element: sentence or paragraph.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -17222,7 +16721,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: button or link label. Short UI text: aim for at most 44 characters (English is 24).",
+          "context": "Screen: Screen shield screen. Element: button or link label. Short UI text: aim for at most 44 characters (English is 24).",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -17238,7 +16737,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: button or link label. Short UI text: aim for at most 42 characters (English is 23).",
+          "context": "Screen: Screen shield screen. Element: button or link label. Short UI text: aim for at most 42 characters (English is 23).",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -17254,7 +16753,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: screen reader label. Short UI text: aim for at most 26 characters (English is 14).",
+          "context": "Screen: Screen shield screen. Element: screen reader label. Short UI text: aim for at most 26 characters (English is 14).",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -17265,22 +16764,22 @@
       "name": "Tagalog",
       "reviewers": [],
       "stats": {
-        "items": 536,
-        "safety_items": 255,
+        "items": 523,
+        "safety_items": 242,
         "ui_items": 281,
         "flags": {
-          "ok": 440,
-          "check": 81,
-          "likely_wrong": 15
+          "ok": 439,
+          "check": 80,
+          "likely_wrong": 4
         },
         "safety_flags": {
-          "ok": 203,
-          "check": 40,
-          "likely_wrong": 12
+          "ok": 202,
+          "check": 39,
+          "likely_wrong": 1
         },
         "auto_check_hits": {
           "length": 30,
-          "identical": 32
+          "identical": 20
         },
         "reviewed_namespaces": 0,
         "namespaces": 15
@@ -21136,7 +20635,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text.",
+          "context": "Screen: Screen shield screen. Element: label or short text.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -21152,7 +20651,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text.",
+          "context": "Screen: Screen shield screen. Element: label or short text.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -21168,7 +20667,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text.",
+          "context": "Screen: Screen shield screen. Element: label or short text.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -21184,254 +20683,10 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text.",
+          "context": "Screen: Screen shield screen. Element: label or short text.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
-        },
-        {
-          "id": "shield.messageGuard.title",
-          "namespace": "shield",
-          "english": "Message Guard: warns you about risky messages as they arrive",
-          "translation": "Message Guard: binababalaan ka tungkol sa mga mensaheng mukhang mapanganib pagdating ng mga ito",
-          "back_translation": "Message Guard: warns you about risky messages as they arrive",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Untranslated English string left in translation. | Auto: identical to English (left untranslated)",
-          "machine_severity": 8,
-          "auto_checks": [
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: heading or title. Message Guard (notification scanning) copy and permission text..",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "Message Guard: binababalaan ka tungkol sa mga mensaheng mukhang mapanganib pagdating ng mga ito",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI text is cut off in the PDF; completed with Gemini.",
-          "previous_translation": "Message Guard: warns you about risky messages as they arrive"
-        },
-        {
-          "id": "shield.messageGuard.privacy",
-          "namespace": "shield",
-          "english": "Only messages that look risky are checked. Codes and personal numbers are removed first.",
-          "translation": "Mga mensaheng mukhang mapanganib lamang ang sinusuri. Inaalis muna ang mga code at personal na numero.",
-          "back_translation": "Only messages that look risky are checked. Codes and personal numbers are removed first.",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Untranslated English string left in translation. | Auto: identical to English (left untranslated)",
-          "machine_severity": 8,
-          "auto_checks": [
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text. Message Guard (notification scanning) copy and permission text..",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "Mga mensaheng mukhang mapanganib lamang ang sinusuri. Inaalis muna ang mga code at personal na numero.",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI text is cut off in the PDF; completed with Gemini.",
-          "previous_translation": "Only messages that look risky are checked. Codes and personal numbers are removed first."
-        },
-        {
-          "id": "shield.messageGuard.a11y",
-          "namespace": "shield",
-          "english": "Message Guard",
-          "translation": "Message Guard",
-          "back_translation": "Message Guard",
-          "machine_flag": "ok",
-          "machine_note": "",
-          "machine_severity": 0,
-          "auto_checks": [],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: screen reader label. Message Guard (notification scanning) copy and permission text.. Short UI text: aim for at most 24 characters (English is 13).",
-          "reviewer_verdict": null,
-          "reviewer_correction": null,
-          "reviewer_note": null
-        },
-        {
-          "id": "shield.messageGuard.status.web",
-          "namespace": "shield",
-          "english": "Works in the SafeRoute Android app.",
-          "translation": "Gumagana sa SafeRoute Android app.",
-          "back_translation": "Works in the SafeRoute Android app.",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Entire sentence was left untranslated in English. | Auto: identical to English (left untranslated)",
-          "machine_severity": 6,
-          "auto_checks": [
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text. Message Guard (notification scanning) copy and permission text..",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "Gumagana sa SafeRoute Android app.",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI full text (complete in PDF).",
-          "previous_translation": "Works in the SafeRoute Android app."
-        },
-        {
-          "id": "shield.messageGuard.status.unavailable",
-          "namespace": "shield",
-          "english": "Not available in this build.",
-          "translation": "Hindi available sa build na ito.",
-          "back_translation": "Not available in this build.",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Entire sentence was left untranslated in English. | Auto: identical to English (left untranslated)",
-          "machine_severity": 6,
-          "auto_checks": [
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text. Message Guard (notification scanning) copy and permission text.. Short UI text: aim for at most 51 characters (English is 28).",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "Hindi available sa build na ito.",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI text is cut off in the PDF; completed with Gemini.",
-          "previous_translation": "Not available in this build."
-        },
-        {
-          "id": "shield.messageGuard.status.on",
-          "namespace": "shield",
-          "english": "On. Risky messages from your chat and SMS apps get a warning.",
-          "translation": "Naka-on. Makatatanggap ng babala ang mga mensaheng mukhang mapanganib mula sa iyong mga chat at SMS app.",
-          "back_translation": "On. Risky messages from your chat and SMS apps get a warning.",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Safety-critical warning text was left completely untranslated in English. | Auto: identical to English (left untranslated)",
-          "machine_severity": 8,
-          "auto_checks": [
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text. Message Guard (notification scanning) copy and permission text..",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "Naka-on. Makatatanggap ng babala ang mga mensaheng mukhang mapanganib mula sa iyong mga chat at SMS app.",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI text is cut off in the PDF; completed with Gemini.",
-          "previous_translation": "On. Risky messages from your chat and SMS apps get a warning."
-        },
-        {
-          "id": "shield.messageGuard.status.off",
-          "namespace": "shield",
-          "english": "Off.",
-          "translation": "Naka-off",
-          "back_translation": "Off.",
-          "machine_flag": "check",
-          "machine_note": "Left in English 'Off.' Consider 'Naka-off' or 'Patay' for clearer low-literacy context. | Auto: identical to English (may be an accepted loanword)",
-          "machine_severity": 2,
-          "auto_checks": [
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text. Message Guard (notification scanning) copy and permission text.. Short UI text: aim for at most 12 characters (English is 4).",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "Naka-off",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI full text (complete in PDF).",
-          "previous_translation": "Off."
-        },
-        {
-          "id": "shield.messageGuard.status.needsAccess",
-          "namespace": "shield",
-          "english": "Off. Turning it on opens Android notification access.",
-          "translation": "Naka-off. Ang pag-on nito ay magbubukas ng Android notification access.",
-          "back_translation": "Off. Turning it on opens Android notification access.",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Entire sentence was left untranslated in English. | Auto: identical to English (left untranslated)",
-          "machine_severity": 7,
-          "auto_checks": [
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text. Message Guard (notification scanning) copy and permission text..",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "Naka-off. Ang pag-on nito ay magbubukas ng Android notification access.",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI text is cut off in the PDF; completed with Gemini.",
-          "previous_translation": "Off. Turning it on opens Android notification access."
-        },
-        {
-          "id": "shield.messageGuard.apps.show",
-          "namespace": "shield",
-          "english": "Choose apps ({{count}} on)",
-          "translation": "Pumili ng mga app ({{count}} naka-on)",
-          "back_translation": "Choose apps ({{count}} on)",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Entire UI label was left untranslated in English. | Auto: identical to English (left untranslated)",
-          "machine_severity": 6,
-          "auto_checks": [
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text. Message Guard (notification scanning) copy and permission text.. Placeholders (keep unchanged): {{count}}. Short UI text: aim for at most 47 characters (English is 26).",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "Pumili ng mga app ({{count}} naka-on)",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI full text (complete in PDF).",
-          "previous_translation": "Choose apps ({{count}} on)"
-        },
-        {
-          "id": "shield.messageGuard.apps.hide",
-          "namespace": "shield",
-          "english": "Hide apps ({{count}} on)",
-          "translation": "Itago ang mga app ({{count}} naka-on)",
-          "back_translation": "Hide apps ({{count}} on)",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Entire UI label was left untranslated in English. | Auto: identical to English (left untranslated)",
-          "machine_severity": 6,
-          "auto_checks": [
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text. Message Guard (notification scanning) copy and permission text.. Placeholders (keep unchanged): {{count}}. Short UI text: aim for at most 44 characters (English is 24).",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "Itago ang mga app ({{count}} naka-on)",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI full text (complete in PDF).",
-          "previous_translation": "Hide apps ({{count}} on)"
-        },
-        {
-          "id": "shield.messageGuard.apps.a11y",
-          "namespace": "shield",
-          "english": "Apps Message Guard watches, {{count}} on",
-          "translation": "Mga app na binabantayan ng Message Guard, {{count}} naka-on",
-          "back_translation": "Apps Message Guard watches, {{count}} on",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Accessibility label was left completely untranslated in English. | Auto: identical to English (left untranslated)",
-          "machine_severity": 6,
-          "auto_checks": [
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: screen reader label. Message Guard (notification scanning) copy and permission text.. Placeholders (keep unchanged): {{count}}.",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "Mga app na binabantayan ng Message Guard, {{count}} naka-on",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI text is cut off in the PDF; completed with Gemini.",
-          "previous_translation": "Apps Message Guard watches, {{count}} on"
-        },
-        {
-          "id": "shield.messageGuard.errors.accessOff",
-          "namespace": "shield",
-          "english": "Notification access is still off. If the switch is greyed out, open SafeRoute in App info, tap the three dots and choose \"Allow restricted settings\".",
-          "translation": "Naka-off pa rin ang notification access. Kung kulay abo ang switch, buksan ang SafeRoute sa App info, pindutin ang tatlong tuldok at piliin ang \"Allow restricted settings\".",
-          "back_translation": "Notification access is still off. If the switch is greyed out, open SafeRoute in App info, tap the three dots and choose \"Allow restricted settings\".",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Important troubleshooting instruction was left completely untranslated in English. | Auto: identical to English (left untranslated)",
-          "machine_severity": 8,
-          "auto_checks": [
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text. Message Guard (notification scanning) copy and permission text..",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "Naka-off pa rin ang notification access. Kung kulay abo ang switch, buksan ang SafeRoute sa App info, pindutin ang tatlong tuldok at piliin ang \"Allow restricted settings\".",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI text is cut off in the PDF; completed with Gemini.",
-          "previous_translation": "Notification access is still off. If the switch is greyed out, open SafeRoute in App info, tap the three dots and choose \"Allow restricted settings\"."
-        },
-        {
-          "id": "shield.messageGuard.errors.cannotOpen",
-          "namespace": "shield",
-          "english": "Could not open the notification access settings.",
-          "translation": "Hindi mabuksan ang mga setting ng notification access.",
-          "back_translation": "Could not open the notification access settings.",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Error message was left completely untranslated in English. | Auto: identical to English (left untranslated)",
-          "machine_severity": 7,
-          "auto_checks": [
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text. Message Guard (notification scanning) copy and permission text..",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "Hindi mabuksan ang mga setting ng notification access.",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI text is cut off in the PDF; completed with Gemini.",
-          "previous_translation": "Could not open the notification access settings."
         },
         {
           "id": "account.title",
@@ -25774,7 +25029,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: heading or title. Short UI text: aim for at most 24 characters (English is 13).",
+          "context": "Screen: Screen shield screen. Element: heading or title. Short UI text: aim for at most 24 characters (English is 13).",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -25790,7 +25045,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text.",
+          "context": "Screen: Screen shield screen. Element: label or short text.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -25806,7 +25061,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text.",
+          "context": "Screen: Screen shield screen. Element: label or short text.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -25822,7 +25077,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text. Short UI text: aim for at most 51 characters (English is 28).",
+          "context": "Screen: Screen shield screen. Element: label or short text. Short UI text: aim for at most 51 characters (English is 28).",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -25838,7 +25093,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text.",
+          "context": "Screen: Screen shield screen. Element: label or short text.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -25854,7 +25109,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text.",
+          "context": "Screen: Screen shield screen. Element: label or short text.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -25870,7 +25125,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text.",
+          "context": "Screen: Screen shield screen. Element: label or short text.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -25886,7 +25141,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text.",
+          "context": "Screen: Screen shield screen. Element: label or short text.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -25902,7 +25157,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text.",
+          "context": "Screen: Screen shield screen. Element: label or short text.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -25918,7 +25173,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: button or link label.",
+          "context": "Screen: Screen shield screen. Element: button or link label.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -25934,7 +25189,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: sentence or paragraph.",
+          "context": "Screen: Screen shield screen. Element: sentence or paragraph.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -25950,7 +25205,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: button or link label. Short UI text: aim for at most 44 characters (English is 24).",
+          "context": "Screen: Screen shield screen. Element: button or link label. Short UI text: aim for at most 44 characters (English is 24).",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -25966,7 +25221,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: button or link label. Short UI text: aim for at most 42 characters (English is 23).",
+          "context": "Screen: Screen shield screen. Element: button or link label. Short UI text: aim for at most 42 characters (English is 23).",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -25982,7 +25237,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: screen reader label. Short UI text: aim for at most 26 characters (English is 14).",
+          "context": "Screen: Screen shield screen. Element: screen reader label. Short UI text: aim for at most 26 characters (English is 14).",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -25993,23 +25248,21 @@
       "name": "Thai",
       "reviewers": [],
       "stats": {
-        "items": 529,
-        "safety_items": 255,
+        "items": 516,
+        "safety_items": 242,
         "ui_items": 274,
         "flags": {
-          "ok": 482,
+          "ok": 481,
           "check": 33,
-          "likely_wrong": 14
+          "likely_wrong": 2
         },
         "safety_flags": {
-          "ok": 220,
+          "ok": 219,
           "check": 21,
-          "likely_wrong": 14
+          "likely_wrong": 2
         },
         "auto_check_hits": {
-          "length": 18,
-          "latin": 12,
-          "identical": 12
+          "length": 18
         },
         "reviewed_namespaces": 0,
         "namespaces": 15
@@ -29851,7 +29104,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text.",
+          "context": "Screen: Screen shield screen. Element: label or short text.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -29867,7 +29120,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text.",
+          "context": "Screen: Screen shield screen. Element: label or short text.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -29883,7 +29136,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text.",
+          "context": "Screen: Screen shield screen. Element: label or short text.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -29899,266 +29152,10 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text.",
+          "context": "Screen: Screen shield screen. Element: label or short text.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
-        },
-        {
-          "id": "shield.messageGuard.title",
-          "namespace": "shield",
-          "english": "Message Guard: warns you about risky messages as they arrive",
-          "translation": "Message Guard: เตือนคุณเกี่ยวกับข้อความที่ดูมีความเสี่ยงทันทีที่ได้รับ",
-          "back_translation": "Message Guard: warns you about risky messages as they arrive",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Entire string left untranslated in English. | Auto: untranslated Latin text left in: warns, you, about, risky, messages, as; identical to English (left untranslated)",
-          "machine_severity": 8,
-          "auto_checks": [
-            "latin",
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: heading or title. Message Guard (notification scanning) copy and permission text..",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "Message Guard: เตือนคุณเกี่ยวกับข้อความที่ดูมีความเสี่ยงทันทีที่ได้รับ",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI text is cut off in the PDF; completed with Gemini.",
-          "previous_translation": "Message Guard: warns you about risky messages as they arrive"
-        },
-        {
-          "id": "shield.messageGuard.privacy",
-          "namespace": "shield",
-          "english": "Only messages that look risky are checked. Codes and personal numbers are removed first.",
-          "translation": "ระบบจะตรวจสอบเฉพาะข้อความที่ดูมีความเสี่ยงเท่านั้น รหัสและหมายเลขส่วนตัวจะถูกลบออกก่อน",
-          "back_translation": "Only messages that look risky are checked. Codes and personal numbers are removed first.",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Entire string left untranslated in English. | Auto: untranslated Latin text left in: Only, messages, that, look, risky, are; identical to English (left untranslated)",
-          "machine_severity": 8,
-          "auto_checks": [
-            "latin",
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text. Message Guard (notification scanning) copy and permission text..",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "ระบบจะตรวจสอบเฉพาะข้อความที่ดูมีความเสี่ยงเท่านั้น รหัสและหมายเลขส่วนตัวจะถูกลบออกก่อน",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI visible opening (ระบบจะตรวจสอบ...) with own ending; Muse text is cut off.",
-          "previous_translation": "Only messages that look risky are checked. Codes and personal numbers are removed first."
-        },
-        {
-          "id": "shield.messageGuard.a11y",
-          "namespace": "shield",
-          "english": "Message Guard",
-          "translation": "Message Guard",
-          "back_translation": "Message Guard",
-          "machine_flag": "ok",
-          "machine_note": "",
-          "machine_severity": 0,
-          "auto_checks": [],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: screen reader label. Message Guard (notification scanning) copy and permission text.. Short UI text: aim for at most 24 characters (English is 13).",
-          "reviewer_verdict": null,
-          "reviewer_correction": null,
-          "reviewer_note": null
-        },
-        {
-          "id": "shield.messageGuard.status.web",
-          "namespace": "shield",
-          "english": "Works in the SafeRoute Android app.",
-          "translation": "ใช้งานได้ในแอป SafeRoute บน Android",
-          "back_translation": "Works in the SafeRoute Android app.",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Entire string left untranslated in English. | Auto: untranslated Latin text left in: Works, in, the, app.; identical to English (left untranslated)",
-          "machine_severity": 7,
-          "auto_checks": [
-            "latin",
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text. Message Guard (notification scanning) copy and permission text..",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "ใช้งานได้ในแอป SafeRoute บน Android",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI full text (complete in PDF).",
-          "previous_translation": "Works in the SafeRoute Android app."
-        },
-        {
-          "id": "shield.messageGuard.status.unavailable",
-          "namespace": "shield",
-          "english": "Not available in this build.",
-          "translation": "ไม่พร้อมใช้งานในเวอร์ชันนี้",
-          "back_translation": "Not available in this build.",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Entire string left untranslated in English. | Auto: untranslated Latin text left in: Not, available, in, this, build.; identical to English (left untranslated)",
-          "machine_severity": 7,
-          "auto_checks": [
-            "latin",
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text. Message Guard (notification scanning) copy and permission text.. Short UI text: aim for at most 51 characters (English is 28).",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "ไม่พร้อมใช้งานในเวอร์ชันนี้",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI full text (complete in PDF).",
-          "previous_translation": "Not available in this build."
-        },
-        {
-          "id": "shield.messageGuard.status.on",
-          "namespace": "shield",
-          "english": "On. Risky messages from your chat and SMS apps get a warning.",
-          "translation": "เปิดอยู่ ระบบจะเตือนเมื่อมีข้อความที่ดูมีความเสี่ยงเข้ามาจากแอปแชทและ SMS ของคุณ",
-          "back_translation": "On. Risky messages from your chat and SMS apps get a warning.",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Entire string left untranslated in English. | Auto: untranslated Latin text left in: On., Risky, messages, from, your, chat; identical to English (left untranslated)",
-          "machine_severity": 8,
-          "auto_checks": [
-            "latin",
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text. Message Guard (notification scanning) copy and permission text..",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "เปิดอยู่ ระบบจะเตือนเมื่อมีข้อความที่ดูมีความเสี่ยงเข้ามาจากแอปแชทและ SMS ของคุณ",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Own rewrite of the Gemini text (passive wording was awkward).",
-          "previous_translation": "On. Risky messages from your chat and SMS apps get a warning."
-        },
-        {
-          "id": "shield.messageGuard.status.off",
-          "namespace": "shield",
-          "english": "Off.",
-          "translation": "ปิด",
-          "back_translation": "Off.",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Untranslated English left in; should be 'ปิด'. | Auto: untranslated Latin text left in: Off.; identical to English (may be an accepted loanword)",
-          "machine_severity": 6,
-          "auto_checks": [
-            "latin",
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text. Message Guard (notification scanning) copy and permission text.. Short UI text: aim for at most 12 characters (English is 4).",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "ปิด",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI full text (complete in PDF).",
-          "previous_translation": "Off."
-        },
-        {
-          "id": "shield.messageGuard.status.needsAccess",
-          "namespace": "shield",
-          "english": "Off. Turning it on opens Android notification access.",
-          "translation": "ปิดอยู่ การเปิดใช้งานจะเปิดการเข้าถึงการแจ้งเตือนของ Android",
-          "back_translation": "Off. Turning it on opens Android notification access.",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Entire string left untranslated in English. | Auto: untranslated Latin text left in: Off., Turning, it, on, opens, notification; identical to English (left untranslated)",
-          "machine_severity": 8,
-          "auto_checks": [
-            "latin",
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text. Message Guard (notification scanning) copy and permission text..",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "ปิดอยู่ การเปิดใช้งานจะเปิดการเข้าถึงการแจ้งเตือนของ Android",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI text is cut off in the PDF; completed with Gemini.",
-          "previous_translation": "Off. Turning it on opens Android notification access."
-        },
-        {
-          "id": "shield.messageGuard.apps.show",
-          "namespace": "shield",
-          "english": "Choose apps ({{count}} on)",
-          "translation": "เลือกแอป (เปิดอยู่ {{count}} แอป)",
-          "back_translation": "Choose apps ({{count}} on)",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Entire string left untranslated in English. | Auto: untranslated Latin text left in: Choose, apps, on; identical to English (left untranslated)",
-          "machine_severity": 7,
-          "auto_checks": [
-            "latin",
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text. Message Guard (notification scanning) copy and permission text.. Placeholders (keep unchanged): {{count}}. Short UI text: aim for at most 47 characters (English is 26).",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "เลือกแอป (เปิดอยู่ {{count}} แอป)",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI full text (complete in PDF).",
-          "previous_translation": "Choose apps ({{count}} on)"
-        },
-        {
-          "id": "shield.messageGuard.apps.hide",
-          "namespace": "shield",
-          "english": "Hide apps ({{count}} on)",
-          "translation": "ซ่อนแอป (เปิดอยู่ {{count}} แอป)",
-          "back_translation": "Hide apps ({{count}} on)",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Text was left completely untranslated in English. | Auto: untranslated Latin text left in: Hide, apps, on; identical to English (left untranslated)",
-          "machine_severity": 7,
-          "auto_checks": [
-            "latin",
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text. Message Guard (notification scanning) copy and permission text.. Placeholders (keep unchanged): {{count}}. Short UI text: aim for at most 44 characters (English is 24).",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "ซ่อนแอป (เปิดอยู่ {{count}} แอป)",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI full text (complete in PDF).",
-          "previous_translation": "Hide apps ({{count}} on)"
-        },
-        {
-          "id": "shield.messageGuard.apps.a11y",
-          "namespace": "shield",
-          "english": "Apps Message Guard watches, {{count}} on",
-          "translation": "แอปที่ Message Guard ตรวจสอบ, เปิดอยู่ {{count}} แอป",
-          "back_translation": "Apps Message Guard watches, {{count}} on",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Screen reader label was left completely untranslated in English. | Auto: untranslated Latin text left in: Apps, watches, on; identical to English (left untranslated)",
-          "machine_severity": 6,
-          "auto_checks": [
-            "latin",
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: screen reader label. Message Guard (notification scanning) copy and permission text.. Placeholders (keep unchanged): {{count}}.",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "แอปที่ Message Guard ตรวจสอบ, เปิดอยู่ {{count}} แอป",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI text is cut off in the PDF; completed with Gemini.",
-          "previous_translation": "Apps Message Guard watches, {{count}} on"
-        },
-        {
-          "id": "shield.messageGuard.errors.accessOff",
-          "namespace": "shield",
-          "english": "Notification access is still off. If the switch is greyed out, open SafeRoute in App info, tap the three dots and choose \"Allow restricted settings\".",
-          "translation": "การเข้าถึงการแจ้งเตือนยังคงปิดอยู่ หากสวิตช์เป็นสีเทา ให้เปิด SafeRoute ในข้อมูลแอป แตะจุดสามจุด แล้วเลือก \"อนุญาตการตั้งค่าที่ถูกจำกัด\"",
-          "back_translation": "Notification access is still off. If the switch is greyed out, open SafeRoute in App info, tap the three dots and choose \"Allow restricted settings\".",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Critical setup instruction was left completely untranslated in English. | Auto: untranslated Latin text left in: Notification, access, is, still, off., If; identical to English (left untranslated)",
-          "machine_severity": 8,
-          "auto_checks": [
-            "latin",
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text. Message Guard (notification scanning) copy and permission text..",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "การเข้าถึงการแจ้งเตือนยังคงปิดอยู่ หากสวิตช์เป็นสีเทา ให้เปิด SafeRoute ในข้อมูลแอป แตะจุดสามจุด แล้วเลือก \"อนุญาตการตั้งค่าที่ถูกจำกัด\"",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI text is cut off in the PDF; completed with Gemini.",
-          "previous_translation": "Notification access is still off. If the switch is greyed out, open SafeRoute in App info, tap the three dots and choose \"Allow restricted settings\"."
-        },
-        {
-          "id": "shield.messageGuard.errors.cannotOpen",
-          "namespace": "shield",
-          "english": "Could not open the notification access settings.",
-          "translation": "ไม่สามารถเปิดการตั้งค่าการเข้าถึงการแจ้งเตือนได้",
-          "back_translation": "Could not open the notification access settings.",
-          "machine_flag": "likely_wrong",
-          "machine_note": "Error message was left completely untranslated in English. | Auto: untranslated Latin text left in: Could, not, open, the, notification, access; identical to English (left untranslated)",
-          "machine_severity": 7,
-          "auto_checks": [
-            "latin",
-            "identical"
-          ],
-          "priority": "safety",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text. Message Guard (notification scanning) copy and permission text..",
-          "reviewer_verdict": "corrected",
-          "reviewer_correction": "ไม่สามารถเปิดการตั้งค่าการเข้าถึงการแจ้งเตือนได้",
-          "reviewer_note": "Muse AI + Gemini cross-check, not native-reviewed. Muse AI text is cut off in the PDF; completed with Gemini.",
-          "previous_translation": "Could not open the notification access settings."
         },
         {
           "id": "account.title",
@@ -34350,7 +33347,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: heading or title. Short UI text: aim for at most 24 characters (English is 13).",
+          "context": "Screen: Screen shield screen. Element: heading or title. Short UI text: aim for at most 24 characters (English is 13).",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -34366,7 +33363,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text.",
+          "context": "Screen: Screen shield screen. Element: label or short text.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -34382,7 +33379,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text.",
+          "context": "Screen: Screen shield screen. Element: label or short text.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -34398,7 +33395,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text. Short UI text: aim for at most 51 characters (English is 28).",
+          "context": "Screen: Screen shield screen. Element: label or short text. Short UI text: aim for at most 51 characters (English is 28).",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -34414,7 +33411,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text.",
+          "context": "Screen: Screen shield screen. Element: label or short text.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -34430,7 +33427,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text.",
+          "context": "Screen: Screen shield screen. Element: label or short text.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -34446,7 +33443,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text.",
+          "context": "Screen: Screen shield screen. Element: label or short text.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -34462,7 +33459,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text.",
+          "context": "Screen: Screen shield screen. Element: label or short text.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -34478,7 +33475,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: label or short text.",
+          "context": "Screen: Screen shield screen. Element: label or short text.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -34494,7 +33491,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: button or link label.",
+          "context": "Screen: Screen shield screen. Element: button or link label.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -34510,7 +33507,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: sentence or paragraph.",
+          "context": "Screen: Screen shield screen. Element: sentence or paragraph.",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -34526,7 +33523,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: button or link label. Short UI text: aim for at most 44 characters (English is 24).",
+          "context": "Screen: Screen shield screen. Element: button or link label. Short UI text: aim for at most 44 characters (English is 24).",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -34542,7 +33539,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: button or link label. Short UI text: aim for at most 42 characters (English is 23).",
+          "context": "Screen: Screen shield screen. Element: button or link label. Short UI text: aim for at most 42 characters (English is 23).",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null
@@ -34558,7 +33555,7 @@
           "machine_severity": 0,
           "auto_checks": [],
           "priority": "ui",
-          "context": "Screen: Screen shield / Message Guard screen. Element: screen reader label. Short UI text: aim for at most 26 characters (English is 14).",
+          "context": "Screen: Screen shield screen. Element: screen reader label. Short UI text: aim for at most 26 characters (English is 14).",
           "reviewer_verdict": null,
           "reviewer_correction": null,
           "reviewer_note": null

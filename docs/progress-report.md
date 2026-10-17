@@ -338,7 +338,6 @@ An estimate, not a measurement: about USD 0.006 per check without grounding and 
 | Google sign-in on Android | Not device-tested by the team **(lead)** | |
 | Share to Kakwe | Not device-tested by the team **(lead)** | |
 | Contact picker and SMS | Not device-tested by the team **(lead)** | |
-| Message Guard (notification scanning) | In progress, not merged | Branch `feat/notifguard`, 3 commits ahead of `feat/production` |
 | Latency work (overlap, SSE, caches) | In progress, not merged | Branch `feat/perf`, has local unpushed commits and uncommitted edits |
 | Overlay in Burmese, Thai, Bahasa, Tagalog | Not translated | Kotlin strings are English (`docs/i18n.md`) |
 
@@ -415,7 +414,7 @@ Weights from `pitch/deck.md`, slide 2. Self-assessment, so treat it as opinion.
 | --- | --- | --- |
 | Technical merit and Gen AI | 40% | Strong. Multimodal extraction, search grounding, rules guard, speech, redaction, intelligence network, 27/27 eval. Weak spots: Web Risk 403, tunnel, thin benchmark on real screenshots |
 | Problem alignment and impact | 25% | Strong story: scam-compound recruitment in SEA, hotlines, Burmese. Weak spot: no pilot data, Family Guardian is design only |
-| Innovation and creativity | 25% | Good. Floating shield, likelihood language guard, privacy-first shared radar. Message Guard would add to this but is not merged |
+| Innovation and creativity | 25% | Good. Floating shield, likelihood language guard, privacy-first shared radar |
 | UX and solution design | 10% | Good. Five UI languages, empty states, 48 px targets. Weak spot: translations unreviewed |
 
 ## 9. Risks and known limitations
@@ -455,7 +454,7 @@ In priority order:
 1. **Link billing** to `saferoute-aibc`, run `scripts/deploy-cloudrun.sh`, check `/healthz`, confirm Web Risk stops returning 403. Then re-run the text eval against Cloud Run.
 2. **Make the repo public.** Only the owner can.
 3. **Real-phone test pass:** floating shield (including the drag fix), Google sign-in, share-to-Kakwe, contact picker and SMS.
-4. **Merge decisions:** decide if Message Guard and the latency work go in. If they do, merge, rebuild and test on a device. If not, say they are future work.
+4. **Merge decision:** decide if the latency work goes in. If it does, merge, rebuild and test on a device. If not, say it is future work.
 5. **Record the video** under 3 minutes from `pitch/video-script.md`. Check `/healthz` shows `mock:false` first. Add the file as `media/demo.mp4`.
 6. **Fix the deck:** team names and roles, deployed URL and contact email, slide 10 numbers (use 27/27, p50 3.1 s, p95 4.8 s and the current test count), the Family Guardian wording. Re-render the PDF and copy to `media/`.
 7. **Send benchmark screenshots** and run the real screenshot bench. Update `README.md` and `bench/RESULTS.md`.

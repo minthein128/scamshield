@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import type { Grounder } from '../src/ground.js';
 import { assessJobOffer, mergeFacts } from '../src/job/assess.js';
 import type { JobExtraction } from '../src/job/types.js';
-import { findJobBanned } from '../src/language-guard.js';
+import { findJobBanned, GROUND_EVIDENCE_FALLBACK } from '../src/language-guard.js';
 import type { Flag } from '../src/types.js';
 import { f, facts } from './helpers/job.js';
 
@@ -77,7 +77,7 @@ describe('job assessment', () => {
     expect(out.findings[0]?.code).toBe('company_not_checked');
   });
 
-  it('replaces search labels with localized job labels', async () => {
+  it('replaces search labels with localized job labels and English evidence with a source note', async () => {
     const g = fakeGrounder(false, [
       { family: 'identity', label: 'လိုင်စင်မှတ်တမ်းหรือข้อมูล', evidence: 'No record in the registry', severity: 'low' },
     ]);
@@ -85,7 +85,7 @@ describe('job assessment', () => {
     expect(res.flags).toContainEqual({
       family: 'identity',
       label: 'ဤကုမ္ပဏီ၏ လိုင်စင် သို့မဟုတ် မှတ်ပုံတင်ခြင်းကို ကျွန်ုပ်တို့ အတည်မပြုနိုင်ပါ',
-      evidence: 'No record in the registry',
+      evidence: GROUND_EVIDENCE_FALLBACK.my,
       severity: 'low',
     });
   });

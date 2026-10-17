@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import { ensureApiUrl, hasInternet, recentlyReached, refreshApiUrl } from '../config/runtime';
 import { getAuthToken } from '../services/token';
 import { ApiError } from './errors';
@@ -11,18 +12,14 @@ export { hasInput, hasJobInput } from './validate';
 export { createHttpClient } from './http';
 export { createMockClient } from './mock';
 
-function streamFetch(): typeof fetch | undefined {
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    return (require('expo/fetch') as { fetch: typeof fetch }).fetch;
-  } catch {
-    return undefined;
-  }
+/** Streamed checks are verified only in browsers; Android posts the plain check. */
+export function streamsChecks(os: string = Platform.OS): boolean {
+  return os === 'web';
 }
 
-export function createClientFromEnv(apiUrl: string | undefined, allowMock: boolean = __DEV__): CheckClient {
+export function createClientFromEnv(apiUrl: string | undefined, allowMock: boolean = __DEV__, os: string = Platform.OS): CheckClient {
   const url = apiUrl?.trim();
-  if (url) return createHttpClient({ baseUrl: url, getToken: getAuthToken, streamFetchImpl: streamFetch() });
+  if (url) return createHttpClient({ baseUrl: url, getToken: getAuthToken, stream: streamsChecks(os) });
   return allowMock ? createMockClient() : createUnavailableClient();
 }
 

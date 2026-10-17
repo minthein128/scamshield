@@ -23,10 +23,6 @@
       "title": "Payagan ang mga notification",
       "body": "Nagpapakita ang Android ng maliit na abiso habang tumatakbo ang shield. Gumagana ang shield kahit wala ito, pero maaaring hindi mo makita na naka-on ito."
     },
-    "guardNotifications": {
-      "title": "Payagan ang mga notification",
-      "body": "Binabalaan ka ng Message Guard sa pamamagitan ng abiso kapag mukhang mapanganib ang isang mensahe. Kung wala ang pahintulot na ito, hindi ito makakapagpakita ng babala."
-    },
     "contacts": {
       "title": "Payagan ang contacts",
       "body": "Binabasa lang ng $t(common:appName) ang isang contact kapag pinili mo ito, para punan ang pangalan at numero."

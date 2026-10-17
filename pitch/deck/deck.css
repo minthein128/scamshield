@@ -1,0 +1,81 @@
+@font-face { font-family: 'Jakarta'; font-weight: 400; src: url('../../assets/fonts/PlusJakartaSans-Regular.ttf'); }
+@font-face { font-family: 'Jakarta'; font-weight: 500; src: url('../../assets/fonts/PlusJakartaSans-Medium.ttf'); }
+@font-face { font-family: 'Jakarta'; font-weight: 600; src: url('../../assets/fonts/PlusJakartaSans-SemiBold.ttf'); }
+@font-face { font-family: 'Jakarta'; font-weight: 700; src: url('../../assets/fonts/PlusJakartaSans-Bold.ttf'); }
+@font-face { font-family: 'Jakarta'; font-weight: 800; src: url('../../assets/fonts/PlusJakartaSans-ExtraBold.ttf'); }
+@font-face { font-family: 'YoeShin'; font-weight: 400; src: url('../../assets/fonts/A10_YoeShin-Regular.ttf'); }
+@font-face { font-family: 'YoeShin'; font-weight: 700; src: url('../../assets/fonts/A10_YoeShin-Bold.ttf'); }
+@font-face { font-family: 'NotoThai'; font-weight: 400; src: url('../../assets/fonts/NotoSansThai-Regular.ttf'); }
+@font-face { font-family: 'NotoThai'; font-weight: 700; src: url('../../assets/fonts/NotoSansThai-Bold.ttf'); }
+
+:root {
+  --bg: #F7F3EE;
+  --ink: #1F1A17;
+  --ink-2: #57504A;
+  --muted: #6B635C;
+  --line: #E6DED3;
+  --card: #FFFFFF;
+  --sand: #EFE8DF;
+  --gold: #F2B01E;
+  --high: #9F1239;
+  --care: #B45309;
+  --low: #1D4ED8;
+}
+
+@page { size: 1920px 1080px; margin: 0; }
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body { font-family: 'Jakarta', 'YoeShin', 'NotoThai', sans-serif; color: var(--ink); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+.slide {
+  position: relative; width: 1920px; height: 1080px; overflow: hidden;
+  background: var(--bg); padding: 96px 120px 88px; page-break-after: always; break-after: page;
+}
+.slide:last-child { page-break-after: auto; break-after: auto; }
+.slide.dark { background: var(--ink); color: #F3ECE3; }
+
+.my { font-family: 'YoeShin', 'Jakarta', sans-serif; }
+.th { font-family: 'NotoThai', 'Jakarta', sans-serif; }
+
+.kicker { font-size: 26px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin: 0 0 18px; }
+.dark .kicker { color: #A89E94; }
+h1 { font-size: 76px; font-weight: 800; letter-spacing: -1.5px; line-height: 1.05; margin: 0 0 40px; }
+h2 { font-size: 40px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.15; margin: 0 0 14px; }
+p { margin: 0; }
+.lead { font-size: 38px; font-weight: 500; line-height: 1.35; color: var(--ink-2); }
+.body { font-size: 32px; line-height: 1.4; color: var(--ink-2); }
+.small { font-size: 22px; color: var(--muted); line-height: 1.4; }
+
+.pageno { position: absolute; right: 120px; bottom: 40px; font-size: 20px; font-weight: 600; color: var(--muted); }
+.brandtag { position: absolute; left: 120px; bottom: 36px; display: flex; align-items: center; gap: 12px; font-size: 22px; font-weight: 800; color: var(--ink); }
+.brandtag img { width: 34px; height: 34px; }
+.dark .brandtag { color: #F3ECE3; }
+.foot { position: absolute; left: 120px; right: 240px; bottom: 84px; font-size: 20px; color: var(--muted); line-height: 1.4; }
+
+.pill { display: inline-flex; align-items: center; gap: 10px; font-weight: 700; border-radius: 999px; padding: 6px 20px; font-size: 24px; }
+.pill.high { background: var(--high); color: #fff; }
+.pill.care { background: #FEF3C7; color: #854D0E; }
+.pill.low { background: #DBE5FF; color: #1E3A8A; }
+
+/* Phones */
+.phone { background: var(--ink); border-radius: 56px; padding: 14px; box-shadow: 0 24px 60px rgba(31,26,23,.22); position: relative; flex: none; }
+.phone .screen { border-radius: 44px; overflow: hidden; background: var(--bg); position: relative; }
+.phone .screen img { display: block; width: 100%; }
+.phone.w360 { width: 388px; }
+.phone.w330 { width: 358px; }
+.phone.w370 { width: 398px; }
+.shot { display: flex; flex-direction: column; align-items: center; gap: 22px; }
+.shot .cap { font-size: 24px; font-weight: 600; color: var(--ink-2); text-align: center; line-height: 1.3; max-width: 400px; }
+.shot .cap b { color: var(--ink); font-weight: 800; }
+
+/* Cards */
+.card { background: var(--card); border: 1.5px solid var(--line); border-radius: 28px; padding: 30px 34px; }
+.card h3 { font-size: 30px; font-weight: 800; margin: 0 0 8px; letter-spacing: -0.3px; }
+.card p { font-size: 25px; line-height: 1.35; color: var(--ink-2); }
+
+.stat { background: var(--card); border: 1.5px solid var(--line); border-radius: 28px; padding: 32px 34px; display: flex; flex-direction: column; gap: 10px; }
+.stat .num { font-size: 84px; font-weight: 800; letter-spacing: -2px; line-height: 1; }
+.stat .lbl { font-size: 27px; font-weight: 700; line-height: 1.25; }
+.stat .sub { font-size: 22px; color: var(--muted); line-height: 1.35; }
+
+.medal { width: 100%; height: 100%; display: block; }
