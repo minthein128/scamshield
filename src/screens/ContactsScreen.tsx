@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useContext, useLayoutEffect, useState } from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { NavigationContext } from '@react-navigation/native';
 import * as Contacts from 'expo-contacts';
 import { Screen } from '../components/Screen';
 import { Grid } from '../components/Grid';
@@ -20,6 +21,9 @@ export const ContactsScreen: React.FC = () => {
   const { t } = useTranslation('contacts');
   const { contacts, contactAccess, addContact, removeContact } = useAppState();
   const openSignIn = useOpenSignIn();
+  const navigation = useContext(NavigationContext);
+  // The tab bar rides above the Android keyboard and would cover the Add contact button.
+  useLayoutEffect(() => navigation?.setOptions?.({ tabBarHideOnKeyboard: true }), [navigation]);
   const [gateOpen, setGateOpen] = useState(false);
   const layout = useLayout();
   const [name, setName] = useState('');
@@ -122,8 +126,8 @@ export const ContactsScreen: React.FC = () => {
         </View>
       ) : (
         <>
-          {list}
           <View style={layout.isTablet ? styles.formCentered : undefined}>{addPane}</View>
+          {list}
         </>
       )}
 

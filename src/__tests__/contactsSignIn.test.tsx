@@ -132,6 +132,16 @@ describe('ContactsScreen prompt', () => {
     expect(screen.queryByTestId('contacts-gate')).toBeNull();
   });
 
+  it('puts the add form above the saved contacts', async () => {
+    await AsyncStorage.setItem(CONTACTS_KEY, JSON.stringify([legacy]));
+    mockStatus = { kind: 'account', uid: 'u1', email: 'a@b.co' };
+    await mount(<ContactsScreen />);
+    await screen.findByText('Aunt');
+    const tree = JSON.stringify(screen.toJSON());
+    expect(tree.indexOf('"contact-add"')).toBeGreaterThan(-1);
+    expect(tree.indexOf('"contact-add"')).toBeLessThan(tree.indexOf('"contact-name"'));
+  });
+
   it('shows the form for a signed-in user', async () => {
     mockStatus = { kind: 'account', uid: 'u1', email: 'a@b.co' };
     await mount(<ContactsScreen />);
