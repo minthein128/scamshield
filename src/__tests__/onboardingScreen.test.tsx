@@ -1,6 +1,7 @@
 import React from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import OnboardingScreen from '../screens/OnboardingScreen';
+import { CHECKS_PER_HOUR } from '../lib/onboarding';
 import type { AuthStatus } from '../services/accounts';
 
 let mockStatus: AuthStatus = { kind: 'anonymous', uid: 'anon' };
@@ -41,8 +42,11 @@ describe('onboarding screen', () => {
     toAccount();
     expect(screen.getByTestId('onboarding-card-without')).toBeTruthy();
     expect(screen.getByTestId('onboarding-card-with')).toBeTruthy();
-    expect(screen.getByText('Up to 20 checks an hour')).toBeTruthy();
-    expect(screen.getByText('Up to 60 checks an hour')).toBeTruthy();
+    expect(screen.getByText('Talk with Pyit Taing Htaung by voice')).toBeTruthy();
+    expect(screen.getByText('Tap Pyit Taing Htaung on your screen to check what you see')).toBeTruthy();
+    expect(screen.getAllByText(/checks an hour/)).toHaveLength(1);
+    expect(screen.getByText(`Up to ${CHECKS_PER_HOUR.account} checks an hour`)).toBeTruthy();
+    expect(screen.queryByText(/new phone/)).toBeNull();
   });
 
   it('moves to the countries step after a Google sign-in and does not finish onboarding', async () => {

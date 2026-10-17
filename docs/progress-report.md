@@ -61,7 +61,7 @@ Screenshots are real captures of the running web build at phone width. The brand
 <img src="../pitch/e2e/prod-04-onboarding-account-choice.png" width="240" alt="Onboarding account choice">
 </p>
 
-Four steps: language, home and destination country, how it works, account choice (anonymous, email, Google).
+Five steps: language, account choice (anonymous, Google, Facebook or email), home country, how it works, and sharing of anonymous scam patterns.
 
 ### 3.2 Home and Check
 

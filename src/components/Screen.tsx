@@ -17,9 +17,11 @@ interface ScreenProps {
   wide?: boolean;
   /** Lay footer buttons out in one row on tablets. */
   footerRow?: boolean;
+  /** Overrides the footer spacing for screens that need a tighter footer. */
+  footerStyle?: StyleProp<ViewStyle>;
 }
 
-export const Screen: React.FC<ScreenProps> = ({ children, footer, edges = ['top'], background = theme.colors.background, contentStyle, scroll = true, wide, footerRow, header }) => {
+export const Screen: React.FC<ScreenProps> = ({ children, footer, edges = ['top'], background = theme.colors.background, contentStyle, scroll = true, wide, footerRow, header, footerStyle }) => {
   const layout = useLayout();
   const [lifted, setLifted] = useState(false);
   const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -59,7 +61,7 @@ export const Screen: React.FC<ScreenProps> = ({ children, footer, edges = ['top'
       ) : (
         <View style={[styles.flex, tablet ? [styles.tabletContent, padX, topPad] : [styles.content, contentStyle, topPad]]}>{body}</View>
       )}
-      {footer ? <View style={[styles.footer, tablet && padX, { backgroundColor: background }]}>{footerBody}</View> : null}
+      {footer ? <View style={[styles.footer, tablet && padX, { backgroundColor: background }, footerStyle]}>{footerBody}</View> : null}
     </SafeAreaView>
   );
 };
