@@ -12,10 +12,6 @@
       "title": "Show the shield over other apps",
       "body": "The shield doll floats on top of other apps so you can tap it on anything suspicious. Android opens a settings page where you switch this on."
     },
-    "screen": {
-      "title": "Let $t(common:appName) see your screen",
-      "body": "When you tap the doll, $t(common:appName) reads what is on your screen to check it. It looks only when you tap. Android asks you to confirm."
-    },
     "notifications": {
       "title": "Allow notifications",
       "body": "Android shows a small notice while the shield runs. The shield works without it, but you may not see that it is on."
@@ -33,10 +29,6 @@
     "overlay": {
       "title": "Display over other apps is off",
       "body": "To use the shield, open Settings, find Display over other apps, and allow $t(common:appName). The rest of $t(common:appName) works without it."
-    },
-    "screen": {
-      "title": "Screen access was not allowed",
-      "body": "The shield needs this to see what you want checked. Turn the shield on again and choose Start now. The rest of $t(common:appName) works without it."
     },
     "contacts": {
       "title": "Contacts are off",

@@ -8,17 +8,16 @@
     "off": "Off. Turn it on to check what is on your screen."
   },
   "steps": {
-    "overlay": "Step 1 of 4: allow \"Display over other apps\", then come back to $t(common:appName).",
-    "notifications": "Step 2 of 4: allow notifications so Android keeps the shield running.",
-    "capture": "Step 3 of 4: allow $t(common:appName) to see your screen when you tap the doll.",
-    "starting": "Step 4 of 4: starting the shield.",
+    "overlay": "Step 1 of 3: allow \"Display over other apps\", then come back to $t(common:appName).",
+    "notifications": "Step 2 of 3: allow notifications so Android keeps the shield running.",
+    "starting": "Step 3 of 3: starting the shield.",
     "stopping": "Turning off the shield."
   },
   "needs": {
     "title": "What the shield needs",
     "overlay": "Allow \"Display over other apps\" so the doll can float over other apps.",
     "notifications": "Allow notifications so Android keeps the shield running.",
-    "capture": "Allow screen capture. $t(common:appName) only looks at your screen when you tap the doll.",
+    "capture": "Each time you tap the doll, Android asks to share your screen. Tap Start now. $t(common:appName) takes one picture, checks it and stops sharing.",
     "privacy": "The screenshot goes to the check service only to be checked. It is not saved."
   },
   "checkNow": "Check this screen now",
@@ -28,7 +27,6 @@
   "details": "Details and permissions",
   "detailsA11y": "Shield details",
   "errors": {
-    "needsScreen": "The shield needs to see your screen to check it. Try again and tap Start now.",
     "notStarted": "The shield did not start. Check that \"Display over other apps\" is allowed and try again.",
     "failed": "The shield did not start. Try again.",
     "checkFailed": "The check did not start. Turn the shield on and try again."

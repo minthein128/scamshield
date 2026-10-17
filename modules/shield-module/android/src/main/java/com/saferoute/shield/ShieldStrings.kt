@@ -65,6 +65,7 @@ class ShieldStrings private constructor(private val values: Map<String, String>)
     val micDenied get() = this["micDenied"]
     val needsForeground get() = this["needsForeground"]
     val endedCap get() = this["endedCap"]
+    val captureCancelled get() = this["captureCancelled"]
     val muteA11y get() = this["muteA11y"]
     val unmuteA11y get() = this["unmuteA11y"]
 
@@ -105,6 +106,7 @@ class ShieldStrings private constructor(private val values: Map<String, String>)
             "errCapture" to "Could not read the screen. Tap the shield to try again.",
             "errCaptureDenied" to "Screen capture was not allowed. Tap the shield to try again.",
             "errFailed" to "The check failed. Try again.",
+            "captureCancelled" to "Nothing was shared. Tap the doll when you want a check.",
             "dismiss" to "Dismiss",
             "fullReport" to "Full report",
             "showDetails" to "Show details",

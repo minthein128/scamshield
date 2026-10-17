@@ -15,9 +15,9 @@ Expo module for Android. It draws a floating bubble over other apps. A tap captu
 | `ShieldPalette.kt` | Light and dark colors from `src/theme/theme.ts`, chip and error labels |
 | `ShieldFonts.kt` | Plus Jakarta Sans from app assets, system sans as fallback |
 | `ShieldHaptics.kt` | Vibration patterns |
-| `ScreenCapturer.kt` | One MediaProjection, one VirtualDisplay, JPEG encoding |
+| `ScreenCapturer.kt` | One MediaProjection and one VirtualDisplay for one capture, JPEG encoding |
 | `CheckClient.kt` | HttpURLConnection call to `/v1/check` |
-| `ConsentActivity.kt` | Transparent activity that shows the screen-capture consent dialog |
+| `ConsentActivity.kt` | Transparent activity that shows the screen-capture consent dialog for one bubble tap |
 | `CompanionSession.kt` | Voice companion state machine: check, warning, `/v1/live` in companion mode, recheck, mute, focus, end |
 | `CompanionAudioEngine.kt` | Mic and speaker for a session, built on the `live-audio` engines, plus audio focus events |
 | `CompanionClients.kt` | `/v1/speak` client, WAV to 24 kHz PCM, OkHttp `/v1/live` socket |
@@ -43,10 +43,10 @@ cd android
 
 The compile check does not exercise runtime behavior. Verify these on a real device:
 
-1. Overlay permission, then `startShield({ apiUrl, language })`. Android 13 and lower call `requestScreenCapturePermission()` before the start; the consent stays for the app process, so the next start shows no dialog. Android 14 and up start without consent and the first bubble tap shows the system dialog.
+1. Overlay permission, then `startShield({ apiUrl, language })`. No version asks for screen capture at the start. Every bubble tap shows the system dialog; after Start now the bubble captures one frame, stops the projection (the cast icon goes away) and checks the frame.
 2. Tap the bubble in another app. The bubble stays on screen and the doll starts rocking under the scan sweep at once (after the 300 ms double-tap window), then shows the verdict ring, a verdict badge and a result pill. `adb logcat -s ShieldCapture` prints the capture path and timings.
 3. "Full report" opens `saferoute://report/<id>`. The app must declare the `saferoute` scheme and read the result with `getShieldResult(id)`.
-4. Android 14 and up: the consent dialog must appear again after the user stops sharing from the status bar chip.
+4. Cancel on the dialog: the bubble stays idle and a short notice says nothing was shared. Taps during the dialog or a check do nothing.
 
 ## Visual spec
 
@@ -260,9 +260,10 @@ Scam-pattern sharing is opt-in. `startShield({ shareSignals })` and `setShieldSh
 
 ## Rules to keep
 
-- Android 14 allows one `createVirtualDisplay` per MediaProjection and one `getMediaProjection` per consent result. The capturer keeps one display for the session. Do not create one per tap.
-- Android 13 and lower keep the consent result in `ShieldBridge.pendingConsent` after use and open a new projection from it on the next start. The projection itself stops with the shield, so no screen-sharing indicator stays on. A refused or user-stopped consent is dropped and the next bubble tap asks again.
+- Consent is per tap on every Android version. A tap launches `ConsentActivity` with a request id; `ShieldService.onConsentResult` opens one projection from that result only if it answers the current request, captures one frame and stops the projection before the network call. The result is never stored or reused, and the shield holds no projection while the bubble is idle.
+- Android 14 allows one `createVirtualDisplay` per MediaProjection and one `getMediaProjection` per consent result, which the per-tap flow follows.
+- The capture waits `DIALOG_SETTLE_MS` after the dialog closes so the frame does not show the dialog's exit animation. A tap more than `CONSENT_RETRY_MS` after an unanswered dialog (left with Home) asks again; the old answer is ignored.
 - `stopShield` runs on the main thread: it removes the bubble and sends `onShieldState` false before it resolves (`ShieldService.stopNow`). `onDestroy` releases the capture and the worker after that.
-- On Android 14 `startForeground` with type `mediaProjection` throws before consent. The service starts as `specialUse` and switches type after consent.
+- The service carries the `mediaProjection` type only while a capture is open. Idle, it runs as `specialUse` on Android 14 and up and with no type on Android 10 to 13 (plus `microphone` when voice is armed). On Android 14 `startForeground` with type `mediaProjection` throws before consent.
 - Overlay labels (verdict and error chips, "Tap to retry", Dismiss, Full report, TalkBack actions and the voice companion) come from the app in the user's language through `startShield({ strings })`. Verdict chips reuse the app's `common:verdict` words (Low risk, Be careful, High risk), never "Safe"; English fallbacks live in `ShieldStrings.DEFAULTS`. Result text comes from the server in the requested language. TalkBack sentences (the bubble description, "Expanded") and the error sentences TalkBack reads come from the same map (`a11y*`, `err*`); each failure kind maps to one translated sentence, and an unknown server message reads as "The check failed". `pitch/e2e/bubble-doll-states-my.png` shows the Burmese labels.
 - `startShield` options also carry `home` and `destination` country codes for the companion's verified hotlines.

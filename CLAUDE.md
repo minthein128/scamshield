@@ -35,7 +35,7 @@ Other env vars: `EXPO_PUBLIC_APK_URL` (download link on web), `EXPO_PUBLIC_FIREB
 
 ## Shield overlay (Android)
 
-- `src/screens/ShieldScreen.tsx` explains and asks for "Display over other apps", then POST_NOTIFICATIONS (Android 13+, optional), then on Android 13 and lower screen capture (reason dialog once per install, consent reused for the app process), then calls `startShield({ apiUrl, language, authToken })`. Android 14 and up ask for screen capture on the first bubble tap. The same flow runs from the switch on Home (`useShieldControl`). The circle and switch show the target state on the tap; a spinner shows only after 300 ms. "Check this screen now" calls `checkScreenNow()`.
+- `src/screens/ShieldScreen.tsx` explains and asks for "Display over other apps", then POST_NOTIFICATIONS (Android 13+, optional), then calls `startShield({ apiUrl, language, authToken })`. Turning the shield on never asks for screen capture: every bubble tap shows the system dialog, captures one frame and stops sharing. The same flow runs from the switch on Home (`useShieldControl`). The circle and switch show the target state on the tap; a spinner shows only after 300 ms. "Check this screen now" calls `checkScreenNow()`.
 - Overlay results are saved to recent checks by `useShieldSync` (listener plus `takeUnsyncedResults()` on start). `saferoute://report/<id>` opens the report through `useShieldDeepLink`.
 - The native client is blocked from cleartext `http://` by Android. `EXPO_PUBLIC_API_URL` must be `https://` for the shield. Cleartext is not enabled. The web build and `pnpm web` may use `http://localhost`.
 - The shield needs `EXPO_PUBLIC_API_URL`; it does not use the mock.

@@ -15,10 +15,6 @@
       "title": "Ipakita ang shield sa ibabaw ng ibang app",
       "body": "Lumulutang ang shield doll sa ibabaw ng ibang app para ma-tap mo ito kapag may kahina-hinala. Magbubukas ang Android ng settings page kung saan mo ito io-on."
     },
-    "screen": {
-      "title": "Payagan ang $t(common:appName) na makita ang screen mo",
-      "body": "Kapag tinap mo ang doll, binabasa ng $t(common:appName) ang nasa screen mo para suriin ito. Kapag nag-tap ka lang. Hihingi ng kumpirmasyon ang Android."
-    },
     "notifications": {
       "title": "Payagan ang mga notification",
       "body": "Nagpapakita ang Android ng maliit na abiso habang tumatakbo ang shield. Gumagana ang shield kahit wala ito, pero maaaring hindi mo makita na naka-on ito."
@@ -36,10 +32,6 @@
     "overlay": {
       "title": "Naka-off ang Display over other apps",
       "body": "Para magamit ang shield, buksan ang Settings, hanapin ang Display over other apps, at payagan ang $t(common:appName). Gumagana pa rin ang ibang bahagi ng $t(common:appName) kahit wala ito."
-    },
-    "screen": {
-      "title": "Hindi pinayagan ang access sa screen",
-      "body": "Kailangan ito ng shield para makita ang gusto mong suriin. I-on muli ang shield at piliin ang Start now. Gumagana pa rin ang ibang bahagi ng $t(common:appName) kahit wala ito."
     },
     "contacts": {
       "title": "Naka-off ang contacts",

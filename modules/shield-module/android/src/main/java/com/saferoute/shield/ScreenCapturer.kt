@@ -18,13 +18,13 @@ import android.view.WindowManager
 import java.io.ByteArrayOutputStream
 import kotlin.math.roundToInt
 
-/** A live screen capture for one shield session. */
+/** A live screen capture for one check. */
 interface ScreenSource {
     fun capture(notBefore: Long, waitMs: Long, masks: List<Rect>, onFrame: () -> Unit = {}): ScreenCapturer.Capture
     fun release()
 }
 
-/** Holds one MediaProjection and one VirtualDisplay for the whole session (Android 14 allows one). */
+/** Holds one MediaProjection and one VirtualDisplay for one check; release() stops the projection. */
 class ScreenCapturer(
     private val context: Context,
     private val projection: MediaProjection,

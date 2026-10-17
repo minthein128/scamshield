@@ -36,6 +36,8 @@ class ShieldService : Service(), ShieldOverlay.Listener {
     private var capturer: ScreenSource? = null
     private var started = false
     private var awaitingConsent = false
+    private var consentRequest = 0
+    private var consentAskedAt = 0L
     @Volatile private var apiUrl = ""
     @Volatile private var fallbackApiUrl = ""
     private var language = "en"
@@ -65,88 +67,93 @@ class ShieldService : Service(), ShieldOverlay.Listener {
         if (!started) {
             started = true
             createNotificationChannel()
-            promoteToForeground(withProjection = false)
+            promoteToForeground()
             overlay = ShieldOverlay(this, this).also {
                 it.strings = ShieldBridge.strings
                 it.show()
             }
             isRunning = true
             ShieldBridge.publishRunning(true)
-            if (ShieldBridge.pendingConsent != null) onConsentGranted()
         }
         overlay?.strings = ShieldBridge.strings
         armVoice()
         return START_NOT_STICKY
     }
 
+    /** True only while one capture is open. The shield holds no projection while the bubble is idle. */
     fun hasProjection(): Boolean = capturer != null
 
     internal val overlayForTest: ShieldOverlay? get() = overlay
 
-    fun onConsentGranted() {
+    /** The system dialog answered request [requestId]. A null [consent] means the user cancelled. */
+    fun onConsentResult(requestId: Int, consent: ShieldBridge.Consent?) {
         main.post {
-            if (!started) return@post
-            val consent = ShieldBridge.takeConsent() ?: return@post
-            var source: ScreenSource? = null
-            try {
-                promoteToForeground(withProjection = true)
-                capturer?.release()
-                capturer = null
-                source = openCapture(this, consent) { main.post { if (source != null && capturer === source) onProjectionStopped() } }
-            } catch (e: Exception) {
-                Log.w(TAG, "projection failed reused=${consent.uses > 1}: ${e.javaClass.simpleName}")
+            if (!started || !awaitingConsent || requestId != consentRequest) return@post
+            awaitingConsent = false
+            if (consent == null) {
+                onConsentCancelled()
+                return@post
             }
+            val source = openProjection(consent)
             if (source == null) {
-                ShieldBridge.forgetConsent(consent)
-                if (consent.uses > 1) {
-                    if (awaitingConsent) askConsent()
-                    return@post
-                }
-                awaitingConsent = false
                 failCheck("Screen capture could not start. Tap the shield to try again.")
                 return@post
             }
             capturer = source
-            if (awaitingConsent) {
-                awaitingConsent = false
-                startCheck()
-            }
+            startCheck(settleUntil = SystemClock.elapsedRealtime() + DIALOG_SETTLE_MS)
         }
     }
 
-    /** The user or the system ended screen sharing. The kept consent no longer opens a projection. */
-    private fun onProjectionStopped() {
-        capturer = null
-        ShieldBridge.forgetConsent(null)
+    /** Switches the service to the mediaProjection type and opens one projection, or returns null. */
+    private fun openProjection(consent: ShieldBridge.Consent): ScreenSource? {
+        var source: ScreenSource? = null
+        try {
+            setProjectionType(true)
+            source = openCapture(this, consent) { main.post { source?.let { if (capturer === it) endProjection(it) } } }
+        } catch (e: Exception) {
+            Log.w(TAG, "projection failed: ${e.javaClass.simpleName}")
+        }
+        if (source == null) setProjectionType(false)
+        return source
     }
 
-    fun onConsentDenied() {
-        main.post {
-            if (!awaitingConsent) return@post
-            awaitingConsent = false
-            failCheck("Screen capture was not allowed. Tap the shield to try again.")
+    /** Stops the projection of one check, drops its VirtualDisplay and leaves the mediaProjection type. */
+    private fun endProjection(source: ScreenSource) {
+        source.release()
+        if (capturer === source) capturer = null
+        if (capturer == null) setProjectionType(false)
+    }
+
+    private fun onConsentCancelled() {
+        val message = "Screen capture was not allowed. Tap the shield to try again."
+        if (companion != null || pendingCheck != null) {
+            failCheck(message)
+            return
         }
+        lastCheckError = message
+        overlay?.showNotice(ShieldBridge.strings.captureCancelled, opensApp = false)
     }
 
     fun requestCheck() {
         main.post { checkNow() }
     }
 
+    /** Every check asks for consent. Taps during a dialog, a capture or a check are ignored. */
     private fun checkNow() {
-        if (!started || busy.get() || awaitingConsent) return
-        if (capturer == null) {
-            awaitingConsent = true
-            if (ShieldBridge.pendingConsent != null) onConsentGranted() else askConsent()
-            return
-        }
-        startCheck()
+        if (!started || busy.get() || capturer != null) return
+        if (awaitingConsent && SystemClock.elapsedRealtime() - consentAskedAt < CONSENT_RETRY_MS) return
+        askConsent()
     }
 
-    /** Shows the system screen-capture dialog. On Android 14 and up the first bubble tap lands here. */
+    /** Shows the system screen-capture dialog through [ConsentActivity]. */
     private fun askConsent() {
+        consentRequest += 1
         awaitingConsent = true
-        overlay?.reset()
-        val intent = Intent(this, ConsentActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        consentAskedAt = SystemClock.elapsedRealtime()
+        if (companion == null) overlay?.reset()
+        val intent = Intent(this, ConsentActivity::class.java)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION)
+            .putExtra(ConsentActivity.EXTRA_REQUEST_ID, consentRequest)
         try {
             startActivity(intent)
         } catch (e: Exception) {
@@ -155,43 +162,59 @@ class ShieldService : Service(), ShieldOverlay.Listener {
         }
     }
 
-    private fun startCheck() {
+    /** Captures one frame once the dialog has gone ([settleUntil]), stops the projection, then checks the frame. */
+    private fun startCheck(settleUntil: Long) {
         val currentCapturer = capturer ?: return
-        if (!busy.compareAndSet(false, true)) return
+        if (!busy.compareAndSet(false, true)) {
+            endProjection(currentCapturer)
+            return
+        }
         val tapAt = SystemClock.elapsedRealtime()
         overlay?.setChecking()
         val masks = overlay?.captureRects().orEmpty()
-        worker.execute {
-            try {
-                var shot = currentCapturer.capture(tapAt + FRESH_FRAME_MS, FRAME_WAIT_MS, masks)
-                var path = "mask"
-                if (shot is ScreenCapturer.Capture.Busy) {
-                    path = "fade"
-                    val fadedBy = onMain { overlay?.fadeForCapture() } ?: SystemClock.elapsedRealtime()
-                    shot = currentCapturer.capture(fadedBy + FRAME_AFTER_FADE_MS, FADE_FRAME_WAIT_MS, emptyList()) {
-                        main.post { overlay?.afterCapture() }
+        try {
+            worker.execute {
+                try {
+                    var path = "mask"
+                    val shot = try {
+                        val settle = settleUntil - SystemClock.elapsedRealtime()
+                        if (settle > 0) Thread.sleep(settle)
+                        var frame = currentCapturer.capture(ANY_FRAME, FRAME_WAIT_MS, masks)
+                        if (frame is ScreenCapturer.Capture.Busy) {
+                            path = "fade"
+                            val fadedBy = onMain { overlay?.fadeForCapture() } ?: SystemClock.elapsedRealtime()
+                            frame = currentCapturer.capture(fadedBy + FRAME_AFTER_FADE_MS, FADE_FRAME_WAIT_MS, emptyList()) {
+                                main.post { overlay?.afterCapture() }
+                            }
+                        } else {
+                            main.post { overlay?.afterCapture() }
+                        }
+                        frame
+                    } finally {
+                        main.post { endProjection(currentCapturer) }
                     }
-                } else {
-                    main.post { overlay?.afterCapture() }
+                    val jpeg = (shot as? ScreenCapturer.Capture.Jpeg)
+                        ?: throw CheckException("Could not read the screen. Tap the shield to try again.")
+                    Log.i(
+                        TAG,
+                        "capture path=$path tap_to_jpeg_ms=${SystemClock.elapsedRealtime() - tapAt} crop=${jpeg.crop.toShortString()} " +
+                            "frame_wait_ms=${jpeg.frameWaitMs} encode_ms=${jpeg.encodeMs}" + if (path == "mask") " bubble hidden_ms=0" else ""
+                    )
+                    val result = withFailover { url, connectMs ->
+                        CheckClient.checkScreen(url, language, jpeg.bytes, ShieldBridge.authToken, ShieldBridge.shareSignals, connectMs)
+                    }
+                    main.post { onResult(result, jpeg.thumb) }
+                } catch (e: CheckException) {
+                    main.post { onFailure(e.message ?: "The check failed.") }
+                } catch (e: InterruptedException) {
+                    main.post { onFailure("The check was cancelled.") }
+                } catch (e: Throwable) {
+                    main.post { onFailure("The check failed. Try again.") }
                 }
-                val jpeg = (shot as? ScreenCapturer.Capture.Jpeg)
-                    ?: throw CheckException("Could not read the screen. Tap the shield to try again.")
-                Log.i(
-                    TAG,
-                    "capture path=$path tap_to_jpeg_ms=${SystemClock.elapsedRealtime() - tapAt} crop=${jpeg.crop.toShortString()} " +
-                        "frame_wait_ms=${jpeg.frameWaitMs} encode_ms=${jpeg.encodeMs}" + if (path == "mask") " bubble hidden_ms=0" else ""
-                )
-                val result = withFailover { url, connectMs ->
-                    CheckClient.checkScreen(url, language, jpeg.bytes, ShieldBridge.authToken, ShieldBridge.shareSignals, connectMs)
-                }
-                main.post { onResult(result, jpeg.thumb) }
-            } catch (e: CheckException) {
-                main.post { onFailure(e.message ?: "The check failed.") }
-            } catch (e: InterruptedException) {
-                main.post { onFailure("The check was cancelled.") }
-            } catch (e: Throwable) {
-                main.post { onFailure("The check failed. Try again.") }
             }
+        } catch (e: Exception) {
+            endProjection(currentCapturer)
+            onFailure("The check failed. Try again.")
         }
     }
 
@@ -462,8 +485,18 @@ class ShieldService : Service(), ShieldOverlay.Listener {
         overlay?.refreshTheme()
     }
 
-    private fun promoteToForeground(withProjection: Boolean) {
-        projectionTyped = withProjection || projectionTyped
+    /** Adds the mediaProjection type for one capture and removes it as soon as the capture ends. */
+    private fun setProjectionType(on: Boolean) {
+        if (projectionTyped == on) return
+        projectionTyped = on
+        if (on) {
+            promoteToForeground()
+        } else {
+            runCatching { promoteToForeground() }.onFailure { Log.w(TAG, "type reset failed: ${it.javaClass.simpleName}") }
+        }
+    }
+
+    private fun promoteToForeground() {
         if (promote()) return
         if (micTyped) {
             micTyped = false
@@ -472,12 +505,13 @@ class ShieldService : Service(), ShieldOverlay.Listener {
         ServiceCompat.startForeground(this, NOTIFICATION_ID, buildNotification(), foregroundType())
     }
 
-    private fun foregroundType(): Int {
+    /** mediaProjection only during a capture; idle is specialUse on Android 14 and up, no type on 10 to 13. */
+    internal fun foregroundType(): Int {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return 0
-        var type = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE && !projectionTyped) {
-            ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
-        } else {
-            ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION
+        var type = when {
+            projectionTyped -> ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+            else -> 0
         }
         if (micTyped && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) type = type or ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
         return type
@@ -536,8 +570,11 @@ class ShieldService : Service(), ShieldOverlay.Listener {
         const val EXTRA_FALLBACK_API_URL = "fallbackApiUrl"
         const val EXTRA_LANGUAGE = "language"
         private const val TAG = "ShieldCapture"
-        /** A frame two vsyncs after the tap no longer shows the dismissed result card. */
-        private const val FRESH_FRAME_MS = 34L
+        /** The system dialog and its exit animation are gone from the mirrored screen after this. */
+        internal const val DIALOG_SETTLE_MS = 300L
+        /** A tap this long after an unanswered dialog asks again (the user left the dialog with Home). */
+        internal const val CONSENT_RETRY_MS = 10_000L
+        private const val ANY_FRAME = 1L
         private const val FRAME_WAIT_MS = 200L
         private const val FRAME_AFTER_FADE_MS = 17L
         private const val FADE_FRAME_WAIT_MS = 150L

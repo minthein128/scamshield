@@ -92,6 +92,7 @@
     "errTooLarge": "The screenshot is too large to check.",
     "errCapture": "Could not read the screen. Tap the shield to try again.",
     "errCaptureDenied": "Screen capture was not allowed. Tap the shield to try again.",
-    "errFailed": "The check failed. Try again."
+    "errFailed": "The check failed. Try again.",
+    "captureCancelled": "Nothing was shared. Tap the doll when you want a check."
   }
 }

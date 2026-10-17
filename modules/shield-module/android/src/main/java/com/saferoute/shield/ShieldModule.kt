@@ -4,7 +4,6 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
 import androidx.core.content.ContextCompat
-import expo.modules.kotlin.Promise
 import expo.modules.kotlin.exception.CodedException
 import expo.modules.kotlin.functions.Queues
 import expo.modules.kotlin.modules.Module
@@ -53,27 +52,6 @@ class ShieldModule : Module() {
                 true
             } catch (e: Exception) {
                 false
-            }
-        }
-
-        AsyncFunction("requestScreenCapturePermission") { promise: Promise ->
-            if (ShieldBridge.hasProjection()) {
-                promise.resolve(true)
-                return@AsyncFunction
-            }
-            val context = appContext.currentActivity ?: appContext.reactContext
-            if (context == null) {
-                promise.resolve(false)
-                return@AsyncFunction
-            }
-            ShieldBridge.consentCallback = { granted -> promise.resolve(granted) }
-            try {
-                context.startActivity(
-                    Intent(context, ConsentActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                )
-            } catch (e: Exception) {
-                ShieldBridge.consentCallback = null
-                promise.resolve(false)
             }
         }
 
