@@ -92,7 +92,7 @@ export function useShieldControl(): ShieldControl {
       }
       awaitingOverlay.current = false;
       setStep('notifications');
-      const notified = await ensureNotifications('notifications', permissionApi({ explain: explainOnceEver }));
+      const notified = await ensureNotifications(permissionApi({ explain: explainOnceEver }));
       if (notified !== 'granted') diag.info('shield', 'notifications_not_granted', { result: notified });
       setStep('capture');
       if (!(await explainOnce('screen'))) {

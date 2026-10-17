@@ -18,7 +18,6 @@ Migrant workers from Myanmar, Thailand, Indonesia and the Philippines find jobs 
 | **Check anything** | Paste a message or link, or share a screenshot. Get **Low risk**, **Be careful** or **High risk**, the quoted words behind it, and a verified hotline for your home and destination countries. |
 | **Job Shield** | Compares the job ad with what the recruiter asks in chat and shows each gap, such as "no fees" in the ad and a deposit in the chat. |
 | **Screen bubble** (Android) | A floating Pyit Taing Htaung doll checks whatever is on screen, in any app, with one tap. |
-| **Message Guard** (Android, opt-in) | Watches notifications from the chat apps you choose and flags risky messages. |
 | **Voice companion** | Talk to Pyit Taing Htaung about a report in your language, on Gemini Live. |
 | **Warn my family** | Sends the warning to a trusted contact by SMS or the share sheet. |
 | **Scam network** (opt-in) | A risky check adds one anonymous, redacted signal. Repeat numbers and handles are matched as keyed hashes and raise the next person's warning. |
@@ -60,7 +59,7 @@ Details: [docs/architecture.md](docs/architecture.md), [docs/api-contract.md](do
 - **Likelihood, never accusation.** Reports say "shows signs of" and never call a named person or company a criminal.
 - **Leave quickly.** One button on every report clears the screen back to Home and stops any audio.
 - **Nothing stored from the check.** Images and message text are not stored or logged. Synced history keeps only the verdict, a score band, the title and the summary, and history can be turned off.
-- **Consent first.** Signal sharing is off until the user turns it on during setup or in Settings. Message Guard explains what it reads and asks for each app.
+- **Consent first.** Signal sharing is off until the user turns it on during setup or in Settings.
 - **Hashed network.** Phones, handles and accounts are stored as HMAC-SHA256 hashes, signals expire after 90 days, and clients cannot read the network directly.
 
 ## Benchmarks

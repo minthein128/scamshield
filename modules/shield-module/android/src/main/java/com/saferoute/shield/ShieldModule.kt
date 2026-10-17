@@ -1,11 +1,8 @@
 package com.saferoute.shield
 
-import android.content.ComponentName
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.provider.Settings
-import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import expo.modules.kotlin.Promise
 import expo.modules.kotlin.exception.CodedException
@@ -26,6 +23,7 @@ class ShieldModule : Module() {
             ShieldBridge.stateSink = { running ->
                 this@ShieldModule.sendEvent("onShieldState", mapOf("running" to running))
             }
+            appContext.reactContext?.let { LegacyDataCleanup.run(it) }
         }
 
         OnDestroy {
@@ -120,93 +118,10 @@ class ShieldModule : Module() {
 
         AsyncFunction("getShieldResult") { id: String ->
             ShieldBridge.recentResult(id)
-                ?: appContext.reactContext?.let { MessageGuardStore(it).result(id) }
         }
 
         AsyncFunction("takeUnsyncedResults") {
             ShieldBridge.takeUnsynced()
-        }
-
-        AsyncFunction("hasNotificationAccess") {
-            val context = appContext.reactContext ?: return@AsyncFunction false
-            NotificationManagerCompat.getEnabledListenerPackages(context).contains(context.packageName)
-        }
-
-        AsyncFunction("openNotificationAccessSettings") {
-            val context = appContext.currentActivity ?: appContext.reactContext ?: return@AsyncFunction false
-            val detail = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                Intent(Settings.ACTION_NOTIFICATION_LISTENER_DETAIL_SETTINGS).putExtra(
-                    Settings.EXTRA_NOTIFICATION_LISTENER_COMPONENT_NAME,
-                    ComponentName(context, MessageGuardListener::class.java).flattenToString()
-                )
-            } else {
-                null
-            }
-            val list = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
-            for (intent in listOfNotNull(detail, list)) {
-                try {
-                    context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-                    return@AsyncFunction true
-                } catch (e: Exception) {
-                    continue
-                }
-            }
-            false
-        }
-
-        AsyncFunction("setMessageGuardEnabled") { enabled: Boolean ->
-            val context = appContext.reactContext ?: return@AsyncFunction false
-            MessageGuardBridge.setEnabled(context, enabled)
-        }
-
-        AsyncFunction("isMessageGuardEnabled") {
-            val context = appContext.reactContext ?: return@AsyncFunction false
-            MessageGuardStore(context).enabled
-        }
-
-        AsyncFunction("getMessageGuardStatus") {
-            val context = appContext.reactContext ?: return@AsyncFunction null
-            MessageGuardBridge.status(context)
-        }
-
-        AsyncFunction("grantMessageGuardConsent") { ids: List<String> ->
-            val context = appContext.reactContext ?: return@AsyncFunction false
-            MessageGuardBridge.grantConsent(context, ids)
-        }
-
-        AsyncFunction("setMessageGuardApps") { ids: List<String> ->
-            val context = appContext.reactContext ?: return@AsyncFunction false
-            MessageGuardBridge.keepApps(context, ids)
-        }
-
-        AsyncFunction("getMessageGuardApps") {
-            val context = appContext.reactContext ?: return@AsyncFunction emptyList<Map<String, Any>>()
-            MessageGuardBridge.apps(context)
-        }
-
-        AsyncFunction("configureMessageGuard") { options: Map<String, Any?> ->
-            val context = appContext.reactContext ?: return@AsyncFunction false
-            MessageGuardBridge.configure(context, options)
-        }
-
-        AsyncFunction("getMessageGuardLog") {
-            val context = appContext.reactContext ?: return@AsyncFunction emptyList<Map<String, Any>>()
-            MessageGuardBridge.log(context)
-        }
-
-        AsyncFunction("getMessageGuardActivity") { afterSeq: Double ->
-            val context = appContext.reactContext ?: return@AsyncFunction null
-            MessageGuardBridge.activity(context, afterSeq.toLong())
-        }
-
-        AsyncFunction("openBatteryOptimizationSettings") {
-            val context = appContext.currentActivity ?: appContext.reactContext ?: return@AsyncFunction false
-            MessageGuardBridge.openBatterySettings(context)
-        }
-
-        AsyncFunction("clearMessageGuardLog") {
-            val context = appContext.reactContext ?: return@AsyncFunction false
-            MessageGuardBridge.clearLog(context)
         }
     }
 }

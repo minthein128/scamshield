@@ -25,7 +25,6 @@ import RadarScreen from '../screens/RadarScreen';
 import { navigationRef } from './ref';
 import { useAppState } from '../state/AppState';
 import { PermissionHost } from '../components/PermissionHost';
-import { useMessageGuardConfigSync } from '../hooks/useMessageGuard';
 import { useShieldTokenSync } from '../hooks/useShieldTokenSync';
 import LearnScreen from '../screens/LearnScreen';
 import ShieldScreen from '../screens/ShieldScreen';
@@ -97,7 +96,6 @@ export const RootNavigator: React.FC = () => {
   const { ready: loaded, profile } = useAppState();
   useShieldTokenSync();
   useShieldShareSync();
-  useMessageGuardConfigSync();
   if (!loaded) return null;
   const inApp = profile.onboarded && profile.sharingAsked;
   return (

@@ -53,14 +53,14 @@ describe('just-in-time permissions', () => {
 
   it('never asks for notifications below Android 13', async () => {
     const a = api({ version: 32 });
-    expect(await ensureNotifications('notifications', a)).toBe('granted');
+    expect(await ensureNotifications(a)).toBe('granted');
     expect(a.calls).toEqual([]);
   });
 
   it('asks for notifications on Android 13 and above, and a refusal does not throw', async () => {
     const a = api({ request: jest.fn(async () => DENIED) });
-    expect(await ensureNotifications('guardNotifications', a)).toBe('denied');
-    expect(a.explain).toHaveBeenCalledWith('guardNotifications');
+    expect(await ensureNotifications(a)).toBe('denied');
+    expect(a.explain).toHaveBeenCalledWith('notifications');
   });
 
   it('on web only explains and leaves the browser prompt to the feature', async () => {
@@ -107,8 +107,8 @@ describe('explainOnceEver', () => {
   it('skips the system dialog after the reason was shown once', async () => {
     const a = api({ explain: explainOnceEver });
     const off = registerPermissionHost({ explain: jest.fn(async () => true), help: jest.fn() });
-    expect(await ensureNotifications('notifications', a)).toBe('granted');
-    expect(await ensureNotifications('notifications', a)).toBe('declined');
+    expect(await ensureNotifications(a)).toBe('granted');
+    expect(await ensureNotifications(a)).toBe('declined');
     expect(a.request).toHaveBeenCalledTimes(1);
     off();
   });

@@ -158,10 +158,10 @@
     "parcel": {
       "e1": {
         "title": "Pesan masuk",
-        "caption": "$t(common:appName) memperingatkan Anda sebelum membuka tautan."
+        "caption": "Ketuk boneka sebelum membuka tautan."
       },
       "e2": {
-        "title": "Ketuk untuk melihat alasannya",
+        "title": "Hasilnya",
         "caption": "Anda melihat alasannya. Jangan buka tautan tersebut."
       }
     },

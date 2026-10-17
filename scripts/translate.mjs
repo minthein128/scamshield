@@ -23,7 +23,6 @@ const LANG_NAMES = {
 const GLOSSARY = {
   Kakwe: { my: 'ကာကွယ်', id: 'Kakwe', tl: 'Kakwe', th: 'Kakwe' },
   'Screen shield': { all: null },
-  'Message Guard': { all: null },
   'Pyit Taing Htaung (the voice companion)': { my: 'ပစ်တိုင်းထောင်', id: 'Pyit Taing Htaung', tl: 'Pyit Taing Htaung', th: 'Pyit Taing Htaung' },
   'Low risk (the safe verdict; never "Safe", it must read as a likelihood)': { my: 'အန္တရာယ်နည်း', id: 'Risiko rendah', tl: 'Mababang panganib', th: 'ความเสี่ยงต่ำ' },
   'Be careful (the careful verdict)': { my: 'သတိထားပါ', id: 'Hati-hati', tl: 'Mag-ingat', th: 'ระวัง' },

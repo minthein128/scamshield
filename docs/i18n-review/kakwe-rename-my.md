@@ -49,11 +49,3 @@ Native review list. Every string below now names the app ကာကွယ် (sou
 | `shield:steps.overlay` | အဆင့် ၁/၄ - "အခြားအက်ပ်များပေါ်တွင် ပြသရန်" ခွင့်ပြုပြီးနောက် ကာကွယ် သို့ ပြန်လာပါ။ |
 | `shield:steps.capture` | အဆင့် 3/4: အရုပ်လေးကို နှိပ်သည့်အခါ ကာကွယ် အား သင့်မျက်နှာပြင်ကို ကြည့်ခွင့်ပြုပါ။ |
 | `shield:body` | ပစ်တိုင်းထောင်အရုပ်လေးသည် တခြားအက်ပ်များအပေါ်တွင် ပေါ်နေပါမည်။ အလုပ်ကြော်ငြာ၊ စကားပြောခန်း သို့မဟုတ် ပို့စ်များတွင် အရုပ်လေးကို နှိပ်ပါက မျက်နှာပြင်ပေါ်ရှိ အရာများကို ကာကွယ် က စစ်ဆေးပေးပါမည်။ |
-| `shield:messageGuard.status.web` | ကာကွယ် Android အက်ပ်တွင် အသုံးပြုနိုင်ပါသည်။ |
-| `shield:messageGuard.errors.accessOff` | အသိပေးချက် ရယူခွင့် ပိတ်ထားဆဲ ဖြစ်ပါသည်။ ခလုတ်ကို နှိပ်မရဘဲ မီးခိုးရောင် ဖြစ်နေပါက App info တွင် ကာကွယ် ကို ဖွင့်ပါ၊ အစက်သုံးစက်ကို နှိပ်ပြီး "Allow restricted settings" ကို ရွေးပါ။ |
-| `shield:messageGuard.consent.who.body` | ကာကွယ် ဆာဗာနှင့် Google ၏ AI က မက်ဆေ့ဂျ်ကို စစ်ဆေးပြီး ရလဒ်ကို ပြန်ပို့ပါသည်။ |
-| `shield:messageGuard.consent.phone.body` | သင့်ဖုန်းကို ကိုင်ထားသူ မည်သူမဆို ကာကွယ် အသိပေးချက်နှင့် ရလဒ်များကို မြင်နိုင်ပါသည်။ |
-| `shield:messageGuard.kill.hint` | Message Guard ကို ပိတ်ပြီး Android ဆက်တင်ကို ဖွင့်ပေးပါမည်။ ထိုနေရာတွင် ကာကွယ် ၏ အသိပေးချက် ရယူခွင့်ကို ဖယ်ရှားနိုင်ပါသည်။ |
-| `shield:messageGuard.activity.outcome.resultWarned` | စစ်ပြီး၊ ကာကွယ် က အသိပေးချက် ပြထားသည် |
-| `shield:messageGuard.activity.outcome.noticeBlocked` | စစ်ပြီးသော်လည်း ကာကွယ် အသိပေးချက်များ ပိတ်ထားသဖြင့် အသိပေးချက် မပေါ်ပါ |
-| `shield:messageGuard.health.notificationsOff` | ကာကွယ် အသိပေးချက်များ ပိတ်ထားသဖြင့် သတိပေးချက်များကို မမြင်ရပါ။ |

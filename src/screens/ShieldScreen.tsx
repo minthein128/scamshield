@@ -3,7 +3,6 @@ import { StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import * as ShieldModule from 'shield-module';
 import { Screen } from '../components/Screen';
-import { MessageGuardCard } from '../components/MessageGuardCard';
 import { VoiceCompanionCard } from '../components/VoiceCompanionCard';
 import { ShieldCardView } from '../components/ShieldCard';
 import { Text } from '../components/Text';
@@ -27,7 +26,6 @@ export const ShieldScreen: React.FC<RootScreenProps<'Shield'>> = ({ navigation }
   useEffect(() => {
     if (control.support !== 'ready') return;
     const sub = ShieldModule.addShieldResultListener(r => {
-      if (r.kind === 'message') return;
       setChecking(false);
       navigation.navigate('Report', { result: toCheckResponse(r), language, fresh: true });
     });
@@ -43,7 +41,6 @@ export const ShieldScreen: React.FC<RootScreenProps<'Shield'>> = ({ navigation }
     <Screen header={<ScreenHeader title={t('title')} onBack={() => navigation.goBack()} />}>
       <ShieldCardView control={control} />
       <VoiceCompanionCard />
-      <MessageGuardCard />
       <Card style={{ gap: 8 }}>
         <Text style={styles.title}>{t('needs.title')}</Text>
         {STEPS.map((step, i) => (
