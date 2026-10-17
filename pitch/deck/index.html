@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Kakwe: AI Builder Cup 2026</title>
+<link rel="stylesheet" href="deck.css">
+<style>
+/* 1 Title */
+.title-grid { display: grid; grid-template-columns: 1fr 560px; gap: 80px; height: 100%; align-items: center; }
+.wordmark { display: flex; align-items: center; gap: 40px; margin-bottom: 44px; }
+.wordmark .m { width: 190px; height: 190px; }
+.wordmark .en { font-size: 150px; font-weight: 800; letter-spacing: -4px; line-height: .9; color: #fff; }
+.wordmark .mm { font-family: 'YoeShin'; font-size: 58px; color: var(--gold); margin-top: 18px; line-height: 1.2; }
+.tagline { font-size: 50px; font-weight: 700; line-height: 1.2; color: #fff; letter-spacing: -0.5px; max-width: 980px; }
+.tagline-my { font-family: 'YoeShin'; font-size: 32px; color: #CFC5B9; margin-top: 22px; line-height: 1.5; }
+.links { display: flex; flex-direction: column; gap: 26px; }
+.links div { border-left: 4px solid #3A322D; padding-left: 24px; }
+.links b { display: block; font-size: 22px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #A89E94; margin-bottom: 4px; }
+.links span { font-size: 27px; font-weight: 600; color: #fff; }
+.title-foot { position: absolute; left: 120px; right: 120px; bottom: 56px; display: flex; justify-content: space-between; font-size: 22px; color: #A89E94; }
+
+/* 2 Problem */
+.prob { display: grid; grid-template-columns: 820px 1fr; gap: 100px; align-items: center; margin-top: 70px; }
+.bignum { font-size: 196px; font-weight: 800; letter-spacing: -8px; line-height: .9; }
+.bignum-l { font-size: 46px; font-weight: 700; line-height: 1.25; margin-top: 26px; }
+.source { font-size: 26px; color: var(--muted); margin-top: 22px; }
+.who { display: flex; flex-direction: column; gap: 36px; }
+.who .row { display: flex; gap: 24px; align-items: baseline; }
+.who .row i { font-style: normal; font-weight: 800; font-size: 30px; color: var(--muted); width: 40px; flex: none; }
+.who .row p { font-size: 36px; line-height: 1.35; color: var(--ink); font-weight: 600; }
+
+/* 3 Ma Su */
+.masu { display: grid; grid-template-columns: 820px 1fr; gap: 100px; align-items: center; margin-top: 60px; }
+.chat { background: #E9E2D8; border-radius: 40px; padding: 40px; }
+.chat .who2 { display: flex; align-items: center; gap: 16px; margin-bottom: 22px; }
+.chat .av { width: 56px; height: 56px; border-radius: 50%; background: #CFC5B9; display: grid; place-items: center; font-weight: 800; font-size: 24px; color: var(--ink); }
+.chat .nm { font-size: 26px; font-weight: 800; }
+.chat .nm small { display: block; font-size: 19px; font-weight: 600; color: var(--muted); }
+.bubble { background: #fff; border-radius: 8px 28px 28px 28px; padding: 32px 36px; font-size: 33px; line-height: 1.45; color: var(--ink); }
+.bubble mark { background: #FBE3E8; color: var(--ink); padding: 0 4px; border-radius: 6px; }
+.steps { display: flex; flex-direction: column; gap: 48px; }
+.step { display: flex; gap: 26px; }
+.step .n { width: 60px; height: 60px; border-radius: 50%; background: var(--ink); color: #fff; font-weight: 800; font-size: 26px; display: grid; place-items: center; flex: none; }
+.step p { font-size: 38px; line-height: 1.35; font-weight: 600; padding-top: 4px; }
+.step.risk .n { background: var(--high); }
+.fic { display: inline-block; font-size: 20px; font-weight: 700; color: var(--muted); border: 1.5px solid var(--line); border-radius: 999px; padding: 4px 16px; margin-left: 20px; vertical-align: middle; letter-spacing: 0; }
+
+/* 4 One picture */
+.hub { position: relative; height: 740px; margin-top: -14px; }
+.hub .center { position: absolute; left: 50%; top: 360px; width: 300px; height: 300px; transform: translate(-50%, -50%); }
+.hub .center img { width: 100%; height: 100%; }
+.hub .tile { position: absolute; width: 560px; background: #fff; border: 1.5px solid var(--line); border-radius: 28px; padding: 26px 32px; }
+.hub .tile h3 { font-size: 34px; font-weight: 800; margin: 0 0 6px; }
+.hub .tile p { font-size: 28px; line-height: 1.35; color: var(--ink-2); }
+.hub svg.links2 { position: absolute; inset: 0; }
+
+/* Demo */
+.demo { display: grid; grid-template-columns: 560px 1fr; gap: 40px; height: 100%; }
+.demo .phones { display: flex; gap: 44px; justify-content: flex-end; align-items: flex-start; margin-top: -8px; }
+.demo .list { display: flex; flex-direction: column; gap: 34px; margin-top: 10px; }
+.demo .list .step p { font-size: 30px; }
+.badge { position: absolute; top: -18px; left: -18px; width: 58px; height: 58px; border-radius: 50%; background: var(--ink); color: #fff; font-weight: 800; font-size: 26px; display: grid; place-items: center; border: 4px solid var(--bg); z-index: 2; }
+
+.crop { position: relative; overflow: hidden; }
+.crop img { position: absolute; left: 0; top: 0; width: 100%; }
+.schem { background: #EDE6DC; position: relative; }
+.schem .bar { position: absolute; height: 18px; border-radius: 9px; background: #D6CCBF; }
+.schem .msg { position: absolute; border-radius: 22px; background: #fff; }
+.schem .msg.me { background: #DDEBD3; }
+.sprite { position: absolute; background-image: url('../e2e/bubble-doll-states.png'); background-repeat: no-repeat; }
+
+/* Architecture */
+.arch { margin-top: -6px; }
+.hosting { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 18px; }
+.hosting .card { padding: 22px 30px; }
+.hosting .card p { font-size: 24px; }
+.hosting .card h3 { font-size: 24px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+
+/* 7 Why Gen AI */
+.why { display: grid; grid-template-columns: repeat(3, 1fr); gap: 34px; margin-top: 30px; }
+.why .card { min-height: 316px; padding: 38px 40px; }
+.why .card h3 { font-size: 38px; margin-bottom: 12px; }
+.why .card p { font-size: 30px; }
+.why .card .tag { display: inline-block; font-size: 21px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+.why .card.wide { grid-column: span 1; }
+
+/* 8 Proof */
+.proof { display: grid; grid-template-columns: repeat(3, 1fr); gap: 34px; margin-top: 20px; }
+.proof .stat { min-height: 300px; padding: 34px 40px; }
+.proof .stat .num { font-size: 104px; }
+.proof .stat .lbl { font-size: 31px; }
+.proof .stat .sub { font-size: 25px; }
+.proof .stat.hl { background: var(--ink); color: #fff; border-color: var(--ink); }
+.proof .stat.hl .sub { color: #CFC5B9; }
+
+/* 9 Safety */
+.safety { display: grid; grid-template-columns: 1fr 420px; gap: 80px; }
+.rules { display: grid; grid-template-columns: 1fr 1fr; gap: 26px 44px; }
+.rule { border-top: 3px solid var(--ink); padding-top: 18px; }
+.rule h3 { font-size: 30px; font-weight: 800; margin: 0 0 6px; }
+.rule p { font-size: 25px; color: var(--ink-2); line-height: 1.35; }
+
+/* 10 UX */
+.ux { display: grid; grid-template-columns: 1fr 400px; gap: 90px; }
+.moods { display: flex; gap: 34px; margin: 6px 0 44px; }
+.mood { background: #fff; border: 1.5px solid var(--line); border-radius: 28px; padding: 24px 22px 26px; width: 300px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.mood img { width: 150px; height: 150px; }
+.mood .w { font-size: 22px; color: var(--muted); font-weight: 600; }
+.meter { display: flex; gap: 10px; margin-top: 4px; width: 100%; }
+.meter span { flex: 1; height: 10px; border-radius: 5px; background: #DCD3C8; }
+.uxlist { display: flex; flex-direction: column; gap: 22px; }
+.uxlist p { font-size: 30px; line-height: 1.35; font-weight: 600; }
+.uxlist p b { font-weight: 800; }
+
+/* 11 Feasibility */
+.feas { display: grid; grid-template-columns: 1fr 1fr; gap: 90px; margin-top: 30px; }
+.feas h2 { font-size: 30px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+.feas ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 30px; }
+.feas li { font-size: 34px; line-height: 1.35; font-weight: 600; padding-left: 30px; position: relative; }
+.feas li::before { content: ''; position: absolute; left: 0; top: 18px; width: 12px; height: 12px; border-radius: 50%; background: var(--ink); }
+.road { display: flex; flex-direction: column; gap: 20px; }
+.road div { display: flex; gap: 22px; align-items: center; background: #fff; border: 1.5px solid var(--line); border-radius: 22px; padding: 22px 28px; font-size: 33px; font-weight: 700; }
+.road div i { font-style: normal; width: 44px; height: 44px; border-radius: 50%; background: var(--sand); display: grid; place-items: center; font-size: 22px; font-weight: 800; flex: none; }
+
+/* 12 Team */
+.team { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; margin-top: 40px; }
+.team .names { font-size: 84px; font-weight: 800; line-height: 1.2; color: #fff; letter-spacing: -1px; }
+.team .contact { display: flex; flex-direction: column; gap: 34px; }
+.team .contact b { display: block; font-size: 22px; letter-spacing: 2px; text-transform: uppercase; color: #A89E94; margin-bottom: 4px; }
+.team .contact span { font-size: 36px; font-weight: 600; color: #fff; }
+.close { position: absolute; left: 120px; right: 120px; bottom: 120px; display: flex; align-items: center; gap: 36px; }
+.close img { width: 120px; height: 120px; }
+.close .t { font-size: 60px; font-weight: 800; color: #fff; letter-spacing: -1px; }
+.close .tm { font-family: 'YoeShin'; font-size: 34px; color: var(--gold); margin-top: 6px; }
+</style>
+</head>
+<body>
+
+<!-- 1 Title -->
+<section class="slide dark">
+  <div class="title-grid">
+    <div>
+      <div class="wordmark">
+        <img class="m" src="img/medallion.svg" alt="">
+        <div><div class="en">Kakwe</div><div class="mm">ကာကွယ်</div></div>
+      </div>
+      <div class="tagline">Spot a job scam before you pay, send documents or travel.</div>
+      <div class="tagline-my">အလုပ်ကမ်းလှမ်းချက်၊ မက်ဆေ့ချ် သို့မဟုတ် လင့်ခ်ကို စစ်ဆေးပါ</div>
+    </div>
+    <div class="links">
+      <div><b>Web demo</b><span>saferoute-aibc.web.app</span></div>
+      <div><b>Android APK</b><span>saferoute-api.akkhayar.com/download</span></div>
+      <div><b>GitHub</b><span>github.com/minthein128/scamshield</span></div>
+      <div><b>Dataset</b><span>huggingface.co/datasets/<wbr>Rickaym/saferoute-scam-screenshots</span></div>
+    </div>
+  </div>
+  <div class="title-foot"><span>AI Builder Cup 2026 · Sustainability &amp; Social Impact</span><span>Formerly SafeRoute. The app build and the links still use that name.</span></div>
+</section>
+
+<!-- 2 Problem -->
+<section class="slide">
+  <div class="kicker">The problem</div>
+  <h1>Job ads that end in forced scam work</h1>
+  <div class="prob">
+    <div>
+      <div class="bignum">120,000</div>
+      <div class="bignum-l">people in Myanmar may be held in forced online scam work.</div>
+      <div class="source">OHCHR, via UN News, 29 August 2023</div>
+    </div>
+    <div class="who">
+      <div class="row"><i>01</i><p>Young job seekers from Myanmar, Thailand, Indonesia and the Philippines find work through Facebook, Viber and Telegram.</p></div>
+      <div class="row"><i>02</i><p>The trap starts with a fee, a passport photo or a car to the border.</p></div>
+      <div class="row"><i>03</i><p>The warning signs are easy to miss in a second language.</p></div>
+    </div>
+  </div>
+  <div class="brandtag"><img src="img/medallion.svg" alt="">Kakwe</div><div class="pageno">2</div>
+</section>
+
+<!-- 3 Ma Su -->
+<section class="slide">
+  <div class="kicker">Who it is for</div>
+  <h1>Ma Su, 23, Magway Region <span class="fic">A fictional story</span></h1>
+  <div class="masu">
+    <div class="chat">
+      <div class="who2"><div class="av">K</div><div class="nm">Agent K<small>Viber</small></div></div>
+      <div class="bubble">Hello sister! Factory job in Mae Sot, Thailand. Salary 18,000 baht per month, free food and room. <mark>Send a photo of your passport today</mark> to book your seat. <mark>A car leaves Myawaddy on Friday night.</mark> Only 3 places left. <mark>Do not tell other people about this job.</mark></div>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="n">1</div><p>Ma Su needs work.</p></div>
+      <div class="step"><div class="n">2</div><p>A recruiter on Viber offers good pay and a free room in Thailand.</p></div>
+      <div class="step risk"><div class="n">3</div><p>The moment of risk: before she pays, sends her passport or gets in the car.</p></div>
+    </div>
+  </div>
+  <div class="brandtag"><img src="img/medallion.svg" alt="">Kakwe</div><div class="pageno">3</div>
+</section>
+
+<!-- 4 One picture -->
+<section class="slide">
+  <div class="kicker">The solution</div>
+  <h1>Kakwe in one picture</h1>
+  <div class="hub">
+    <svg class="links2" width="1680" height="760" viewBox="0 0 1680 760">
+      <g stroke="#D6CCBF" stroke-width="3" fill="none">
+        <path d="M840 360 L560 90"/><path d="M840 360 L560 360"/><path d="M840 360 L560 620"/>
+        <path d="M840 360 L1120 90"/><path d="M840 360 L1120 360"/><path d="M840 360 L1120 620"/>
+      </g>
+    </svg>
+    <div class="center"><img src="img/medallion.svg" alt=""></div>
+    <div class="tile" style="left:0;top:10px"><h3>Verdict with reasons</h3><p>Low risk, Be careful or High risk, with her own words quoted.</p></div>
+    <div class="tile" style="left:0;top:272px"><h3>Job Shield</h3><p>Puts the job ad next to the recruiter's chat.</p></div>
+    <div class="tile" style="left:0;top:534px"><h3>Screen bubble</h3><p>A doll over any Android app checks the screen.</p></div>
+    <div class="tile" style="right:0;top:10px"><h3>Voice companion</h3><p>Ask Pyit Taing Htaung out loud about the report.</p></div>
+    <div class="tile" style="right:0;top:272px"><h3>Warn my family</h3><p>Shares the warning through any chat app.</p></div>
+    <div class="tile" style="right:0;top:534px"><h3>5 languages</h3><p>English, <span class="my">မြန်မာ</span>, Bahasa Indonesia, Tagalog, <span class="th">ไทย</span></p></div>
+  </div>
+  <div class="brandtag"><img src="img/medallion.svg" alt="">Kakwe</div><div class="pageno">4</div>
+</section>
+
+<!-- 5 Demo A -->
+<section class="slide">
+  <div class="demo">
+    <div>
+      <div class="kicker">Demo</div>
+      <h1>A message in, a verdict out</h1>
+      <div class="list">
+        <div class="step"><div class="n">1</div><p>Ma Su pastes the message. High risk: the doll looks worried and the next step comes first.</p></div>
+        <div class="step"><div class="n">2</div><p>Job Shield reads the ad and the chat. The ad says no fees. The chat asks for a deposit.</p></div>
+      </div>
+    </div>
+    <div class="phones">
+      <div class="phone w370"><div class="badge">1</div><div class="screen crop" style="height:778px"><img src="../e2e/verdict-report-danger-390x844-en.png" alt="High risk report"></div></div>
+      <div class="phone w370"><div class="badge">2</div><div class="screen crop" style="height:778px"><img style="top:-23px" src="../e2e/jobshield-result-conflicts-pause-en-390x844.png" alt="Job Shield, what doesn't match"></div></div>
+    </div>
+  </div>
+  <div class="foot" style="right:1300px">Web build captures with fictional inputs. Screen 2 uses the app's built-in demo data.</div>
+  <div class="brandtag"><img src="img/medallion.svg" alt="">Kakwe</div><div class="pageno">5</div>
+</section>
+
+<!-- 6 Demo B -->
+<section class="slide">
+  <div class="demo">
+    <div>
+      <div class="kicker">Demo</div>
+      <h1>Over any app, out loud, to family</h1>
+      <div class="list">
+        <div class="step"><div class="n">3</div><p>One tap on the floating doll checks the chat on screen.</p></div>
+        <div class="step"><div class="n">4</div><p>She asks Pyit Taing Htaung in Burmese, on Gemini Live.</p></div>
+        <div class="step"><div class="n">5</div><p>Warn my family shares the warning. No account needed.</p></div>
+      </div>
+    </div>
+    <div class="phones" style="gap:36px">
+      <div class="phone w330"><div class="badge">3</div>
+        <div class="screen schem" style="height:714px">
+          <div class="bar" style="left:28px;top:34px;width:150px;height:22px;background:#CFC5B9"></div>
+          <div class="msg" style="left:22px;top:92px;width:230px;height:96px"></div>
+          <div class="bar" style="left:44px;top:114px;width:180px"></div>
+          <div class="bar" style="left:44px;top:146px;width:140px"></div>
+          <div class="msg me" style="right:22px;top:208px;width:170px;height:58px"></div>
+          <div class="msg" style="left:22px;top:286px;width:250px;height:58px"></div>
+          <div class="sprite" style="right:8px;top:232px;width:92px;height:92px;border-radius:50%;background-size:590px auto;background-position:-403px -30px"></div>
+          <div class="sprite" style="left:4px;top:368px;width:322px;height:340px;background-size:370px auto;background-position:-16px -673px"></div>
+        </div>
+      </div>
+      <div class="phone w330"><div class="badge">4</div><div class="screen"><img src="../e2e/verdict-report-danger-390x844-my.png" alt="High risk report in Burmese with the voice button"></div></div>
+      <div class="phone w330"><div class="badge">5</div><div class="screen"><img src="../e2e/contacts-signin-warn-en.png" alt="Warn someone you trust sheet"></div></div>
+    </div>
+  </div>
+  <div class="foot" style="right:1300px">Screen 3: the Android overlay views from the app's snapshot test, on a schematic chat.</div>
+  <div class="brandtag"><img src="img/medallion.svg" alt="">Kakwe</div><div class="pageno">6</div>
+</section>
+
+<!-- 7 Architecture -->
+<section class="slide" style="padding-top:80px">
+  <div class="kicker">How it works</div>
+  <h1 style="margin-bottom:30px">Gemini finds evidence. Rules decide.</h1>
+  <div class="arch">
+  <svg width="1680" height="560" viewBox="0 0 1680 560" font-family="Jakarta, sans-serif">
+    <defs>
+      <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#1F1A17"/></marker>
+    </defs>
+    <g fill="none" stroke="#1F1A17" stroke-width="3" marker-end="url(#ar)">
+      <path d="M200 250 L246 250"/>
+      <path d="M496 250 L520 250 L520 90 L556 90"/>
+      <path d="M496 250 L556 250"/>
+      <path d="M496 250 L520 250 L520 410 L556 410"/>
+      <path d="M836 90 L880 90 L880 200 L906 200"/>
+      <path d="M836 250 L880 250 L880 330 L1156 330"/>
+      <path d="M836 410 L880 410 L880 360 L1156 360"/>
+      <path d="M1146 200 L1176 200 L1176 276"/>
+      <path d="M1376 320 L1416 320"/>
+      <path d="M1546 400 L1546 446"/>
+      <path d="M371 160 L371 10 L1026 10 L1026 130"/>
+    </g>
+    
+    <g font-size="25" fill="#1F1A17">
+      <rect x="0" y="180" width="200" height="140" rx="22" fill="#EFE8DF"/>
+      <text x="100" y="236" text-anchor="middle" font-weight="800" font-size="26">Message,</text>
+      <text x="100" y="268" text-anchor="middle" font-weight="800" font-size="26">link or</text>
+      <text x="100" y="300" text-anchor="middle" font-weight="800" font-size="26">screenshot</text>
+
+      <rect x="246" y="160" width="250" height="180" rx="22" fill="#1F1A17"/>
+      <text x="371" y="212" text-anchor="middle" font-weight="800" fill="#fff" font-size="27">Gemini</text>
+      <text x="371" y="246" text-anchor="middle" font-weight="800" fill="#fff" font-size="27">extraction</text>
+      <text x="371" y="284" text-anchor="middle" fill="#CFC5B9" font-size="21">multimodal, JSON</text>
+      <text x="371" y="312" text-anchor="middle" fill="#CFC5B9" font-size="21">schema, 7 flag families</text>
+
+      <rect x="556" y="30" width="280" height="120" rx="22" fill="#fff" stroke="#E6DED3" stroke-width="2"/>
+      <text x="696" y="76" text-anchor="middle" font-weight="800" font-size="24">Google Search</text>
+      <text x="696" y="104" text-anchor="middle" font-weight="800" font-size="24">grounding</text>
+      <text x="696" y="134" text-anchor="middle" fill="#57504A" font-size="20">does the company exist?</text>
+
+      <rect x="556" y="190" width="280" height="120" rx="22" fill="#fff" stroke="#E6DED3" stroke-width="2"/>
+      <text x="696" y="236" text-anchor="middle" font-weight="800" font-size="24">Web Risk and</text>
+      <text x="696" y="264" text-anchor="middle" font-weight="800" font-size="24">Safe Browsing</text>
+      <text x="696" y="294" text-anchor="middle" fill="#57504A" font-size="20">links, plus RDAP domain age</text>
+
+      <rect x="556" y="350" width="280" height="120" rx="22" fill="#fff" stroke="#E6DED3" stroke-width="2"/>
+      <text x="696" y="396" text-anchor="middle" font-weight="800" font-size="24">Scam network</text>
+      <text x="696" y="424" text-anchor="middle" fill="#57504A" font-size="20">hashed numbers and</text>
+      <text x="696" y="450" text-anchor="middle" fill="#57504A" font-size="20">handles, in Firestore</text>
+
+      <rect x="906" y="130" width="240" height="140" rx="22" fill="#fff" stroke="#E6DED3" stroke-width="2"/>
+      <text x="1026" y="182" text-anchor="middle" font-weight="800" font-size="24">Likelihood</text>
+      <text x="1026" y="210" text-anchor="middle" font-weight="800" font-size="24">language guard</text>
+      <text x="1026" y="242" text-anchor="middle" fill="#57504A" font-size="20">"is" becomes "looks like"</text>
+
+      <rect x="1156" y="276" width="220" height="124" rx="22" fill="#1F1A17"/>
+      <text x="1266" y="324" text-anchor="middle" font-weight="800" fill="#fff" font-size="25">Deterministic</text>
+      <text x="1266" y="354" text-anchor="middle" font-weight="800" fill="#fff" font-size="25">score</text>
+      <text x="1266" y="384" text-anchor="middle" fill="#CFC5B9" font-size="20">rules, no model</text>
+
+      <rect x="1416" y="240" width="264" height="160" rx="22" fill="#fff" stroke="#E6DED3" stroke-width="2"/>
+      <text x="1548" y="290" text-anchor="middle" font-weight="800" font-size="24">Explanation</text>
+      <text x="1548" y="322" text-anchor="middle" fill="#57504A" font-size="20">verdict, quoted reasons,</text>
+      <text x="1548" y="348" text-anchor="middle" fill="#57504A" font-size="20">verified hotline,</text>
+      <text x="1548" y="374" text-anchor="middle" fill="#57504A" font-size="20">in 5 languages</text>
+
+      <rect x="1416" y="446" width="126" height="100" rx="20" fill="#EFE8DF"/>
+      <text x="1479" y="488" text-anchor="middle" font-weight="800" font-size="22">Gemini</text>
+      <text x="1479" y="516" text-anchor="middle" font-weight="800" font-size="22">TTS</text>
+      <rect x="1554" y="446" width="126" height="100" rx="20" fill="#EFE8DF"/>
+      <text x="1617" y="488" text-anchor="middle" font-weight="800" font-size="22">Gemini</text>
+      <text x="1617" y="516" text-anchor="middle" font-weight="800" font-size="22">Live</text>
+    </g>
+    <text x="246" y="380" font-size="20" fill="#6B635C">gemini-3.5-flash-lite</text>
+    <text x="1416" y="226" font-size="20" fill="#6B635C">15 s budget per check</text>
+  </svg>
+  </div>
+  <div class="hosting">
+    <div class="card"><h3>Firebase</h3><p>Auth, Firestore, Hosting for the web demo, App Distribution for test builds.</p></div>
+    <div class="card"><h3>API hosting today</h3><p>A Hono service on our host behind a Cloudflare tunnel. The Cloud Run deploy script is ready and needs billing.</p></div>
+  </div>
+  <div class="brandtag"><img src="img/medallion.svg" alt="">Kakwe</div><div class="pageno">7</div>
+</section>
+
+<!-- 8 Why Gen AI -->
+<section class="slide">
+  <div class="kicker">Technical merit and Gen AI</div>
+  <h1>Why Gen AI, and what is new</h1>
+  <div class="why">
+    <div class="card"><span class="tag">Multimodal</span><h3>Reads Burmese screenshots</h3><p>One Gemini call turns a chat image into quotes, flags and links.</p></div>
+    <div class="card"><span class="tag">Grounding</span><h3>Search is evidence</h3><p>Search findings are capped at medium. They never decide alone.</p></div>
+    <div class="card"><span class="tag">Control</span><h3>Rules over the model</h3><p>The model finds evidence. Tested rules set the verdict.</p></div>
+    <div class="card"><span class="tag">Job Shield</span><h3>Ad against chat</h3><p>13 conflict rules, such as "no fees" in the ad and a deposit in the chat.</p></div>
+    <div class="card"><span class="tag">Gemini Live</span><h3>Voice grounded in the report</h3><p>Answers come from the finished report and verified hotlines.</p></div>
+    <div class="card"><span class="tag">Language</span><h3>A likelihood guard</h3><p>Certainty phrases are rewritten in all 5 languages.</p></div>
+  </div>
+  <div class="brandtag"><img src="img/medallion.svg" alt="">Kakwe</div><div class="pageno">8</div>
+</section>
+
+<!-- 9 Proof -->
+<section class="slide">
+  <div class="kicker">Proof</div>
+  <h1>We measure it</h1>
+  <div class="proof">
+    <div class="stat hl"><div class="num">31/31</div><div class="lbl">Text eval cases correct</div><div class="sub">0 certainty phrases after the guard</div></div>
+    <div class="stat"><div class="num">89.7</div><div class="lbl">Protection Score, 24 synthetic screenshots</div><div class="sub">0 critical failures, 5 languages</div></div>
+    <div class="stat"><div class="num">about 67</div><div class="lbl">Protection Score, 96 real screenshots</div><div class="sub">Provisional. Draft labels from two models</div></div>
+    <div class="stat"><div class="num">10/10</div><div class="lbl">Job Shield ad and chat pairs</div><div class="sub">No legit pair reached Pause. No scam pair stayed at the lowest tier</div></div>
+    <div class="stat"><div class="num">93 + 28</div><div class="lbl">Public dataset on Hugging Face</div><div class="sub">Real redacted and synthetic screenshots</div></div>
+    <div class="stat"><div class="num" style="font-size:64px;padding:10px 0 8px">High risk</div><div class="lbl">Google's test phishing link</div><div class="sub">Flagged by the Safe Browsing link check</div></div>
+  </div>
+  <div class="foot" style="left:300px;bottom:38px">gemini-3.5-flash-lite, production prompt. Runs of 16 October 2026.</div>
+  <div class="brandtag"><img src="img/medallion.svg" alt="">Kakwe</div><div class="pageno">9</div>
+</section>
+
+<!-- 10 Safety -->
+<section class="slide">
+  <div class="safety">
+    <div>
+      <div class="kicker">Responsible AI</div>
+      <h1>Safety and privacy</h1>
+      <div class="rules">
+        <div class="rule"><h3>Likelihood words</h3><p>"Shows signs of", never "is a scam".</p></div>
+        <div class="rule"><h3>No accusations</h3><p>No named person is called a criminal.</p></div>
+        <div class="rule"><h3>Consent first</h3><p>Sharing and Message Guard are off until she turns them on.</p></div>
+        <div class="rule"><h3>Hashed indicators</h3><p>Numbers and handles stay as one-way hashes for 90 days.</p></div>
+        <div class="rule"><h3>Leave quickly</h3><p>One tap clears the screen.</p></div>
+        <div class="rule"><h3>Slim sync, 18+</h3><p>History keeps the verdict and summary only.</p></div>
+      </div>
+    </div>
+    <div class="phone" style="width:420px;align-self:start;margin-top:-10px"><div class="screen crop" style="height:866px"><img src="../e2e/privacy-onboarding-sharing-en.png" alt="Opt-in sharing screen"></div></div>
+  </div>
+  <div class="brandtag"><img src="img/medallion.svg" alt="">Kakwe</div><div class="pageno">10</div>
+</section>
+
+<!-- 11 UX -->
+<section class="slide">
+  <div class="ux">
+    <div>
+      <div class="kicker">User experience</div>
+      <h1>Made for a reader in her own language</h1>
+      <div class="moods">
+        <div class="mood"><img src="img/doll-calm.svg" alt=""><span class="pill low">Low risk</span><div class="meter"><span style="background:#1D4ED8"></span><span></span><span></span></div></div>
+        <div class="mood"><img src="img/doll-concerned.svg" alt=""><span class="pill care">Be careful</span><div class="meter"><span></span><span style="background:#B45309"></span><span></span></div></div>
+        <div class="mood"><img src="img/doll-worried.svg" alt=""><span class="pill high">High risk</span><div class="meter"><span></span><span></span><span style="background:#9F1239"></span></div></div>
+      </div>
+      <div class="uxlist">
+        <p><b>Language first.</b> Setup starts with one of 5 languages.</p>
+        <p><b>Doll moods and a word meter.</b> Colour never works alone.</p>
+        <p><b>Next step first,</b> in the largest type, and spoken aloud.</p>
+      </div>
+    </div>
+    <div class="phone" style="width:400px;align-self:start;margin-top:-10px"><div class="screen crop" style="height:860px"><img src="../e2e/refine-01-onboarding-phone-my.png" style="top:-268px" alt="Language choice in Burmese"></div></div>
+  </div>
+  <div class="brandtag"><img src="img/medallion.svg" alt="">Kakwe</div><div class="pageno">11</div>
+</section>
+
+<!-- 12 Feasibility -->
+<section class="slide">
+  <div class="kicker">Feasibility and roadmap</div>
+  <h1>Running today, ready to scale</h1>
+  <div class="feas">
+    <div>
+      <h2>Today</h2>
+      <ul>
+        <li>Web demo on Firebase Hosting. APK by direct download.</li>
+        <li>Stateless API. Cloud Run deploy is one script once billing is on.</li>
+        <li>Text checks: 2.8 s median, 4.4 s p95.</li>
+        <li>Cost limits: search only when a name appears, a 10-minute result cache, hourly limits.</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Next</h2>
+      <div class="road">
+        <div><i>1</i>Native review of every Burmese string</div>
+        <div><i>2</i>Move the API to Cloud Run</div>
+        <div><i>3</i>A simpler Check page</div>
+        <div><i>4</i>More languages for the region</div>
+        <div><i>5</i>Pilots with migrant worker NGOs</div>
+      </div>
+    </div>
+  </div>
+  <div class="brandtag"><img src="img/medallion.svg" alt="">Kakwe</div><div class="pageno">12</div>
+</section>
+
+<!-- 13 Team -->
+<section class="slide dark">
+  <div class="kicker">Team</div>
+  <div class="team">
+    <div class="names">Ricky<br>Min Thein Kyaw</div>
+    <div class="contact">
+      <div><b>Contact</b><span>support@akkhayar.com</span></div>
+      <div><b>GitHub</b><span>github.com/minthein128/scamshield</span></div>
+      <div><b>Web demo</b><span>saferoute-aibc.web.app</span></div>
+    </div>
+  </div>
+  <div class="close">
+    <img src="img/medallion.svg" alt="">
+    <div><div class="t">Check before you say yes.</div><div class="tm">သဘောမတူခင် အရင်စစ်ဆေးပါ</div></div>
+  </div>
+</section>
+
+</body>
+</html>
