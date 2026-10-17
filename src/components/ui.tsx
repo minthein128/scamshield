@@ -23,7 +23,7 @@ export const BackButton: React.FC<{ onPress: () => void }> = ({ onPress }) => {
 export const ScreenHeader: React.FC<{ title: string; onBack?: () => void }> = ({ title, onBack }) => (
   <View style={styles.header}>
     {onBack ? <BackButton onPress={onBack} /> : null}
-    <Text style={styles.headerTitle}>{title}</Text>
+    <Text wrap="word" style={styles.headerTitle}>{title}</Text>
   </View>
 );
 
@@ -171,7 +171,7 @@ export const Notice: React.FC<{ title?: string; message: string; tone?: 'error' 
 
 export const Divider: React.FC = () => <View accessibilityRole="none" style={styles.divider} />;
 
-export const SectionTitle: React.FC<{ children: string }> = ({ children }) => <Text accessibilityRole="header" style={styles.sectionTitle}>{children}</Text>;
+export const SectionTitle: React.FC<{ children: string }> = ({ children }) => <Text wrap="word" accessibilityRole="header" style={styles.sectionTitle}>{children}</Text>;
 
 const styles = StyleSheet.create({
   linkButton: { minHeight: 48, paddingHorizontal: 4, justifyContent: 'center' },
