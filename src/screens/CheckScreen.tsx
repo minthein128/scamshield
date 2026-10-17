@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { View, StyleSheet, ScrollView } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import * as Clipboard from 'expo-clipboard';
 import { Screen } from '../components/Screen';
@@ -34,6 +34,8 @@ interface SourceProps {
   image: PreparedImage | null;
   busy: boolean;
   hasClip: boolean;
+  notice?: string | null;
+  onReveal?: (node: View | null) => void;
   focusKey?: number;
   onText: (value: string) => void;
   onClip: () => void;
@@ -50,11 +52,17 @@ async function readClipboard(): Promise<string> {
 }
 
 /** One card: a text box with an OR line and the upload box, or the picture and text once added. */
-const SourceCard: React.FC<SourceProps> = ({ id, title, optional, hint, a11y, placeholder, text, image, busy, hasClip, focusKey, onText, onClip, onPick, onRemove }) => {
+const SourceCard: React.FC<SourceProps> = ({ id, title, optional, hint, a11y, placeholder, text, image, busy, hasClip, notice, onReveal, focusKey, onText, onClip, onPick, onRemove }) => {
   const { t } = useTranslation(['check', 'common']);
   const empty = !image && !text;
+  const noticeRef = useRef<View>(null);
   return (
     <CheckCard testID={id} title={title} optional={optional} hint={image ? undefined : hint}>
+      {notice ? (
+        <View ref={noticeRef} onLayout={() => onReveal?.(noticeRef.current)}>
+          <Notice testID={`${id}-notice`} message={notice} />
+        </View>
+      ) : null}
       {image ? (
         <FileCard
           testID={`${id}-file`}
@@ -91,26 +99,34 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
   const [chatImage, setChatImage] = useState<PreparedImage | null>(null);
   const [focusKey, setFocusKey] = useState(0);
   const [busy, setBusy] = useState(false);
-  const [notice, setNotice] = useState<string | null>(null);
+  const [notice, setNotice] = useState<{ id: string; message: string } | null>(null);
   const hasClip = useClipboardHasText();
+  const scrollRef = useRef<ScrollView>(null);
 
-  const attachImage = useCallback(async (loader: () => Promise<PreparedImage | null>, target: (image: PreparedImage) => void = setImage) => {
+  const reveal = useCallback((node: View | null) => {
+    const scroller = scrollRef.current;
+    const inner = scroller?.getInnerViewNode?.();
+    if (!node || !scroller || !inner) return;
+    node.measureLayout(inner, (_x, y) => scroller.scrollTo({ y: Math.max(0, y - 150), animated: true }), () => undefined);
+  }, []);
+
+  const attachImage = useCallback(async (loader: () => Promise<PreparedImage | null>, target: (image: PreparedImage) => void = setImage, cardId = 'check') => {
     setBusy(true);
     setNotice(null);
     try {
       const prepared = await loader();
       if (prepared) target(prepared);
     } catch {
-      setNotice(t('errors.image'));
+      setNotice({ id: cardId, message: t('errors.image') });
     } finally {
       setBusy(false);
     }
   }, [t]);
 
-  const pasteInto = useCallback(async (target: (value: string) => void) => {
+  const pasteInto = useCallback(async (target: (value: string) => void, cardId = 'check') => {
     const value = await readClipboard();
     if (!value) {
-      setNotice(t('errors.clipboardEmpty'));
+      setNotice({ id: cardId, message: t('errors.clipboardEmpty') });
       return;
     }
     setNotice(null);
@@ -137,7 +153,7 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
       if (shared) setText(shared);
       if (draft.imageUri) {
         const uri = draft.imageUri;
-        attachImage(() => prepareSharedImage(uri));
+        attachImage(() => prepareSharedImage(uri), setImage, draft.kind && modeForKind(draft.kind) === 'job' ? 'job-ad' : 'check');
       }
     } else if (intent === 'text') {
       setMode('message');
@@ -169,11 +185,12 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
     navigation.getParent()?.navigate('Checking', { request: buildRequest(form), source: sourceLabel(form) });
   };
 
-  const common = { busy, hasClip };
+  const common = { busy, hasClip, onReveal: reveal };
   const added = [hasInput({ text, imageBase64: image?.base64 }) ? t('job.added.ad') : '', hasInput({ text: chatText, imageBase64: chatImage?.base64 }) ? t('job.added.chat') : ''].filter(Boolean);
 
   return (
     <Screen
+      scrollRef={scrollRef}
       header={
         <View style={styles.headRow}>
           <View style={{ flex: 1 }}>
@@ -204,6 +221,7 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
           <SourceCard
             {...common}
             id="job-ad"
+            notice={notice?.id === 'job-ad' ? notice.message : null}
             title={t('job.step1')}
             hint={t('job.step1Hint')}
             a11y={t('job.ad.a11y')}
@@ -211,13 +229,14 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
             text={text}
             image={image}
             onText={setText}
-            onClip={() => pasteInto(setText)}
-            onPick={() => attachImage(pickScreenshot)}
+            onClip={() => pasteInto(setText, 'job-ad')}
+            onPick={() => attachImage(pickScreenshot, setImage, 'job-ad')}
             onRemove={() => setImage(null)}
           />
           <SourceCard
             {...common}
             id="job-chat"
+            notice={notice?.id === 'job-chat' ? notice.message : null}
             title={t('job.step2')}
             optional={t('job.optional')}
             hint={t('job.step2Hint')}
@@ -226,8 +245,8 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
             text={chatText}
             image={chatImage}
             onText={setChatText}
-            onClip={() => pasteInto(setChatText)}
-            onPick={() => attachImage(pickScreenshot, setChatImage)}
+            onClip={() => pasteInto(setChatText, 'job-chat')}
+            onPick={() => attachImage(pickScreenshot, setChatImage, 'job-chat')}
             onRemove={() => setChatImage(null)}
           />
           {added.length ? <AddedBar testID="job-added" items={added} /> : null}
@@ -236,6 +255,7 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
         <SourceCard
           {...common}
           id="check"
+          notice={notice?.id === 'check' ? notice.message : null}
           focusKey={focusKey}
           title={t(`${mode}.title`)}
           a11y={t('text.a11y')}
@@ -269,7 +289,6 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
         />
       </FoldRow>
 
-      {notice ? <Notice message={notice} /> : null}
     </Screen>
   );
 };

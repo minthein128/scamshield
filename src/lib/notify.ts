@@ -1,6 +1,7 @@
 import { Alert, Platform, Share } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import { t } from '../i18n';
+import { showToast } from './toast';
 
 export function notify(title: string, message?: string): void {
   if (Platform.OS === 'web') {
@@ -10,12 +11,12 @@ export function notify(title: string, message?: string): void {
   Alert.alert(title, message);
 }
 
-export async function shareText(message: string): Promise<void> {
+export async function shareText(message: string, copiedMessage?: string): Promise<void> {
   try {
     await Share.share({ message });
   } catch {
     await Clipboard.setStringAsync(message);
-    notify(t('common:copied.title'), t('common:copied.message'));
+    showToast(copiedMessage ?? t('common:copied.message'));
   }
 }
 

@@ -19,9 +19,10 @@ interface ScreenProps {
   footerRow?: boolean;
   /** Overrides the footer spacing for screens that need a tighter footer. */
   footerStyle?: StyleProp<ViewStyle>;
+  scrollRef?: React.Ref<ScrollView>;
 }
 
-export const Screen: React.FC<ScreenProps> = ({ children, footer, edges = ['top'], background = theme.colors.background, contentStyle, scroll = true, wide, footerRow, header, footerStyle }) => {
+export const Screen: React.FC<ScreenProps> = ({ children, footer, edges = ['top'], background = theme.colors.background, contentStyle, scroll = true, wide, footerRow, header, footerStyle, scrollRef }) => {
   const layout = useLayout();
   const [lifted, setLifted] = useState(false);
   const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -50,6 +51,7 @@ export const Screen: React.FC<ScreenProps> = ({ children, footer, edges = ['top'
       ) : null}
       {scroll ? (
         <ScrollView
+          ref={scrollRef}
           style={styles.flex}
           contentContainerStyle={tablet ? [styles.tabletContent, padX, topPad] : [styles.content, contentStyle, topPad]}
           keyboardShouldPersistTaps="handled"
@@ -74,7 +76,7 @@ const styles = StyleSheet.create({
   column: { width: '100%', alignSelf: 'center' },
   inner: { gap: 16 },
   header: { paddingTop: 20, paddingHorizontal: 20, paddingBottom: 12, gap: 12, zIndex: 1, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: 'transparent' },
-  headerLifted: { borderBottomColor: theme.colors.border, shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 6, shadowOffset: { width: 0, height: 2 }, elevation: 2 },
+  headerLifted: { borderBottomColor: theme.colors.border },
   headerTablet: { paddingTop: 28 },
   belowHeader: { paddingTop: 16 },
   footer: { paddingTop: 10, paddingHorizontal: 20, paddingBottom: 16, gap: 8 },

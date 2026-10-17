@@ -36,6 +36,7 @@
     "share": "Ibahagi ang ulat",
     "clear": "Burahin ang log",
     "copied": "Nakopya ang ulat. I-paste ito sa mensahe sa $t(common:appName) team.",
+    "reportCopied": "Nakopya ang ulat ng problema",
     "clearTitle": "Buburahin ang log?",
     "clearMessage": "Buburahin nito ang lahat ng tala ng log sa teleponong ito.",
     "clearAction": "Burahin",
