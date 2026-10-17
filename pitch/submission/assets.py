@@ -52,10 +52,11 @@ def phone(name, src, screen_h=None, top=0, width=330):
 
 
 phone('ph-danger-en', e2e('verdict-report-danger-390x844-en.png'), 694)
-phone('ph-jobshield', e2e('jobshield-result-conflicts-pause-en-390x844.png'), 694, -20)
 phone('ph-danger-my', e2e('verdict-report-danger-390x844-my.png'), 694)
-phone('ph-warn', e2e('contacts-signin-warn-en.png'), 694)
-phone('ph-privacy', e2e('privacy-onboarding-sharing-en.png'), 640)
+phone('ph-jobshield', e2e('jobshield-result-conflicts-pause-en-390x844.png'), 694, -20)
+phone('ph-check', e2e('kakwe-check-en.png'), 694, -20)
+phone('ph-report-my', e2e('kakwe-report-my.png'), 694, -20)
+phone('ph-settings', e2e('kakwe-settings-en.png'), 640, -262)
 bubble = """<div class="phone"><div class="screen schem" style="width:330px;height:694px;position:relative">
 <div class="bar" style="left:28px;top:34px;width:150px;height:22px;background:#CFC5B9"></div>
 <div class="msg" style="left:22px;top:92px;width:230px;height:96px"></div>
@@ -75,10 +76,10 @@ shot('arch', (HERE / 'arch.svg').read_text(), 1680, 560)
 
 MOCK = Path(os.environ.get('MOCK_DIR', Path.home() / 'work/home-check-v2-handoff'))
 crops = {
-    'mock-home-off': ('home-page.png', (1043, 290, 1490, 1133)),
-    'mock-home-on': ('home-page.png', (1517, 290, 1965, 1133)),
-    'mock-check-empty': ('jobshield-page.png', (2555, 205, 2989, 1389)),
-    'mock-check-filled': ('jobshield-page.png', (3018, 205, 3453, 1389)),
+    'mock-home-off': ('home/home-shield-off-en.png', (0, 150, 780, 1500)),
+    'mock-home-on': ('home/home-shield-on-en.png', (0, 150, 780, 1500)),
+    'mock-check-message': ('check/c3-mode-message-en.png', (0, 150, 780, 1470)),
+    'mock-check-job': ('check/c3-job-filled-full-en.png', (0, 150, 780, 1555)),
 }
 for name, (f, box) in crops.items():
     Image.open(MOCK / f).convert('RGB').crop(box).save(OUT / f'{name}.png')

@@ -160,6 +160,8 @@ def append_after(par, value, size=None, link=None, bold=None):
     r.find(qn('a:t')).text = value
     last.addnext(r)
     rpr = r.find(qn('a:rPr'))
+    for old in rpr.findall(qn('a:hlinkClick')):
+        rpr.remove(old)
     if size:
         rpr.set('sz', str(int(size * 100)))
     if bold is not None:
@@ -215,7 +217,7 @@ def brief(s):
           'High risk.'], {'space': 8}),
         (['The report quotes the user\'s own words, gives a verified hotline and speaks the warning in English, '
           'Burmese, Bahasa Indonesia, Tagalog or Thai.'], {'space': 8}),
-        ([('Formerly SafeRoute. The app build, package and links still use that name.', {'color': MUTED, 'size': 9.5})],
+        ([('The package name and web addresses keep the earlier project name saferoute.', {'color': MUTED, 'size': 9.5})],
          {'space': 12}),
     ]
     text(s, LEFT, TOP + 0.1, 5.0, 3.9, paras, size=12.5, color=INK2, line=1.15)
@@ -311,7 +313,7 @@ def process_flow(s):
 
 def wireframes(s):
     items = [('mock-home-off', 'Home, shield off'), ('mock-home-on', 'Home, shield on'),
-             ('mock-check-empty', 'Job offer, empty'), ('mock-check-filled', 'Job offer, filled')]
+             ('mock-check-message', 'Check, message'), ('mock-check-job', 'Check, job offer filled')]
     h = 3.45
     widths = []
     for name, _ in items:
@@ -323,24 +325,19 @@ def wireframes(s):
         picture(s, name, x, TOP + 0.02, w=w, h=h, border=True)
         text(s, x - 0.1, TOP + h + 0.08, w + 0.2, 0.3, [[(cap, {'bold': True})]], size=10.5, align=PP_ALIGN.CENTER)
         x += w + gap
-    note(s, 'Approved design mockups for the next Home (one big shield button) and Check page, in English. '
-            'The logo row is cropped.')
+    note(s, 'Approved design mockups for Home (one big shield button) and the Check v3 page with kind chips, in '
+            'English. The logo row and the footer line are cropped.')
 
 
 def architecture(s):
     picture(s, 'arch', LEFT + 0.05, TOP + 0.02, w=9.15)
-    y = 4.32
-    box(s, LEFT, y, 4.55, 0.92)
-    text(s, LEFT + 0.15, y + 0.08, 4.3, 0.8, [
-        ([('Firebase', {'bold': True, 'size': 11})], {}),
-        ([('Auth, Firestore, Hosting for the web demo, App Distribution for test builds.', {'color': INK2})], {'space': 2}),
-    ], size=10.5)
-    box(s, LEFT + 4.71, y, 4.55, 0.92)
-    text(s, LEFT + 4.86, y + 0.08, 4.3, 0.8, [
-        ([('API hosting today', {'bold': True, 'size': 11})], {}),
-        ([('A Hono service on our host behind a Cloudflare tunnel. The Cloud Run deploy script is ready and needs '
-           'a billing account.', {'color': INK2})], {'space': 2}),
-    ], size=10.5)
+    y = 4.4
+    box(s, LEFT, y, 9.26, 0.8)
+    text(s, LEFT + 0.18, y + 0.1, 8.9, 0.65, [
+        ([('Hosting', {'bold': True, 'size': 11})], {}),
+        ([('API on Cloud Run (asia-southeast1, Singapore). Firebase for sign-in, data, web hosting and test builds.',
+           {'color': INK2})], {'space': 2}),
+    ], size=11)
 
 
 def technologies(s):
@@ -352,6 +349,7 @@ def technologies(s):
         ('Web Risk API, Safe Browsing API', 'Known malicious links'),
         ('Firebase Auth, Firestore', 'Anonymous and Google sign-in, synced history and contacts, the scam network'),
         ('Firebase Hosting, App Distribution', 'The web demo and Android test builds'),
+        ('Cloud Run, asia-southeast1', 'Hosts the check API and the voice relay'),
         ('Expo 52, React Native 0.76, TypeScript', 'The Android app and the web demo'),
         ('Hono on Node 22, TypeScript', 'The check API, the rules engine and the voice relay'),
         ('Kotlin Android module', 'The screen bubble and Message Guard'),
@@ -407,9 +405,9 @@ def cost(s):
 
 
 def snapshots(s):
-    items = [('ph-danger-en', 'High risk report'), ('ph-jobshield', "Job Shield: what doesn't match"),
-             ('ph-bubble', 'Screen bubble (Android)'), ('ph-danger-my', 'Burmese report, voice button'),
-             ('ph-warn', 'Warn my family')]
+    items = [('ph-check', 'Check: pick what to check'), ('ph-danger-en', 'High risk report'),
+             ('ph-jobshield', "Job Shield: what doesn't match"), ('ph-bubble', 'Screen bubble (Android)'),
+             ('ph-report-my', 'Burmese report, voice and family')]
     h = 3.3
     iw, ih = Image.open(ART / 'ph-danger-en.png').size
     w = h * iw / ih
@@ -418,8 +416,8 @@ def snapshots(s):
         x = LEFT + i * (w + gap)
         picture(s, name, x, TOP - 0.02, w=w, h=h)
         text(s, x - 0.15, TOP + h + 0.04, w + 0.3, 0.42, [[(cap, {'bold': True})]], size=10, align=PP_ALIGN.CENTER)
-    note(s, 'Web build captures with fictional inputs. Job Shield uses built-in demo data. '
-            'The bubble shows Android overlay views on a drawn chat.')
+    note(s, 'Web build captures with fictional inputs and the built-in demo data. The bubble shows the Android '
+            'overlay views on a drawn chat.')
 
 
 def benchmarks(s):
@@ -447,11 +445,10 @@ def benchmarks(s):
 
 
 def future(s):
-    road = ['Native review of every Burmese string', 'Move the API to Cloud Run', 'A simpler Check page and a big '
-            'shield button on Home', 'More languages for the region', 'Pilots with migrant worker NGOs']
+    road = ['Native review of every Burmese string', 'Human review of the real-screenshot labels',
+            'More languages for the region', 'Pilots with migrant worker NGOs']
     limits = ['Burmese app strings are machine translated and not yet reviewed by a native speaker.',
               'Real-screenshot labels are drafts from two models, so that score is provisional.',
-              'The API runs on our host behind a Cloudflare tunnel until Cloud Run billing is on.',
               'The web demo has no screen bubble or Message Guard; both need Android.']
     text(s, LEFT, TOP, 4.4, 0.3, [[('Next', {'bold': True, 'size': 13})]])
     for i, t in enumerate(road):
@@ -463,8 +460,8 @@ def future(s):
         text(s, LEFT + 0.6, y + 0.04, 3.75, 0.48, [[(t, {'bold': True})]], size=11.5, anchor=MSO_ANCHOR.MIDDLE)
     x = LEFT + 4.75
     text(s, x, TOP, 4.4, 0.3, [[('Known limits today', {'bold': True, 'size': 13})]])
-    box(s, x, TOP + 0.42, 4.5, 3.28)
-    text(s, x + 0.18, TOP + 0.55, 4.15, 3.05, [([('•  ' + t, {'color': INK2})], {'space': 10}) for t in limits],
+    box(s, x, TOP + 0.42, 4.5, 2.6)
+    text(s, x + 0.18, TOP + 0.55, 4.15, 2.4, [([('•  ' + t, {'color': INK2})], {'space': 10}) for t in limits],
          size=11.5, line=1.15)
 
 
@@ -479,7 +476,7 @@ def links(s):
             append_after(p, ': web demo ')
             append_after(p, 'https://saferoute-aibc.web.app', link='https://saferoute-aibc.web.app')
             append_after(p, ', Android APK ')
-            append_after(p, 'https://saferoute-api.akkhayar.com/download', link='https://saferoute-api.akkhayar.com/download')
+            append_after(p, 'https://saferoute-aibc.web.app/saferoute.apk', link='https://saferoute-aibc.web.app/saferoute.apk')
     y = 2.55
     box(s, LEFT, y, 9.26, 1.45)
     text(s, LEFT + 0.2, y + 0.14, 8.9, 1.3, [
@@ -512,7 +509,7 @@ def safety(s, heading_src):
     text(s, LEFT, TOP + 3 * (h + gy) + 0.02, 6.45, 0.3, [[(
         'Images and message text are not stored or logged. Personal details are redacted before a signal is kept.',
         {'color': INK2})]], size=10)
-    picture(s, 'ph-privacy', 7.15, TOP - 0.02, h=3.98)
+    picture(s, 'ph-settings', 7.15, TOP - 0.02, h=3.98)
 
 
 def main(src, out):
