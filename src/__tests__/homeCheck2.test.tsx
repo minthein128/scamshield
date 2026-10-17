@@ -28,7 +28,7 @@ const flat = (children: unknown): string =>
   Array.isArray(children) ? children.map(flat).join('') : typeof children === 'string' ? children : children && typeof children === 'object' && 'props' in children ? flat((children as Node).props.children) : '';
 const textOf = (id: string): string => flat(screen.getByTestId(id));
 
-const control = (patch: Partial<ShieldControl> = {}): ShieldControl => ({ support: 'ready', running: false, step: 'idle', error: null, setEnabled: jest.fn(async () => undefined), checkNow: jest.fn(async () => true), ...patch });
+const control = (patch: Partial<ShieldControl> = {}): ShieldControl => ({ support: 'ready', running: false, on: patch.running ?? false, step: 'idle', error: null, setEnabled: jest.fn(async () => undefined), checkNow: jest.fn(async () => true), ...patch });
 
 beforeEach(async () => {
   await i18n.changeLanguage('en');

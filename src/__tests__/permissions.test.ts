@@ -1,6 +1,6 @@
 import { PermissionsAndroid } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { EXPLAINED_KEY, ensureContacts, ensureMicrophone, ensureNotifications, explainOnce, explainOnceEver, registerPermissionHost, resetPermissionSession, type AndroidPermissionApi } from '../lib/permissions';
+import { EXPLAINED_KEY, ensureContacts, ensureMicrophone, ensureNotifications, explainFirstTime, explainOnceEver, registerPermissionHost, resetPermissionSession, type AndroidPermissionApi } from '../lib/permissions';
 
 const { GRANTED, DENIED, NEVER_ASK_AGAIN } = PermissionsAndroid.RESULTS;
 
@@ -69,22 +69,26 @@ describe('just-in-time permissions', () => {
     expect(a.request).not.toHaveBeenCalled();
   });
 
-  it('explains screen capture once per launch', async () => {
+  it('explains screen capture once per install, not once per launch', async () => {
+    await AsyncStorage.clear();
     resetPermissionSession();
     const explain = jest.fn(async () => true);
     const off = registerPermissionHost({ explain, help: jest.fn() });
-    expect(await explainOnce('screen')).toBe(true);
-    expect(await explainOnce('screen')).toBe(true);
+    expect(await explainFirstTime('screen')).toBe(true);
+    expect(await explainFirstTime('screen')).toBe(true);
+    resetPermissionSession();
+    expect(await explainFirstTime('screen')).toBe(true);
     expect(explain).toHaveBeenCalledTimes(1);
     off();
   });
 
   it('does not remember a declined explanation', async () => {
+    await AsyncStorage.clear();
     resetPermissionSession();
     const explain = jest.fn(async () => false);
     const off = registerPermissionHost({ explain, help: jest.fn() });
-    expect(await explainOnce('screen')).toBe(false);
-    expect(await explainOnce('screen')).toBe(false);
+    expect(await explainFirstTime('screen')).toBe(false);
+    expect(await explainFirstTime('screen')).toBe(false);
     expect(explain).toHaveBeenCalledTimes(2);
     off();
   });

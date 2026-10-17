@@ -991,7 +991,7 @@ class ShieldOverlay(private val context: Context, private val listener: Listener
         main.removeCallbacks(autoCollapse)
         removeCardNow()
         bubble.animate().cancel()
-        bubble.animate().alpha(0f).scaleX(0.3f).scaleY(0.3f).setDuration(160)
+        bubble.animate().alpha(0f).scaleX(0.3f).scaleY(0.3f).setDuration(ShieldMotion.EXIT_MS).setInterpolator(ShieldMotion.EXIT)
             .setListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
                     bubble.animate().setListener(null)

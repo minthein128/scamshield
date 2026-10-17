@@ -166,6 +166,7 @@ export async function hasOverlayPermission(): Promise<boolean> {
   return mockOverlayGranted;
 }
 
+/** Resolves true when the permission is granted or the system settings screen opened for it. */
 export async function requestOverlayPermission(): Promise<boolean> {
   if (nativeShieldModule) {
     try {
@@ -178,7 +179,10 @@ export async function requestOverlayPermission(): Promise<boolean> {
   return true;
 }
 
-/** Shows the system screen-capture consent dialog. Resolves true when the user allows. */
+/**
+ * Shows the system screen-capture consent dialog. Resolves true when the user allows.
+ * On Android 13 and lower a consent from earlier in the app process is reused without a dialog.
+ */
 export async function requestScreenCapturePermission(): Promise<boolean> {
   if (nativeShieldModule) {
     try {
@@ -225,6 +229,7 @@ export async function setShieldAuthToken(token: string | null): Promise<boolean>
   }
 }
 
+/** Removes the bubble and sends the stopped state before it resolves; the service finishes after. */
 export async function stopShield(): Promise<boolean> {
   if (nativeShieldModule) {
     try {
@@ -287,7 +292,7 @@ function setMockRunning(running: boolean) {
 
 /**
  * Called when the shield service has actually started or stopped, including a stop from the
- * bubble's close target. startShield and stopShield resolve before the service changes state.
+ * bubble's close target. startShield resolves before the service has started.
  */
 export function addShieldStateListener(callback: (running: boolean) => void): ShieldSubscription {
   if (nativeShieldModule) {

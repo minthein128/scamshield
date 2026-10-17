@@ -26,14 +26,6 @@ export function explainPermission(kind: PermissionKind): Promise<boolean> {
   return host ? host.explain(kind) : Promise.resolve(true);
 }
 
-/** Explains once per app launch, for system dialogs that return every time (screen capture). */
-export async function explainOnce(kind: PermissionKind): Promise<boolean> {
-  if (explainedThisSession.has(kind)) return true;
-  const ok = await explainPermission(kind);
-  if (ok) explainedThisSession.add(kind);
-  return ok;
-}
-
 async function explainedKinds(): Promise<string[]> {
   try {
     const list: unknown = JSON.parse((await AsyncStorage.getItem(EXPLAINED_KEY)) ?? '[]');
@@ -41,6 +33,18 @@ async function explainedKinds(): Promise<string[]> {
   } catch {
     return [];
   }
+}
+
+/** Explains once per install, for a system dialog that returns. Later calls resolve true; a decline asks again. */
+export async function explainFirstTime(kind: PermissionKind): Promise<boolean> {
+  if (explainedThisSession.has(kind)) return true;
+  const list = await explainedKinds();
+  if (!list.includes(kind)) {
+    if (!(await explainPermission(kind))) return false;
+    await AsyncStorage.setItem(EXPLAINED_KEY, JSON.stringify([...list, kind])).catch(() => undefined);
+  }
+  explainedThisSession.add(kind);
+  return true;
 }
 
 /** Explains once per install, for optional permissions. Later calls resolve false. */

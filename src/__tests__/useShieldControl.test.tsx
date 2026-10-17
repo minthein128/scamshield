@@ -4,9 +4,10 @@ import { AppState, PermissionsAndroid, Platform } from 'react-native';
 import { act, fireEvent, render, renderHook, screen } from '@testing-library/react-native';
 import * as ShieldModule from 'shield-module';
 import i18n from '../i18n';
-import { BigShieldButton } from '../components/BigShieldButton';
+import { BigShieldButton, BUSY_DELAY_MS } from '../components/BigShieldButton';
+import { SETTLE_INTERVAL_MS, SETTLE_TIMEOUT_MS } from '../lib/shieldState';
 import { ShieldCard } from '../components/ShieldCard';
-import { useShieldControl } from '../hooks/useShieldControl';
+import { resetShieldPermissionCache, useShieldControl } from '../hooks/useShieldControl';
 import { registerPermissionHost, resetPermissionSession, type PermissionKind } from '../lib/permissions';
 
 jest.mock('shield-module', () => ({
@@ -17,6 +18,7 @@ jest.mock('shield-module', () => ({
   isShieldRunning: jest.fn(),
   startShield: jest.fn(),
   stopShield: jest.fn(),
+  setShieldAuthToken: jest.fn(),
   checkScreenNow: jest.fn(),
   addShieldStateListener: jest.fn(),
 }));
@@ -27,7 +29,8 @@ jest.mock('../state/AppState', () => ({
   useAppState: () => ({ language: 'en', profile: { homeCountry: 'MM', destinationCountry: 'TH', shareSignals: false } }),
 }));
 jest.mock('../config/runtime', () => ({ useApiUrl: () => 'https://api.example.com' }));
-jest.mock('../services/token', () => ({ getAuthToken: async () => null }));
+let mockToken: () => Promise<string | null> = async () => null;
+jest.mock('../services/token', () => ({ getAuthToken: () => mockToken() }));
 
 const shield = ShieldModule as jest.Mocked<typeof ShieldModule>;
 const realOS = Platform.OS;
@@ -59,6 +62,7 @@ afterAll(() => {
 beforeEach(async () => {
   await AsyncStorage.clear();
   resetPermissionSession();
+  resetShieldPermissionCache();
   jest.clearAllMocks();
   jest.spyOn(AppState, 'addEventListener').mockImplementation(((_: string, l: (s: string) => void) => {
     appStateListener = l;
@@ -84,6 +88,7 @@ beforeEach(async () => {
     stateListeners.add(l);
     return { remove: () => stateListeners.delete(l) };
   });
+  mockToken = async () => null;
   explain = jest.fn(async (_kind: PermissionKind) => true);
   help = jest.fn();
   off = registerPermissionHost({ explain, help });
@@ -172,6 +177,7 @@ describe.each([
     });
     expect(result.current.step).toBe('starting');
     expect(result.current.running).toBe(false);
+    expect(result.current.on).toBe(true);
     await act(() => tap);
     expect(result.current.running).toBe(true);
     expect(result.current.step).toBe('idle');
@@ -190,6 +196,7 @@ describe.each([
     });
     expect(result.current.step).toBe('stopping');
     expect(result.current.running).toBe(true);
+    expect(result.current.on).toBe(false);
     await act(() => tap);
     expect(result.current.running).toBe(false);
     expect(result.current.step).toBe('idle');
@@ -233,7 +240,10 @@ describe('home and the shield screen', () => {
   const flat = (children: unknown): string =>
     Array.isArray(children) ? children.map(flat).join('') : typeof children === 'string' ? children : children && typeof children === 'object' && 'props' in children ? flat((children as Node).props.children) : '';
   const homeStatus = () => flat(screen.getAllByTestId('shield-status')[0]);
-  const idle = () => expect(screen.queryByTestId('shield-busy') === null).toBe(true);
+  const settled = () => {
+    expect(screen.queryByTestId('shield-busy')).toBeNull();
+    expect(screen.getByTestId('shield-button').props.accessibilityState.disabled).toBe(false);
+  };
 
   async function until(check: () => void) {
     for (let waited = 0; ; waited += 50) {
@@ -256,11 +266,15 @@ describe('home and the shield screen', () => {
     await act(async () => undefined);
     expect(homeStatus()).toBe('Shield is OFF');
     fireEvent.press(screen.getByTestId('shield-button'));
-    await until(() => expect(homeStatus()).toBe('Shield is ON'));
-    await until(idle);
+    expect(homeStatus()).toBe('Shield is ON');
+    await until(settled);
+    expect(nativeRunning).toBe(true);
+    expect(homeStatus()).toBe('Shield is ON');
     fireEvent.press(screen.getByTestId('shield-button'));
-    await until(() => expect(homeStatus()).toBe('Shield is OFF'));
-    await until(idle);
+    expect(homeStatus()).toBe('Shield is OFF');
+    await until(settled);
+    expect(nativeRunning).toBe(false);
+    expect(homeStatus()).toBe('Shield is OFF');
     expect(shield.startShield).toHaveBeenCalledTimes(1);
     expect(shield.stopShield).toHaveBeenCalledTimes(1);
   }, 20000);
@@ -274,8 +288,220 @@ describe('home and the shield screen', () => {
     );
     await act(async () => undefined);
     fireEvent(screen.getByTestId('shield-switch'), 'valueChange', true);
-    await until(() => expect(homeStatus()).toBe('Shield is ON'));
-    await until(idle);
+    expect(homeStatus()).toBe('Shield is ON');
+    await until(settled);
+    await until(() => expect(screen.getByTestId('shield-switch').props.accessibilityState.disabled).toBe(false));
+    expect(nativeRunning).toBe(true);
     expect(flat(screen.getAllByTestId('shield-status')[1])).toBe(i18n.t('shield:status.on'));
   }, 20000);
+});
+
+describe('the circle reacts at once', () => {
+  type Node = { props: { children?: unknown } };
+  const flat = (children: unknown): string =>
+    Array.isArray(children) ? children.map(flat).join('') : typeof children === 'string' ? children : children && typeof children === 'object' && 'props' in children ? flat((children as Node).props.children) : '';
+  const status = () => flat(screen.getByTestId('shield-status'));
+  const button = () => screen.getByTestId('shield-button');
+  const spinner = () => screen.queryByTestId('shield-busy');
+  const tick = () => act(() => jest.advanceTimersByTimeAsync(0));
+  const advance = (ms: number) => act(() => jest.advanceTimersByTimeAsync(ms));
+  const SLOW_MS = 1000;
+
+  beforeEach(async () => {
+    await i18n.changeLanguage('en');
+    jest.useFakeTimers();
+    const slow = (running: boolean) => async () => {
+      setTimeout(() => serviceChanges(running), SLOW_MS);
+      return true;
+    };
+    shield.startShield.mockImplementation(slow(true));
+    shield.stopShield.mockImplementation(slow(false));
+    jest.spyOn(PermissionsAndroid, 'check').mockResolvedValue(true);
+  });
+  afterEach(async () => {
+    await act(() => jest.runAllTimersAsync());
+    jest.useRealTimers();
+  });
+
+  async function show() {
+    render(<BigShieldButton />);
+    await tick();
+  }
+
+  it('on: the look flips on the tap and the spinner waits 300 ms for a slow service', async () => {
+    await show();
+    expect(status()).toBe('Shield is OFF');
+    fireEvent.press(button());
+    expect(status()).toBe('Shield is ON');
+    expect(screen.getByText('On')).toBeTruthy();
+    expect(spinner()).toBeNull();
+    await advance(BUSY_DELAY_MS - 1);
+    expect(spinner()).toBeNull();
+    await advance(1);
+    expect(spinner()).not.toBeNull();
+    expect(shield.startShield).toHaveBeenCalledTimes(1);
+    await advance(SLOW_MS);
+    await tick();
+    expect(spinner()).toBeNull();
+    expect(status()).toBe('Shield is ON');
+    expect(button().props.accessibilityState.disabled).toBe(false);
+  });
+
+  it('off: the look flips on the tap, and a quick stop never shows the spinner', async () => {
+    nativeRunning = true;
+    shield.stopShield.mockImplementation(async () => {
+      serviceChanges(false);
+      return true;
+    });
+    await show();
+    expect(status()).toBe('Shield is ON');
+    const reads = shield.isShieldRunning.mock.calls.length;
+    fireEvent.press(button());
+    expect(status()).toBe('Shield is OFF');
+    expect(screen.getByText('Turn on')).toBeTruthy();
+    await tick();
+    expect(spinner()).toBeNull();
+    expect(button().props.accessibilityState.disabled).toBe(false);
+    expect(shield.isShieldRunning.mock.calls.length).toBe(reads);
+    expect(status()).toBe('Shield is OFF');
+  });
+
+  it('settles on the service event without waiting for the next status read', async () => {
+    await show();
+    fireEvent.press(button());
+    await advance(SLOW_MS - 1);
+    expect(button().props.accessibilityState.disabled).toBe(true);
+    const reads = shield.isShieldRunning.mock.calls.length;
+    await advance(1);
+    expect(button().props.accessibilityState.disabled).toBe(false);
+    expect(shield.isShieldRunning.mock.calls.length).toBe(reads);
+  });
+
+  it('a returning user starts with no permission checks and no awaits before startShield', async () => {
+    await show();
+    fireEvent.press(button());
+    await advance(SLOW_MS);
+    expect(nativeRunning).toBe(true);
+    fireEvent.press(button());
+    await advance(SLOW_MS);
+    expect(nativeRunning).toBe(false);
+    expect(status()).toBe('Shield is OFF');
+    jest.clearAllMocks();
+    fireEvent.press(button());
+    expect(shield.startShield).toHaveBeenCalledTimes(1);
+    expect(shield.hasOverlayPermission).not.toHaveBeenCalled();
+    expect(PermissionsAndroid.check).not.toHaveBeenCalled();
+    expect(shield.requestScreenCapturePermission).not.toHaveBeenCalled();
+    expect(explain).not.toHaveBeenCalled();
+  });
+
+  it('starts without waiting for the sign-in token and sends it when it arrives', async () => {
+    let giveToken: (t: string) => void = () => undefined;
+    mockToken = () => new Promise(resolve => (giveToken = resolve));
+    await show();
+    fireEvent.press(button());
+    await tick();
+    expect(shield.startShield).toHaveBeenCalledTimes(1);
+    expect(shield.startShield.mock.calls[0][0]).not.toHaveProperty('authToken');
+    await advance(SLOW_MS);
+    await tick();
+    await act(async () => giveToken('id-token'));
+    expect(shield.setShieldAuthToken).toHaveBeenCalledWith('id-token');
+  });
+
+  it('rolls back to off with the error text when the start fails', async () => {
+    shield.startShield.mockResolvedValue(false);
+    await show();
+    fireEvent.press(button());
+    expect(status()).toBe('Shield is ON');
+    await tick();
+    await tick();
+    expect(status()).toBe('Shield is OFF');
+    expect(flat(screen.getByTestId('shield-error'))).toBe(i18n.t('shield:errors.notStarted'));
+    expect(button().props.accessibilityState.disabled).toBe(false);
+  });
+
+  it('rolls back to off when the service never confirms', async () => {
+    emitEvents = false;
+    shield.startShield.mockResolvedValue(true);
+    await show();
+    fireEvent.press(button());
+    expect(status()).toBe('Shield is ON');
+    for (let i = 0; i <= SETTLE_TIMEOUT_MS / SETTLE_INTERVAL_MS + 1; i++) await advance(SETTLE_INTERVAL_MS);
+    expect(status()).toBe('Shield is OFF');
+    expect(screen.getByTestId('shield-error')).toBeTruthy();
+  });
+
+  it('first run: Settings opens for the overlay, then the start continues by itself when the user comes back', async () => {
+    let granted = false;
+    shield.hasOverlayPermission.mockImplementation(async () => granted);
+    shield.requestOverlayPermission.mockResolvedValue(true);
+    await show();
+    fireEvent.press(button());
+    await tick();
+    await tick();
+    expect(shield.startShield).not.toHaveBeenCalled();
+    expect(status()).toBe('Shield is OFF');
+    expect(flat(screen.getByTestId('shield-hint'))).toBe(i18n.t('shield:steps.overlay'));
+    expect(help).not.toHaveBeenCalled();
+    granted = true;
+    await act(async () => appStateListener?.('active'));
+    await tick();
+    expect(shield.startShield).toHaveBeenCalledTimes(1);
+    expect(status()).toBe('Shield is ON');
+    await advance(SLOW_MS);
+    await tick();
+    expect(nativeRunning).toBe(true);
+    expect(button().props.accessibilityState.disabled).toBe(false);
+  });
+
+  describe('Android 13 and lower', () => {
+    beforeEach(() => {
+      Object.defineProperty(Platform, 'Version', { value: 33, configurable: true });
+    });
+    afterEach(() => {
+      Object.defineProperty(Platform, 'Version', { value: 34, configurable: true });
+    });
+
+    it('asks for screen capture before the start, with the reason dialog once per install', async () => {
+      await show();
+      fireEvent.press(button());
+      await tick();
+      await tick();
+      expect(shield.requestScreenCapturePermission).toHaveBeenCalledTimes(1);
+      expect(explain.mock.calls.filter(([k]) => k === 'screen')).toHaveLength(1);
+      await advance(SLOW_MS);
+      await tick();
+      fireEvent.press(button());
+      await advance(SLOW_MS);
+      await tick();
+      resetPermissionSession();
+      fireEvent.press(button());
+      await tick();
+      await tick();
+      expect(shield.requestScreenCapturePermission).toHaveBeenCalledTimes(2);
+      expect(explain.mock.calls.filter(([k]) => k === 'screen')).toHaveLength(1);
+    });
+
+    it('rolls back to off with the error text when screen capture is refused', async () => {
+      shield.requestScreenCapturePermission.mockResolvedValue(false);
+      await show();
+      fireEvent.press(button());
+      expect(status()).toBe('Shield is ON');
+      await tick();
+      await tick();
+      expect(status()).toBe('Shield is OFF');
+      expect(flat(screen.getByTestId('shield-error'))).toBe(i18n.t('shield:errors.needsScreen'));
+      expect(shield.startShield).not.toHaveBeenCalled();
+    });
+  });
+
+  it('Android 14 and up starts without asking for screen capture; the bubble asks on the first tap', async () => {
+    await show();
+    fireEvent.press(button());
+    await tick();
+    expect(shield.requestScreenCapturePermission).not.toHaveBeenCalled();
+    expect(explain).not.toHaveBeenCalledWith('screen');
+    expect(shield.startShield).toHaveBeenCalledTimes(1);
+  });
 });
