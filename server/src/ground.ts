@@ -123,6 +123,7 @@ export function buildGroundingRequest(x: Pick<Extraction, 'entities'>, lang: Lan
     '- identity: the entity cannot be found, has no licence, or the claimed identity does not match.',
     '- Add a finding only when search results support it. If everything checks out, return {"findings":[]}.',
     '- Use likelihood language. Never write "X is unlicensed", "X is a scammer" or "X is a scam". Never call a named company or website a criminal. Never use "definitely", "confirmed" or "100%".',
+    '- State each finding directly. Never write "credible sources indicated", "according to credible sources", "reliable sources suggest" or "reports indicate", or their equivalents in any language. Write "Search found no registered agency named X", not "Credible sources indicated that X ...".',
     `- Good wording in ${LANG_NAMES[lang]}: "${ex.licence}" or "${ex.reports}"`,
     ...(lang === 'th' ? ['- In Thai never write "เป็นการหลอกลวง", "เป็นมิจฉาชีพ", "แน่นอน", "ชัวร์" or "ยืนยันแล้ว".'] : []),
     `- Write label and evidence in ${LANG_NAMES[lang]} only, whatever the language of the search results. Evidence is your own note about the source, not a quote: one short ${LANG_NAMES[lang]} sentence naming the source. Only names of organisations, websites and places may stay as written.`,

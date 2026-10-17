@@ -2,10 +2,10 @@
   "_meta": {
     "reviewed": false
   },
-  "button": "Bicara dengan Pyit Taing Htaung",
+  "button": "Bicara dengan $t(common:appName)",
   "buttonSub": "Obrolan suara tentang laporan ini",
-  "a11yButton": "Bicara dengan Pyit Taing Htaung. Obrolan suara tentang laporan ini.",
-  "title": "Pyit Taing Htaung",
+  "a11yButton": "Bicara dengan $t(common:appName). Obrolan suara tentang laporan ini.",
+  "title": "$t(common:appName)",
   "subtitle": "Bicara dengan $t(common:appName) tentang laporan ini",
   "privacy": "Suara Anda dikirim ke Google untuk dijawab. Tidak ada yang direkam atau disimpan.",
   "family": "Jelaskan ke keluarga saya",
@@ -25,7 +25,7 @@
     "warning": "Memutar peringatan dulu...",
     "listening": "Mendengarkan. Ajukan pertanyaan Anda.",
     "listeningMuted": "Mikrofon dibisukan.",
-    "speaking": "Pyit Taing Htaung sedang berbicara..."
+    "speaking": "$t(common:appName) sedang berbicara..."
   },
   "ended": {
     "user": "Percakapan selesai.",
@@ -44,12 +44,12 @@
     "audio": "Audio tidak tersedia di perangkat ini."
   },
   "companion": {
-    "name": "Pyit Taing Htaung",
+    "name": "$t(common:appName)",
     "ask": "Tanya",
     "whatWeChecked": "Ini yang kami periksa",
     "previewClose": "Ketuk untuk menutup. Foto ini tidak disimpan.",
-    "askA11y": "Tanya Pyit Taing Htaung tentang hasil ini",
-    "talkA11y": "Bicara dengan Pyit Taing Htaung",
+    "askA11y": "Tanya $t(common:appName) tentang hasil ini",
+    "talkA11y": "Bicara dengan $t(common:appName)",
     "listening": "Mendengarkan",
     "muted": "Dibisukan",
     "paused": "Dijeda",
@@ -60,7 +60,7 @@
     "rechecking": "Memeriksa lagi",
     "connecting": "Menghubungkan",
     "endA11y": "Akhiri percakapan",
-    "voiceChip": "Pyit Taing Htaung",
+    "voiceChip": "$t(common:appName)",
     "micDenied": "Buka $t(common:appName) untuk izinkan mikrofon",
     "needsForeground": "Buka $t(common:appName) sekali untuk menyalakan suara",
     "unavailable": "Suara tidak bisa dipakai saat ini",
@@ -70,7 +70,7 @@
     "endedCap": "Waktu habis. Ketuk dua kali boneka untuk bicara lagi",
     "muteA11y": "Ketuk dua kali untuk mematikan suara mikrofon",
     "unmuteA11y": "Ketuk dua kali untuk menyalakan mikrofon",
-    "permissionTitle": "Bicara dengan Pyit Taing Htaung dari gelembung",
+    "permissionTitle": "Bicara dengan $t(common:appName) dari gelembung",
     "permissionBody": "Opsional. Ketuk dua kali boneka melayang, atau ketuk Tanya pada hasil, untuk bicara tentang apa yang ada di layar Anda. $t(common:appName) butuh mikrofon untuk ini.",
     "permissionStep": "Boleh dilewati: izinkan mikrofon agar bisa bicara dengan $t(common:appName) dari gelembung.",
     "allowMic": "Izinkan mikrofon",
@@ -95,6 +95,7 @@
     "errTooLarge": "Tangkapan layar terlalu besar untuk diperiksa.",
     "errCapture": "Layar tidak bisa dibaca. Ketuk perisai untuk coba lagi.",
     "errCaptureDenied": "Tangkapan layar tidak diizinkan. Ketuk perisai untuk coba lagi.",
-    "errFailed": "Pemeriksaan gagal. Coba lagi."
+    "errFailed": "Pemeriksaan gagal. Coba lagi.",
+    "captureCancelled": "Tidak ada yang dibagikan. Ketuk boneka saat Anda ingin memeriksa."
   }
 }

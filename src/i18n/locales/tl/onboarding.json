@@ -50,8 +50,8 @@
     "without": {
       "heading": "Kahit walang account, magagawa mo ang:",
       "check": "Suriin ang job offer, mensahe, link at larawan",
-      "voice": "Makipag-usap kay Pyit Taing Htaung gamit ang boses",
-      "doll": "Pindutin si Pyit Taing Htaung sa screen mo para suriin ang nakikita mo",
+      "voice": "Makipag-usap kay $t(common:appName) gamit ang boses",
+      "doll": "Pindutin ang manika sa screen mo para suriin ang nakikita mo",
       "call": "Tumawag sa mga hotline at magbahagi ng babala"
     },
     "with": {

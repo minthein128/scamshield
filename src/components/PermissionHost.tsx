@@ -47,7 +47,7 @@ export const PermissionHost: React.FC = () => {
   };
 
   const explain = active?.mode === 'explain';
-  const showSettings = active?.mode === 'help' && active.kind !== 'screen';
+  const showSettings = active?.mode === 'help';
   const body = active ? (explain ? `explain.${active.kind}` : `help.${active.kind}`) : '';
 
   return (

@@ -1,8 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { PermissionsAndroid, Platform, type Permission } from 'react-native';
 
-export type PermissionKind = 'mic' | 'overlay' | 'screen' | 'notifications' | 'contacts';
-export type HelpKind = 'mic' | 'overlay' | 'screen' | 'contacts';
+export type PermissionKind = 'mic' | 'overlay' | 'notifications' | 'contacts';
+export type HelpKind = 'mic' | 'overlay' | 'contacts';
 export type PermissionResult = 'granted' | 'declined' | 'denied' | 'blocked';
 
 interface Host {
@@ -11,7 +11,6 @@ interface Host {
 }
 
 let host: Host | null = null;
-const explainedThisSession = new Set<PermissionKind>();
 export const EXPLAINED_KEY = 'saferoute.permissions.explained.v1';
 
 export function registerPermissionHost(next: Host): () => void {
@@ -35,18 +34,6 @@ async function explainedKinds(): Promise<string[]> {
   }
 }
 
-/** Explains once per install, for a system dialog that returns. Later calls resolve true; a decline asks again. */
-export async function explainFirstTime(kind: PermissionKind): Promise<boolean> {
-  if (explainedThisSession.has(kind)) return true;
-  const list = await explainedKinds();
-  if (!list.includes(kind)) {
-    if (!(await explainPermission(kind))) return false;
-    await AsyncStorage.setItem(EXPLAINED_KEY, JSON.stringify([...list, kind])).catch(() => undefined);
-  }
-  explainedThisSession.add(kind);
-  return true;
-}
-
 /** Explains once per install, for optional permissions. Later calls resolve false. */
 export async function explainOnceEver(kind: PermissionKind): Promise<boolean> {
   const list = await explainedKinds();
@@ -58,10 +45,6 @@ export async function explainOnceEver(kind: PermissionKind): Promise<boolean> {
 
 export function showPermissionHelp(kind: HelpKind): void {
   host?.help(kind);
-}
-
-export function resetPermissionSession(): void {
-  explainedThisSession.clear();
 }
 
 export interface AndroidPermissionApi {

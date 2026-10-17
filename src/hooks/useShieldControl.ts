@@ -6,7 +6,7 @@ import { t } from '../i18n';
 import { useApiUrl } from '../config/runtime';
 import { companionStrings } from '../lib/companionStrings';
 import { diag, errorCode } from '../lib/diagLog';
-import { ensureNotifications, explainFirstTime, explainOnceEver, explainPermission, permissionApi, showPermissionHelp } from '../lib/permissions';
+import { ensureNotifications, explainOnceEver, explainPermission, permissionApi, showPermissionHelp } from '../lib/permissions';
 import { isCleartext } from '../lib/shield';
 import {
   beginShieldTransition,
@@ -32,10 +32,10 @@ export function shieldSupport(platform: string = Platform.OS, apiUrl: string | n
   return 'ready';
 }
 
-export type ShieldStep = 'idle' | 'overlay' | 'notifications' | 'capture' | 'starting' | 'stopping';
+export type ShieldStep = 'idle' | 'overlay' | 'notifications' | 'starting' | 'stopping';
 
 /** Steps that wait on the user (a reason dialog, a system dialog or Settings). */
-export const PERMISSION_STEPS: readonly ShieldStep[] = ['overlay', 'notifications', 'capture'];
+export const PERMISSION_STEPS: readonly ShieldStep[] = ['overlay', 'notifications'];
 
 export function stepText(step: ShieldStep): string {
   if (step === 'idle') return '';
@@ -53,10 +53,6 @@ export interface ShieldControl {
   setEnabled: (on: boolean) => Promise<void>;
   checkNow: () => Promise<boolean>;
 }
-
-/** Android 13 and lower ask for screen capture before the start; 14 and up ask on the first bubble tap. */
-export const consentAtStart = (platform: string = Platform.OS, version: number | string = Platform.Version): boolean =>
-  platform === 'android' && Number(version) < 34;
 
 let overlayGranted = false;
 let notificationsAsked = false;
@@ -130,21 +126,6 @@ export function useShieldControl(): ShieldControl {
         const notified = await ensureNotifications(permissionApi({ explain: explainOnceEver }));
         notificationsAsked = true;
         if (notified !== 'granted') diag.info('shield', 'notifications_not_granted', { result: notified });
-      }
-      if (consentAtStart()) {
-        setStep('capture');
-        if (!(await explainFirstTime('screen'))) {
-          diag.info('shield', 'capture_declined');
-          setStep('idle');
-          return;
-        }
-        if (!(await ShieldModule.requestScreenCapturePermission())) {
-          diag.warn('shield', 'capture_denied');
-          setError(t('shield:errors.needsScreen'));
-          showPermissionHelp('screen');
-          setStep('idle');
-          return;
-        }
       }
       let ok = false;
       const sentToken = token;

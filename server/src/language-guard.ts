@@ -144,7 +144,7 @@ export function findJobBanned(text: string, lang: Lang): string[] {
 
 /** Rewrites certainty phrases, then the Job Shield banned phrases. */
 export function guardJobText(text: string, lang: Lang): { text: string; hits: number } {
-  const first = rewriteCertainty(fixAppName(text, lang), lang);
+  const first = rewriteCertainty(stripSourceFiller(fixAppName(text, lang), lang), lang);
   let hits = first.hits;
   let out = first.text;
   for (const r of JOB_BANNED[lang]) {
@@ -153,6 +153,73 @@ export function guardJobText(text: string, lang: Lang): { text: string; hits: nu
     if (n && r.sub !== undefined) out = out.replace(new RegExp(r.re.source, r.re.flags), r.sub as never);
   }
   return { text: out, hits };
+}
+
+const EN_CRED = '(?:credible|reliable|trusted|reputable|trustworthy)';
+const EN_SRC = `(?:(?:${EN_CRED}|several|multiple|online|public|available)(?: and ${EN_CRED})? )+(?:sources?|reports?)`;
+const EN_SAY = '(?:indicate|suggest|show|say|state|report|confirm)(?:s|d|ed)?';
+const ID_CRED = '(?:yang )?(?:terpercaya|tepercaya|kredibel|dapat dipercaya|andal)';
+const TL_CRED = '(?:mapagkakatiwalaang?|maaasahang?|kapani-paniwalang?)';
+const TL_SRC = '(?:mga )?(?:source|sources|pinagmulan|sanggunian|batis)';
+const MY_CRED = '(?:ယုံကြည်စိတ်ချရ|ယုံကြည်ရလောက်|ယုံကြည်ရ|ယုံကြည်စိတ်ချ)(?:သော|သည့်|တဲ့)';
+const MY_SRC = '(?:သတင်းအရင်းအမြစ်|သတင်းရင်းမြစ်|အရင်းအမြစ်|ရင်းမြစ်)(?:များ)?';
+const TH_SRC = '(?:แหล่งข้อมูล|แหล่งข่าว|แหล่งที่มา)(?:ที่)?(?:น่าเชื่อถือ|เชื่อถือได้|ไว้วางใจได้)';
+const TH_SAY = '(?:ระบุ|รายงาน|บ่งชี้|ชี้|แจ้ง|กล่าว|เปิดเผย)(?:ไว้)?';
+
+// Attribution filler such as "credible sources indicated that ..." is dropped and the finding stays.
+const FILLER: Record<Lang, RegExp[]> = {
+  en: [
+    new RegExp(
+      `,?\\s*\\b(?:according to|as per|based on|from|per) ${EN_SRC}(?:\\s+${EN_SAY})?(?:\\s*,|(?=[.!?;]|$))\\s*(?:that\\s+)?`,
+      'gi',
+    ),
+    new RegExp(`\\b${EN_SRC}(?:\\s+(?:have |has )?${EN_SAY})+,?\\s*(?:that\\s+)?`, 'gi'),
+    /\b(?:reports?|sources?) (?:indicate|suggest)(?:s|d|ed)? that\s+/gi,
+  ],
+  id: [
+    new RegExp(
+      `,?\\s*\\b(?:menurut|berdasarkan|dari|sesuai) (?:beberapa )?sumber ${ID_CRED}(?:\\s+(?:menyebutkan|menyatakan|menunjukkan|mengindikasikan))?(?:\\s+bahwa)?(?:\\s*,|(?=[.!?;]|$))?\\s*`,
+      'gi',
+    ),
+    new RegExp(`\\bsumber ${ID_CRED} (?:menyebutkan|menyatakan|menunjukkan|mengindikasikan|melaporkan)(?: bahwa)?,?\\s*`, 'gi'),
+    /\blaporan (?:menunjukkan|mengindikasikan) bahwa\s+/gi,
+  ],
+  tl: [
+    new RegExp(`,?\\s*\\b(?:ayon sa|batay sa|mula sa) ${TL_CRED} ${TL_SRC}(?:\\s*,|(?=[.!?;]|$))?\\s*(?:na\\s+)?`, 'gi'),
+    new RegExp(`\\b(?:ipinahiwatig|ipinapahiwatig|ipinakita|ipinapakita|sinabi|iniulat) ng (?:mga )?${TL_CRED} ${TL_SRC} na\\s+`, 'gi'),
+    /\b(?:ipinahiwatig|ipinapahiwatig|ipinakita|ipinapakita) ng mga ulat na\s+/gi,
+  ],
+  my: [new RegExp(`${MY_CRED}\\s*${MY_SRC}\\s*(?:အရ|က|မှ)[၊,]?\\s*`, 'g')],
+  th: [
+    new RegExp(`\\s?(?:จาก|ตาม|ตามที่|อ้างอิงจาก)${TH_SRC}(?:หลายแห่ง)?(?:${TH_SAY})?(?:ว่า)?\\s?`, 'g'),
+    new RegExp(`${TH_SRC}(?:หลายแห่ง)?${TH_SAY}(?:ว่า)?\\s?`, 'g'),
+  ],
+};
+
+/** Source-attribution filler found in text, for counting. */
+export function findSourceFiller(text: string, lang: Lang): string[] {
+  return FILLER[lang].flatMap((re) => [...text.matchAll(new RegExp(re.source, re.flags))].map((m) => m[0].trim()));
+}
+
+/** Removes attribution filler such as "credible sources indicated that" and mends the sentence around it. */
+export function stripSourceFiller(text: string, lang: Lang): string {
+  let out = text;
+  for (const re of FILLER[lang]) {
+    out = out.replace(new RegExp(re.source, re.flags), (m: string, ...rest: unknown[]) => {
+      const offset = rest[rest.length - 2] as number;
+      const before = (rest[rest.length - 1] as string).slice(0, offset);
+      if (m.startsWith(',') && /,\s*$/.test(m)) return ', ';
+      if (!m.startsWith(',') && (before.trim() === '' || /[.!?]\s*$/.test(before))) return '\uE000';
+      return /\s$/.test(m) ? ' ' : '';
+    });
+  }
+  if (out === text) return text;
+  return out
+    .replace(/\uE000\s*(\p{L})/gu, (_m, c: string) => c.toUpperCase())
+    .replace(/\uE000/g, '')
+    .replace(/ {2,}/g, ' ')
+    .replace(/\s+([,.;!?])/g, '$1')
+    .trim();
 }
 
 const TH_VOWEL_MARK = '\\u0E30-\\u0E3A\\u0E47-\\u0E4E';
@@ -266,7 +333,7 @@ export function foreignInExtraction(x: Pick<Extraction, 'summary' | 'spokenWarni
 export function guardExtraction(x: Extraction, lang: Lang): { extraction: Extraction; stats: GuardStats } {
   const stats: GuardStats = { before: 0, rewrites: 0 };
   const fix = (t: string) => {
-    const r = rewriteCertainty(fixAppName(t, lang), lang);
+    const r = rewriteCertainty(stripSourceFiller(fixAppName(t, lang), lang), lang);
     stats.before += r.hits;
     if (r.text !== t) stats.rewrites++;
     return r.text;
@@ -283,7 +350,7 @@ export function guardExtraction(x: Extraction, lang: Lang): { extraction: Extrac
 export function guardFlags(flags: Flag[], lang: Lang): { flags: Flag[]; stats: GuardStats } {
   const stats: GuardStats = { before: 0, rewrites: 0 };
   const fix = (t: string) => {
-    const r = rewriteCertainty(fixAppName(t, lang), lang);
+    const r = rewriteCertainty(stripSourceFiller(fixAppName(t, lang), lang), lang);
     stats.before += r.hits;
     if (r.text !== t) stats.rewrites++;
     return r.text;

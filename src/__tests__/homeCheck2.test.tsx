@@ -76,9 +76,9 @@ describe('big shield button', () => {
   });
 
   it('while a permission step runs: disabled and shows the step', () => {
-    render(<BigShieldButtonView control={control({ step: 'capture' })} />);
+    render(<BigShieldButtonView control={control({ step: 'notifications' })} />);
     expect(screen.getByTestId('shield-button').props.accessibilityState.disabled).toBe(true);
-    expect(textOf('shield-hint')).toContain('Step 3 of 4');
+    expect(textOf('shield-hint')).toContain('Step 2 of 3');
   });
 
   it('busy: shows a spinner, disables the circle and shows the permission step', () => {

@@ -31,14 +31,12 @@ describe('PermissionHost', () => {
     expect(answer).toBe(false);
   });
 
-  it('offers Open Settings after a refusal, except for screen capture', async () => {
+  it('offers Open Settings after a refusal', async () => {
     const open = jest.spyOn(Linking, 'openSettings').mockResolvedValue();
     const screen = render(<PermissionHost />);
     act(() => showPermissionHelp('mic'));
+    expect(screen.getByTestId('permission-close')).toBeTruthy();
     fireEvent.press(screen.getByTestId('permission-open-settings'));
     expect(open).toHaveBeenCalled();
-    act(() => showPermissionHelp('screen'));
-    expect(screen.queryByTestId('permission-open-settings')).toBeNull();
-    expect(screen.getByTestId('permission-close')).toBeTruthy();
   });
 });

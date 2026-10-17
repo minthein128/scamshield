@@ -11,27 +11,25 @@
     "off": "Mati. Nyalakan untuk memeriksa apa yang ada di layar Anda."
   },
   "steps": {
-    "overlay": "Langkah 1 dari 4: izinkan \"Tampilkan di atas aplikasi lain\", lalu kembali ke $t(common:appName).",
-    "notifications": "Langkah 2 dari 4: izinkan notifikasi agar Android tetap menjalankan shield.",
-    "capture": "Langkah 3 dari 4: izinkan $t(common:appName) melihat layar Anda saat Anda mengetuk boneka.",
-    "starting": "Langkah 4 dari 4: memulai shield.",
+    "overlay": "Langkah 1 dari 3: izinkan \"Tampilkan di atas aplikasi lain\", lalu kembali ke $t(common:appName).",
+    "notifications": "Langkah 2 dari 3: izinkan notifikasi agar Android tetap menjalankan shield.",
+    "starting": "Langkah 3 dari 3: memulai shield.",
     "stopping": "Mematikan shield."
   },
   "needs": {
     "title": "Yang dibutuhkan shield",
     "overlay": "Izinkan \"Tampilkan di atas aplikasi lain\" agar boneka bisa melayang di atas aplikasi lain.",
     "notifications": "Izinkan notifikasi agar Android tetap menjalankan shield.",
-    "capture": "Izinkan perekaman layar. $t(common:appName) hanya melihat layar Anda saat Anda mengetuk boneka.",
+    "capture": "Setiap kali Anda mengetuk boneka, Android meminta izin untuk membagikan layar. Ketuk Mulai sekarang. $t(common:appName) mengambil satu gambar, memeriksanya, lalu berhenti membagikan layar.",
     "privacy": "Tangkapan layar dikirim ke layanan pemeriksaan hanya untuk diperiksa. Tangkapan layar tidak disimpan."
   },
   "checkNow": "Periksa layar ini sekarang",
   "checkingNow": "Memeriksa layar Anda...",
-  "body": "Boneka kecil Pyit Taing Htaung melayang di atas aplikasi lain. Ketuk boneka pada info lowongan kerja, chat, atau iklan dan $t(common:appName) akan memeriksa isi layar Anda.",
+  "body": "Boneka kecil melayang di atas aplikasi lain. Ketuk boneka pada info lowongan kerja, chat, atau iklan dan $t(common:appName) akan memeriksa isi layar Anda.",
   "download": "Unduh aplikasi Android",
   "details": "Detail dan izin",
   "detailsA11y": "Detail shield",
   "errors": {
-    "needsScreen": "Shield perlu melihat layar Anda untuk memeriksanya. Coba lagi dan ketuk Mulai sekarang.",
     "notStarted": "Shield tidak berjalan. Pastikan izin \"Tampilkan di atas aplikasi lain\" aktif, lalu coba lagi.",
     "failed": "Shield tidak berjalan. Coba lagi.",
     "checkFailed": "Pemeriksaan tidak berjalan. Nyalakan shield dan coba lagi."
