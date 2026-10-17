@@ -15,7 +15,7 @@
     "remove": "Alisin",
     "call": "Tawagan",
     "tryAgain": "Subukan muli",
-    "leave": "Umalis agad",
+    "leave": "Mabilis na labas",
     "leaveA11y": "Umalis sa screen na ito at pumunta sa Home"
   },
   "tabs": {
@@ -61,6 +61,7 @@
     "marketplace_fraud": "Posibleng panloloko sa marketplace",
     "investment": "Posibleng panloloko sa investment",
     "other": "Kahina-hinalang mensahe",
+    "other_link": "Kahina-hinalang link",
     "none": "Walang nakitang senyales ng panloloko"
   },
   "countries": {

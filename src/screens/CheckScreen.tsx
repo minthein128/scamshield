@@ -6,7 +6,7 @@ import { Screen } from '../components/Screen';
 import { Text, TextInput } from '../components/Text';
 import { BlockIcon } from '../components/blockIcons';
 import { BrandLockup } from '../components/BrandMark';
-import { QuickExitButton } from '../components/QuickExit';
+import { LeaveQuicklyButton } from '../components/LeaveQuickly';
 import { AddedBar, CheckCard, FileCard, FoldRow, ModeChips, OrDivider, TextBox, UploadBox } from '../components/CheckBlocks';
 import { Button, Notice } from '../components/ui';
 import { Select } from '../components/Select';
@@ -179,7 +179,7 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
           <View style={{ flex: 1 }}>
             <BrandLockup />
           </View>
-          <QuickExitButton />
+          <LeaveQuicklyButton />
         </View>
       }
       footer={
