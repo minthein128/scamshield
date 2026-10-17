@@ -1,6 +1,6 @@
 # Kakwe demo video script
 
-TLDR: a presenter-led walkthrough for the Google Cloud AI Builder Cup 2026 judges. Estimated runtime 2:48 at about 140 words a minute. The live product, the pipeline and the results take 1:56 (69%), because Technical Merit (40%), Innovation (25%) and User Experience (10%) are all judged on what the judges see working. The purpose, the problem, the user and the close take 0:43 (26%) for Problem Alignment and Impact (25%). Responsible AI takes 0:09 and also shows on screen during the demo. The film uses build 1.0.195 and fictional inputs only.
+TLDR: a presenter-led walkthrough for the Google Cloud AI Builder Cup 2026 judges. Estimated runtime 2:48 at about 140 words a minute. The live product, the pipeline and the results take 1:56 (69%), because Technical Merit (40%), Innovation (25%) and User Experience (10%) are all judged on what the judges see working. The purpose, the problem, the user and the close take 0:43 (26%) for Problem Alignment and Impact (25%). Responsible AI takes 0:09 and also shows on screen during the demo. The film uses build 1.0.254 and fictional inputs only.
 
 This script replaces the earlier story version with the persona Ma Su.
 
@@ -68,7 +68,7 @@ Draw it in the brand palette: boxes on the warm page colour `#F7F3EE`, lacquer-b
 ## Shot list for recording
 
 1. Voice-over first, in a quiet room, one take per segment. Leave half a second of silence at every cut.
-2. Phone: one physical Android phone, Android 11 or later, build 1.0.195, clean profile, language Myanmar, anonymous, "No thanks" on the sharing step. Turn on the Screen shield and allow overlay, screen capture and microphone. Do Not Disturb on, Show taps on.
+2. Phone: one physical Android phone, Android 11 or later, build 1.0.254, clean profile, language Myanmar, anonymous, "No thanks" on the sharing step. Turn on the Screen shield and allow overlay, screen capture and microphone. Do Not Disturb on, Show taps on.
 3. Check the API before each session: the health endpoint answers with `"mock": false`, and the app shows no "Offline demo mode" banner.
 4. Run every input once before recording. An identical check within 10 minutes comes from the cache, so the take is fast and gives the same result.
 5. Screen takes, in this order: Check (input A), Job Shield (input B), bubble over Viber (input C, record the whole screen), voice companion (record app audio, or room audio synced in the edit), Warn my family, language list, then the three Responsible AI cuts.
