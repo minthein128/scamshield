@@ -25,6 +25,37 @@ const TITLES: Record<Verdict, Record<Lang, string>> = {
   },
 };
 
+const SAFE_NOTE: Record<Lang, { summary: string; spoken: string }> = {
+  en: {
+    summary:
+      'We found no major warning signs. A few small details may still be worth checking, so verify the sender before you pay or share documents.',
+    spoken: 'We found no major warning signs. Please still verify the sender before you pay or share documents.',
+  },
+  id: {
+    summary:
+      'Kami tidak menemukan tanda bahaya besar. Beberapa detail kecil mungkin tetap perlu diperiksa, jadi pastikan pengirimnya sebelum Anda membayar atau membagikan dokumen.',
+    spoken: 'Kami tidak menemukan tanda bahaya besar. Tetap periksa pengirimnya sebelum membayar atau membagikan dokumen.',
+  },
+  tl: {
+    summary:
+      'Wala kaming nakitang malaking babala. Maaaring may ilang maliliit na detalye pa ring dapat suriin, kaya i-verify muna ang nagpadala bago magbayad o magbahagi ng dokumento.',
+    spoken: 'Wala kaming nakitang malaking babala. I-verify pa rin ang nagpadala bago magbayad o magbahagi ng dokumento.',
+  },
+  my: {
+    summary: 'အရေးကြီးသော သတိပေးချက် မတွေ့ရပါ။ သို့သော် သေးငယ်သော အချက်အလက်အချို့ကို ထပ်စစ်သင့်နိုင်သဖြင့် ငွေမပေးမီ သို့မဟုတ် စာရွက်စာတမ်း မမျှဝေမီ ပို့သူကို အရင်စစ်ဆေးပါ။',
+    spoken: 'အရေးကြီးသော သတိပေးချက် မတွေ့ရပါ။ ငွေမပေးမီ ပို့သူကို အရင်စစ်ဆေးပါရှင်။',
+  },
+  th: {
+    summary: 'เราไม่พบสัญญาณเตือนสำคัญ แต่รายละเอียดเล็กน้อยบางอย่างอาจยังควรตรวจสอบ โปรดตรวจสอบผู้ส่งก่อนโอนเงินหรือส่งเอกสาร',
+    spoken: 'เราไม่พบสัญญาณเตือนสำคัญ แต่โปรดตรวจสอบผู้ส่งก่อนโอนเงินหรือส่งเอกสารนะคะ',
+  },
+};
+
+/** Text for a safe verdict whose model prose or flags still describe a warning. */
+export function safeNote(lang: Lang): { summary: string; spoken: string } {
+  return SAFE_NOTE[lang];
+}
+
 const WEB_RISK_NOTE: Record<Lang, string> = {
   en: 'Google Web Risk flags a link in this message as unsafe.',
   id: 'Google Web Risk menandai tautan dalam pesan ini sebagai tidak aman.',

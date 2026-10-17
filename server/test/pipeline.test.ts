@@ -277,3 +277,54 @@ describe('unchecked links', () => {
     expect(r.summary).toContain('not verified');
   });
 });
+
+describe('pipeline report consistency', () => {
+  const run = (overrides: Record<string, unknown>, language: 'en' | 'th' = 'en') => {
+    const mock = createMockExtractor();
+    const p = createPipeline({
+      extractor: {
+        extract: async (r) => ({
+          ...(await mock.extract(r)),
+          flags: [{ family: 'payment_route', label: 'Requests a fee payment', evidence: 'Pay fee $250 now', severity: 'medium' }],
+          scamType: 'other',
+          verdictDraft: 'careful',
+          unsolicited: true,
+          summary: 'This message demands an upfront fee. It looks like it could be a fee scam. Please do not pay.',
+          spokenWarning: 'This looks like a fee scam. Please do not pay.',
+          ...overrides,
+        }),
+      },
+      correlator: createMockCorrelator(),
+      grounder: { ground: async () => ({ flags: [], sources: [] }) },
+      model: 'm',
+    });
+    return p.run({ kind: 'message', language, text: 'Pay fee $250 now' });
+  };
+
+  it('never shows scam wording or a scam type under a safe verdict', async () => {
+    const r = await run({ scamType: 'other' });
+    expect(r.verdict).toBe('safe');
+    expect(r.scamType).toBe('none');
+    expect(r.summary).not.toMatch(/scam/i);
+    expect(r.spokenWarning).not.toMatch(/scam/i);
+    expect(r.summary).toContain('no major warning signs');
+  });
+
+  it('uses the localised safe text for a contradictory safe verdict', async () => {
+    const r = await run({}, 'th');
+    expect(r.verdict).toBe('safe');
+    expect(r.summary).toContain('เราไม่พบสัญญาณเตือนสำคัญ');
+  });
+
+  it('keeps the model summary when the verdict is careful', async () => {
+    const r = await run({ flags: [{ family: 'payment_route', label: 'Fee', evidence: 'x', severity: 'high' }], unsolicited: false });
+    expect(r.verdict).toBe('careful');
+    expect(r.summary).toContain('fee scam');
+  });
+
+  it('keeps the model summary for a clean safe input', async () => {
+    const r = await run({ flags: [], scamType: 'none', verdictDraft: 'safe', summary: 'This looks like an ordinary chat.' });
+    expect(r.verdict).toBe('safe');
+    expect(r.summary).toBe('This looks like an ordinary chat.');
+  });
+});

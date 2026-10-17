@@ -1,7 +1,7 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { createTtlLru } from './cache.js';
 import type { Correlator } from './correlate.js';
-import { buildActions, titleFor, traffickingCheck, withWebRiskNote } from './explain.js';
+import { buildActions, safeNote, titleFor, traffickingCheck, withWebRiskNote } from './explain.js';
 import type { Extractor } from './extract.js';
 import type { StreamOpts } from './extract-stream.js';
 import type { Feedback } from './feedback/service.js';
@@ -255,7 +255,9 @@ export function createPipeline(deps: PipelineDeps): Pipeline {
         sources: Source[],
         network: typeof NO_LOOKUP,
       ): CheckResponse => {
-        const scamType = s.flags.length === 0 ? 'none' : extraction.scamType;
+        const contradicts = s.verdict === 'safe' && (s.flags.length > 0 || extraction.verdictDraft !== 'safe');
+        const note = contradicts ? safeNote(req.language) : undefined;
+        const scamType = s.flags.length === 0 || contradicts ? 'none' : extraction.scamType;
         return {
           id,
           createdAt,
@@ -263,8 +265,8 @@ export function createPipeline(deps: PipelineDeps): Pipeline {
           verdict: s.verdict,
           score: s.score,
           title: titleFor(s.verdict, req.language),
-          summary: withWebRiskNote(extraction.summary, linkChecks, req.language),
-          spokenWarning: extraction.spokenWarning,
+          summary: withWebRiskNote(note?.summary ?? extraction.summary, linkChecks, req.language),
+          spokenWarning: note?.spoken ?? extraction.spokenWarning,
           scamType,
           flags: s.flags,
           linkChecks,
