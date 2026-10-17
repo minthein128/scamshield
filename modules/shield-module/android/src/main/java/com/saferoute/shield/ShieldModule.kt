@@ -23,6 +23,7 @@ class ShieldModule : Module() {
             ShieldBridge.stateSink = { running ->
                 this@ShieldModule.sendEvent("onShieldState", mapOf("running" to running))
             }
+            appContext.reactContext?.let { LegacyDataCleanup.run(it) }
         }
 
         OnDestroy {
