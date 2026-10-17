@@ -16,6 +16,15 @@
     "capture": "Hakbang 3 ng 4: payagan ang $t(common:appName) na makita ang iyong screen kapag pinindot mo ang manika.",
     "starting": "Hakbang 4 ng 4: sinisimulan ang shield."
   },
+  "needs": {
+    "title": "Mga kailangan ng shield",
+    "overlay": "Payagan ang \"Display over other apps\" para makalutang ang manika sa ibang apps.",
+    "notifications": "Payagan ang mga notification para mapanatiling gumagana ng Android ang shield.",
+    "capture": "Payagan ang screen capture. Tinitingnan lang ng $t(common:appName) ang iyong screen kapag pinindot mo ang manika.",
+    "privacy": "Ipinapadala ang screenshot sa check service para lang masuri. Hindi ito sine-save."
+  },
+  "checkNow": "Suriin ang screen na ito ngayon",
+  "checkingNow": "Sinusuri ang iyong screen...",
   "body": "Isang maliit na manikang Pyit Taing Htaung ang lulutang sa ibabaw ng iba pang app. Pindutin ito sa isang post ng trabaho, chat, o listahan at susuriin ng $t(common:appName) ang nasa iyong screen.",
   "download": "I-download ang Android app",
   "details": "Mga detalye at pahintulot",

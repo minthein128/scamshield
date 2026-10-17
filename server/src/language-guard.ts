@@ -178,6 +178,30 @@ export function rewriteCertainty(text: string, lang: Lang): { text: string; hits
 export interface GuardStats {
   before: number;
   rewrites: number;
+  dropped?: number;
+}
+
+const SCRIPT = {
+  myanmar: '\\u1000-\\u109F\\uA9E0-\\uA9FF\\uAA60-\\uAA7F',
+  thai: '\\u0E00-\\u0E7F',
+  other: '\\u0900-\\u0DFF\\u0E80-\\u0EFF\\u1780-\\u17FF',
+};
+const FOREIGN: Record<Lang, RegExp> = {
+  en: new RegExp(`[${SCRIPT.myanmar}${SCRIPT.thai}${SCRIPT.other}]`, 'gu'),
+  id: new RegExp(`[${SCRIPT.myanmar}${SCRIPT.thai}${SCRIPT.other}]`, 'gu'),
+  tl: new RegExp(`[${SCRIPT.myanmar}${SCRIPT.thai}${SCRIPT.other}]`, 'gu'),
+  my: new RegExp(`[${SCRIPT.thai}${SCRIPT.other}]`, 'gu'),
+  th: new RegExp(`[${SCRIPT.myanmar}${SCRIPT.other}]`, 'gu'),
+};
+
+/** Characters from a regional script the report language does not use (Thai in Burmese, Tamil anywhere). */
+export function countForeignScript(text: string, lang: Lang): number {
+  return text.match(FOREIGN[lang])?.length ?? 0;
+}
+
+/** Foreign-script characters in the model's own words: summary, spoken warning and flag labels. */
+export function foreignInExtraction(x: Pick<Extraction, 'summary' | 'spokenWarning' | 'flags'>, lang: Lang): number {
+  return [x.summary, x.spokenWarning, ...x.flags.map((f) => f.label)].reduce((n, t) => n + countForeignScript(t, lang), 0);
 }
 
 export function guardExtraction(x: Extraction, lang: Lang): { extraction: Extraction; stats: GuardStats } {
@@ -205,7 +229,9 @@ export function guardFlags(flags: Flag[], lang: Lang): { flags: Flag[]; stats: G
     if (r.text !== t) stats.rewrites++;
     return r.text;
   };
-  return { flags: flags.map((f) => ({ ...f, label: fix(f.label), evidence: fix(f.evidence) })), stats };
+  const kept = flags.filter((f) => countForeignScript(f.label, lang) + countForeignScript(f.evidence, lang) === 0);
+  if (kept.length < flags.length) stats.dropped = flags.length - kept.length;
+  return { flags: kept.map((f) => ({ ...f, label: fix(f.label), evidence: fix(f.evidence) })), stats };
 }
 
 export const isHeavy = (hits: number) => hits >= 3;

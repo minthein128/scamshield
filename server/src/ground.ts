@@ -106,8 +106,13 @@ export function buildGroundingRequest(x: Pick<Extraction, 'entities'>, lang: Lan
     '- General advisories that scammers use a brand name (Tokopedia, Shopee, DHL, a bank) say nothing about the message you are checking. Never report them in any family. A well-known brand with a normal, specific listing or notice needs no finding.',
     '- identity: the entity cannot be found, has no licence, or the claimed identity does not match.',
     '- Add a finding only when search results support it. If everything checks out, return {"findings":[]}.',
-    '- Use likelihood language. Say "We could not find a licence record for X", never "X is unlicensed" or "X is a scammer". Say "Reports online describe similar messages as scams", never "X is a scam". Never call a named company or website a criminal. Never use "definitely", "confirmed" or "100%". In Thai, write "เราไม่พบข้อมูลใบอนุญาตของ X" or "มีรายงานออนไลน์ว่าข้อความคล้ายกันถูกใช้หลอกลวง", never "เป็นการหลอกลวง", "เป็นมิจฉาชีพ", "แน่นอน", "ชัวร์" or "ยืนยันแล้ว".',
-    `- Write label in ${LANG_NAMES[lang]}. Keep evidence to one short sentence naming the source.`,
+    '- Use likelihood language. Say "We could not find a licence record for X", never "X is unlicensed" or "X is a scammer". Say "Reports online describe similar messages as scams", never "X is a scam". Never call a named company or website a criminal. Never use "definitely", "confirmed" or "100%".',
+    ...(lang === 'th'
+      ? [
+          '- In Thai, write "เราไม่พบข้อมูลใบอนุญาตของ X" or "มีรายงานออนไลน์ว่าข้อความคล้ายกันถูกใช้หลอกลวง", never "เป็นการหลอกลวง", "เป็นมิจฉาชีพ", "แน่นอน", "ชัวร์" or "ยืนยันแล้ว".',
+        ]
+      : []),
+    `- Write label and evidence in ${LANG_NAMES[lang]} only, whatever the language of the search results. Keep evidence to one short sentence naming the source.`,
     ...(opts.companyCheck
       ? [
           '- Also add "companyFound" to the JSON object: true only if the search results show a real company or agency with this exact name (in the stated country, if one is given), otherwise false. A company existing says nothing about whether a recruiter works for it.',

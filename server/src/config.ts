@@ -64,7 +64,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   const hasCreds = useVertex ? Boolean(project) : Boolean(geminiApiKey);
   return {
     port: Number(env.PORT ?? 8080),
-    publicApiUrl: (env.PUBLIC_API_URL?.trim() || 'https://saferoute-api.akkhayar.com').replace(/\/+$/, ''),
+    publicApiUrl: (env.PUBLIC_API_URL?.trim() || 'https://sg-dev-808112092414.asia-southeast1.run.app').replace(/\/+$/, ''),
     model: env.GEMINI_MODEL || 'gemini-3.5-flash-lite',
     mock: bool(env.MOCK) || !hasCreds,
     useVertex,

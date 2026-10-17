@@ -16,6 +16,15 @@
     "capture": "Langkah 3 dari 4: izinkan $t(common:appName) melihat layar Anda saat Anda mengetuk boneka.",
     "starting": "Langkah 4 dari 4: memulai shield."
   },
+  "needs": {
+    "title": "Yang dibutuhkan shield",
+    "overlay": "Izinkan \"Tampilkan di atas aplikasi lain\" agar boneka bisa melayang di atas aplikasi lain.",
+    "notifications": "Izinkan notifikasi agar Android tetap menjalankan shield.",
+    "capture": "Izinkan perekaman layar. $t(common:appName) hanya melihat layar Anda saat Anda mengetuk boneka.",
+    "privacy": "Tangkapan layar dikirim ke layanan pemeriksaan hanya untuk diperiksa. Tangkapan layar tidak disimpan."
+  },
+  "checkNow": "Periksa layar ini sekarang",
+  "checkingNow": "Memeriksa layar Anda...",
   "body": "Boneka kecil Pyit Taing Htaung melayang di atas aplikasi lain. Ketuk boneka pada info lowongan kerja, chat, atau iklan dan $t(common:appName) akan memeriksa isi layar Anda.",
   "download": "Unduh aplikasi Android",
   "details": "Detail dan izin",

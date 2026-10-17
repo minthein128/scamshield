@@ -40,5 +40,6 @@ export const FIREBASE_CONFIG = readFirebaseConfig({
 export const GOOGLE_SIGNIN = process.env.EXPO_PUBLIC_GOOGLE_SIGNIN === '1';
 export const GOOGLE_WEB_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID?.trim() ?? '';
 export const SITE_URL = (process.env.EXPO_PUBLIC_SITE_URL?.trim() || 'https://saferoute-aibc.web.app').replace(/\/+$/, '');
+export const APK_URL = process.env.EXPO_PUBLIC_APK_URL?.trim() || `${SITE_URL}/saferoute.apk`;
 export const FACEBOOK_APP_ID = process.env.EXPO_PUBLIC_FACEBOOK_APP_ID?.trim() ?? '';
 

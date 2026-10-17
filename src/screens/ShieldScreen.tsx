@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { Text, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import * as ShieldModule from 'shield-module';
 import { Screen } from '../components/Screen';
 import { MessageGuardCard } from '../components/MessageGuardCard';
 import { VoiceCompanionCard } from '../components/VoiceCompanionCard';
 import { ShieldCardView } from '../components/ShieldCard';
+import { Text } from '../components/Text';
 import { Button, Card, ScreenHeader } from '../components/ui';
 import { useShieldControl } from '../hooks/useShieldControl';
-import { appName } from '../config/brand';
 import { toCheckResponse } from '../lib/shield';
 import { useAppState } from '../state/AppState';
 import type { RootScreenProps } from '../navigation/types';
@@ -15,13 +16,10 @@ import theme from '../theme/theme';
 
 const { colors, fonts } = theme;
 
-const steps = () => [
-  'Allow "Display over other apps" so the button can float over other apps.',
-  'Allow notifications so Android keeps the shield running.',
-  `Allow screen capture. ${appName()} only looks at your screen when you tap the button.`,
-];
+const STEPS = ['overlay', 'notifications', 'capture'] as const;
 
 export const ShieldScreen: React.FC<RootScreenProps<'Shield'>> = ({ navigation }) => {
+  const { t } = useTranslation('shield');
   const control = useShieldControl();
   const [checking, setChecking] = useState(false);
   const { language } = useAppState();
@@ -42,19 +40,19 @@ export const ShieldScreen: React.FC<RootScreenProps<'Shield'>> = ({ navigation }
   };
 
   return (
-    <Screen header={<ScreenHeader title="Screen shield" onBack={() => navigation.goBack()} />}>
+    <Screen header={<ScreenHeader title={t('title')} onBack={() => navigation.goBack()} />}>
       <ShieldCardView control={control} />
       <VoiceCompanionCard />
       <MessageGuardCard />
       <Card style={{ gap: 8 }}>
-        <Text style={styles.title}>What the shield needs</Text>
-        {steps().map((s, i) => (
-          <Text key={s} style={styles.body}>{`${i + 1}. ${s}`}</Text>
+        <Text style={styles.title}>{t('needs.title')}</Text>
+        {STEPS.map((step, i) => (
+          <Text key={step} style={styles.body}>{`${i + 1}. ${t(`needs.${step}`)}`}</Text>
         ))}
-        <Text style={styles.body}>The screenshot goes to the check service only to be checked. It is not saved.</Text>
+        <Text style={styles.body}>{t('needs.privacy')}</Text>
       </Card>
       {control.running ? (
-        <Button testID="shield-check-now" label={checking ? 'Checking your screen...' : 'Check this screen now'} onPress={checkNow} disabled={checking} />
+        <Button testID="shield-check-now" label={checking ? t('checkingNow') : t('checkNow')} onPress={checkNow} disabled={checking} />
       ) : null}
     </Screen>
   );

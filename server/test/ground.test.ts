@@ -129,6 +129,8 @@ describe('grounding', () => {
     expect(p).toContain('Acme Recruit');
     expect(p).toContain('Thailand');
     expect(p).toContain('Burmese');
+    expect(p).not.toMatch(/[\u0E00-\u0E7F]/);
+    expect(buildGroundingRequest(base, 'th').system).toMatch(/[\u0E00-\u0E7F]/);
     expect(p).not.toContain('USD 3000');
     expect(p).not.toContain('cook');
   });
