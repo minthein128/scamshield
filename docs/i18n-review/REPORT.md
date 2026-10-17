@@ -1,6 +1,6 @@
 # SafeRoute language review: how the languages work today
 
-TLDR: all four non-English languages have every key, and none has a human review. Message Guard text (12 strings) is still English in all four languages. Burmese has the most automatic flags (133 of 529) and the weakest model coverage, so it needs a native reviewer first. Verdict copy from the backend reads well and keeps its hedges in most cases, with a few exceptions listed below. Spoken warnings work in my, id and tl.
+TLDR: all four non-English languages have every key, and none has a human review. Burmese has the most automatic flags (121 of 516) and the weakest model coverage, so it needs a native reviewer first. Verdict copy from the backend reads well and keeps its hedges in most cases, with a few exceptions listed below. Spoken warnings work in my, id and tl.
 
 Generated 2026-10-15 from commit `3d1bf79`. Files in this folder: `languages-to-check.json` (main review file), `languages-to-check.csv` (same items for spreadsheets), `verdict-samples.json` (live backend samples). The merge script is `scripts/i18n-apply-review.mjs`. No app code, translation or locale file was changed.
 
@@ -15,42 +15,38 @@ Generated 2026-10-15 from commit `3d1bf79`. Files in this folder: `languages-to-
 
 | Language | Keys | Keys translated | Effectively translated (not English copy) | Namespaces reviewed | Strings with no review |
 | --- | --- | --- | --- | --- | --- |
-| Burmese (my) | 529 | 100% | 97.9% (11 English copies) | 0 of 15 | 100% |
-| Bahasa Indonesia (id) | 529 | 100% | 97.9% (11 English copies) | 0 of 15 | 100% |
-| Tagalog (tl) | 536 | 100% | 97.2% (15 English copies) | 0 of 15 | 100% |
-| Thai (th) | 529 | 100% | 97.9% (11 English copies) | 0 of 15 | 100% |
+| Burmese (my) | 516 | 100% | 97.9% (11 English copies) | 0 of 15 | 100% |
+| Bahasa Indonesia (id) | 516 | 100% | 97.9% (11 English copies) | 0 of 15 | 100% |
+| Tagalog (tl) | 523 | 100% | 97.2% (15 English copies) | 0 of 15 | 100% |
+| Thai (th) | 516 | 100% | 97.9% (11 English copies) | 0 of 15 | 100% |
 
-English has 536 keys. Burmese, Bahasa and Thai have 529 because they use one plural form (`_other`). Tagalog has 536. Every file has `_meta.reviewed: false`.
+English has 523 keys. Burmese, Bahasa and Thai have 516 because they use one plural form (`_other`). Tagalog has 523. Every file has `_meta.reviewed: false`.
 
-Items marked safety: 255 per language (about 48%). The Learn namespace alone is 142 keys.
+Items marked safety: 242 per language (about 47%). The Learn namespace alone is 142 keys.
 
 ## Automated findings
 
 | Language | Items | ok | check | likely_wrong | Safety items not ok |
 | --- | --- | --- | --- | --- | --- |
-| Burmese | 529 | 396 | 118 | 15 | 78 of 255 |
-| Bahasa Indonesia | 529 | 479 | 38 | 12 | 34 of 255 |
-| Tagalog | 536 | 440 | 81 | 15 | 52 of 255 |
-| Thai | 529 | 482 | 33 | 14 | 35 of 255 |
+| Burmese | 516 | 395 | 118 | 3 | 66 of 242 |
+| Bahasa Indonesia | 516 | 478 | 38 | 0 | 22 of 242 |
+| Tagalog | 523 | 439 | 80 | 4 | 40 of 242 |
+| Thai | 516 | 481 | 33 | 2 | 23 of 242 |
 
 Automatic check hits per language:
 
 | Language | length | latin | identical | mmorder | zawgyi |
 | --- | --- | --- | --- | --- | --- |
-| Burmese | 65 | 25 | 12 | 2 | 0 |
-| Bahasa Indonesia | 10 | 0 | 14 | 0 | 0 |
-| Tagalog | 30 | 0 | 32 | 0 | 0 |
-| Thai | 18 | 12 | 12 | 0 | 0 |
+| Burmese | 65 | 13 | 0 | 2 | 0 |
+| Bahasa Indonesia | 10 | 0 | 2 | 0 | 0 |
+| Tagalog | 30 | 0 | 20 | 0 | 0 |
+| Thai | 18 | 0 | 0 | 0 | 0 |
 
-The model gave Burmese 75% `ok` and the other languages 83% to 91%. That gap most likely shows the model's weaker Burmese, not better Burmese text. Treat Burmese `ok` as unconfirmed.
-
-### Message Guard is not translated
-
-The 12 keys under `shield.messageGuard.*` are exact English copies in all four languages: the title, the privacy promise (`privacy`), the status lines, the app picker and the two error messages (`errors.accessOff`, `errors.cannotOpen`). This is safety and consent text, and it is the top finding in every language. They are left out of the tables below so the other problems show. `pnpm i18n:translate` skips them because the keys are not empty.
+The model gave Burmese 77% `ok` and the other languages 84% to 93%. That gap most likely shows the model's weaker Burmese, not better Burmese text. Treat Burmese `ok` as unconfirmed.
 
 ### Worst 15 items per language
 
-Ranked by flag, then the model's severity score, then safety priority. Message Guard strings are excluded (see above).
+Ranked by flag, then the model's severity score, then safety priority.
 
 #### Burmese (my)
 
@@ -136,7 +132,7 @@ The model's reasons are leads, not facts. Some notes are wrong or over-eager (fo
 
 ## Systematic issues
 
-**Terminology and the glossary.** The fixed glossary terms (Low risk, Be careful, High risk, Scam radar, Trusted contacts, SafeRoute, Screen shield, Message Guard) pass the automatic check in every language. Gaps remain around them:
+**Terminology and the glossary.** The fixed glossary terms (Low risk, Be careful, High risk, Scam radar, Trusted contacts, SafeRoute, Screen shield) pass the automatic check in every language. Gaps remain around them:
 - Thai uses "มิจฉาชีพ" (scammer, a person) in the glossary term for Scam radar ("เรดาร์มิจฉาชีพ", 3 strings), in `help.categories.cybercrime` and in `settings.privacy.shareBody`. The house rule says to describe signs and never call people scammers. A Thai reviewer should pick a sign-based word.
 - Bahasa uses "pelindung" for "shield" in `learn.shieldSteps.s1.title`, while the glossary keeps "Screen shield" in English. Burmese uses "Shield" alone in several shield errors.
 - Tagalog mixes "scam" and "panloloko". Bahasa mixes "penipuan" and "phishing" and "tautan" and "link". Burmese uses Latin "app", "store" and "trading" in 13 strings where a Burmese word may exist. Low-literacy readers may not read Latin script.
@@ -209,19 +205,18 @@ Estimates use about 12 seconds plus 0.5 seconds per English character for a safe
 
 | Reviewer | Scope | Items | Time |
 | --- | --- | --- | --- |
-| Burmese speaker (native, ideally a migrant worker or outreach worker) | Safety items first, then flagged UI items, then the rest | 529 | 2 to 2.5 hours for safety, 5 to 6 hours for all |
-| Indonesian speaker | Flagged and safety items, then the rest | 529 | 1.5 hours for safety and flagged, 4 hours for all |
-| Tagalog speaker | Same | 536 | 1.5 hours for safety and flagged, 4 hours for all |
-| Thai speaker | Same, plus the question of whether Thai needs its own verdicts | 529 | 1.5 hours for safety and flagged, 4 hours for all |
+| Burmese speaker (native, ideally a migrant worker or outreach worker) | Safety items first, then flagged UI items, then the rest | 516 | 2 to 2.5 hours for safety, 5 to 6 hours for all |
+| Indonesian speaker | Flagged and safety items, then the rest | 516 | 1.5 hours for safety and flagged, 4 hours for all |
+| Tagalog speaker | Same | 523 | 1.5 hours for safety and flagged, 4 hours for all |
+| Thai speaker | Same, plus the question of whether Thai needs its own verdicts | 516 | 1.5 hours for safety and flagged, 4 hours for all |
 | Each of my, id, tl | Verdict samples (18 checks plus fixed server copy) and a listen to the spoken warning | 6 samples each | 30 to 45 minutes each |
 
 Order:
-1. Translate Message Guard (12 strings, all languages) before any review. It is still English. This is a code-side step, so it is outside this review.
-2. Burmese safety items, then the other languages' safety items, in parallel.
-3. Flagged UI items, then the remaining UI items.
-4. Verdict samples and spoken warnings.
-5. Spot-check on a device for overflow after the corrections merge.
-6. A second reviewer for Burmese safety strings, because the model gives the least backup there.
+1. Burmese safety items, then the other languages' safety items, in parallel.
+2. Flagged UI items, then the remaining UI items.
+3. Verdict samples and spoken warnings.
+4. Spot-check on a device for overflow after the corrections merge.
+5. A second reviewer for Burmese safety strings, because the model gives the least backup there.
 
 ## How to apply corrections
 
