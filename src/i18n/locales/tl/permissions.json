@@ -9,7 +9,7 @@
   "explain": {
     "mic": {
       "title": "Payagan ang mikropono",
-      "body": "Para makipag-usap kay Pyit Taing Htaung, kailangan ng $t(common:appName) ang mikropono mo. Ipinapadala ang boses mo sa Google para sumagot. Walang nire-record o sine-save."
+      "body": "Para makipag-usap gamit ang boses, kailangan ng $t(common:appName) ang mikropono mo. Ipinapadala ang boses mo sa Google para sumagot. Walang nire-record o sine-save."
     },
     "overlay": {
       "title": "Ipakita ang shield sa ibabaw ng ibang app",
@@ -27,7 +27,7 @@
   "help": {
     "mic": {
       "title": "Naka-off ang mikropono",
-      "body": "Para makipag-usap kay Pyit Taing Htaung, buksan ang Settings, piliin ang Permissions, tapos Microphone, at payagan ito. Gumagana pa rin ang ibang bahagi ng $t(common:appName) kahit wala ito."
+      "body": "Para makipag-usap gamit ang boses, buksan ang Settings, piliin ang Permissions, tapos Microphone, at payagan ito. Gumagana pa rin ang ibang bahagi ng $t(common:appName) kahit wala ito."
     },
     "overlay": {
       "title": "Naka-off ang Display over other apps",

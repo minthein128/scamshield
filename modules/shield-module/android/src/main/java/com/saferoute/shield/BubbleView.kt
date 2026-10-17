@@ -30,7 +30,7 @@ internal class BubbleView(context: Context, palette: ShieldPalette) : View(conte
             invalidate()
         }
 
-    /** The Pyit Taing Htaung doll, drawn in every state. Null keeps the shield glyph. */
+    /** The Kakwe doll, drawn in every state. Null keeps the shield glyph. */
     var avatar: android.graphics.Bitmap? = null
         set(value) {
             field = value

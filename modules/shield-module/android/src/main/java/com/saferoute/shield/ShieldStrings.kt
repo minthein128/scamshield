@@ -83,7 +83,7 @@ class ShieldStrings private constructor(private val values: Map<String, String>)
         const val MAX_LENGTH = 160
 
         val DEFAULTS: Map<String, String> = linkedMapOf(
-            "name" to "Pyit Taing Htaung",
+            "name" to "Kakwe",
             "ask" to "Ask",
             "verdictSafe" to "Low risk",
             "verdictCareful" to "Be careful",
@@ -113,8 +113,8 @@ class ShieldStrings private constructor(private val values: Map<String, String>)
             "closeShield" to "Close shield",
             "whatWeChecked" to "This is what we checked",
             "previewClose" to "Tap to close. This picture is not saved.",
-            "askA11y" to "Ask Pyit Taing Htaung about this result",
-            "talkA11y" to "Talk to Pyit Taing Htaung",
+            "askA11y" to "Ask Kakwe about this result",
+            "talkA11y" to "Talk to Kakwe",
             "listening" to "Listening",
             "muted" to "Muted",
             "paused" to "Paused",
@@ -125,7 +125,7 @@ class ShieldStrings private constructor(private val values: Map<String, String>)
             "rechecking" to "Checking again",
             "connecting" to "Connecting",
             "endA11y" to "End the conversation",
-            "voiceChip" to "Pyit Taing Htaung",
+            "voiceChip" to "Kakwe",
             "micDenied" to "Open Kakwe to allow the microphone",
             "needsForeground" to "Open Kakwe once to allow voice",
             "unavailable" to "Voice is not available right now",

@@ -2,10 +2,10 @@
   "_meta": {
     "reviewed": false
   },
-  "button": "Kausapin si Pyit Taing Htaung",
+  "button": "Kausapin si $t(common:appName)",
   "buttonSub": "Voice chat tungkol sa ulat na ito",
-  "a11yButton": "Kausapin si Pyit Taing Htaung. Voice chat tungkol sa ulat na ito.",
-  "title": "Pyit Taing Htaung",
+  "a11yButton": "Kausapin si $t(common:appName). Voice chat tungkol sa ulat na ito.",
+  "title": "$t(common:appName)",
   "subtitle": "Kausapin ang $t(common:appName) tungkol sa ulat na ito",
   "privacy": "Ipinapadala ang boses mo sa Google para masagot. Walang nire-record o sine-save.",
   "family": "Ipaliwanag sa pamilya ko",
@@ -25,7 +25,7 @@
     "warning": "Pinapatugtog muna ang babala...",
     "listening": "Nakikinig. Itanong mo na.",
     "listeningMuted": "Naka-mute ang mikropono.",
-    "speaking": "Nagsasalita ang Pyit Taing Htaung..."
+    "speaking": "Nagsasalita ang $t(common:appName)..."
   },
   "ended": {
     "user": "Tapos na ang usapan.",
@@ -44,12 +44,12 @@
     "audio": "Hindi available ang audio sa device na ito."
   },
   "companion": {
-    "name": "Pyit Taing Htaung",
+    "name": "$t(common:appName)",
     "ask": "Magtanong",
     "whatWeChecked": "Ito ang sinuri namin",
     "previewClose": "Pindutin para isara. Hindi nai-save ang larawang ito.",
-    "askA11y": "Tanungin si Pyit Taing Htaung tungkol sa resulta na ito",
-    "talkA11y": "Kausapin si Pyit Taing Htaung",
+    "askA11y": "Tanungin si $t(common:appName) tungkol sa resulta na ito",
+    "talkA11y": "Kausapin si $t(common:appName)",
     "listening": "Nakikinig",
     "muted": "Naka-mute",
     "paused": "Naka-pause",
@@ -60,7 +60,7 @@
     "rechecking": "Sinusuring muli",
     "connecting": "Kumokonekta",
     "endA11y": "Tapusin ang usapan",
-    "voiceChip": "Pyit Taing Htaung",
+    "voiceChip": "$t(common:appName)",
     "micDenied": "Buksan ang $t(common:appName) para payagan ang mikropono",
     "needsForeground": "Buksan ang $t(common:appName) nang minsan para payagan ang boses",
     "unavailable": "Hindi magagamit ang boses sa ngayon",
@@ -70,7 +70,7 @@
     "endedCap": "Tapos na ang oras. I-double tap ang manika para makipag-usap muli",
     "muteA11y": "I-double tap para i-mute ang mikropono",
     "unmuteA11y": "I-double tap para buksan ang mikropono",
-    "permissionTitle": "Kausapin si Pyit Taing Htaung mula sa bubble",
+    "permissionTitle": "Kausapin si $t(common:appName) mula sa bubble",
     "permissionBody": "Opsyonal. I-double tap ang lumulutang na manika, o i-tap ang Magtanong sa resulta, para pag-usapan kung ano ang nasa iyong screen. Kailangan ng $t(common:appName) ang mikropono para dito.",
     "permissionStep": "Opsyonal: payagan ang mikropono para makausap mo ang $t(common:appName) mula sa bubble.",
     "allowMic": "Payagan ang mikropono",
