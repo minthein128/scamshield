@@ -72,9 +72,6 @@ class ScreenCapturer(
         )
     }
 
-    /** True while a capture has a Surface on the display. Tests and logs only. */
-    val attached: Boolean get() = synchronized(lock) { reader != null }
-
     private fun targetSize(): Triple<Int, Int, Int> {
         val wm = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         val realW: Int
