@@ -1,6 +1,6 @@
 # Kakwe demo video script
 
-TLDR: a presenter-led walkthrough for the Google Cloud AI Builder Cup 2026 judges. Estimated runtime 2:48 at about 140 words a minute. The live product, the pipeline and the results take 1:56 (69%), because Technical Merit (40%), Innovation (25%) and User Experience (10%) are all judged on what the judges see working. The purpose, the problem, the user and the close take 0:43 (26%) for Problem Alignment and Impact (25%). Responsible AI takes 0:09 and also shows on screen during the demo. The film uses build 1.0.254 and fictional inputs only.
+TLDR: a presenter-led walkthrough for the Google Cloud AI Builder Cup 2026 judges. Estimated runtime 2:48 at about 140 words a minute. The live product, the pipeline and the results take 1:56 (69%), because Technical Merit (40%), Innovation (25%) and User Experience (10%) are all judged on what the judges see working. The purpose, the problem, the user and the close take 0:43 (26%) for Problem Alignment and Impact (25%). Responsible AI takes 0:09 and also shows on screen during the demo. The film uses build 1.0.269 and fictional inputs only.
 
 This script replaces the earlier story version with the persona Ma Su.
 
@@ -26,8 +26,8 @@ Presenter voice: calm, even pace, no music bed louder than a low pad. App text i
 | 3 | 0:24-0:30 | Slide "Who it is for". Four labels: Myanmar, Thailand, Indonesia, Philippines. Line: "Migrant job seekers, 18 and older." | Kakwe is for migrant job seekers from Myanmar, Thailand, Indonesia and the Philippines. |
 | 4 | 0:30-0:47 | Demo phone, app in Burmese. Home, then the Check tab. "What is it?" set to Message (**မက်ဆေ့ဂျ်**). Tap Paste (input A below), tap **အခု စစ်ဆေးပါ** (Check now). The doll loader runs, then the report opens: red banner **အန္တရာယ်မြင့်** (High risk), the 3-step meter on step three. Scroll to **တွေ့ရှိရသည့် သတိပြုဖွယ် အချက်များ** (Warning signs we found) with the pasted lines quoted. Rest on the call button "1599". Subtitle: "High risk". Callouts on the quotes. | The user pastes a message or shares a screenshot. Kakwe returns a verdict, here High risk. The report gives the next step first, then quotes the user's own message as warning signs. A verified hotline is one tap away. |
 | 5 | 0:47-1:07 | Check tab, "What is it?" set to Job offer (**အလုပ်ကမ်းလှမ်းချက်**). Paste input B ad and chat. Tap **ဤစာသားများကို စစ်ဆေးပါ**. Fact screen **ဤအချက် မှန်ပါသလား။** (Is this right?): scroll two facts with **မူရင်းစာသား** (Text it came from). Tap **မှန်ကန်ပါသည်၊ စစ်ဆေးပါ**. Result: **ခဏရပ်ပါ** (Pause). Scroll to **မကိုက်ညီသည့် အချက်များ** (What doesn't match): the fee card with both quotes side by side. Callouts: "The ad says: No agency fees." and "The chat says: pay a 300 USD deposit today". | Job Shield compares a job ad with the recruiter's chat. Gemini extracts the facts, and the user can correct any of them. The result is Pause. Under What doesn't match, the ad says no agency fees, and the chat asks for a 300 dollar deposit. |
-| 6 | 1:07-1:16 | Android screen recording. Viber chat with message C. The Kakwe doll bubble floats at the right edge. Tap the doll. It checks. The result pill opens over Viber: **အန္တရာယ်မြင့်** badge and the title. Tag: "Android". | On Android, a floating bubble sits over any app. One tap checks what is on screen. The user copies nothing. |
-| 7 | 1:16-1:31 | Full report. Tap **ပစ်တိုင်းထောင်နဲ့ စကားပြောမယ်** (Talk to Pyit Taing Htaung). Voice sheet. Narration stops. Spoken dialogue plays: the user asks in Burmese (line D1), the companion answers. Subtitles on both lines. Tag: "Gemini Live". | The voice companion, Pyit Taing Htaung, takes spoken questions in Burmese. It answers only from the finished report. |
+| 6 | 1:07-1:16 | Android screen recording. Viber chat with message C. The Kakwe doll bubble floats at the right edge. Tap the doll. Android shows "Start recording or casting with Kakwe?". Tap "Start now". One frame is captured and sharing stops at once. The result pill opens over Viber: **အန္တရာယ်မြင့်** badge and the title. Tag: "Android". | On Android, a floating bubble sits over any app. Each tap asks permission, captures once, and stops sharing. |
+| 7 | 1:16-1:31 | Full report. Tap **ကာကွယ်နဲ့ စကားပြောမယ်** (Talk to Kakwe). Voice sheet. Narration stops. Spoken dialogue plays: the user asks in Burmese (line D1), the companion answers. Subtitles on both lines. Tag: "Gemini Live". | The voice companion, Kakwe, takes spoken questions in Burmese. It answers only from the finished report. |
 | 8 | 1:31-1:40 | Report. Tap **မိသားစုကို သတိပေးပါ** (Warn my family). Warn sheet, then **ဤသတိပေးချက်ကို မျှဝေရန်** (Share this warning), share sheet, pick a chat. Then Settings, language list shown briefly. | Warn my family shares the report through any chat app. The app speaks Burmese, English, Bahasa Indonesia, Tagalog and Thai. |
 | 9 | 1:40-2:08 | Architecture diagram (see Diagram). Each box lights up as it is named. End on the full diagram for 2 seconds. Footer: "gemini-3.5-flash-lite, gemini-3.8-flash-tts, gemini-3.8-live". | Gemini reads the text or image and returns evidence as structured JSON. Google Search grounding checks that named companies exist. It supplies evidence, not a verdict. Web Risk and Safe Browsing check links. Deterministic rules set the score. A guard rewrites certainty wording into likelihood language. Gemini TTS and Live give the voice. The API runs on Cloud Run behind a Cloudflare edge, with Firebase. |
 | 10 | 2:08-2:26 | Four stat cards, one after another: "31/31 text eval cases correct. 0 certainty phrases." "Protection Score 89.7. 24 synthetic screenshots." "Job Shield 10/10 pairs." "Public dataset: 93 real, 28 synthetic screenshots." Small note under the cards: "Real-screenshot score is provisional." | The text eval passes 31 of 31 cases, with no certainty phrases. The Protection Score is 89.7 on synthetic screenshots. Job Shield passes 10 of 10 pairs. The public dataset has 93 real and 28 synthetic screenshots. The real-screenshot score is provisional. |
@@ -38,8 +38,8 @@ Presenter voice: calm, even pace, no music bed louder than a low pad. App text i
 
 | Item | Value |
 | --- | --- |
-| Narration words | 369 |
-| Narration at 140 words a minute | 2:38 |
+| Narration words | 365 |
+| Narration at 140 words a minute | 2:36 |
 | Spoken Burmese dialogue (segment 7) | about 0:07 |
 | Estimated runtime | 2:48 (limit 3:00) |
 
@@ -59,7 +59,7 @@ flowchart LR
   N --> S
   S --> R[Report in 5 languages]
   R --> V[Gemini TTS<br/>spoken warning]
-  R --> LV[Gemini Live<br/>Pyit Taing Htaung]
+  R --> LV[Gemini Live<br/>Kakwe]
   FB[Firebase: Auth, Firestore,<br/>Hosting] -.- R
 ```
 
@@ -68,10 +68,10 @@ Draw it in the brand palette: boxes on the warm page colour `#F7F3EE`, lacquer-b
 ## Shot list for recording
 
 1. Voice-over first, in a quiet room, one take per segment. Leave half a second of silence at every cut.
-2. Phone: one physical Android phone, Android 11 or later, build 1.0.254, clean profile, language Myanmar, anonymous, "No thanks" on the sharing step. Turn on the Screen shield and allow overlay, screen capture and microphone. Do Not Disturb on, Show taps on.
+2. Phone: one physical Android phone, Android 11 or later, build 1.0.269, clean profile, language Myanmar, anonymous, "No thanks" on the sharing step. Turn on the Screen shield and allow overlay and microphone. Turning the shield on does not ask for screen capture. Each bubble tap shows Android's "Start recording or casting with Kakwe?" dialog; tap "Start now". Do Not Disturb on, Show taps on.
 3. Check the API before each session: the health endpoint answers with `"mock": false`, and the app shows no "Offline demo mode" banner.
 4. Run every input once before recording. An identical check within 10 minutes comes from the cache, so the take is fast and gives the same result.
-5. Screen takes, in this order: Check (input A), Job Shield (input B), bubble over Viber (input C, record the whole screen), voice companion (record app audio, or room audio synced in the edit), Warn my family, language list, then the three Responsible AI cuts.
+5. Screen takes, in this order: Check (input A), Job Shield (input B), bubble over Viber (input C, record the whole screen, include the permission dialog and the Start now tap), voice companion (record app audio, or room audio synced in the edit), Warn my family, language list, then the three Responsible AI cuts.
 6. Graphics: title card, statistic card with source line, "Who it is for" slide, diagram animation, four stat cards, close card with links.
 7. Voice lines D1 and D2 are spoken off camera by a Burmese speaker. Cut the spoken warning that plays when the voice sheet opens.
 8. Subtitles: English under every Burmese line, at least 2 seconds on screen, under 12 words.
