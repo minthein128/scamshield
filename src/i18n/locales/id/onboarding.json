@@ -50,16 +50,14 @@
     "without": {
       "heading": "Tanpa akun, Anda bisa:",
       "check": "Memeriksa tawaran kerja, pesan, tautan, dan gambar",
-      "voice": "Bicara dengan boneka lewat suara",
-      "doll": "Memakai boneka di layar Anda (Android)",
-      "call": "Menelepon nomor bantuan dan membagikan peringatan",
-      "limit": "Hingga {{n}} pemeriksaan per jam"
+      "voice": "Bicara dengan Pyit Taing Htaung lewat suara",
+      "doll": "Ketuk Pyit Taing Htaung di layar untuk memeriksa apa yang Anda lihat",
+      "call": "Menelepon nomor bantuan dan membagikan peringatan"
     },
     "with": {
       "heading": "Dengan akun, Anda juga mendapat:",
       "contacts": "Menyimpan kontak darurat",
       "warn": "Mengirim peringatan siap pakai dengan satu ketukan",
-      "restore": "Memulihkan pemeriksaan dan kontak di ponsel baru",
       "limit": "Hingga {{n}} pemeriksaan per jam"
     },
     "free": "Gratis",
