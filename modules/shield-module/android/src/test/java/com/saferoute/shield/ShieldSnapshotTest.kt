@@ -177,4 +177,39 @@ class ShieldSnapshotTest {
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
         }
     }
+
+    @Test
+    fun headerFitsNarrowWidthAtLargestFontScale() {
+        for ((lang, strings) in listOf("en" to ShieldStrings.DEFAULT, "my" to appStrings("my"))) {
+            for (fontScale in listOf(1f, 2f)) {
+                val m = model(ShieldOverlay.State.DANGER, strings)
+                val card = ResultCardView(context, ShieldPalette(false), ShieldFonts(context), fontScale, m, object : CardCallbacks {
+                    override fun onRetry() = Unit
+                    override fun onFullReport() = Unit
+                    override fun onDismissClicked() = Unit
+                    override fun onSwipedAway() = Unit
+                }, strings)
+                card.prepare((320 * d).toInt() - (16 * d).toInt())
+                card.layoutParams = ViewGroup.LayoutParams(card.collapsedWidth, ViewGroup.LayoutParams.WRAP_CONTENT)
+                card.measure(
+                    View.MeasureSpec.makeMeasureSpec(card.collapsedWidth, View.MeasureSpec.EXACTLY),
+                    View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+                )
+                card.layout(0, 0, card.measuredWidth, card.measuredHeight)
+                val header = card.getChildAt(0) as android.view.ViewGroup
+                val kids = (0 until header.childCount).map { header.getChildAt(it) }
+                assertTrue("$lang x$fontScale: card fits 320dp", card.measuredWidth <= 320 * d)
+                kids.zipWithNext().forEach { (a, b) ->
+                    assertTrue("$lang x$fontScale: children overlap", a.right <= b.left)
+                }
+                assertTrue("$lang x$fontScale: right edge inside header", kids.last().right <= header.width)
+                val ask = kids.first { it.contentDescription == m.askDescription }
+                assertTrue("ask target is 48dp", ask.width >= 48 * d - 1 && ask.height >= 48 * d - 1)
+                val shot = Bitmap.createBitmap(card.measuredWidth, card.measuredHeight, Bitmap.Config.ARGB_8888)
+                card.draw(Canvas(shot))
+                val dir = File("build/shield-snapshots").apply { mkdirs() }
+                FileOutputStream(File(dir, "narrow-$lang-x${fontScale.toInt()}.png")).use { shot.compress(Bitmap.CompressFormat.PNG, 100, it) }
+            }
+        }
+    }
 }

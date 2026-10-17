@@ -7,7 +7,7 @@ Expo module for Android. It draws a floating bubble over other apps. A tap captu
 | File | Role |
 | --- | --- |
 | `index.ts` | JS API, types and a mock for web and iOS |
-| `ShieldModule.kt` | Expo module: functions and the `onShieldResult` event |
+| `ShieldModule.kt` | Expo module: functions, the `onShieldResult` event and the `onShieldState` event (service really started or stopped) |
 | `ShieldService.kt` | Foreground service: owns the overlay, the capture session and the check flow |
 | `ShieldOverlay.kt` | Overlay controller: windows, drag, snap, close target, card lifecycle |
 | `BubbleView.kt` | Bubble (ring, progress arc, glyph) and the close target view |

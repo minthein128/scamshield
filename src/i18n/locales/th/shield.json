@@ -14,7 +14,8 @@
     "overlay": "ขั้นตอนที่ 1 จาก 4: อนุญาต \"แสดงทับแอปอื่น\" แล้วกลับมาที่ $t(common:appName)",
     "notifications": "ขั้นตอนที่ 2 จาก 4: อนุญาตการแจ้งเตือน เพื่อให้ Android เปิด Screen shield ทำงานต่อไปได้",
     "capture": "ขั้นตอนที่ 3 จาก 4: อนุญาตให้ $t(common:appName) ดูหน้าจอของคุณเมื่อคุณแตะที่ตุ๊กตา",
-    "starting": "ขั้นตอนที่ 4 จาก 4: กำลังเริ่มเปิด Screen shield"
+    "starting": "ขั้นตอนที่ 4 จาก 4: กำลังเริ่มเปิด Screen shield",
+    "stopping": "กำลังปิด Screen shield"
   },
   "needs": {
     "title": "สิ่งที่ Screen shield ต้องใช้",

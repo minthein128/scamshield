@@ -3,7 +3,7 @@ import Svg, { Path, Circle } from 'react-native-svg';
 import type { TabParamList } from './types';
 
 export const TabIcon: React.FC<{ name: keyof TabParamList; color: string }> = ({ name, color }) => (
-  <Svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+  <Svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
     {name === 'Home' && <Path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" />}
     {name === 'Check' && (
       <>

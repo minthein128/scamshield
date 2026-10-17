@@ -106,6 +106,6 @@ Deploy notes: [docs/setup-gcp.md](docs/setup-gcp.md). Repo layout and contributo
 
 ## Team and licence
 
-Team: Ricky and Min Thein Kyaw.
+Team Super Power Rangers: Pyae Sone Myo (Ricky), Min Thein Kyaw and May Myat Noe Aung.
 
 [MIT](LICENSE). The doll is the Pyit Taing Htaung, the Myanmar roly-poly doll that always gets back up ([brand notes](docs/brand.md)).

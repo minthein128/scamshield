@@ -5,6 +5,7 @@ import i18n from '../i18n';
 import { NAMESPACES, en } from '../i18n/resources';
 import { createMockClient } from '../api/mock';
 import type { CheckResponse } from '../api/types';
+import { HOTLINES } from '../data/hotlines';
 import type { ShieldControl } from '../hooks/useShieldControl';
 import { CheckScreen } from '../screens/CheckScreen';
 import { HomeScreen } from '../screens/HomeScreen';
@@ -198,6 +199,8 @@ describe.each(LOCALES)('every main screen in %s', lng => {
     await settle();
     expect(screen.getByTestId('verdict-danger')).toBeTruthy();
     expectTranslated('report');
+    const names = new Set(HOTLINES.map(h => h.name));
+    expect(visibleStrings().some(s => names.has(s))).toBe(lng === 'en');
   });
 
   it('Settings', async () => {

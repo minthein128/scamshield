@@ -14,16 +14,20 @@ class ShieldModule : Module() {
     override fun definition() = ModuleDefinition {
         Name("ShieldModule")
 
-        Events("onShieldResult")
+        Events("onShieldResult", "onShieldState")
 
         OnCreate {
             ShieldBridge.eventSink = { id, json ->
                 this@ShieldModule.sendEvent("onShieldResult", mapOf("id" to id, "json" to json))
             }
+            ShieldBridge.stateSink = { running ->
+                this@ShieldModule.sendEvent("onShieldState", mapOf("running" to running))
+            }
         }
 
         OnDestroy {
             ShieldBridge.eventSink = null
+            ShieldBridge.stateSink = null
         }
 
         OnActivityEntersForeground {
