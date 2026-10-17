@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Linking, StyleSheet, TouchableOpacity, View } from 'react-native';
 import Svg, { Circle, G } from 'react-native-svg';
 import { useTranslation } from 'react-i18next';
@@ -6,7 +6,7 @@ import { Text } from './Text';
 import { BlockIcon } from './blockIcons';
 import { MarkShapes } from './BrandMark';
 import { MARK_COLORS, MARK_VIEW, markShapes, type MarkShape } from './dollMark';
-import { stepText, type ShieldControl } from '../hooks/useShieldControl';
+import { PERMISSION_STEPS, stepText, type ShieldControl } from '../hooks/useShieldControl';
 import { useHomeShield } from '../hooks/useHomeShield';
 import { APK_URL } from '../config/env';
 import theme from '../theme/theme';
@@ -17,6 +17,8 @@ const [VX, VY, VS] = MARK_VIEW;
 const DISC = 164;
 const HALO = 212;
 const DOLL = 84;
+/** A start or stop shows the spinner only when the service takes longer than this to confirm. */
+export const BUSY_DELAY_MS = 300;
 
 const GREY: Record<string, string> = {
   [MARK_COLORS.body]: '#B3AEA8',
@@ -39,6 +41,18 @@ const Doll: React.FC<{ on: boolean }> = ({ on }) => (
   </Svg>
 );
 
+/** True once [active] has stayed true for [ms]. */
+function useActiveFor(active: boolean, ms: number): boolean {
+  const [late, setLate] = useState(false);
+  useEffect(() => {
+    setLate(false);
+    if (!active) return;
+    const timer = setTimeout(() => setLate(true), ms);
+    return () => clearTimeout(timer);
+  }, [active, ms]);
+  return active && late;
+}
+
 export const BigShieldButton: React.FC = () => <BigShieldButtonView control={useHomeShield()} />;
 
 export const downloadUrl = (): string => APK_URL;
@@ -46,20 +60,22 @@ export const downloadUrl = (): string => APK_URL;
 /** Status line, the round on/off button and one hint line. */
 export const BigShieldButtonView: React.FC<{ control: ShieldControl }> = ({ control }) => {
   const { t } = useTranslation(['home', 'shield']);
-  const { support, running, step, error, setEnabled } = control;
+  const { support, step, error, setEnabled } = control;
+  const working = step !== 'idle';
+  const slow = useActiveFor(working, BUSY_DELAY_MS);
   if (support === 'unsupported') return null;
 
   const unavailable = support !== 'ready';
   const web = support === 'web';
-  const working = step !== 'idle';
-  const on = !unavailable && running;
+  const busy = slow || PERMISSION_STEPS.includes(step);
+  const on = !unavailable && control.on;
   const hint = unavailable
     ? support === 'web'
       ? t('home:shield.web')
       : support === 'insecure-service'
         ? t('shield:status.insecure')
         : t('shield:status.unavailable')
-    : working
+    : busy
       ? stepText(step)
       : on
         ? t('home:shield.hintOn')
@@ -81,16 +97,16 @@ export const BigShieldButtonView: React.FC<{ control: ShieldControl }> = ({ cont
           testID="shield-button"
           accessibilityRole={web ? 'link' : 'button'}
           accessibilityLabel={web ? t('shield:download') : unavailable ? `${statusText}. ${hint}` : on ? t('home:shield.a11yOn') : t('home:shield.a11yOff')}
-          accessibilityState={{ disabled: (unavailable && !web) || working, selected: on, busy: working }}
+          accessibilityState={{ disabled: (unavailable && !web) || working, selected: on, busy }}
           activeOpacity={0.85}
           disabled={(unavailable && !web) || working}
-          onPress={() => (web ? Linking.openURL(downloadUrl()).catch(() => undefined) : setEnabled(!running))}
+          onPress={() => (web ? Linking.openURL(downloadUrl()).catch(() => undefined) : setEnabled(!on))}
           style={[styles.disc, on ? styles.discOn : styles.discOff, unavailable && !web && styles.discUnavailable]}
         >
           <Doll on={on} />
           {web ? (
             <Text testID="shield-download" style={styles.download}>{t('shield:download')}</Text>
-          ) : working ? (
+          ) : busy ? (
             <ActivityIndicator testID="shield-busy" color={colors.textPrimary} />
           ) : unavailable ? null : (
             <View style={styles.labelRow}>

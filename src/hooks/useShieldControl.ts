@@ -6,9 +6,18 @@ import { t } from '../i18n';
 import { useApiUrl } from '../config/runtime';
 import { companionStrings } from '../lib/companionStrings';
 import { diag, errorCode } from '../lib/diagLog';
-import { ensureNotifications, explainOnce, explainOnceEver, explainPermission, permissionApi, showPermissionHelp } from '../lib/permissions';
+import { ensureNotifications, explainFirstTime, explainOnceEver, explainPermission, permissionApi, showPermissionHelp } from '../lib/permissions';
 import { isCleartext } from '../lib/shield';
-import { getShieldState, refreshShieldState, runShieldTransition, subscribeShieldState } from '../lib/shieldState';
+import {
+  beginShieldTransition,
+  cancelShieldTransition,
+  confirmShieldTransition,
+  getShieldState,
+  refreshShieldState,
+  runShieldTransition,
+  shieldShownOn,
+  subscribeShieldState,
+} from '../lib/shieldState';
 import { getAuthToken } from '../services/token';
 import { useAppState } from '../state/AppState';
 
@@ -25,6 +34,9 @@ export function shieldSupport(platform: string = Platform.OS, apiUrl: string | n
 
 export type ShieldStep = 'idle' | 'overlay' | 'notifications' | 'capture' | 'starting' | 'stopping';
 
+/** Steps that wait on the user (a reason dialog, a system dialog or Settings). */
+export const PERMISSION_STEPS: readonly ShieldStep[] = ['overlay', 'notifications', 'capture'];
+
 export function stepText(step: ShieldStep): string {
   if (step === 'idle') return '';
   return t(`shield:steps.${step}`);
@@ -32,11 +44,27 @@ export function stepText(step: ShieldStep): string {
 
 export interface ShieldControl {
   support: ShieldSupport;
+  /** Confirmed by the service. */
   running: boolean;
+  /** What the controls show: the target from the tap until the service confirms, then [running]. */
+  on: boolean;
   step: ShieldStep;
   error: string | null;
   setEnabled: (on: boolean) => Promise<void>;
   checkNow: () => Promise<boolean>;
+}
+
+/** Android 13 and lower ask for screen capture before the start; 14 and up ask on the first bubble tap. */
+export const consentAtStart = (platform: string = Platform.OS, version: number | string = Platform.Version): boolean =>
+  platform === 'android' && Number(version) < 34;
+
+let overlayGranted = false;
+let notificationsAsked = false;
+
+/** Forgets the per-launch permission results that let a returning user start without checks. */
+export function resetShieldPermissionCache(): void {
+  overlayGranted = false;
+  notificationsAsked = false;
 }
 
 export function useShieldControl(): ShieldControl {
@@ -47,6 +75,7 @@ export function useShieldControl(): ShieldControl {
   const support = shieldSupport(Platform.OS, apiUrl);
   const shared = useSyncExternalStore(subscribeShieldState, getShieldState);
   const running = shared.running;
+  const on = shieldShownOn(shared);
   const [ownStep, setStep] = useState<ShieldStep>('idle');
   const step: ShieldStep = ownStep !== 'idle' ? ownStep : shared.transition ?? 'idle';
   const [error, setError] = useState<string | null>(null);
@@ -69,49 +98,59 @@ export function useShieldControl(): ShieldControl {
   );
 
   const turnOn = useCallback(async () => {
-    if (busy.current) return;
+    if (busy.current || !beginShieldTransition('starting')) return;
     busy.current = true;
     setError(null);
+    let token: string | null | undefined;
+    const tokenRead = getAuthToken().then(value => (token = value));
+    let confirming = false;
     try {
-      if (!(await ShieldModule.hasOverlayPermission())) {
+      if (!overlayGranted && !(await ShieldModule.hasOverlayPermission())) {
         if (!(await explainPermission('overlay'))) {
           diag.info('shield', 'overlay_declined');
           return;
         }
         diag.info('shield', 'overlay_permission_requested');
-        setStep('overlay');
-        awaitingOverlay.current = true;
-        if (await ShieldModule.requestOverlayPermission()) return;
-        awaitingOverlay.current = false;
-        if (!(await ShieldModule.hasOverlayPermission())) {
+        if (!(await ShieldModule.requestOverlayPermission())) {
           diag.warn('shield', 'overlay_settings_unavailable');
           setStep('idle');
           showPermissionHelp('overlay');
           return;
         }
+        if (!(await ShieldModule.hasOverlayPermission())) {
+          setStep('overlay');
+          awaitingOverlay.current = true;
+          return;
+        }
       }
+      overlayGranted = true;
       awaitingOverlay.current = false;
-      setStep('notifications');
-      const notified = await ensureNotifications(permissionApi({ explain: explainOnceEver }));
-      if (notified !== 'granted') diag.info('shield', 'notifications_not_granted', { result: notified });
-      setStep('capture');
-      if (!(await explainOnce('screen'))) {
-        diag.info('shield', 'capture_declined');
-        setStep('idle');
-        return;
+      if (!notificationsAsked) {
+        setStep('notifications');
+        const notified = await ensureNotifications(permissionApi({ explain: explainOnceEver }));
+        notificationsAsked = true;
+        if (notified !== 'granted') diag.info('shield', 'notifications_not_granted', { result: notified });
       }
-      if (!(await ShieldModule.requestScreenCapturePermission())) {
-        diag.warn('shield', 'capture_denied');
-        setError(t('shield:errors.needsScreen'));
-        showPermissionHelp('screen');
-        setStep('idle');
-        return;
+      if (consentAtStart()) {
+        setStep('capture');
+        if (!(await explainFirstTime('screen'))) {
+          diag.info('shield', 'capture_declined');
+          setStep('idle');
+          return;
+        }
+        if (!(await ShieldModule.requestScreenCapturePermission())) {
+          diag.warn('shield', 'capture_denied');
+          setError(t('shield:errors.needsScreen'));
+          showPermissionHelp('screen');
+          setStep('idle');
+          return;
+        }
       }
       let ok = false;
-      let hasToken = false;
-      const started = runShieldTransition('starting', async () => {
-        const token = await getAuthToken();
-        hasToken = Boolean(token);
+      const sentToken = token;
+      confirming = true;
+      setStep('idle');
+      const started = await confirmShieldTransition(async () => {
         ok = await ShieldModule.startShield({
           apiUrl: apiUrl ?? '',
           language,
@@ -119,20 +158,22 @@ export function useShieldControl(): ShieldControl {
           shareSignals,
           ...(homeCountry ? { home: homeCountry } : {}),
           ...(destinationCountry ? { destination: destinationCountry } : {}),
-          ...(token ? { authToken: token } : {}),
+          ...(sentToken ? { authToken: sentToken } : {}),
         });
+        if (!ok) overlayGranted = false;
         return ok;
       });
-      setStep('idle');
-      const on = await started;
-      if (on === null) return;
-      diag[on ? 'info' : 'warn']('shield', on ? 'started' : 'not_started', { hasUrl: Boolean(apiUrl), hasToken, accepted: ok });
-      if (!on) setError(t('shield:errors.notStarted'));
+      if (started && sentToken === undefined) {
+        tokenRead.then(value => (value ? ShieldModule.setShieldAuthToken(value) : undefined)).catch(() => undefined);
+      }
+      diag[started ? 'info' : 'warn']('shield', started ? 'started' : 'not_started', { hasUrl: Boolean(apiUrl), hasToken: Boolean(sentToken), accepted: ok });
+      if (!started) setError(t('shield:errors.notStarted'));
     } catch (e) {
       diag.error('shield', 'start_failed', { code: errorCode(e) });
       setError(t('shield:errors.failed'));
       setStep('idle');
     } finally {
+      if (!confirming) cancelShieldTransition();
       busy.current = false;
     }
   }, [language, apiUrl, homeCountry, destinationCountry, shareSignals]);
@@ -143,6 +184,7 @@ export function useShieldControl(): ShieldControl {
     const sub = AppState.addEventListener('change', state => {
       if (state !== 'active') return;
       refresh().catch(() => undefined);
+      if (overlayGranted) ShieldModule.hasOverlayPermission().then(ok => (overlayGranted = ok)).catch(() => undefined);
       if (awaitingOverlay.current) {
         ShieldModule.hasOverlayPermission().then(ok => {
           if (ok) turnOn().catch(() => undefined);
@@ -158,9 +200,9 @@ export function useShieldControl(): ShieldControl {
   }, [refresh, support, turnOn]);
 
   const setEnabled = useCallback(
-    async (on: boolean) => {
+    async (enable: boolean) => {
       if (support !== 'ready') return;
-      if (on) {
+      if (enable) {
         await turnOn();
         return;
       }
@@ -183,5 +225,5 @@ export function useShieldControl(): ShieldControl {
     }
   }, []);
 
-  return { support, running, step, error, setEnabled, checkNow };
+  return { support, running, on, step, error, setEnabled, checkNow };
 }
