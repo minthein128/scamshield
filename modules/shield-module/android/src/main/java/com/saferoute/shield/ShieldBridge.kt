@@ -40,8 +40,20 @@ object ShieldBridge {
         }
     }
 
+    private val stateListeners = java.util.concurrent.CopyOnWriteArraySet<(Boolean) -> Unit>()
+
+    /** Extra state listeners, such as the Quick Settings tile while the shade is open. */
+    fun addStateListener(listener: (Boolean) -> Unit) {
+        stateListeners.add(listener)
+    }
+
+    fun removeStateListener(listener: (Boolean) -> Unit) {
+        stateListeners.remove(listener)
+    }
+
     fun publishRunning(running: Boolean) {
         stateSink?.invoke(running)
+        stateListeners.forEach { it(running) }
     }
 
     @Synchronized

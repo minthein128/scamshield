@@ -5,6 +5,9 @@ class ShieldStrings private constructor(private val values: Map<String, String>)
 
     operator fun get(key: String): String = values[key] ?: DEFAULTS[key] ?: key
 
+    /** The labels the app passed, without the English fallbacks. */
+    internal fun overrides(): Map<String, String> = values
+
     val name get() = this["name"]
     val appName get() = this["appName"]
     val ask get() = this["ask"]
