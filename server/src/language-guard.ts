@@ -209,14 +209,14 @@ export function stripSourceFiller(text: string, lang: Lang): string {
       const offset = rest[rest.length - 2] as number;
       const before = (rest[rest.length - 1] as string).slice(0, offset);
       if (m.startsWith(',') && /,\s*$/.test(m)) return ', ';
-      if (!m.startsWith(',') && (before.trim() === '' || /[.!?]\s*$/.test(before))) return '\u0001';
+      if (!m.startsWith(',') && (before.trim() === '' || /[.!?]\s*$/.test(before))) return '\uE000';
       return /\s$/.test(m) ? ' ' : '';
     });
   }
   if (out === text) return text;
   return out
-    .replace(/\u0001\s*(\p{L})/gu, (_m, c: string) => c.toUpperCase())
-    .replace(/\u0001/g, '')
+    .replace(/\uE000\s*(\p{L})/gu, (_m, c: string) => c.toUpperCase())
+    .replace(/\uE000/g, '')
     .replace(/ {2,}/g, ' ')
     .replace(/\s+([,.;!?])/g, '$1')
     .trim();
