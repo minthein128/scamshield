@@ -267,7 +267,7 @@ def features(s):
         ('Voice companion', 'Talk to Pyit Taing Htaung about a report, in your language, on Gemini Live.'),
         ('Warn my family', 'Sends the warning to a trusted contact by SMS or the share sheet.'),
         ('Scam network', 'Opt-in. Repeat numbers and handles, kept as keyed hashes, raise the next warning.'),
-        ('Five languages', 'English, Burmese, Bahasa Indonesia, Tagalog and Thai. Leave quickly clears the screen.'),
+        ('Five languages', 'English, Burmese, Bahasa Indonesia, Tagalog and Thai. Quick exit clears the screen.'),
     ]
     w, h, gx, gy = 2.17, 1.86, 0.15, 0.15
     for i, (t, b) in enumerate(items):
@@ -500,7 +500,7 @@ def safety(s, heading_src):
         ('No accusations', 'No named person, company, number or handle is called a criminal.'),
         ('Consent first', 'Sharing is off until turned on. Overlay, screen capture, microphone, notifications and contacts are asked only when needed.'),
         ('Hashed indicators', 'Phone numbers and handles are kept as one-way hashes; signals expire after 90 days.'),
-        ('Leave quickly', 'One button on every report clears the screen back to Home and stops audio.'),
+        ('Quick exit', 'One button on every report clears the screen back to Home and stops audio.'),
         ('Slim sync, 18+', 'History keeps the verdict, a score band, the title and the summary, and can be turned off.'),
     ]
     w, h, gx, gy = 3.15, 1.2, 0.15, 0.13
