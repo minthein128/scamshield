@@ -7,7 +7,7 @@ import { z } from 'zod';
 import { clientIp, type Limits } from './app.js';
 import { bearerToken, type TokenVerifier } from './auth.js';
 import type { Config } from './config.js';
-import { findCertainty, findMaleFormsAny, findPromises, genderCounters, promiseCounters } from './language-guard.js';
+import { findCertainty, findMaleFormsAny, findPromises, fixAppName, genderCounters, promiseCounters } from './language-guard.js';
 import {
   ACTION_SCREENS,
   type ActionScreen,
@@ -248,7 +248,7 @@ export function attachLive(server: Server, deps: LiveDeps) {
 
     const endModelLine = () => {
       if (!modelText) return;
-      send({ type: 'transcript', role: 'model', text: modelText, final: true });
+      send({ type: 'transcript', role: 'model', text: fixAppName(modelText, 'th'), final: true });
       const hits = LANGS.reduce((n, l) => n + findCertainty(modelText, l).length, 0);
       certaintyHits += hits;
       liveCounters.live_certainty_hit += hits;
@@ -319,7 +319,7 @@ export function attachLive(server: Server, deps: LiveDeps) {
       if (said) {
         endUserLine();
         modelText += said;
-        send({ type: 'transcript', role: 'model', text: modelText });
+        send({ type: 'transcript', role: 'model', text: fixAppName(modelText, 'th') });
       }
       if (c?.turnComplete) endModelLine();
       for (const fc of m.toolCall?.functionCalls ?? []) {
