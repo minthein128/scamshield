@@ -33,7 +33,7 @@ class ShieldService : Service(), ShieldOverlay.Listener {
     private val worker: ExecutorService = Executors.newSingleThreadExecutor()
     private val busy = AtomicBoolean(false)
     private var overlay: ShieldOverlay? = null
-    private var capturer: ScreenCapturer? = null
+    private var capturer: ScreenSource? = null
     private var started = false
     private var awaitingConsent = false
     private var apiUrl = ""
@@ -79,30 +79,43 @@ class ShieldService : Service(), ShieldOverlay.Listener {
 
     fun hasProjection(): Boolean = capturer != null
 
+    internal val overlayForTest: ShieldOverlay? get() = overlay
+
     fun onConsentGranted() {
         main.post {
-            val consent = ShieldBridge.pendingConsent
-            if (consent == null || !started) return@post
-            ShieldBridge.pendingConsent = null
+            if (!started) return@post
+            val consent = ShieldBridge.takeConsent() ?: return@post
+            var source: ScreenSource? = null
             try {
                 promoteToForeground(withProjection = true)
-                val manager = getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
-                val projection = manager.getMediaProjection(consent.resultCode, consent.data)
                 capturer?.release()
-                capturer = ScreenCapturer(this, projection) {
-                    main.post { capturer = null }
-                }
-            } catch (e: Exception) {
                 capturer = null
+                source = openCapture(this, consent) { main.post { if (source != null && capturer === source) onProjectionStopped() } }
+            } catch (e: Exception) {
+                Log.w(TAG, "projection failed reused=${consent.uses > 1}: ${e.javaClass.simpleName}")
+            }
+            if (source == null) {
+                ShieldBridge.forgetConsent(consent)
+                if (consent.uses > 1) {
+                    if (awaitingConsent) askConsent()
+                    return@post
+                }
                 awaitingConsent = false
                 failCheck("Screen capture could not start. Tap the shield to try again.")
                 return@post
             }
+            capturer = source
             if (awaitingConsent) {
                 awaitingConsent = false
                 startCheck()
             }
         }
+    }
+
+    /** The user or the system ended screen sharing. The kept consent no longer opens a projection. */
+    private fun onProjectionStopped() {
+        capturer = null
+        ShieldBridge.forgetConsent(null)
     }
 
     fun onConsentDenied() {
@@ -118,25 +131,26 @@ class ShieldService : Service(), ShieldOverlay.Listener {
     }
 
     private fun checkNow() {
-        if (busy.get() || awaitingConsent) return
+        if (!started || busy.get() || awaitingConsent) return
         if (capturer == null) {
-            if (ShieldBridge.pendingConsent != null) {
-                awaitingConsent = true
-                onConsentGranted()
-                return
-            }
             awaitingConsent = true
-            overlay?.reset()
-            val intent = Intent(this, ConsentActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            try {
-                startActivity(intent)
-            } catch (e: Exception) {
-                awaitingConsent = false
-                failCheck("Could not ask for screen capture permission.")
-            }
+            if (ShieldBridge.pendingConsent != null) onConsentGranted() else askConsent()
             return
         }
         startCheck()
+    }
+
+    /** Shows the system screen-capture dialog. On Android 14 and up the first bubble tap lands here. */
+    private fun askConsent() {
+        awaitingConsent = true
+        overlay?.reset()
+        val intent = Intent(this, ConsentActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        try {
+            startActivity(intent)
+        } catch (e: Exception) {
+            awaitingConsent = false
+            failCheck("Could not ask for screen capture permission.")
+        }
     }
 
     private fun startCheck() {
@@ -394,8 +408,23 @@ class ShieldService : Service(), ShieldOverlay.Listener {
         overlay?.reset()
     }
 
-    override fun onClose() {
+    override fun onClose() = stopNow()
+
+    /** Removes the bubble and reports the shield stopped at once; onDestroy finishes the teardown. */
+    fun stopNow() {
+        overlay?.remove()
+        overlay = null
+        markStopped()
+        companion?.end(EndReason.SHIELD)
+        companion = null
         stopSelf()
+    }
+
+    private fun markStopped() {
+        if (!started) return
+        started = false
+        isRunning = false
+        ShieldBridge.publishRunning(false)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -456,18 +485,16 @@ class ShieldService : Service(), ShieldOverlay.Listener {
 
     override fun onDestroy() {
         super.onDestroy()
+        overlay?.remove()
+        overlay = null
+        markStopped()
         companion?.end(EndReason.SHIELD)
         companion = null
         pendingCheck = null
         worker.shutdownNow()
-        overlay?.remove()
-        overlay = null
         capturer?.release()
         capturer = null
-        instance = null
-        isRunning = false
-        started = false
-        ShieldBridge.publishRunning(false)
+        if (instance === this) instance = null
     }
 
     companion object {
@@ -489,5 +516,11 @@ class ShieldService : Service(), ShieldOverlay.Listener {
             private set
         @Volatile var isRunning = false
             private set
+
+        /** Opens a capture from a consent result, or null when the system refuses it. Tests replace it. */
+        internal var openCapture: (ShieldService, ShieldBridge.Consent, () -> Unit) -> ScreenSource? = { service, consent, onStopped ->
+            val manager = service.getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
+            manager.getMediaProjection(consent.resultCode, consent.data)?.let { ScreenCapturer(service, it, onStopped) }
+        }
     }
 }
