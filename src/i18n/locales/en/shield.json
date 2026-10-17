@@ -17,7 +17,7 @@
     "title": "What the shield needs",
     "overlay": "Allow \"Display over other apps\" so the doll can float over other apps.",
     "notifications": "Allow notifications so Android keeps the shield running.",
-    "capture": "Each time you tap the doll, Android asks to share your screen. Tap Start now. $t(common:appName) takes one picture, checks it and stops sharing.",
+    "capture": "The first time you tap the doll after you turn on the shield, Android asks to share your screen. Tap Start now. $t(common:appName) takes a picture only when you tap the doll. Turn off the shield to stop sharing.",
     "privacy": "The screenshot goes to the check service only to be checked. It is not saved."
   },
   "checkNow": "Check this screen now",

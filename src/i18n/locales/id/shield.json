@@ -20,7 +20,7 @@
     "title": "Yang dibutuhkan shield",
     "overlay": "Izinkan \"Tampilkan di atas aplikasi lain\" agar boneka bisa melayang di atas aplikasi lain.",
     "notifications": "Izinkan notifikasi agar Android tetap menjalankan shield.",
-    "capture": "Setiap kali Anda mengetuk boneka, Android meminta izin untuk membagikan layar. Ketuk Mulai sekarang. $t(common:appName) mengambil satu gambar, memeriksanya, lalu berhenti membagikan layar.",
+    "capture": "Saat pertama kali Anda mengetuk boneka setelah perisai aktif, Android meminta izin untuk membagikan layar. Ketuk Mulai sekarang. $t(common:appName) hanya mengambil gambar saat Anda mengetuk boneka. Matikan perisai untuk berhenti membagikan layar.",
     "privacy": "Tangkapan layar dikirim ke layanan pemeriksaan hanya untuk diperiksa. Tangkapan layar tidak disimpan."
   },
   "checkNow": "Periksa layar ini sekarang",

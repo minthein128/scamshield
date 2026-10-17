@@ -52,6 +52,7 @@ export const COMPANION_STRING_KEYS = [
   'errCaptureDenied',
   'errFailed',
   'captureCancelled',
+  'sharingNotice',
   'dismiss',
   'fullReport',
   'showDetails',
