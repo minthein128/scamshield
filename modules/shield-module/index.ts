@@ -211,6 +211,7 @@ interface ShieldModuleType {
     event: 'onShieldResult',
     listener: (e: { id: string; json: string }) => void
   ): ShieldSubscription;
+  addListener(event: 'onShieldState', listener: (e: { running: boolean }) => void): ShieldSubscription;
 }
 
 let nativeShieldModule: ShieldModuleType | null = null;
@@ -307,7 +308,7 @@ export async function startShield(options?: ShieldStartOptions): Promise<boolean
       return false;
     }
   }
-  mockRunning = true;
+  setMockRunning(true);
   return true;
 }
 
@@ -340,7 +341,7 @@ export async function stopShield(): Promise<boolean> {
       return false;
     }
   }
-  mockRunning = false;
+  setMockRunning(false);
   return true;
 }
 
@@ -382,6 +383,25 @@ export function addShieldResultListener(
   }
   mockListeners.add(callback);
   return { remove: () => mockListeners.delete(callback) };
+}
+
+const mockStateListeners = new Set<(running: boolean) => void>();
+
+function setMockRunning(running: boolean) {
+  mockRunning = running;
+  mockStateListeners.forEach((cb) => cb(running));
+}
+
+/**
+ * Called when the shield service has actually started or stopped, including a stop from the
+ * bubble's close target. startShield and stopShield resolve before the service changes state.
+ */
+export function addShieldStateListener(callback: (running: boolean) => void): ShieldSubscription {
+  if (nativeShieldModule) {
+    return nativeShieldModule.addListener('onShieldState', (e) => callback(e.running === true));
+  }
+  mockStateListeners.add(callback);
+  return { remove: () => mockStateListeners.delete(callback) };
 }
 
 /** Result of a recent check by id, for the saferoute://report/<id> deep link. */
@@ -590,6 +610,7 @@ export default {
   isShieldRunning,
   checkScreenNow,
   addShieldResultListener,
+  addShieldStateListener,
   getShieldResult,
   takeUnsyncedResults,
   hasNotificationAccess,
