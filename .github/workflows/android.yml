@@ -10,6 +10,13 @@ on:
         description: Upload to Firebase App Distribution from any branch
         type: boolean
         default: false
+      abi:
+        description: Target ABIs for test builds (distribution and tag builds always ship both)
+        type: choice
+        options:
+          - armeabi-v7a,arm64-v8a
+          - arm64-v8a
+        default: armeabi-v7a,arm64-v8a
 
 concurrency:
   group: android-${{ github.ref }}
@@ -39,6 +46,12 @@ jobs:
       EXPO_NO_TELEMETRY: "1"
       CI: "true"
       NODE_OPTIONS: --max-old-space-size=4096
+      SAFEROUTE_ABIS: ${{ github.event_name == 'workflow_dispatch' && !inputs.force_distribute && inputs.abi || 'armeabi-v7a,arm64-v8a' }}
+      CMAKE_C_COMPILER_LAUNCHER: ccache
+      CMAKE_CXX_COMPILER_LAUNCHER: ccache
+      CCACHE_DIR: ${{ github.workspace }}/.ccache
+      CCACHE_MAXSIZE: 1G
+      CCACHE_COMPRESS: "1"
       REQUIRE_RELEASE_SIGNING: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/feat/production' }}
       ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
       ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
@@ -79,7 +92,17 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
         with:
-          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.event_name != 'workflow_dispatch' }}
+
+      - name: Install ccache
+        run: sudo apt-get install -y --no-install-recommends ccache
+
+      - uses: actions/cache@v4
+        with:
+          path: .ccache
+          key: ccache-${{ runner.os }}-${{ env.SAFEROUTE_ABIS }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ccache-${{ runner.os }}-${{ env.SAFEROUTE_ABIS }}-
 
       - run: pnpm install --frozen-lockfile
 
@@ -93,7 +116,10 @@ jobs:
 
       - name: Assemble release
         working-directory: android
-        run: ./gradlew assembleRelease -PreactNativeArchitectures=armeabi-v7a,arm64-v8a --no-daemon --stacktrace -Dorg.gradle.jvmargs="-Xmx3g -XX:MaxMetaspaceSize=512m"
+        run: ./gradlew assembleRelease -PreactNativeArchitectures=${SAFEROUTE_ABIS} --no-daemon --build-cache --parallel --stacktrace -Dorg.gradle.jvmargs="-Xmx4g -XX:MaxMetaspaceSize=512m"
+
+      - name: ccache stats
+        run: ccache -s
 
       - name: Sign APK
         id: sign
