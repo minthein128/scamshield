@@ -36,7 +36,8 @@ class ShieldService : Service(), ShieldOverlay.Listener {
     private var capturer: ScreenSource? = null
     private var started = false
     private var awaitingConsent = false
-    private var apiUrl = ""
+    @Volatile private var apiUrl = ""
+    @Volatile private var fallbackApiUrl = ""
     private var language = "en"
     private var lastId: String? = null
     private var lastJson: String? = null
@@ -59,6 +60,7 @@ class ShieldService : Service(), ShieldOverlay.Listener {
             return START_NOT_STICKY
         }
         intent?.getStringExtra(EXTRA_API_URL)?.let { apiUrl = it }
+        fallbackApiUrl = intent?.getStringExtra(EXTRA_FALLBACK_API_URL).orEmpty()
         intent?.getStringExtra(EXTRA_LANGUAGE)?.let { if (it.isNotBlank()) language = it }
         if (!started) {
             started = true
@@ -179,7 +181,9 @@ class ShieldService : Service(), ShieldOverlay.Listener {
                     "capture path=$path tap_to_jpeg_ms=${SystemClock.elapsedRealtime() - tapAt} crop=${jpeg.crop.toShortString()} " +
                         "frame_wait_ms=${jpeg.frameWaitMs} encode_ms=${jpeg.encodeMs}" + if (path == "mask") " bubble hidden_ms=0" else ""
                 )
-                val result = CheckClient.checkScreen(apiUrl, language, jpeg.bytes, ShieldBridge.authToken, ShieldBridge.shareSignals)
+                val result = withFailover { url, connectMs ->
+                    CheckClient.checkScreen(url, language, jpeg.bytes, ShieldBridge.authToken, ShieldBridge.shareSignals, connectMs)
+                }
                 main.post { onResult(result, jpeg.thumb) }
             } catch (e: CheckException) {
                 main.post { onFailure(e.message ?: "The check failed.") }
@@ -188,6 +192,25 @@ class ShieldService : Service(), ShieldOverlay.Listener {
             } catch (e: Throwable) {
                 main.post { onFailure("The check failed. Try again.") }
             }
+        }
+    }
+
+    /** Makes [url] the primary for the rest of the session and keeps the old primary as the fallback. */
+    private fun switchTo(url: String) {
+        val old = apiUrl
+        apiUrl = url
+        fallbackApiUrl = old
+    }
+
+    /** Runs [call] on the primary with a short connect timeout, then once on the fallback if the primary is unreachable. */
+    private fun <T> withFailover(call: (url: String, connectMs: Int) -> T): T {
+        val first = apiUrl
+        val alt = fallbackApiUrl
+        if (alt.isBlank() || alt == first) return call(first, CheckClient.CONNECT_TIMEOUT_MS)
+        return try {
+            call(first, CheckClient.FAST_CONNECT_TIMEOUT_MS)
+        } catch (e: UnreachableException) {
+            call(alt, CheckClient.CONNECT_TIMEOUT_MS).also { switchTo(alt) }
         }
     }
 
@@ -244,12 +267,17 @@ class ShieldService : Service(), ShieldOverlay.Listener {
         }
 
         override fun fetchWarning(text: String, onDone: (ByteArray?) -> Unit) {
-            val url = apiUrl
             val lang = language
             val token = ShieldBridge.authToken
             try {
                 worker.execute {
-                    val wav = SpeakClient.speak(url, text, lang, token)
+                    val first = apiUrl
+                    val alt = fallbackApiUrl
+                    var wav = SpeakClient.speak(first, text, lang, token)
+                    if (wav == null && alt.isNotBlank() && alt != first) {
+                        wav = SpeakClient.speak(alt, text, lang, token)
+                        if (wav != null) switchTo(alt)
+                    }
                     main.post { onDone(wav) }
                 }
             } catch (e: Exception) {
@@ -257,8 +285,10 @@ class ShieldService : Service(), ShieldOverlay.Listener {
             }
         }
 
-        override fun openSocket(listener: CompanionSocketListener): CompanionSocket =
-            OkHttpCompanionSocket(OkHttpCompanionSocket.liveUrl(apiUrl), listener)
+        override fun openSocket(listener: CompanionSocketListener): CompanionSocket {
+            val bases = listOf(apiUrl, fallbackApiUrl).filter { it.isNotBlank() }.distinct()
+            return FailoverCompanionSocket(bases.ifEmpty { listOf(apiUrl) }, listener, onOpened = { base -> if (base != apiUrl) switchTo(base) })
+        }
 
         override fun startFields(): JSONObject = JSONObject().apply {
             put("language", language)
@@ -503,6 +533,7 @@ class ShieldService : Service(), ShieldOverlay.Listener {
         const val ACTION_START = "com.saferoute.shield.START"
         const val ACTION_STOP = "com.saferoute.shield.STOP"
         const val EXTRA_API_URL = "apiUrl"
+        const val EXTRA_FALLBACK_API_URL = "fallbackApiUrl"
         const val EXTRA_LANGUAGE = "language"
         private const val TAG = "ShieldCapture"
         /** A frame two vsyncs after the tap no longer shows the dismissed result card. */

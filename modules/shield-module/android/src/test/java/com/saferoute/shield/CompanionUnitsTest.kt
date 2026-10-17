@@ -98,4 +98,61 @@ class CompanionUnitsTest {
         assertEquals("wss://api.example.org/v1/live", OkHttpCompanionSocket.liveUrl("https://api.example.org/"))
         assertEquals("ws://10.0.2.2:8080/v1/live", OkHttpCompanionSocket.liveUrl("http://10.0.2.2:8080"))
     }
+
+    private class Recorder : CompanionSocketListener {
+        val events = mutableListOf<String>()
+        override fun onOpen() { events += "open" }
+        override fun onText(text: String) { events += "text:$text" }
+        override fun onClosed(failed: Boolean) { events += "closed:$failed" }
+    }
+
+    private class FakeSocket : CompanionSocket {
+        var closed = false
+        override fun send(text: String) = true
+        override fun close() { closed = true }
+    }
+
+    @Test
+    fun failoverSocketOpensTheNextHostWhenTheFirstFailsBeforeOpening() {
+        val recorder = Recorder()
+        val opened = mutableListOf<String>()
+        val listeners = mutableListOf<CompanionSocketListener>()
+        val used = mutableListOf<String>()
+        FailoverCompanionSocket(listOf("https://a", "https://b"), recorder, { used += it }, { base, l, _ ->
+            opened += base
+            listeners += l
+            FakeSocket()
+        })
+        assertEquals(listOf("https://a"), opened)
+        listeners[0].onClosed(true)
+        assertEquals(listOf("https://a", "https://b"), opened)
+        assertEquals(emptyList<String>(), recorder.events)
+        listeners[1].onOpen()
+        assertEquals(listOf("open"), recorder.events)
+        assertEquals(listOf("https://b"), used)
+    }
+
+    @Test
+    fun failoverSocketReportsTheFailureOfTheLastHostAndAfterOpening() {
+        val recorder = Recorder()
+        val listeners = mutableListOf<CompanionSocketListener>()
+        FailoverCompanionSocket(listOf("https://a", "https://b"), recorder, {}, { _, l, _ ->
+            listeners += l
+            FakeSocket()
+        })
+        listeners[0].onClosed(true)
+        listeners[1].onClosed(true)
+        assertEquals(listOf("closed:true"), recorder.events)
+
+        val after = Recorder()
+        val seen = mutableListOf<CompanionSocketListener>()
+        FailoverCompanionSocket(listOf("https://a", "https://b"), after, {}, { _, l, _ ->
+            seen += l
+            FakeSocket()
+        })
+        seen[0].onOpen()
+        seen[0].onClosed(true)
+        assertEquals(1, seen.size)
+        assertEquals(listOf("open", "closed:true"), after.events)
+    }
 }

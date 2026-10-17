@@ -1,4 +1,4 @@
-import { COMPANION_STRING_KEYS } from 'shield-module';
+import { COMPANION_STRING_KEYS, defaultFallbackUrl } from 'shield-module';
 import i18n, { t } from '../i18n';
 import { screenFromUrl } from '../lib/shield';
 import { companionStrings } from '../lib/companionStrings';
@@ -56,5 +56,13 @@ describe('shield deep links', () => {
     expect(screenFromUrl('saferoute://report/chk_1')).toBeNull();
     expect(screenFromUrl('https://help')).toBeNull();
     expect(screenFromUrl(null)).toBeNull();
+  });
+});
+
+describe('shield fallback host', () => {
+  it('gives the other built-in host for whichever one the app picked', () => {
+    expect(defaultFallbackUrl('https://saferoute-api.akkhayar.com')).toBe('https://sg-dev-808112092414.asia-southeast1.run.app');
+    expect(defaultFallbackUrl('https://sg-dev-808112092414.asia-southeast1.run.app/')).toBe('https://saferoute-api.akkhayar.com');
+    expect(defaultFallbackUrl('https://other.example')).toBe('https://saferoute-api.akkhayar.com');
   });
 });
