@@ -70,6 +70,22 @@ describe('just-in-time permissions', () => {
   });
 });
 
+describe('on a platform without PermissionsAndroid (web)', () => {
+  const original = PermissionsAndroid.PERMISSIONS;
+  beforeEach(() => {
+    (PermissionsAndroid as { PERMISSIONS: unknown }).PERMISSIONS = undefined;
+  });
+  afterEach(() => {
+    (PermissionsAndroid as { PERMISSIONS: unknown }).PERMISSIONS = original;
+  });
+
+  it('resolves the microphone without reading Android constants', async () => {
+    const a = api({ platform: 'web' });
+    await expect(ensureMicrophone(a)).resolves.toBe('granted');
+    await expect(ensureContacts(api({ platform: 'web', explain: jest.fn(async () => false) }))).resolves.toBe('declined');
+  });
+});
+
 describe('explainOnceEver', () => {
   beforeEach(() => AsyncStorage.clear());
 
