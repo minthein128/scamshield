@@ -10,7 +10,6 @@ import {
   CONTACTS_KEY,
   loadContacts,
   makeContact,
-  mergeContacts,
   removeContact as removeFromList,
   saveContacts,
   upsertContact,
@@ -28,7 +27,7 @@ import {
   type Profile,
   type ProfileChoices,
 } from '../lib/profile';
-import { historyMissingRemotely, mergeHistory } from '../lib/sync';
+import { syncAccount, type AccountLocal } from '../lib/accountSync';
 import * as cloud from '../services/cloud';
 import { useAuth } from './AuthState';
 import { contactAccess, type ContactAccess } from '../lib/contactAccess';
@@ -85,6 +84,28 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     });
   }, []);
 
+  const local = useMemo<AccountLocal>(
+    () => ({
+      read: () => latest.current,
+      applyContacts: async list => {
+        setContacts(list);
+        await saveContacts(list);
+      },
+      applyProfile: async (next, lang) => {
+        setProfile(next);
+        await saveProfile(next);
+        if (lang) await setUiLanguage(lang);
+      },
+      applyHistory: async list => {
+        setHistory(list);
+        await saveHistory(list);
+      },
+      historySlimmed,
+      markHistorySlimmed,
+    }),
+    [],
+  );
+
   useEffect(() => {
     if (!uid || !ready) {
       setSyncState('off');
@@ -92,49 +113,16 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
     let cancelled = false;
     setSyncState('syncing');
-    (async () => {
-      try {
-        const keepsHistory = latest.current.profile.keepHistory;
-        const snap = await cloud.pullAll(uid, keepsHistory);
-        if (cancelled) return;
-        const { profile: localProfile, history: localHistory, contacts: localContacts } = latest.current;
-        if (snap.profile) {
-          const { shareSignals, sharingAsked, keepHistory } = localProfile;
-          const adopted = { ...snap.profile, shareSignals, sharingAsked, keepHistory };
-          setProfile(adopted);
-          await saveProfile(adopted);
-          if (snap.language) await setUiLanguage(snap.language);
-        } else if (localProfile.onboarded) {
-          await cloud.pushProfile(uid, localProfile, latest.current.language);
-        }
-        if (snap.legacyHistory > 0 || !(await historySlimmed(uid))) {
-          await cloud.slimRemoteHistory(uid);
-          await markHistorySlimmed(uid);
-        }
-        if (keepsHistory) {
-          const mergedHistory = mergeHistory(localHistory, snap.history);
-          setHistory(mergedHistory);
-          await saveHistory(mergedHistory);
-          await cloud.pushHistory(uid, historyMissingRemotely(mergedHistory, snap.history));
-        }
-        const mergedContacts = mergeContacts(localContacts, snap.contacts);
-        setContacts(mergedContacts);
-        await saveContacts(mergedContacts);
-        const remoteStamp = new Map(snap.contacts.map(c => [c.id, c.updatedAt]));
-        await Promise.all(mergedContacts.filter(c => (remoteStamp.get(c.id) ?? '') < c.updatedAt).map(c => cloud.pushContact(uid, c)));
-        if (!cancelled) {
-          diag.info('sync', 'done', { history: latest.current.history.length, contacts: mergedContacts.length });
-          setSyncState('done');
-        }
-      } catch (e) {
-        diag.error('sync', 'pull_failed', { code: errorCode(e) });
-        if (!cancelled) setSyncState('error');
-      }
-    })();
+    syncAccount(uid, cloud, local, () => cancelled).then(failures => {
+      for (const f of failures) diag.error('sync', 'failed', { step: f.step, stage: f.stage, code: errorCode(f.error) });
+      if (cancelled) return;
+      diag.info('sync', 'done', { history: latest.current.history.length, contacts: latest.current.contacts.length, failed: failures.length });
+      setSyncState(failures.length > 0 ? 'error' : 'done');
+    });
     return () => {
       cancelled = true;
     };
-  }, [uid, ready]);
+  }, [uid, ready, local]);
 
   const persistProfile = useCallback((next: Profile) => {
     setProfile(next);

@@ -6,6 +6,8 @@ import { AppStateProvider, useAppState } from '../state/AppState';
 import { WarnFamilySheet } from '../components/WarnFamilySheet';
 import { ContactsScreen } from '../screens/ContactsScreen';
 import { CONTACTS_KEY } from '../lib/contacts';
+import { saveHistory } from '../lib/history';
+import { buildMockResponse } from '../api/mock';
 import * as cloud from '../services/cloud';
 import * as notify from '../lib/notify';
 import type { AuthStatus } from '../services/accounts';
@@ -16,7 +18,9 @@ const mockNavigate = jest.fn();
 jest.mock('../state/AuthState', () => ({ useAuth: () => ({ status: mockStatus }) }));
 jest.mock('../hooks/useShieldSync', () => ({ useShieldSync: jest.fn() }));
 jest.mock('../services/cloud', () => ({
-  pullAll: jest.fn().mockResolvedValue({ history: [], contacts: [], legacyHistory: 0 }),
+  pullContacts: jest.fn().mockResolvedValue([]),
+  pullProfile: jest.fn().mockResolvedValue(null),
+  pullHistory: jest.fn().mockResolvedValue({ history: [], legacy: 0 }),
   pushContact: jest.fn().mockResolvedValue(undefined),
   pushHistory: jest.fn().mockResolvedValue(undefined),
   pushProfile: jest.fn().mockResolvedValue(undefined),
@@ -94,6 +98,26 @@ describe('contacts saved before the gate', () => {
     await mount();
     expect(api.contacts).toEqual([legacy]);
     await waitFor(() => expect(mockPush).toHaveBeenCalledWith('u1', legacy));
+  });
+});
+
+describe('contacts after signing in', () => {
+  const remote = [
+    { id: 'c_r1', name: 'Sister', phone: '+66810000001', updatedAt: '2026-10-17T06:41:00.000Z' },
+    { id: 'c_r2', name: 'Uncle', phone: '+959000000002', updatedAt: '2026-10-17T06:41:30.000Z' },
+  ];
+
+  it('shows the account contacts when this device has checks the account refuses to store', async () => {
+    const result = { ...buildMockResponse({ kind: 'job', language: 'en', text: 'offer' }), id: 'chk_local' };
+    await saveHistory([{ id: result.id, createdAt: result.createdAt, language: 'en', result }]);
+    (cloud.pullContacts as jest.Mock).mockResolvedValueOnce(remote);
+    (cloud.pushHistory as jest.Mock).mockRejectedValueOnce(Object.assign(new Error('denied'), { code: 'permission-denied' }));
+    mockStatus = { kind: 'account', uid: 'u1', email: 'a@b.co' };
+    await mount(<ContactsScreen />);
+    expect(await screen.findByText('Sister')).toBeTruthy();
+    expect(screen.getByText('Uncle')).toBeTruthy();
+    await waitFor(() => expect(api.syncState).toBe('error'));
+    expect(JSON.parse((await AsyncStorage.getItem(CONTACTS_KEY)) ?? '[]')).toHaveLength(2);
   });
 });
 
