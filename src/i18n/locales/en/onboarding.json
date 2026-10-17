@@ -47,16 +47,14 @@
     "without": {
       "heading": "Without an account, you can:",
       "check": "Check job offers, messages, links and pictures",
-      "voice": "Talk with the doll by voice",
-      "doll": "Use the doll on your screen (Android)",
-      "call": "Call hotlines and share a warning",
-      "limit": "Up to {{n}} checks an hour"
+      "voice": "Talk with Pyit Taing Htaung by voice",
+      "doll": "Tap Pyit Taing Htaung on your screen to check what you see",
+      "call": "Call hotlines and share a warning"
     },
     "with": {
       "heading": "With an account, you also get:",
       "contacts": "Save emergency contacts",
       "warn": "Send them a ready-made warning in one tap",
-      "restore": "Get your checks and contacts back on a new phone",
       "limit": "Up to {{n}} checks an hour"
     },
     "free": "Free",

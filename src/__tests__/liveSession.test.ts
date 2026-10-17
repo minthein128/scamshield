@@ -45,6 +45,7 @@ class FakeSocket implements SocketLike {
 
 function setup(over: Partial<LiveSessionDeps> = {}, perm = true) {
   const sockets: FakeSocket[] = [];
+  const urls: string[] = [];
   const order: string[] = [];
   const chunkSink: { cb?: (b: string) => void } = {};
   const audio = {
@@ -61,7 +62,8 @@ function setup(over: Partial<LiveSessionDeps> = {}, perm = true) {
   } satisfies LiveAudio;
   const deps: LiveSessionDeps = {
     createAudio: () => audio,
-    openSocket: () => {
+    openSocket: url => {
+      urls.push(url);
       order.push('socket');
       const s = new FakeSocket();
       sockets.push(s);
@@ -78,7 +80,7 @@ function setup(over: Partial<LiveSessionDeps> = {}, perm = true) {
   const views: LiveView[] = [];
   const onAction = jest.fn();
   const session = createLiveSession({ result: RESULT, language: 'my', mode: 'self', home: 'MM', destination: 'TH', onAction }, deps, v => views.push(v));
-  return { session, sockets, order, audio, chunkSink, views, onAction, deps };
+  return { session, sockets, urls, order, audio, chunkSink, views, onAction, deps };
 }
 
 
@@ -206,6 +208,45 @@ describe('live session', () => {
     h.sockets[0].open();
     h.sockets[0].push({ type: 'error', code: 'unsupported_language', message: 'x' });
     expect(h.session.view).toMatchObject({ state: 'error', error: 'unavailable', fallback: true });
+  });
+
+  it('reopens the socket on the other host once when the first fails to open', async () => {
+    const failover = jest.fn(async (failed: string) => (failed === 'http://api.test' ? 'http://alt.test' : failed));
+    const h = setup({ failover });
+    const p = h.session.start();
+    await jest.advanceTimersByTimeAsync(0);
+    await p;
+    h.sockets[0].onclose?.({});
+    await jest.advanceTimersByTimeAsync(0);
+    expect(failover).toHaveBeenCalledWith('http://api.test');
+    expect(h.urls).toEqual(['ws://api.test/v1/live', 'ws://alt.test/v1/live']);
+    h.sockets[1].open();
+    expect(h.sockets[1].sent[0]).toMatchObject({ type: 'start' });
+    expect(h.session.view.state).not.toBe('error');
+  });
+
+  it('gives up with the Listen fallback when the second host fails too, after one retry only', async () => {
+    const failover = jest.fn(async () => 'http://alt.test');
+    const h = setup({ failover });
+    const p = h.session.start();
+    await jest.advanceTimersByTimeAsync(0);
+    await p;
+    h.sockets[0].onclose?.({});
+    await jest.advanceTimersByTimeAsync(0);
+    h.sockets[1].onclose?.({});
+    expect(failover).toHaveBeenCalledTimes(1);
+    expect(h.session.view).toMatchObject({ state: 'error', error: 'unavailable', fallback: true });
+  });
+
+  it('fails over when the first host stays silent for 4 seconds', async () => {
+    const failover = jest.fn(async () => 'http://alt.test');
+    const h = setup({ failover });
+    const p = h.session.start();
+    await jest.advanceTimersByTimeAsync(0);
+    await p;
+    await jest.advanceTimersByTimeAsync(4100);
+    expect(h.sockets).toHaveLength(2);
+    expect(h.session.view.state).toBe('connecting');
   });
 
   it('reports a denied microphone without opening a socket', async () => {

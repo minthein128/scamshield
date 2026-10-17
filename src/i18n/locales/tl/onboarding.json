@@ -50,16 +50,14 @@
     "without": {
       "heading": "Kahit walang account, magagawa mo ang:",
       "check": "Suriin ang job offer, mensahe, link at larawan",
-      "voice": "Makipag-usap sa manika gamit ang boses",
-      "doll": "Gamitin ang manika sa screen mo (Android)",
-      "call": "Tumawag sa mga hotline at magbahagi ng babala",
-      "limit": "Hanggang {{n}} pagsusuri kada oras"
+      "voice": "Makipag-usap kay Pyit Taing Htaung gamit ang boses",
+      "doll": "Pindutin si Pyit Taing Htaung sa screen mo para suriin ang nakikita mo",
+      "call": "Tumawag sa mga hotline at magbahagi ng babala"
     },
     "with": {
       "heading": "Kung may account, makukuha mo rin ang:",
       "contacts": "I-save ang mga emergency contact",
       "warn": "Magpadala ng handang babala sa isang tap",
-      "restore": "Maibalik ang mga pagsusuri at contact sa bagong telepono",
       "limit": "Hanggang {{n}} pagsusuri kada oras"
     },
     "free": "Libre",

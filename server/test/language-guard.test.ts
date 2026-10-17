@@ -8,6 +8,7 @@ import {
   findMaleForms,
   findMaleFormsAny,
   findPromises,
+  fixAppName,
   GROUND_EVIDENCE_FALLBACK,
   guardExtraction,
   guardFlags,
@@ -198,5 +199,42 @@ describe('promises Kakwe cannot keep', () => {
     expect(findPromises('You can press Get help to call a verified hotline.')).toEqual([]);
     expect(findPromises('Get help ခလုတ်ကို နှိပ်ပြီး ဖုန်းဆက်နိုင်ပါတယ်ရှင်။')).toEqual([]);
     expect(findPromises('กด Get help เพื่อโทรหาสายด่วนได้ค่ะ')).toEqual([]);
+  });
+});
+
+describe('app name guard', () => {
+  it.each([
+    ['ผ่านทางกาควาย', 'ผ่านทางKakwe'],
+    ['คาควายตรวจพบ', 'Kakwe' + 'ตรวจพบ'],
+    ['ใช้กาเกวเพื่อตรวจสอบ', 'ใช้Kakweเพื่อตรวจสอบ'],
+    ['ใช้คาเคว ตรวจ', 'ใช้Kakwe ตรวจ'],
+    ['กาเกวย์ ช่วยได้', 'Kakwe ช่วยได้'],
+  ])('rewrites %s in Thai', (input, out) => {
+    expect(fixAppName(input, 'th')).toBe(out);
+  });
+
+  it.each(['ปากควายใหญ่', 'ขาควายเดินช้า', 'เกวียนเก่า', 'กาเกวียนเก่า', 'การควบคุมความเสี่ยง', 'ความปลอดภัย', 'ฝากควายไว้'])(
+    'leaves normal Thai alone: %s',
+    (t) => {
+      expect(fixAppName(t, 'th')).toBe(t);
+    },
+  );
+
+  it('does not touch other languages', () => {
+    expect(fixAppName('กาควาย', 'en')).toBe('กาควาย');
+    expect(fixAppName('ကာကွယ်', 'my')).toBe('ကာကွယ်');
+  });
+
+  it('rewrites the summary, spoken warning and flag labels of an extraction', () => {
+    const x = {
+      summary: 'ตรวจโดยกาควาย พบสัญญาณเตือน',
+      spokenWarning: 'ลองถามกาควายอีกครั้ง',
+      flags: [{ family: 'x', label: 'กาควายพบลิงก์', evidence: 'e', weight: 1 }],
+    } as unknown as Extraction;
+    const { extraction } = guardExtraction(x, 'th');
+    expect(extraction.summary).toContain('Kakwe');
+    expect(extraction.spokenWarning).toContain('Kakwe');
+    expect(extraction.flags[0]?.label).toContain('Kakwe');
+    expect(JSON.stringify(extraction)).not.toContain('ควาย');
   });
 });

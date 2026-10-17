@@ -45,6 +45,8 @@ export interface LiveSessionDeps {
   createAudio: () => LiveAudio;
   openSocket: (url: string) => SocketLike;
   getUrl: () => Promise<string>;
+  /** Picks another host after the socket to `failedBase` failed to open. */
+  failover?: (failedBase: string) => Promise<string>;
   getToken: () => Promise<string | null>;
   /** Plays the approved spoken warning and resolves when it ends. */
   playWarning: (text: string, language: LanguageCode) => Promise<void>;
@@ -55,6 +57,7 @@ export interface LiveSessionDeps {
 
 export const DEFAULT_CAP_MS = 120_000;
 export const CONNECT_TIMEOUT_MS = 8_000;
+export const FIRST_CONNECT_TIMEOUT_MS = 4_000;
 const OPEN = 1;
 const PLAYBACK_BYTES_PER_SEC = 24000 * 2;
 
@@ -200,19 +203,48 @@ export function createLiveSession(options: LiveSessionOptions, deps: LiveSession
       .catch(() => fail('audio'));
   };
 
-  const connect = async () => {
+  let retried = false;
+
+  const dropSocket = () => {
+    const s = ws;
+    ws = null;
+    clearTimeout(connectTimer);
+    if (!s) return;
+    s.onopen = s.onmessage = s.onerror = s.onclose = null;
+    try {
+      s.close();
+    } catch {
+      // socket already gone
+    }
+  };
+
+  const connect = async (failedBase?: string) => {
     let url: string;
+    let base: string;
     let token: string | null;
     try {
-      [url, token] = [liveWsUrl(await deps.getUrl()), await deps.getToken()];
+      base = failedBase !== undefined && deps.failover ? await deps.failover(failedBase) : await deps.getUrl();
+      if (failedBase !== undefined && base === failedBase) return fail('unavailable', { fallback: true });
+      [url, token] = [liveWsUrl(base), await deps.getToken()];
       if (!/^wss?:\/\//.test(url)) throw new Error('no url');
     } catch {
       return fail('unavailable', { fallback: true });
     }
     if (finished) return;
+    const connectFailed = () => {
+      if (finished) return;
+      if (!retried && deps.failover && view.state === 'connecting') {
+        retried = true;
+        diag.warn('live', 'connect_failover', {});
+        dropSocket();
+        void connect(base);
+        return;
+      }
+      fail('unavailable', { fallback: true });
+    };
     const socket = deps.openSocket(url);
     ws = socket;
-    connectTimer = setTimeout(() => fail('unavailable', { fallback: true }), CONNECT_TIMEOUT_MS);
+    connectTimer = setTimeout(connectFailed, deps.failover && !retried ? FIRST_CONNECT_TIMEOUT_MS : CONNECT_TIMEOUT_MS);
     socket.onopen = () => {
       socket.send(
         JSON.stringify({
@@ -229,11 +261,11 @@ export function createLiveSession(options: LiveSessionOptions, deps: LiveSession
     };
     socket.onmessage = e => onFrame(e.data);
     socket.onerror = () => {
-      if (view.state === 'connecting') fail('unavailable', { fallback: true });
+      if (view.state === 'connecting') connectFailed();
     };
     socket.onclose = () => {
       if (finished) return;
-      if (view.state === 'connecting') fail('unavailable', { fallback: true });
+      if (view.state === 'connecting') connectFailed();
       else fail('upstream');
     };
   };

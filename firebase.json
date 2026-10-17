@@ -10,6 +10,10 @@
       ],
       "rewrites": [
         {
+          "source": "/kakwe.apk",
+          "destination": "/dl/saferoute.pkg"
+        },
+        {
           "source": "/saferoute.apk",
           "destination": "/dl/saferoute.pkg"
         },
@@ -37,7 +41,7 @@
             },
             {
               "key": "Content-Disposition",
-              "value": "attachment; filename=saferoute.apk"
+              "value": "attachment; filename=Kakwe.apk"
             },
             {
               "key": "Cache-Control",
@@ -59,6 +63,23 @@
             {
               "key": "Access-Control-Allow-Origin",
               "value": "*"
+            }
+          ]
+        },
+        {
+          "source": "/kakwe.apk",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/vnd.android.package-archive"
+            },
+            {
+              "key": "Content-Disposition",
+              "value": "attachment; filename=Kakwe.apk"
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache"
             }
           ]
         }

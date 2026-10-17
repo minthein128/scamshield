@@ -43,7 +43,7 @@ cd android
 
 The compile check does not exercise runtime behavior. Verify these on a real device:
 
-1. Overlay permission, then `requestScreenCapturePermission()`, then `startShield({ apiUrl, language })`.
+1. Overlay permission, then `startShield({ apiUrl, language })`. Android 13 and lower call `requestScreenCapturePermission()` before the start; the consent stays for the app process, so the next start shows no dialog. Android 14 and up start without consent and the first bubble tap shows the system dialog.
 2. Tap the bubble in another app. The bubble stays on screen and the doll starts rocking under the scan sweep at once (after the 300 ms double-tap window), then shows the verdict ring, a verdict badge and a result pill. `adb logcat -s ShieldCapture` prints the capture path and timings.
 3. "Full report" opens `saferoute://report/<id>`. The app must declare the `saferoute` scheme and read the result with `getShieldResult(id)`.
 4. Android 14 and up: the consent dialog must appear again after the user stops sharing from the status bar chip.
@@ -261,6 +261,8 @@ Scam-pattern sharing is opt-in. `startShield({ shareSignals })` and `setShieldSh
 ## Rules to keep
 
 - Android 14 allows one `createVirtualDisplay` per MediaProjection and one `getMediaProjection` per consent result. The capturer keeps one display for the session. Do not create one per tap.
+- Android 13 and lower keep the consent result in `ShieldBridge.pendingConsent` after use and open a new projection from it on the next start. The projection itself stops with the shield, so no screen-sharing indicator stays on. A refused or user-stopped consent is dropped and the next bubble tap asks again.
+- `stopShield` runs on the main thread: it removes the bubble and sends `onShieldState` false before it resolves (`ShieldService.stopNow`). `onDestroy` releases the capture and the worker after that.
 - On Android 14 `startForeground` with type `mediaProjection` throws before consent. The service starts as `specialUse` and switches type after consent.
 - Overlay labels (verdict and error chips, "Tap to retry", Dismiss, Full report, TalkBack actions and the voice companion) come from the app in the user's language through `startShield({ strings })`. Verdict chips reuse the app's `common:verdict` words (Low risk, Be careful, High risk), never "Safe"; English fallbacks live in `ShieldStrings.DEFAULTS`. Result text comes from the server in the requested language. TalkBack sentences (the bubble description, "Expanded") and the error sentences TalkBack reads come from the same map (`a11y*`, `err*`); each failure kind maps to one translated sentence, and an unknown server message reads as "The check failed". `pitch/e2e/bubble-doll-states-my.png` shows the Burmese labels.
 - `startShield` options also carry `home` and `destination` country codes for the companion's verified hotlines.

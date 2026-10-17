@@ -18,18 +18,24 @@ import android.view.WindowManager
 import java.io.ByteArrayOutputStream
 import kotlin.math.roundToInt
 
+/** A live screen capture for one shield session. */
+interface ScreenSource {
+    fun capture(notBefore: Long, waitMs: Long, masks: List<Rect>, onFrame: () -> Unit = {}): ScreenCapturer.Capture
+    fun release()
+}
+
 /** Holds one MediaProjection and one VirtualDisplay for the whole session (Android 14 allows one). */
 class ScreenCapturer(
     private val context: Context,
     private val projection: MediaProjection,
     private val onStopped: () -> Unit
-) {
+) : ScreenSource {
     private val lock = Object()
     private val thread = HandlerThread("shield-capture").apply { start() }
     private val handler = Handler(thread.looper)
     private val callback = object : MediaProjection.Callback() {
         override fun onStop() {
-            release(stopProjection = false)
+            releaseAll(stopProjection = false)
             onStopped()
         }
     }
@@ -162,7 +168,7 @@ class ScreenCapturer(
      * Blocks like [captureJpeg] and paints over [masks] (real screen pixels) before encoding.
      * Returns [Capture.Busy] when the area around a mask is not plain enough to fill.
      */
-    fun capture(notBefore: Long, waitMs: Long, masks: List<Rect>, onFrame: () -> Unit = {}): Capture {
+    override fun capture(notBefore: Long, waitMs: Long, masks: List<Rect>, onFrame: () -> Unit): Capture {
         synchronized(lock) {
             if (released) return Capture.None
             resizeIfNeeded()
@@ -222,7 +228,9 @@ class ScreenCapturer(
         return Sent(bytes, thumb, crop)
     }
 
-    fun release(stopProjection: Boolean = true) {
+    override fun release() = releaseAll(stopProjection = true)
+
+    private fun releaseAll(stopProjection: Boolean) {
         synchronized(lock) {
             if (released) return
             released = true

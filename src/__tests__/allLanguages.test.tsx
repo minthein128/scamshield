@@ -148,7 +148,7 @@ describe.each(LOCALES)('every main screen in %s', lng => {
   beforeEach(async () => {
     missing.length = 0;
     await i18n.changeLanguage(lng);
-    mockShield = { support: 'ready', running: false, step: 'idle', error: null, setEnabled: jest.fn(async () => undefined), checkNow: jest.fn(async () => true) };
+    mockShield = { support: 'ready', running: false, on: false, step: 'idle', error: null, setEnabled: jest.fn(async () => undefined), checkNow: jest.fn(async () => true) };
   });
 
   it('onboarding, each step', async () => {
@@ -171,7 +171,7 @@ describe.each(LOCALES)('every main screen in %s', lng => {
     await settle();
     const off = JSON.stringify(screen.getByTestId('shield-status').props.children);
     expectTranslated('home off');
-    mockShield = { ...mockShield, running: true };
+    mockShield = { ...mockShield, running: true, on: true };
     view.rerender(<HomeScreen navigation={nav()} route={{ key: 'Home', name: 'Home' } as never} />);
     await settle();
     expect(JSON.stringify(screen.getByTestId('shield-status').props.children)).not.toBe(off);
@@ -207,6 +207,10 @@ describe.each(LOCALES)('every main screen in %s', lng => {
     render(<SettingsScreen navigation={nav()} route={{ key: 'Settings', name: 'Settings' } as never} />);
     await settle();
     expectTranslated('settings');
+    expect(screen.getByTestId('settings-open-log')).toBeTruthy();
+    expect(visibleStrings()).toContain(i18n.t('settings:problemReport'));
+    expect(screen.queryByTestId('settings-connection')).toBeNull();
+    expect(screen.queryByTestId('settings-recheck')).toBeNull();
   });
 
   it('Screen shield details', async () => {

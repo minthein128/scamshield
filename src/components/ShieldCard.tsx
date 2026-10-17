@@ -13,7 +13,7 @@ export const ShieldCard: React.FC<{ onDetails?: () => void; style?: StyleProp<Vi
 
 export const ShieldCardView: React.FC<{ control: ShieldControl; onDetails?: () => void; style?: StyleProp<ViewStyle> }> = ({ control, onDetails, style }) => {
   const { t } = useTranslation('shield');
-  const { support, running, step, error, setEnabled } = control;
+  const { support, on, step, error, setEnabled } = control;
   const apkUrl = APK_URL;
 
   if (support === 'unsupported') return null;
@@ -28,7 +28,7 @@ export const ShieldCardView: React.FC<{ control: ShieldControl; onDetails?: () =
         : t('status.unavailable')
     : working
       ? stepText(step)
-      : running
+      : on
         ? t('status.on')
         : t('status.off');
 
@@ -36,7 +36,7 @@ export const ShieldCardView: React.FC<{ control: ShieldControl; onDetails?: () =
     <View testID="shield-card" style={[styles.card, unavailable && styles.cardOff, style]}>
       <View style={styles.row}>
         <View style={styles.icon}>
-          <BrandMark size={56} medallion={running ? colors.brandGold : colors.textLight} />
+          <BrandMark size={56} medallion={on ? colors.brandGold : colors.textLight} />
         </View>
         <View style={styles.text}>
           <Text style={styles.title}>{t('title')}</Text>
@@ -45,7 +45,7 @@ export const ShieldCardView: React.FC<{ control: ShieldControl; onDetails?: () =
         {unavailable ? null : <Switch
           testID="shield-switch"
           accessibilityLabel={t('title')}
-          value={running || working}
+          value={on}
           disabled={unavailable || working}
           onValueChange={setEnabled}
           trackColor={{ false: colors.borderDark, true: colors.brandGold }}

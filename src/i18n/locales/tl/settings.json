@@ -11,7 +11,7 @@
     "none": "Walang account",
     "noneBody": "Gumagana ang lahat kahit walang account. Gumawa ng account para maitabi ang iyong mga pagsusuri at contact kung magpapalit ka ng telepono, at para makakuha ng mas mataas na limit sa pagsusuri bawat oras.",
     "create": "Gumawa ng account",
-    "signIn": "Mag-sign in"
+    "signIn": "May account na ako"
   },
   "sync": {
     "syncing": "Sini-sync ang iyong mga pagsusuri at contact...",
@@ -24,16 +24,7 @@
   },
   "myCountry": "Aking bansa",
   "destination": "Kung saan ako magtatrabaho o pupunta",
-  "connection": {
-    "title": "Koneksyon",
-    "host": "Server",
-    "healthy": "Sumasagot ang server",
-    "unhealthy": "Hindi sumasagot ang server",
-    "checking": "Sinusuri...",
-    "none": "Walang address ng server",
-    "recheck": "Suriin muli ang koneksyon",
-    "openLog": "Diagnostics log"
-  },
+  "problemReport": "Tulong at ulat ng problema",
   "diagnostics": {
     "title": "Diagnostics log",
     "privacy": "Nananatili ang log na ito sa telepono mo. Walang laman itong mensahe o personal na detalye. Ibahagi lang kung hihingin ng $t(common:appName) team.",

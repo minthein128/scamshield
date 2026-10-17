@@ -6,6 +6,7 @@ import android.provider.Settings
 import androidx.core.content.ContextCompat
 import expo.modules.kotlin.Promise
 import expo.modules.kotlin.exception.CodedException
+import expo.modules.kotlin.functions.Queues
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 
@@ -47,8 +48,12 @@ class ShieldModule : Module() {
                 Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                 Uri.parse("package:${context.packageName}")
             ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            context.startActivity(intent)
-            false
+            try {
+                context.startActivity(intent)
+                true
+            } catch (e: Exception) {
+                false
+            }
         }
 
         AsyncFunction("requestScreenCapturePermission") { promise: Promise ->
@@ -84,6 +89,7 @@ class ShieldModule : Module() {
             val intent = Intent(context, ShieldService::class.java).apply {
                 action = ShieldService.ACTION_START
                 putExtra(ShieldService.EXTRA_API_URL, options?.get("apiUrl") as? String ?: "")
+                putExtra(ShieldService.EXTRA_FALLBACK_API_URL, options?.get("fallbackApiUrl") as? String ?: "")
                 (options?.get("language") as? String)?.let { putExtra(ShieldService.EXTRA_LANGUAGE, it) }
             }
             ContextCompat.startForegroundService(context, intent)
@@ -102,9 +108,10 @@ class ShieldModule : Module() {
 
         AsyncFunction("stopShield") {
             val context = appContext.reactContext ?: return@AsyncFunction false
-            context.stopService(Intent(context, ShieldService::class.java))
+            val service = ShieldService.instance
+            if (service != null) service.stopNow() else context.stopService(Intent(context, ShieldService::class.java))
             true
-        }
+        }.runOnQueue(Queues.MAIN)
 
         AsyncFunction("isShieldRunning") {
             ShieldService.isRunning

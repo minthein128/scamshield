@@ -6,10 +6,14 @@ import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
 
-class CheckException(message: String) : Exception(message)
+open class CheckException(message: String) : Exception(message)
+
+/** The host did not answer: no connection, a timeout or a gateway error. Another host may. */
+class UnreachableException(message: String) : CheckException(message)
 
 object CheckClient {
-    private const val CONNECT_TIMEOUT_MS = 10_000
+    const val CONNECT_TIMEOUT_MS = 10_000
+    const val FAST_CONNECT_TIMEOUT_MS = 4_000
     private const val READ_TIMEOUT_MS = 60_000
 
     /** The /v1/check body. Scam-pattern sharing is opt-in, so shareSignals is always sent and false unless chosen. */
@@ -20,7 +24,7 @@ object CheckClient {
         .put("language", language)
         .put("shareSignals", shareSignals)
 
-    fun checkScreen(apiUrl: String, language: String, jpeg: ByteArray, authToken: String = "", shareSignals: Boolean = false): JSONObject {
+    fun checkScreen(apiUrl: String, language: String, jpeg: ByteArray, authToken: String = "", shareSignals: Boolean = false, connectTimeoutMs: Int = CONNECT_TIMEOUT_MS): JSONObject {
         if (apiUrl.isBlank()) throw CheckException("Shield has no server address.")
         val body = requestBody(language, jpeg, shareSignals).toString().toByteArray(Charsets.UTF_8)
 
@@ -31,7 +35,7 @@ object CheckClient {
         }
         try {
             connection.requestMethod = "POST"
-            connection.connectTimeout = CONNECT_TIMEOUT_MS
+            connection.connectTimeout = connectTimeoutMs
             connection.readTimeout = READ_TIMEOUT_MS
             connection.doOutput = true
             connection.setRequestProperty("Content-Type", "application/json")
@@ -52,11 +56,12 @@ object CheckClient {
                 if (!json.has("verdict")) throw CheckException("The server sent an answer we cannot read.")
                 return json
             }
+            if (code == 502 || code == 504) throw UnreachableException(errorMessage(code, text))
             throw CheckException(errorMessage(code, text))
         } catch (e: CheckException) {
             throw e
         } catch (e: IOException) {
-            throw CheckException("No connection. Check your internet and try again.")
+            throw UnreachableException("No connection. Check your internet and try again.")
         } finally {
             connection.disconnect()
         }

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getApiClient } from '../api';
 import type { CheckResponse, LanguageCode } from '../api/types';
-import { ensureApiUrl } from '../config/runtime';
+import { ensureApiUrl, refreshApiUrl } from '../config/runtime';
 import { createLiveAudio } from '../lib/liveAudio';
 import { createLiveSession, type LiveAction, type LiveSessionDeps, type LiveView, type SocketLike } from '../lib/liveSession';
 import { ensureMicrophone } from '../lib/permissions';
@@ -36,6 +36,7 @@ export const realDeps: LiveSessionDeps = {
   createAudio: createLiveAudio,
   openSocket: url => new WebSocket(url) as unknown as SocketLike,
   getUrl: ensureApiUrl,
+  failover: refreshApiUrl,
   getToken: getAuthToken,
   playWarning,
   stopWarning: stopSpeaking,

@@ -144,7 +144,7 @@ export function findJobBanned(text: string, lang: Lang): string[] {
 
 /** Rewrites certainty phrases, then the Job Shield banned phrases. */
 export function guardJobText(text: string, lang: Lang): { text: string; hits: number } {
-  const first = rewriteCertainty(text, lang);
+  const first = rewriteCertainty(fixAppName(text, lang), lang);
   let hits = first.hits;
   let out = first.text;
   for (const r of JOB_BANNED[lang]) {
@@ -153,6 +153,14 @@ export function guardJobText(text: string, lang: Lang): { text: string; hits: nu
     if (n && r.sub !== undefined) out = out.replace(new RegExp(r.re.source, r.re.flags), r.sub as never);
   }
   return { text: out, hits };
+}
+
+const TH_VOWEL_MARK = '\\u0E30-\\u0E3A\\u0E47-\\u0E4E';
+const TH_APP_NAME = new RegExp(`[กค]า[กคข]ว(?:าย|ย์?)|[กค]า[เแ][กคข]ว(?:ย์)?(?![${TH_VOWEL_MARK}])`, 'g');
+
+/** Thai-script spellings of the app name (ka-kwe) back to Kakwe. Only Thai text is touched. */
+export function fixAppName(text: string, lang: Lang): string {
+  return lang === 'th' ? text.replace(TH_APP_NAME, 'Kakwe') : text;
 }
 
 export function findCertainty(text: string, lang: Lang): string[] {
@@ -258,7 +266,7 @@ export function foreignInExtraction(x: Pick<Extraction, 'summary' | 'spokenWarni
 export function guardExtraction(x: Extraction, lang: Lang): { extraction: Extraction; stats: GuardStats } {
   const stats: GuardStats = { before: 0, rewrites: 0 };
   const fix = (t: string) => {
-    const r = rewriteCertainty(t, lang);
+    const r = rewriteCertainty(fixAppName(t, lang), lang);
     stats.before += r.hits;
     if (r.text !== t) stats.rewrites++;
     return r.text;
@@ -275,7 +283,7 @@ export function guardExtraction(x: Extraction, lang: Lang): { extraction: Extrac
 export function guardFlags(flags: Flag[], lang: Lang): { flags: Flag[]; stats: GuardStats } {
   const stats: GuardStats = { before: 0, rewrites: 0 };
   const fix = (t: string) => {
-    const r = rewriteCertainty(t, lang);
+    const r = rewriteCertainty(fixAppName(t, lang), lang);
     stats.before += r.hits;
     if (r.text !== t) stats.rewrites++;
     return r.text;

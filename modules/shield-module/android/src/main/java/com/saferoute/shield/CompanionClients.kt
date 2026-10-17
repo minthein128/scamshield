@@ -122,10 +122,11 @@ interface CompanionSocketListener {
 }
 
 /** /v1/live over OkHttp. Callbacks hop to the main thread; send() is safe from any thread. */
-class OkHttpCompanionSocket(url: String, listener: CompanionSocketListener) : CompanionSocket {
+class OkHttpCompanionSocket(url: String, listener: CompanionSocketListener, connectTimeoutMs: Long? = null) : CompanionSocket {
     private val main = Handler(Looper.getMainLooper())
+    private val http = if (connectTimeoutMs == null) client else client.newBuilder().connectTimeout(connectTimeoutMs, TimeUnit.MILLISECONDS).build()
     @Volatile private var closed = false
-    private val socket: WebSocket = client.newWebSocket(Request.Builder().url(url).build(), object : WebSocketListener() {
+    private val socket: WebSocket = http.newWebSocket(Request.Builder().url(url).build(), object : WebSocketListener() {
         override fun onOpen(webSocket: WebSocket, response: Response) {
             main.post { if (!closed) listener.onOpen() }
         }
@@ -165,5 +166,44 @@ class OkHttpCompanionSocket(url: String, listener: CompanionSocketListener) : Co
 
         fun liveUrl(apiUrl: String): String =
             apiUrl.trim().trimEnd('/').replaceFirst(Regex("^http", RegexOption.IGNORE_CASE), "ws") + "/v1/live"
+    }
+}
+
+/** Opens the first host and, if it fails before the socket opens, the next one. Reports the host that opened. */
+class FailoverCompanionSocket(
+    private val bases: List<String>,
+    private val listener: CompanionSocketListener,
+    private val onOpened: (String) -> Unit = {},
+    private val connect: (base: String, listener: CompanionSocketListener, fast: Boolean) -> CompanionSocket = { base, l, fast ->
+        OkHttpCompanionSocket(OkHttpCompanionSocket.liveUrl(base), l, if (fast) 4_000L else null)
+    },
+) : CompanionSocket {
+    @Volatile private var closed = false
+    @Volatile private var opened = false
+    @Volatile private var inner: CompanionSocket? = null
+
+    init {
+        inner = start(0)
+    }
+
+    private fun start(i: Int): CompanionSocket = connect(bases[i], object : CompanionSocketListener {
+        override fun onOpen() {
+            opened = true
+            onOpened(bases[i])
+            listener.onOpen()
+        }
+
+        override fun onText(text: String) = listener.onText(text)
+
+        override fun onClosed(failed: Boolean) {
+            if (failed && !opened && !closed && i + 1 < bases.size) inner = start(i + 1) else listener.onClosed(failed)
+        }
+    }, i + 1 < bases.size)
+
+    override fun send(text: String): Boolean = inner?.send(text) ?: false
+
+    override fun close() {
+        closed = true
+        inner?.close()
     }
 }

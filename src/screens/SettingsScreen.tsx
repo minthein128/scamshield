@@ -4,7 +4,6 @@ import { Linking, Switch, StyleSheet, TouchableOpacity, View } from 'react-nativ
 import { useTranslation } from 'react-i18next';
 import { SITE_URL } from '../config/env';
 import Constants from 'expo-constants';
-import { ConnectionCard } from '../components/ConnectionCard';
 import { Screen } from '../components/Screen';
 import { Text } from '../components/Text';
 import { Icon } from '../components/Icon';
@@ -107,7 +106,7 @@ export const SettingsScreen: React.FC<RootScreenProps<'Settings'>> = ({ navigati
               <Text style={styles.strong}>{t('account.none')}</Text>
               <Text style={styles.body}>{t('account.noneBody')}</Text>
               <Button testID="settings-signup" label={t('account.create')} onPress={() => navigation.navigate('Account', { mode: 'signUp' })} />
-              <LinkButton label={t('account.signIn')} onPress={() => navigation.navigate('Account', { mode: 'signIn' })} />
+              <Button testID="settings-signin" label={t('account.signIn')} onPress={() => navigation.navigate('Account', { mode: 'signIn' })} />
             </>
           )}
           {error ? <Notice message={error} /> : null}
@@ -188,10 +187,7 @@ export const SettingsScreen: React.FC<RootScreenProps<'Settings'>> = ({ navigati
         <Button testID="settings-delete-local" label={t('privacy.deleteLocal')} variant="secondary" onPress={onDeleteLocal} disabled={busy} />
       </View>
 
-      <View style={{ gap: 8 }}>
-        <SectionTitle>{t('connection.title')}</SectionTitle>
-        <ConnectionCard onOpenLog={() => navigation.navigate('Diagnostics')} />
-      </View>
+      <LinkButton testID="settings-open-log" label={t('problemReport')} onPress={() => navigation.navigate('Diagnostics')} />
 
       <Text style={styles.version}>{`${appName()} ${Constants.expoConfig?.version ?? ''}`.trim()}</Text>
     </Screen>

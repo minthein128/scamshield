@@ -87,6 +87,8 @@ export type CompanionStringKey = (typeof COMPANION_STRING_KEYS)[number];
 export interface ShieldStartOptions {
   /** Defaults to EXPO_PUBLIC_API_URL. */
   apiUrl?: string;
+  /** Tried when apiUrl is unreachable. Defaults to the other built-in host. */
+  fallbackApiUrl?: string;
   language?: 'en' | 'id' | 'tl' | 'my' | 'th';
   /** Firebase ID token sent as a Bearer header. Optional; without it the server limits by IP. */
   authToken?: string;
@@ -166,6 +168,7 @@ export async function hasOverlayPermission(): Promise<boolean> {
   return mockOverlayGranted;
 }
 
+/** Resolves true when the permission is granted or the system settings screen opened for it. */
 export async function requestOverlayPermission(): Promise<boolean> {
   if (nativeShieldModule) {
     try {
@@ -178,7 +181,10 @@ export async function requestOverlayPermission(): Promise<boolean> {
   return true;
 }
 
-/** Shows the system screen-capture consent dialog. Resolves true when the user allows. */
+/**
+ * Shows the system screen-capture consent dialog. Resolves true when the user allows.
+ * On Android 13 and lower a consent from earlier in the app process is reused without a dialog.
+ */
 export async function requestScreenCapturePermission(): Promise<boolean> {
   if (nativeShieldModule) {
     try {
@@ -191,11 +197,21 @@ export async function requestScreenCapturePermission(): Promise<boolean> {
   return true;
 }
 
+const PRIMARY_API_URL = (process.env.EXPO_PUBLIC_STABLE_API_URL?.trim() || 'https://saferoute-api.akkhayar.com').replace(/\/+$/, '');
+const FALLBACK_API_URL = (process.env.EXPO_PUBLIC_FALLBACK_API_URL?.trim() || 'https://sg-dev-808112092414.asia-southeast1.run.app').replace(/\/+$/, '');
+
+/** The built-in host that is not `apiUrl`. */
+export function defaultFallbackUrl(apiUrl: string): string {
+  const current = apiUrl.trim().replace(/\/+$/, '');
+  return [PRIMARY_API_URL, FALLBACK_API_URL].find(u => u !== current) ?? '';
+}
+
 export async function startShield(options?: ShieldStartOptions): Promise<boolean> {
   if (nativeShieldModule) {
     try {
       const apiUrl = options?.apiUrl || process.env.EXPO_PUBLIC_API_URL || '';
-      return await nativeShieldModule.startShield({ ...options, apiUrl });
+      const fallbackApiUrl = options?.fallbackApiUrl ?? defaultFallbackUrl(apiUrl);
+      return await nativeShieldModule.startShield({ ...options, apiUrl, fallbackApiUrl });
     } catch (e) {
       console.warn('Native startShield error:', e);
       return false;
@@ -225,6 +241,7 @@ export async function setShieldAuthToken(token: string | null): Promise<boolean>
   }
 }
 
+/** Removes the bubble and sends the stopped state before it resolves; the service finishes after. */
 export async function stopShield(): Promise<boolean> {
   if (nativeShieldModule) {
     try {
@@ -287,7 +304,7 @@ function setMockRunning(running: boolean) {
 
 /**
  * Called when the shield service has actually started or stopped, including a stop from the
- * bubble's close target. startShield and stopShield resolve before the service changes state.
+ * bubble's close target. startShield resolves before the service has started.
  */
 export function addShieldStateListener(callback: (running: boolean) => void): ShieldSubscription {
   if (nativeShieldModule) {

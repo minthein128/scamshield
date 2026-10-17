@@ -37,30 +37,22 @@ function db(): Firestore {
   return cached;
 }
 
-export interface CloudSnapshot {
-  profile: Profile | null;
-  language: LanguageCode | null;
-  history: HistoryEntry[];
-  /** Pulled history docs still in the old full-report shape. */
-  legacyHistory: number;
-  contacts: TrustedContact[];
+export async function pullContacts(uid: string): Promise<TrustedContact[]> {
+  const snap = await getDocs(collection(db(), 'users', uid, 'contacts'));
+  return snap.docs.flatMap(s => docToContact(s.id, s.data()) ?? []);
 }
 
-export async function pullAll(uid: string, withHistory = true): Promise<CloudSnapshot> {
-  const d = db();
-  const [profileSnap, historySnap, contactSnap] = await Promise.all([
-    getDoc(doc(d, 'users', uid)),
-    withHistory ? getDocs(query(collection(d, 'users', uid, 'history'), orderBy('createdAt', 'desc'), limit(PULL_LIMIT))) : null,
-    getDocs(collection(d, 'users', uid, 'contacts')),
-  ]);
-  const profileData = profileSnap.exists() ? profileSnap.data() : null;
-  const remote = profileData ? docToProfile(profileData) : null;
+export async function pullProfile(uid: string): Promise<{ profile: Profile; language: LanguageCode } | null> {
+  const snap = await getDoc(doc(db(), 'users', uid));
+  return snap.exists() ? docToProfile(snap.data()) : null;
+}
+
+/** The newest history docs, and how many of them still have the old full-report shape. */
+export async function pullHistory(uid: string): Promise<{ history: HistoryEntry[]; legacy: number }> {
+  const snap = await getDocs(query(collection(db(), 'users', uid, 'history'), orderBy('createdAt', 'desc'), limit(PULL_LIMIT)));
   return {
-    profile: remote?.profile ?? null,
-    language: remote?.language ?? null,
-    history: historySnap?.docs.flatMap(s => docToHistory(s.id, s.data()) ?? []) ?? [],
-    legacyHistory: historySnap?.docs.filter(s => isLegacyDoc(s.data())).length ?? 0,
-    contacts: contactSnap.docs.flatMap(s => docToContact(s.id, s.data()) ?? []),
+    history: snap.docs.flatMap(s => docToHistory(s.id, s.data()) ?? []),
+    legacy: snap.docs.filter(s => isLegacyDoc(s.data())).length,
   };
 }
 

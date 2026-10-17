@@ -11,7 +11,7 @@
     "none": "Tanpa akun",
     "noneBody": "Semua fitur tetap bisa dipakai tanpa akun. Buat akun agar hasil periksa dan kontak Anda tidak hilang jika berganti HP, dan dapat batas periksa per jam lebih banyak.",
     "create": "Buat akun",
-    "signIn": "Masuk"
+    "signIn": "Saya sudah punya akun"
   },
   "sync": {
     "syncing": "Menyinkronkan hasil periksa dan kontak Anda...",
@@ -24,16 +24,7 @@
   },
   "myCountry": "Negara asal saya",
   "destination": "Tempat saya akan bekerja atau bepergian",
-  "connection": {
-    "title": "Koneksi",
-    "host": "Server",
-    "healthy": "Server menjawab",
-    "unhealthy": "Server tidak menjawab",
-    "checking": "Memeriksa...",
-    "none": "Tidak ada alamat server",
-    "recheck": "Periksa ulang koneksi",
-    "openLog": "Log diagnostik"
-  },
+  "problemReport": "Bantuan & laporan masalah",
   "diagnostics": {
     "title": "Log diagnostik",
     "privacy": "Log ini tetap di ponsel Anda. Isinya tidak memuat pesan atau data pribadi. Bagikan hanya jika tim $t(common:appName) memintanya.",
