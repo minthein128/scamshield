@@ -47,8 +47,8 @@
     "without": {
       "heading": "Without an account, you can:",
       "check": "Check job offers, messages, links and pictures",
-      "voice": "Talk with Pyit Taing Htaung by voice",
-      "doll": "Tap Pyit Taing Htaung on your screen to check what you see",
+      "voice": "Talk with $t(common:appName) by voice",
+      "doll": "Tap the doll on your screen to check what you see",
       "call": "Call hotlines and share a warning"
     },
     "with": {

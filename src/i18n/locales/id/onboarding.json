@@ -50,8 +50,8 @@
     "without": {
       "heading": "Tanpa akun, Anda bisa:",
       "check": "Memeriksa tawaran kerja, pesan, tautan, dan gambar",
-      "voice": "Bicara dengan Pyit Taing Htaung lewat suara",
-      "doll": "Ketuk Pyit Taing Htaung di layar untuk memeriksa apa yang Anda lihat",
+      "voice": "Bicara dengan $t(common:appName) lewat suara",
+      "doll": "Ketuk boneka di layar untuk memeriksa apa yang Anda lihat",
       "call": "Menelepon nomor bantuan dan membagikan peringatan"
     },
     "with": {

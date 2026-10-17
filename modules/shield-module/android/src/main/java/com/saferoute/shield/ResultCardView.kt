@@ -42,7 +42,7 @@ internal data class CardModel(
     /** Shows the "Ask" mic chip that starts a voice companion session about this result. */
     val canAsk: Boolean = false,
     val askLabel: String = "Ask",
-    val askDescription: String = "Ask Pyit Taing Htaung about this result",
+    val askDescription: String = "Ask Kakwe about this result",
     /** In-memory copy of the screenshot that was sent. Never written to disk. */
     val preview: android.graphics.Bitmap? = null,
     val previewLabel: String = "This is what we checked",
