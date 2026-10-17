@@ -21,16 +21,7 @@
   },
   "myCountry": "My country",
   "destination": "Where I will work or travel",
-  "connection": {
-    "title": "Connection",
-    "host": "Server",
-    "healthy": "Server answers",
-    "unhealthy": "Server does not answer",
-    "checking": "Checking...",
-    "none": "No server address",
-    "recheck": "Re-check connection",
-    "openLog": "Diagnostics log"
-  },
+  "problemReport": "Help & problem report",
   "diagnostics": {
     "title": "Diagnostics log",
     "privacy": "This log stays on your phone. It contains no messages or personal details. Share it only if the $t(common:appName) team asks.",

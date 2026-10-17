@@ -207,6 +207,10 @@ describe.each(LOCALES)('every main screen in %s', lng => {
     render(<SettingsScreen navigation={nav()} route={{ key: 'Settings', name: 'Settings' } as never} />);
     await settle();
     expectTranslated('settings');
+    expect(screen.getByTestId('settings-open-log')).toBeTruthy();
+    expect(visibleStrings()).toContain(i18n.t('settings:problemReport'));
+    expect(screen.queryByTestId('settings-connection')).toBeNull();
+    expect(screen.queryByTestId('settings-recheck')).toBeNull();
   });
 
   it('Screen shield details', async () => {
