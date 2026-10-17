@@ -63,10 +63,27 @@ describe('just-in-time permissions', () => {
     expect(a.explain).toHaveBeenCalledWith('notifications');
   });
 
-  it('on web only explains and leaves the browser prompt to the feature', async () => {
+  it('on web leaves the browser prompt to the feature, with no in-app dialog that a sheet would cover', async () => {
     const a = api({ platform: 'web' });
     expect(await ensureMicrophone(a)).toBe('granted');
     expect(a.request).not.toHaveBeenCalled();
+    expect(a.explain).not.toHaveBeenCalled();
+  });
+});
+
+describe('on a platform without PermissionsAndroid (web)', () => {
+  const original = PermissionsAndroid.PERMISSIONS;
+  beforeEach(() => {
+    (PermissionsAndroid as { PERMISSIONS: unknown }).PERMISSIONS = undefined;
+  });
+  afterEach(() => {
+    (PermissionsAndroid as { PERMISSIONS: unknown }).PERMISSIONS = original;
+  });
+
+  it('resolves the microphone without reading Android constants', async () => {
+    const a = api({ platform: 'web' });
+    await expect(ensureMicrophone(a)).resolves.toBe('granted');
+    await expect(ensureContacts(api({ platform: 'web' }))).resolves.toBe('granted');
   });
 });
 

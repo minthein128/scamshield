@@ -3,6 +3,7 @@ import { StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import * as ShieldModule from 'shield-module';
 import { Screen } from '../components/Screen';
+import { QuickSettingsTileCard } from '../components/QuickSettingsTileCard';
 import { VoiceCompanionCard } from '../components/VoiceCompanionCard';
 import { ShieldCardView } from '../components/ShieldCard';
 import { Text } from '../components/Text';
@@ -41,6 +42,7 @@ export const ShieldScreen: React.FC<RootScreenProps<'Shield'>> = ({ navigation }
     <Screen header={<ScreenHeader title={t('title')} onBack={() => navigation.goBack()} />}>
       <ShieldCardView control={control} />
       <VoiceCompanionCard />
+      {control.support === 'ready' ? <QuickSettingsTileCard /> : null}
       <Card style={{ gap: 8 }}>
         <Text style={styles.title}>{t('needs.title')}</Text>
         {STEPS.map((step, i) => (

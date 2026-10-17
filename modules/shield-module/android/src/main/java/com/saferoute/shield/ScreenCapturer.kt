@@ -18,13 +18,17 @@ import android.view.WindowManager
 import java.io.ByteArrayOutputStream
 import kotlin.math.roundToInt
 
-/** A live screen capture for one check. */
+/** A screen-capture session: one consent, any number of captures until release(). */
 interface ScreenSource {
     fun capture(notBefore: Long, waitMs: Long, masks: List<Rect>, onFrame: () -> Unit = {}): ScreenCapturer.Capture
     fun release()
 }
 
-/** Holds one MediaProjection and one VirtualDisplay for one check; release() stops the projection. */
+/**
+ * Holds one MediaProjection and one VirtualDisplay for a shield session. The display has no Surface
+ * while idle, so nothing is composed or delivered; a capture attaches a fresh ImageReader and
+ * detaches it again. One VirtualDisplay per projection also meets the Android 14 rule.
+ */
 class ScreenCapturer(
     private val context: Context,
     private val projection: MediaProjection,
@@ -46,23 +50,23 @@ class ScreenCapturer(
     private var latestAt = 0L
     private var width = 0
     private var height = 0
+    private var dpi = 0
     private var realWidth = 0
     private var released = false
 
     init {
         projection.registerCallback(callback, handler)
-        val (w, h, dpi) = targetSize()
+        val (w, h, d) = targetSize()
         width = w
         height = h
-        val newReader = newReader(w, h)
-        reader = newReader
+        dpi = d
         display = projection.createVirtualDisplay(
             "saferoute-shield",
             w,
             h,
-            dpi,
+            d,
             DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
-            newReader.surface,
+            null,
             null,
             handler
         )
@@ -115,22 +119,32 @@ class ScreenCapturer(
         return r
     }
 
-    private fun resizeIfNeeded() {
-        val (w, h, dpi) = targetSize()
-        if (w == width && h == height) return
-        val oldReader = reader
-        val newReader = newReader(w, h)
-        display?.resize(w, h, dpi)
-        display?.surface = newReader.surface
-        synchronized(lock) {
-            latest?.close()
-            latest = null
-            latestAt = 0L
+    /** Gives the display a new ImageReader at the current screen size. Frames flow from here on. */
+    private fun attach() {
+        val (w, h, d) = targetSize()
+        if (w != width || h != height || d != dpi) {
+            display?.resize(w, h, d)
+            width = w
+            height = h
+            dpi = d
         }
-        oldReader?.close()
+        val newReader = newReader(w, h)
         reader = newReader
-        width = w
-        height = h
+        latest = null
+        latestAt = 0L
+        display?.surface = newReader.surface
+    }
+
+    /** Takes the Surface off the display and frees the buffers. Nothing renders until the next attach. */
+    private fun detach() {
+        try {
+            display?.surface = null
+        } catch (_: Exception) {
+        }
+        latest?.close()
+        latest = null
+        reader?.close()
+        reader = null
     }
 
     /** Outcome of one capture. [Busy] means the masks would erase content; nothing was encoded. */
@@ -171,19 +185,23 @@ class ScreenCapturer(
     override fun capture(notBefore: Long, waitMs: Long, masks: List<Rect>, onFrame: () -> Unit): Capture {
         synchronized(lock) {
             if (released) return Capture.None
-            resizeIfNeeded()
-            val start = SystemClock.elapsedRealtime()
-            val deadline = start + waitMs
-            while (!released && latestAt < notBefore) {
-                val remaining = deadline - SystemClock.elapsedRealtime()
-                if (remaining <= 0) break
-                lock.wait(remaining)
+            try {
+                attach()
+                val start = SystemClock.elapsedRealtime()
+                val deadline = start + waitMs
+                while (!released && latestAt < notBefore) {
+                    val remaining = deadline - SystemClock.elapsedRealtime()
+                    if (remaining <= 0) break
+                    lock.wait(remaining)
+                }
+                val image = latest ?: return Capture.None
+                val waited = SystemClock.elapsedRealtime() - start
+                onFrame()
+                val sent = encode(image, masks) ?: return Capture.Busy
+                return Capture.Jpeg(sent.bytes, waited, SystemClock.elapsedRealtime() - start - waited, sent.thumb, sent.crop)
+            } finally {
+                if (!released) detach()
             }
-            val image = latest ?: return Capture.None
-            val waited = SystemClock.elapsedRealtime() - start
-            onFrame()
-            val sent = encode(image, masks) ?: return Capture.Busy
-            return Capture.Jpeg(sent.bytes, waited, SystemClock.elapsedRealtime() - start - waited, sent.thumb, sent.crop)
         }
     }
 
@@ -242,10 +260,12 @@ class ScreenCapturer(
             projection.unregisterCallback(callback)
         } catch (_: Exception) {
         }
-        display?.release()
-        display = null
-        reader?.close()
-        reader = null
+        synchronized(lock) {
+            display?.release()
+            display = null
+            reader?.close()
+            reader = null
+        }
         if (stopProjection) {
             try {
                 projection.stop()

@@ -1,9 +1,13 @@
 package com.saferoute.shield
 
+import android.app.StatusBarManager
+import android.content.ComponentName
 import android.content.Intent
+import android.graphics.drawable.Icon
 import android.net.Uri
+import android.os.Build
 import android.provider.Settings
-import androidx.core.content.ContextCompat
+import expo.modules.kotlin.Promise
 import expo.modules.kotlin.exception.CodedException
 import expo.modules.kotlin.functions.Queues
 import expo.modules.kotlin.modules.Module
@@ -59,24 +63,44 @@ class ShieldModule : Module() {
             val context = appContext.reactContext ?: return@AsyncFunction false
             if (!Settings.canDrawOverlays(context)) return@AsyncFunction false
             ShieldBridge.authToken = (options?.get("authToken") as? String).orEmpty()
-            ShieldBridge.shareSignals = options?.get("shareSignals") == true
-            ShieldBridge.homeCountry = ShieldBridge.countryCode(options?.get("home"))
-            ShieldBridge.destinationCountry = ShieldBridge.countryCode(options?.get("destination"))
-            @Suppress("UNCHECKED_CAST")
-            (options?.get("strings") as? Map<String, Any?>)?.let { ShieldBridge.strings = ShieldStrings.from(it) }
-            val intent = Intent(context, ShieldService::class.java).apply {
-                action = ShieldService.ACTION_START
-                putExtra(ShieldService.EXTRA_API_URL, options?.get("apiUrl") as? String ?: "")
-                putExtra(ShieldService.EXTRA_FALLBACK_API_URL, options?.get("fallbackApiUrl") as? String ?: "")
-                (options?.get("language") as? String)?.let { putExtra(ShieldService.EXTRA_LANGUAGE, it) }
-            }
-            ContextCompat.startForegroundService(context, intent)
+            val config = ShieldStartConfig.fromOptions(options)
+            ShieldStartConfig.save(context, config)
+            ShieldLauncher.start(context, config)
             true
         }
 
         AsyncFunction("setShareSignals") { enabled: Boolean ->
             ShieldBridge.shareSignals = enabled
+            appContext.reactContext?.let { ShieldStartConfig.saveShareSignals(it, enabled) }
             true
+        }
+
+        AsyncFunction("quickSettingsTileSupport") {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) "request" else "manual"
+        }
+
+        AsyncFunction("requestAddTile") { label: String?, promise: Promise ->
+            val context = appContext.currentActivity ?: appContext.reactContext
+            if (context == null || Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+                promise.resolve("unsupported")
+                return@AsyncFunction
+            }
+            val manager = context.getSystemService(StatusBarManager::class.java)
+            if (manager == null) {
+                promise.resolve("unsupported")
+                return@AsyncFunction
+            }
+            val name = label?.trim()?.takeIf { it.isNotEmpty() } ?: context.getString(R.string.kakwe_shield_tile)
+            try {
+                manager.requestAddTileService(
+                    ComponentName(context, ShieldTileService::class.java),
+                    name,
+                    Icon.createWithResource(context, R.drawable.ic_kakwe_tile),
+                    context.mainExecutor
+                ) { result -> promise.resolve(tileRequestResult(result)) }
+            } catch (e: Exception) {
+                promise.resolve("error")
+            }
         }
 
         AsyncFunction("setAuthToken") { token: String? ->
@@ -86,8 +110,7 @@ class ShieldModule : Module() {
 
         AsyncFunction("stopShield") {
             val context = appContext.reactContext ?: return@AsyncFunction false
-            val service = ShieldService.instance
-            if (service != null) service.stopNow() else context.stopService(Intent(context, ShieldService::class.java))
+            ShieldLauncher.stop(context)
             true
         }.runOnQueue(Queues.MAIN)
 
@@ -107,6 +130,16 @@ class ShieldModule : Module() {
 
         AsyncFunction("takeUnsyncedResults") {
             ShieldBridge.takeUnsynced()
+        }
+    }
+
+    companion object {
+        /** Maps a StatusBarManager tile request result to the JS result name. */
+        fun tileRequestResult(code: Int): String = when (code) {
+            StatusBarManager.TILE_ADD_REQUEST_RESULT_TILE_ADDED -> "added"
+            StatusBarManager.TILE_ADD_REQUEST_RESULT_TILE_ALREADY_ADDED -> "already"
+            StatusBarManager.TILE_ADD_REQUEST_RESULT_TILE_NOT_ADDED -> "declined"
+            else -> "error"
         }
     }
 }

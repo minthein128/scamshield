@@ -96,6 +96,7 @@
     "errCapture": "Hindi mabasa ang screen. Pindutin ang shield para subukang muli.",
     "errCaptureDenied": "Hindi pinayagan ang screen capture. Pindutin ang shield para subukang muli.",
     "errFailed": "Hindi nagtagumpay ang pagsusuri. Subukang muli.",
-    "captureCancelled": "Walang naibahagi. Pindutin ang manika kapag gusto mong magpasuri."
+    "captureCancelled": "Walang naibahagi. Pindutin ang manika kapag gusto mong magpasuri.",
+    "sharingNotice": "Masusuri ng $t(common:appName) ang iyong screen habang naka-on ang shield. I-off ang shield para huminto."
   }
 }

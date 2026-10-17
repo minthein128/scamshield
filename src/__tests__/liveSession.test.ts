@@ -275,6 +275,23 @@ describe('live session', () => {
     }
   });
 
+  it('never stays in connecting when ensureMic throws before it returns a promise', async () => {
+    const h = setup({
+      ensureMic: (() => {
+        throw new TypeError('boom');
+      }) as never,
+    });
+    await h.session.start();
+    expect(h.session.view).toMatchObject({ state: 'error', error: 'mic_denied' });
+    expect(h.sockets).toHaveLength(0);
+  });
+
+  it('ends in error when a step after the mic throws', async () => {
+    const h = setup({ playWarning: (() => { throw new Error('boom'); }) as never });
+    await h.session.start();
+    expect(h.session.view).toMatchObject({ state: 'error', error: 'audio' });
+  });
+
   it('falls back to Listen when the socket cannot open', async () => {
     const h = setup();
     const p = h.session.start();

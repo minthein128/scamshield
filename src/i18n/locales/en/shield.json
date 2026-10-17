@@ -17,7 +17,7 @@
     "title": "What the shield needs",
     "overlay": "Allow \"Display over other apps\" so the doll can float over other apps.",
     "notifications": "Allow notifications so Android keeps the shield running.",
-    "capture": "Each time you tap the doll, Android asks to share your screen. Tap Start now. $t(common:appName) takes one picture, checks it and stops sharing.",
+    "capture": "The first time you tap the doll after you turn on the shield, Android asks to share your screen. Tap Start now. $t(common:appName) takes a picture only when you tap the doll. Turn off the shield to stop sharing.",
     "privacy": "The screenshot goes to the check service only to be checked. It is not saved."
   },
   "checkNow": "Check this screen now",
@@ -30,5 +30,13 @@
     "notStarted": "The shield did not start. Check that \"Display over other apps\" is allowed and try again.",
     "failed": "The shield did not start. Try again.",
     "checkFailed": "The check did not start. Turn the shield on and try again."
+  },
+  "tile": {
+    "title": "Quick settings",
+    "body": "Turn the shield on or off from the quick settings at the top of your screen.",
+    "add": "Add to quick settings",
+    "added": "$t(common:appName) shield is in your quick settings.",
+    "failed": "Could not add it. Edit your quick settings and drag $t(common:appName) shield in.",
+    "hint": "Swipe down from the top, tap the pencil to edit, and drag $t(common:appName) shield into your quick settings."
   }
 }

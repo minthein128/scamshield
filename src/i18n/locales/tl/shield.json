@@ -20,7 +20,7 @@
     "title": "Mga kailangan ng shield",
     "overlay": "Payagan ang \"Display over other apps\" para makalutang ang manika sa ibang apps.",
     "notifications": "Payagan ang mga notification para mapanatiling gumagana ng Android ang shield.",
-    "capture": "Tuwing pipindutin mo ang manika, magtatanong ang Android kung ibabahagi ang iyong screen. I-tap ang Start now. Kukuha ang $t(common:appName) ng isang larawan, susuriin ito, at ihihinto ang pagbabahagi.",
+    "capture": "Sa unang pagpindot mo sa manika matapos i-on ang shield, magtatanong ang Android kung ibabahagi ang iyong screen. I-tap ang Start now. Kukuha lang ng larawan ang $t(common:appName) kapag pinindot mo ang manika. I-off ang shield para ihinto ang pagbabahagi.",
     "privacy": "Ipinapadala ang screenshot sa check service para lang masuri. Hindi ito sine-save."
   },
   "checkNow": "Suriin ang screen na ito ngayon",
@@ -33,5 +33,13 @@
     "notStarted": "Hindi nagsimula ang shield. Tiyaking pinapayagan ang \"Display over other apps\" at subukang muli.",
     "failed": "Hindi nagsimula ang shield. Subukang muli.",
     "checkFailed": "Hindi nagsimula ang pagsusuri. I-on ang shield at subukang muli."
+  },
+  "tile": {
+    "title": "Quick settings",
+    "body": "I-on o i-off ang shield mula sa quick settings sa itaas ng iyong screen.",
+    "add": "Idagdag sa quick settings",
+    "added": "Nasa iyong quick settings na ang $t(common:appName) shield.",
+    "failed": "Hindi ito naidagdag. I-edit ang iyong quick settings at i-drag doon ang $t(common:appName) shield.",
+    "hint": "Mag-swipe pababa mula sa itaas, i-tap ang lapis para mag-edit, at i-drag ang $t(common:appName) shield sa iyong quick settings."
   }
 }

@@ -70,6 +70,7 @@ export async function ensureAndroidPermission(
   permission: Permission,
   api: AndroidPermissionApi = permissionApi(),
 ): Promise<PermissionResult> {
+  if (api.platform === 'web') return 'granted';
   if (api.platform !== 'android') return (await api.explain(kind)) ? 'granted' : 'declined';
   if (await api.check(permission).catch(() => false)) return 'granted';
   if (!(await api.explain(kind))) return 'declined';
@@ -78,14 +79,17 @@ export async function ensureAndroidPermission(
   return answer === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN ? 'blocked' : 'denied';
 }
 
+const androidPermission = (name: 'RECORD_AUDIO' | 'POST_NOTIFICATIONS' | 'READ_CONTACTS') =>
+  (PermissionsAndroid?.PERMISSIONS?.[name] ?? `android.permission.${name}`) as Permission;
+
 export const ensureMicrophone = (api?: AndroidPermissionApi) =>
-  ensureAndroidPermission('mic', PermissionsAndroid.PERMISSIONS.RECORD_AUDIO, api);
+  ensureAndroidPermission('mic', androidPermission('RECORD_AUDIO'), api);
 
 /** Asks only on Android 13+. The shield still runs when this is refused. */
 export async function ensureNotifications(api: AndroidPermissionApi = permissionApi()): Promise<PermissionResult> {
   if (api.platform !== 'android' || Number(api.version) < 33) return 'granted';
-  return ensureAndroidPermission('notifications', PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS, api);
+  return ensureAndroidPermission('notifications', androidPermission('POST_NOTIFICATIONS'), api);
 }
 
 export const ensureContacts = (api?: AndroidPermissionApi) =>
-  ensureAndroidPermission('contacts', PermissionsAndroid.PERMISSIONS.READ_CONTACTS, api);
+  ensureAndroidPermission('contacts', androidPermission('READ_CONTACTS'), api);

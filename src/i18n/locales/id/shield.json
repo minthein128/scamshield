@@ -20,7 +20,7 @@
     "title": "Yang dibutuhkan shield",
     "overlay": "Izinkan \"Tampilkan di atas aplikasi lain\" agar boneka bisa melayang di atas aplikasi lain.",
     "notifications": "Izinkan notifikasi agar Android tetap menjalankan shield.",
-    "capture": "Setiap kali Anda mengetuk boneka, Android meminta izin untuk membagikan layar. Ketuk Mulai sekarang. $t(common:appName) mengambil satu gambar, memeriksanya, lalu berhenti membagikan layar.",
+    "capture": "Saat pertama kali Anda mengetuk boneka setelah perisai aktif, Android meminta izin untuk membagikan layar. Ketuk Mulai sekarang. $t(common:appName) hanya mengambil gambar saat Anda mengetuk boneka. Matikan perisai untuk berhenti membagikan layar.",
     "privacy": "Tangkapan layar dikirim ke layanan pemeriksaan hanya untuk diperiksa. Tangkapan layar tidak disimpan."
   },
   "checkNow": "Periksa layar ini sekarang",
@@ -33,5 +33,13 @@
     "notStarted": "Shield tidak berjalan. Pastikan izin \"Tampilkan di atas aplikasi lain\" aktif, lalu coba lagi.",
     "failed": "Shield tidak berjalan. Coba lagi.",
     "checkFailed": "Pemeriksaan tidak berjalan. Nyalakan shield dan coba lagi."
+  },
+  "tile": {
+    "title": "Setelan cepat",
+    "body": "Nyalakan atau matikan perisai dari setelan cepat di bagian atas layar.",
+    "add": "Tambahkan ke setelan cepat",
+    "added": "Perisai $t(common:appName) sudah ada di setelan cepat Anda.",
+    "failed": "Tidak bisa ditambahkan. Edit setelan cepat Anda dan seret Perisai $t(common:appName) ke dalamnya.",
+    "hint": "Usap ke bawah dari atas, ketuk ikon pensil untuk mengedit, lalu seret Perisai $t(common:appName) ke setelan cepat."
   }
 }
