@@ -24,16 +24,7 @@
   },
   "myCountry": "Negara asal saya",
   "destination": "Tempat saya akan bekerja atau bepergian",
-  "connection": {
-    "title": "Koneksi",
-    "host": "Server",
-    "healthy": "Server menjawab",
-    "unhealthy": "Server tidak menjawab",
-    "checking": "Memeriksa...",
-    "none": "Tidak ada alamat server",
-    "recheck": "Periksa ulang koneksi",
-    "openLog": "Log diagnostik"
-  },
+  "problemReport": "Bantuan & laporan masalah",
   "diagnostics": {
     "title": "Log diagnostik",
     "privacy": "Log ini tetap di ponsel Anda. Isinya tidak memuat pesan atau data pribadi. Bagikan hanya jika tim $t(common:appName) memintanya.",

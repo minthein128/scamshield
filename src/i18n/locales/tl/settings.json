@@ -24,16 +24,7 @@
   },
   "myCountry": "Aking bansa",
   "destination": "Kung saan ako magtatrabaho o pupunta",
-  "connection": {
-    "title": "Koneksyon",
-    "host": "Server",
-    "healthy": "Sumasagot ang server",
-    "unhealthy": "Hindi sumasagot ang server",
-    "checking": "Sinusuri...",
-    "none": "Walang address ng server",
-    "recheck": "Suriin muli ang koneksyon",
-    "openLog": "Diagnostics log"
-  },
+  "problemReport": "Tulong at ulat ng problema",
   "diagnostics": {
     "title": "Diagnostics log",
     "privacy": "Nananatili ang log na ito sa telepono mo. Walang laman itong mensahe o personal na detalye. Ibahagi lang kung hihingin ng $t(common:appName) team.",
