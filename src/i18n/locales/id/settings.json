@@ -36,6 +36,7 @@
     "share": "Bagikan laporan",
     "clear": "Hapus log",
     "copied": "Laporan disalin. Tempel di pesan ke tim $t(common:appName).",
+    "reportCopied": "Laporan masalah disalin",
     "clearTitle": "Hapus log?",
     "clearMessage": "Ini menghapus semua catatan log di ponsel ini.",
     "clearAction": "Hapus",

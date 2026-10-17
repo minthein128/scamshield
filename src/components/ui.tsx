@@ -162,7 +162,7 @@ export const Notice: React.FC<{ title?: string; message: string; tone?: 'error' 
   onAction,
   testID,
 }) => (
-  <View testID={testID} accessibilityRole="alert" style={[styles.notice, tone === 'error' ? styles.noticeError : styles.noticeInfo]}>
+  <View testID={testID} accessibilityRole="alert" accessibilityLiveRegion="assertive" style={[styles.notice, tone === 'error' ? styles.noticeError : styles.noticeInfo]}>
     {title ? <Text style={[styles.noticeTitle, { color: tone === 'error' ? colors.dangerSoftText : colors.textPrimary }]}>{title}</Text> : null}
     <Text style={[styles.noticeText, { color: tone === 'error' ? colors.dangerDark : colors.textPrimary }]}>{message}</Text>
     {actionLabel && onAction ? <LinkButton label={actionLabel} onPress={onAction} color={tone === 'error' ? colors.dangerDark : colors.accent} /> : null}

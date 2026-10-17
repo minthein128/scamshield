@@ -9,6 +9,7 @@ import { BrandMark } from './components/BrandMark';
 import { Text } from './components/Text';
 import RootNavigator from './navigation/RootNavigator';
 import { AppStateProvider } from './state/AppState';
+import { ToastHost } from './components/ToastHost';
 import { AuthProvider } from './state/AuthState';
 import { FOREGROUND_REFRESH_MS, refreshApiUrl, useApiUrl } from './config/runtime';
 import { useLayout, APP_MAX_WIDTH } from './hooks/useLayout';
@@ -79,6 +80,7 @@ export default function App() {
           <AuthProvider>
             <AppStateProvider>
               <RootNavigator />
+              <ToastHost />
             </AppStateProvider>
           </AuthProvider>
         </View>
