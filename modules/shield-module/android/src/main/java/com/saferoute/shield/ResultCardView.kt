@@ -151,8 +151,7 @@ internal class ResultCardView(
         }
         header.addView(titleView, titleParams())
         if (model.canAsk) {
-            header.addView(askChip(), LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(48)).apply {
-                marginEnd = dp(2)
+            header.addView(askButton(), LayoutParams(dp(ASK_TARGET_DP), dp(ASK_TARGET_DP)).apply {
                 topMargin = -dp(4)
                 bottomMargin = -dp(4)
             })
@@ -200,33 +199,34 @@ internal class ResultCardView(
         })
     }
 
-    private fun askChip(): View {
-        val radius = dp(18).toFloat()
-        fun pill(color: Int) = GradientDrawable().apply { cornerRadius = radius; setColor(color) }
+    private fun askButton(): View {
+        fun disc(color: Int) = GradientDrawable().apply { shape = GradientDrawable.OVAL; setColor(color) }
         val states = android.graphics.drawable.StateListDrawable().apply {
-            addState(intArrayOf(android.R.attr.state_pressed), pill(palette.askPressed))
-            addState(intArrayOf(), pill(palette.askFill))
+            addState(intArrayOf(android.R.attr.state_pressed), disc(palette.askPressed))
+            addState(intArrayOf(), disc(palette.askFill))
         }
-        val inset = android.graphics.drawable.InsetDrawable(states, 0, dp(6), 0, dp(6))
-        val mask = android.graphics.drawable.InsetDrawable(pill(0xFFFFFFFF.toInt()), 0, dp(6), 0, dp(6))
-        val chip = LinearLayout(context).apply {
-            orientation = HORIZONTAL
-            gravity = Gravity.CENTER_VERTICAL
-            setPadding(dp(10), 0, dp(14), 0)
-            minimumWidth = dp(48)
-            minimumHeight = dp(48)
+        val inset = dp((ASK_TARGET_DP - ASK_DISC_DP) / 2)
+        fun inset(drawable: android.graphics.drawable.Drawable) =
+            android.graphics.drawable.InsetDrawable(drawable, inset)
+        val button = android.widget.FrameLayout(context).apply {
+            minimumWidth = dp(ASK_TARGET_DP)
+            minimumHeight = dp(ASK_TARGET_DP)
             isClickable = true
             isFocusable = true
             contentDescription = model.askDescription
-            background = RippleDrawable(ColorStateList.valueOf((palette.askText and 0x00FFFFFF) or 0x33000000), inset, mask)
+            background = RippleDrawable(
+                ColorStateList.valueOf((palette.askText and 0x00FFFFFF) or 0x33000000),
+                inset(states),
+                inset(disc(0xFFFFFFFF.toInt()))
+            )
             setOnClickListener { callbacks.onAsk() }
         }
-        chip.addView(MicIconView(context, palette.askText), LayoutParams(dp(16), dp(16)))
-        chip.addView(
-            text(model.askLabel, 13f, palette.askText, fonts.bold).apply { maxLines = 1 },
-            LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply { marginStart = dp(5) }
+        ViewCompat.setTooltipText(button, model.askLabel)
+        button.addView(
+            MicIconView(context, palette.askText),
+            android.widget.FrameLayout.LayoutParams(dp(20), dp(20), Gravity.CENTER)
         )
-        return chip
+        return button
     }
 
     /** "This is what we checked": a small thumbnail of the sent screenshot. Tap to enlarge. */
@@ -554,6 +554,8 @@ internal class ResultCardView(
 
         const val PILL_RADIUS_DP = 24f
         const val PREVIEW_DP = 72
+        const val ASK_DISC_DP = 40
+        const val ASK_TARGET_DP = 48
         const val SHEET_RADIUS_DP = 20f
         val EASE = PathInterpolator(0.2f, 0f, 0f, 1f)
     }
