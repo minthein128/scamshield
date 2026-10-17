@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { buildActions, titleFor } from '../src/explain.js';
+import { GROUND_EXAMPLES } from '../src/ground.js';
 import {
   countCertainty,
   countMaleForms,
@@ -7,10 +8,12 @@ import {
   findMaleForms,
   findMaleFormsAny,
   findPromises,
+  GROUND_EVIDENCE_FALLBACK,
   guardExtraction,
   guardFlags,
   isHeavy,
   rewriteCertainty,
+  wrongLanguage,
 } from '../src/language-guard.js';
 import type { Extraction } from '../src/types.js';
 
@@ -115,6 +118,43 @@ describe('language guard', () => {
   it('guards grounding evidence too', () => {
     const { flags } = guardFlags([{ family: 'known_bad', label: 'X', evidence: 'Acme is a scammer', severity: 'low' }], 'en');
     expect(flags[0]?.evidence).toBe('Acme may be linked to scam reports');
+  });
+
+  it('replaces English grounding evidence in a Burmese, Thai, Indonesian or Tagalog report', () => {
+    const en = 'Reports online describe similar messages as scams.';
+    for (const lang of ['my', 'th', 'id', 'tl'] as const) {
+      const { flags, stats } = guardFlags(
+        [{ family: 'identity', label: GROUND_EXAMPLES[lang].licence, evidence: en, severity: 'low' }],
+        lang,
+      );
+      expect(flags[0]?.evidence).toBe(GROUND_EVIDENCE_FALLBACK[lang]);
+      expect(flags[0]?.label).toBe(GROUND_EXAMPLES[lang].licence);
+      expect(stats.replaced).toBe(1);
+    }
+    expect(guardFlags([{ family: 'identity', label: 'X', evidence: en, severity: 'low' }], 'en').flags[0]?.evidence).toBe(en);
+  });
+
+  it('keeps report-language evidence that names a source or a website', () => {
+    const kept = [
+      ['thaipost-redelivery.top သည် Thailand Post နှင့် မသက်ဆိုင်ကြောင်း Scamwatch တွင် တွေ့ရသည်။', 'my'],
+      ['DICA', 'my'],
+      ['Royal Thai Police', 'th'],
+      ['มีรายงานบน https://www.thaipost.net/news ว่าข้อความคล้ายกันถูกใช้หลอกลวง', 'th'],
+      ['Ada laporan online di Scamwatch bahwa pesan serupa dipakai untuk menipu.', 'id'],
+      ['May mga ulat online na ang website na ito ay hindi registered.', 'tl'],
+    ] as const;
+    for (const [text, lang] of kept) expect(wrongLanguage(text, lang)).toBe(false);
+    expect(wrongLanguage('We could not find a licence record for Acme.', 'id')).toBe(true);
+    expect(wrongLanguage('No licence record was found for this company on DICA.', 'my')).toBe(true);
+  });
+
+  it('drops a grounded finding whose label is English in a Burmese report', () => {
+    const { flags, stats } = guardFlags(
+      [{ family: 'identity', label: 'We could not find a licence record for Acme', evidence: 'DICA', severity: 'low' }],
+      'my',
+    );
+    expect(flags).toEqual([]);
+    expect(stats.dropped).toBe(1);
   });
 
   it('counts certainty in a response', () => {

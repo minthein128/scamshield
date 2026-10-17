@@ -179,6 +179,7 @@ export interface GuardStats {
   before: number;
   rewrites: number;
   dropped?: number;
+  replaced?: number;
 }
 
 const SCRIPT = {
@@ -197,6 +198,56 @@ const FOREIGN: Record<Lang, RegExp> = {
 /** Characters from a regional script the report language does not use (Thai in Burmese, Tamil anywhere). */
 export function countForeignScript(text: string, lang: Lang): number {
   return text.match(FOREIGN[lang])?.length ?? 0;
+}
+
+const NATIVE: Partial<Record<Lang, RegExp>> = {
+  my: new RegExp(`[${SCRIPT.myanmar}]`, 'gu'),
+  th: new RegExp(`[${SCRIPT.thai}]`, 'gu'),
+};
+const LINKISH = /https?:\/\/\S+|\S+@\S+|[\w-]+(?:\.[\w-]+)+\S*/g;
+const EN_WORDS = new Set(
+  'the is are was were be been has have had of and or with this that these those we our they their it its could would not no found find describe describes described similar reports reported messages message as by for from about which there here online scam scams scammers licence license record records registered website company'.split(
+    ' ',
+  ),
+);
+const OWN_WORDS: Partial<Record<Lang, Set<string>>> = {
+  id: new Set(
+    'yang dan ini itu tidak kami untuk dengan sebagai ada di dari pada laporan serupa belum tentang oleh atau menyebut ditemukan catatan izin pesan situs penipuan'.split(
+      ' ',
+    ),
+  ),
+  tl: new Set(
+    'ang ng mga sa na ay ito hindi wala kami may para iniulat ulat nang at nahanap rekord lisensya mensahe katulad panloloko'.split(' '),
+  ),
+};
+
+/** True when model-written text reads as English in a my, th, id or tl report. Links and short names are ignored. */
+export function wrongLanguage(text: string, lang: Lang): boolean {
+  if (lang === 'en') return false;
+  const plain = text.replace(LINKISH, ' ');
+  const words = plain.toLowerCase().match(/[a-z']+/g) ?? [];
+  const english = words.filter((w) => EN_WORDS.has(w)).length;
+  if (english < 2) return false;
+  const native = NATIVE[lang];
+  if (native) return (plain.match(/[A-Za-z]/g)?.length ?? 0) > (plain.match(native)?.length ?? 0);
+  const own = OWN_WORDS[lang];
+  return english > (own ? words.filter((w) => own.has(w)).length : 0);
+}
+
+const offLanguage = (text: string, lang: Lang) => countForeignScript(text, lang) > 0 || wrongLanguage(text, lang);
+
+/** Source note for a grounded finding whose own evidence sentence came back in another language. */
+export const GROUND_EVIDENCE_FALLBACK: Record<Lang, string> = {
+  en: 'Based on web search results.',
+  id: 'Berdasarkan hasil pencarian web.',
+  tl: 'Batay sa mga resulta ng paghahanap sa web.',
+  my: 'အွန်လိုင်း ရှာဖွေမှုရလဒ်များအပေါ် အခြေခံထားသည်။',
+  th: 'อ้างอิงจากผลการค้นหาบนเว็บ',
+};
+
+/** The grounded evidence, or the localized source note when it is not in the report language. */
+export function groundEvidence(evidence: string, lang: Lang): string {
+  return offLanguage(evidence, lang) ? GROUND_EVIDENCE_FALLBACK[lang] : evidence;
 }
 
 /** Foreign-script characters in the model's own words: summary, spoken warning and flag labels. */
@@ -229,9 +280,11 @@ export function guardFlags(flags: Flag[], lang: Lang): { flags: Flag[]; stats: G
     if (r.text !== t) stats.rewrites++;
     return r.text;
   };
-  const kept = flags.filter((f) => countForeignScript(f.label, lang) + countForeignScript(f.evidence, lang) === 0);
+  const kept = flags.filter((f) => !offLanguage(f.label, lang));
   if (kept.length < flags.length) stats.dropped = flags.length - kept.length;
-  return { flags: kept.map((f) => ({ ...f, label: fix(f.label), evidence: fix(f.evidence) })), stats };
+  const replaced = kept.filter((f) => offLanguage(f.evidence, lang)).length;
+  if (replaced) stats.replaced = replaced;
+  return { flags: kept.map((f) => ({ ...f, label: fix(f.label), evidence: fix(groundEvidence(f.evidence, lang)) })), stats };
 }
 
 export const isHeavy = (hits: number) => hits >= 3;

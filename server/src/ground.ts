@@ -29,6 +29,21 @@ export interface Grounder {
 const LANG_NAMES: Record<Lang, string> = { en: 'English', id: 'Bahasa Indonesia', tl: 'Tagalog', my: 'Burmese', th: 'Thai' };
 const MAX_SOURCES = 6;
 
+/** Hedged finding sentences in each report language: a missing licence, and online reports about similar messages. */
+export const GROUND_EXAMPLES: Record<Lang, { licence: string; reports: string }> = {
+  en: { licence: 'We could not find a licence record for X.', reports: 'Reports online describe similar messages as scams.' },
+  id: { licence: 'Kami tidak menemukan catatan izin untuk X.', reports: 'Ada laporan online bahwa pesan serupa dipakai untuk menipu.' },
+  tl: {
+    licence: 'Wala kaming nahanap na rekord ng lisensya para sa X.',
+    reports: 'May mga ulat online na ginagamit ang mga katulad na mensahe sa panloloko.',
+  },
+  my: {
+    licence: 'X အတွက် လိုင်စင်မှတ်တမ်း ရှာမတွေ့ပါ။',
+    reports: 'အလားတူ မက်ဆေ့ချ်များကို လိမ်လည်ရန် အသုံးပြုကြောင်း အွန်လိုင်းတွင် တိုင်ကြားချက်များ ရှိသည်။',
+  },
+  th: { licence: 'เราไม่พบข้อมูลใบอนุญาตของ X', reports: 'มีรายงานออนไลน์ว่าข้อความคล้ายกันถูกใช้หลอกลวง' },
+};
+
 const findingsSchema = z.object({
   findings: z
     .array(
@@ -99,6 +114,7 @@ export function buildGroundingRequest(x: Pick<Extraction, 'entities'>, lang: Lan
     names.length === 1
       ? `Is ${names[0]}${where} a licensed, legitimate business? Are there scam reports about it?`
       : `Are ${names.join(', ')}${where} licensed, legitimate businesses? Are there scam reports about any of them?`;
+  const ex = GROUND_EXAMPLES[lang];
   const system = [
     'You check companies, agencies and websites named in a message that a user wants checked for scams. Search Google before you answer.',
     `First search, then write a short answer, and end it with a JSON object: {"findings":[{"family":"known_bad|identity","label":"...","evidence":"..."}]}`,
@@ -106,13 +122,10 @@ export function buildGroundingRequest(x: Pick<Extraction, 'entities'>, lang: Lan
     '- General advisories that scammers use a brand name (Tokopedia, Shopee, DHL, a bank) say nothing about the message you are checking. Never report them in any family. A well-known brand with a normal, specific listing or notice needs no finding.',
     '- identity: the entity cannot be found, has no licence, or the claimed identity does not match.',
     '- Add a finding only when search results support it. If everything checks out, return {"findings":[]}.',
-    '- Use likelihood language. Say "We could not find a licence record for X", never "X is unlicensed" or "X is a scammer". Say "Reports online describe similar messages as scams", never "X is a scam". Never call a named company or website a criminal. Never use "definitely", "confirmed" or "100%".',
-    ...(lang === 'th'
-      ? [
-          '- In Thai, write "เราไม่พบข้อมูลใบอนุญาตของ X" or "มีรายงานออนไลน์ว่าข้อความคล้ายกันถูกใช้หลอกลวง", never "เป็นการหลอกลวง", "เป็นมิจฉาชีพ", "แน่นอน", "ชัวร์" or "ยืนยันแล้ว".',
-        ]
-      : []),
-    `- Write label and evidence in ${LANG_NAMES[lang]} only, whatever the language of the search results. Keep evidence to one short sentence naming the source.`,
+    '- Use likelihood language. Never write "X is unlicensed", "X is a scammer" or "X is a scam". Never call a named company or website a criminal. Never use "definitely", "confirmed" or "100%".',
+    `- Good wording in ${LANG_NAMES[lang]}: "${ex.licence}" or "${ex.reports}"`,
+    ...(lang === 'th' ? ['- In Thai never write "เป็นการหลอกลวง", "เป็นมิจฉาชีพ", "แน่นอน", "ชัวร์" or "ยืนยันแล้ว".'] : []),
+    `- Write label and evidence in ${LANG_NAMES[lang]} only, whatever the language of the search results. Evidence is your own note about the source, not a quote: one short ${LANG_NAMES[lang]} sentence naming the source. Only names of organisations, websites and places may stay as written.`,
     ...(opts.companyCheck
       ? [
           '- Also add "companyFound" to the JSON object: true only if the search results show a real company or agency with this exact name (in the stated country, if one is given), otherwise false. A company existing says nothing about whether a recruiter works for it.',

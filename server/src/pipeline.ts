@@ -292,6 +292,8 @@ export function createPipeline(deps: PipelineDeps): Pipeline {
       const groundedGuard = guardFlags(grounded.flags, req.language);
       if (groundedGuard.stats.dropped)
         log('INFO', 'grounding_foreign_dropped', { lang: req.language, dropped: groundedGuard.stats.dropped });
+      if (groundedGuard.stats.replaced)
+        log('INFO', 'grounding_evidence_replaced', { lang: req.language, replaced: groundedGuard.stats.replaced });
       const ownFlags = [...extraction.flags, ...groundedGuard.flags];
       const scored = network.flags.length ? ownScore([...ownFlags, ...network.flags], linkChecks) : ownScore(ownFlags, linkChecks);
       const response = respond(scored, linkChecks, grounded.sources, network);
