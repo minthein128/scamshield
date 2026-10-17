@@ -9,7 +9,7 @@ Kakwe is called ကာကွယ် when the app language is Burmese. It was name
 
 Migrant workers from Myanmar, Thailand, Indonesia and the Philippines find jobs through social media ads and chat apps. Some of those offers lead to debt, forced scam work or trafficking, and the warning signs are easy to miss in a second language. Kakwe is an Android app and a web demo that checks a job ad, message, link or screenshot before the person pays, sends documents or travels. It explains what it found in the user's own language and points to a verified hotline. Built for the Google Cloud AI Builder Cup 2026.
 
-**[Web demo](https://saferoute-aibc.web.app)** · **[Android APK](https://saferoute-aibc.web.app/saferoute.apk)** · **[Dataset](https://huggingface.co/datasets/Rickaym/saferoute-scam-screenshots)** · **[Pitch deck](pitch/deck.pdf)**
+**[Web demo](https://saferoute-aibc.web.app)** · **[Android APK](https://saferoute-aibc.web.app/kakwe.apk)** · **[Dataset](https://huggingface.co/datasets/Rickaym/saferoute-scam-screenshots)** · **[Pitch deck](pitch/deck.pdf)**
 
 ## Features
 
