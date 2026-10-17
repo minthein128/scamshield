@@ -42,8 +42,8 @@ export const OnboardingScreen: React.FC = () => {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [footerHeight, setFooterHeight] = useState(0);
-  const { height: windowHeight } = useWindowDimensions();
-  const stacked = footerHeight > windowHeight * FOOTER_SHARE_MAX;
+  const { height: windowHeight, fontScale } = useWindowDimensions();
+  const stacked = fontScale > 1 || footerHeight > windowHeight * FOOTER_SHARE_MAX;
   const awaitingAuth = useRef(false);
   const step = steps[index];
   const accountsOff = status.kind === 'unavailable';
@@ -269,7 +269,7 @@ const Heading: React.FC<{ title: string; body: string }> = ({ title, body }) => 
   );
 };
 
-/** When the account buttons would take more than this share of the window, they scroll with the cards. */
+/** With a larger font, or when the account buttons would take more than this share of the window, they scroll with the cards. */
 const FOOTER_SHARE_MAX = 0.45;
 const ANON_SLOP = { top: 6, bottom: 6, left: 8, right: 8 };
 const BAR_EMPTY = '#E3DBD0';
