@@ -174,8 +174,8 @@ export const OnboardingScreen: React.FC = () => {
       {step === 'account' ? (
         <>
           <Text accessibilityRole="header" style={[styles.h1, readable(tablet, 24, 32)]}>{t('account.title')}</Text>
-          <View testID="onboarding-card-without" style={[styles.group, styles.groupPlain]}>
-            <Text accessibilityRole="header" style={styles.groupTitle}>{t('account.without.heading')}</Text>
+          <View testID="onboarding-card-without" style={[styles.group, styles.groupPlain, uiLanguage === 'my' && styles.groupTight]}>
+            <Text accessibilityRole="header" style={[styles.groupTitle, uiLanguage === 'my' && styles.burmeseHead]}>{t('account.without.heading')}</Text>
             <View style={styles.list}>
               <Perk icon="check" text={t('account.without.check')} />
               <Perk icon="check" text={t('account.without.voice')} />
@@ -184,10 +184,10 @@ export const OnboardingScreen: React.FC = () => {
             </View>
           </View>
           {accountsOff ? null : (
-            <View testID="onboarding-card-with" style={[styles.group, styles.groupGold]}>
+            <View testID="onboarding-card-with" style={[styles.group, styles.groupGold, uiLanguage === 'my' && styles.groupTight]}>
               <View style={styles.groupHead}>
-                <Text accessibilityRole="header" style={[styles.groupTitle, styles.groupHeadText]}>{t('account.with.heading')}</Text>
-                <View style={styles.badge}>
+                <Text accessibilityRole="header" style={[styles.groupTitle, styles.groupHeadText, uiLanguage === 'my' && styles.burmeseHead]}>{t('account.with.heading')}</Text>
+                <View style={[styles.badge, uiLanguage === 'my' && styles.badgeTight]}>
                   <Text style={styles.badgeText}>{t('account.free')}</Text>
                 </View>
               </View>
@@ -237,7 +237,7 @@ export const OnboardingScreen: React.FC = () => {
           <Heading title={t('sharing.title')} body={t('sharing.body')} />
           <View style={styles.note}>
             {SHARING_POINTS.map(p => (
-              <Text key={p} style={styles.pointBody}>{`\u2022 ${t(`sharing.${p}`)}`}</Text>
+              <Text key={p} style={[styles.pointBody, uiLanguage === 'my' && styles.burmeseList]}>{`\u2022 ${t(`sharing.${p}`)}`}</Text>
             ))}
           </View>
           <Text style={styles.body}>{t('sharing.note')}</Text>
@@ -249,12 +249,13 @@ export const OnboardingScreen: React.FC = () => {
 
 const Perk: React.FC<{ icon: IconName; text: string; onWhite?: boolean }> = ({ icon, text, onWhite }) => {
   const tablet = useLayout().isTablet;
+  const my = useUiLanguage().uiLanguage === 'my';
   return (
     <View style={styles.perk}>
       <View style={[styles.perkIcon, onWhite && styles.perkIconWhite]}>
         <Icon name={icon} size={16} color={colors.brandInk} />
       </View>
-      <Text style={[styles.perkText, readable(tablet, 15, 21)]}>{text}</Text>
+      <Text style={[styles.perkText, readable(tablet, 15, 21), my && styles.burmeseList]}>{text}</Text>
     </View>
   );
 };
@@ -292,13 +293,17 @@ const styles = StyleSheet.create({
   tileText: { color: colors.textPrimary, fontSize: 18, lineHeight: 24, fontFamily: fonts.bold },
   wrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   group: { borderRadius: 16, paddingHorizontal: 12, paddingVertical: 6, gap: 2 },
+  groupTight: { paddingVertical: 4 },
   groupPlain: { backgroundColor: '#FBF9F6', borderWidth: 1, borderColor: colors.border },
   groupGold: { backgroundColor: '#FFF6E6', borderWidth: 1.5, borderColor: colors.brandGold },
   groupHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
   groupHeadText: { flex: 1 },
   groupTitle: { color: colors.textPrimary, fontSize: 16, lineHeight: 22, fontFamily: fonts.extraBold },
   badge: { flexShrink: 0, paddingHorizontal: 10, paddingVertical: 2, borderRadius: 13, backgroundColor: colors.brandGoldSoft },
+  badgeTight: { paddingVertical: 0 },
   badgeText: { color: '#7A4B00', fontSize: 12, lineHeight: 18, fontFamily: fonts.bold },
+  burmeseList: { fontSize: 14, lineHeight: 17.5 },
+  burmeseHead: { fontSize: 14, lineHeight: 17 },
   list: { gap: 1 },
   perk: { flexDirection: 'row', gap: 8, alignItems: 'flex-start' },
   perkIcon: { width: 22, height: 22, borderRadius: 11, backgroundColor: colors.brandGoldSoft, alignItems: 'center', justifyContent: 'center' },
