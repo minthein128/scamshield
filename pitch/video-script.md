@@ -102,7 +102,7 @@ Draw it in the brand palette: boxes on the warm page colour `#F7F3EE`, lacquer-b
 
 - One physical Android phone, Android 11 or later, 1080 x 2400 or similar. The bubble needs Android; the web demo does not have it.
 - Clean demo profile: uninstall and reinstall, or clear app data. In onboarding pick **Myanmar** (one setting for the UI, reports, spoken warnings and the voice), from Myanmar, to Thailand. Stay anonymous (no sign-in). On the sharing step tap **No thanks**, so demo checks add nothing to the scam network.
-- On Home, turn on the Screen shield. Allow notifications, "Display over other apps" and screen capture (Start now). Allow the microphone for the voice companion.
+- On Home, turn on the Screen shield. Allow notifications and "Display over other apps". Each tap on the doll asks to share the screen; tap Start now. Allow the microphone for the voice companion.
 - Do Not Disturb on, all other notifications off, battery full, wallpaper plain. Settings, Developer options, Show taps on.
 - Viber with three test accounts: the demo phone ("Ma Su"), a second phone saved as "Agent K", and a third saved as "အမေ" (Mum). Use no real names, photos or numbers. Turn off Viber profile photos.
 

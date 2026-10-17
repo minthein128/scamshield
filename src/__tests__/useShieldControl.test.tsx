@@ -8,13 +8,12 @@ import { BigShieldButton, BUSY_DELAY_MS } from '../components/BigShieldButton';
 import { SETTLE_INTERVAL_MS, SETTLE_TIMEOUT_MS } from '../lib/shieldState';
 import { ShieldCard } from '../components/ShieldCard';
 import { resetShieldPermissionCache, useShieldControl } from '../hooks/useShieldControl';
-import { registerPermissionHost, resetPermissionSession, type PermissionKind } from '../lib/permissions';
+import { registerPermissionHost, type PermissionKind } from '../lib/permissions';
 
 jest.mock('shield-module', () => ({
   COMPANION_STRING_KEYS: [],
   hasOverlayPermission: jest.fn(),
   requestOverlayPermission: jest.fn(),
-  requestScreenCapturePermission: jest.fn(),
   isShieldRunning: jest.fn(),
   startShield: jest.fn(),
   stopShield: jest.fn(),
@@ -61,7 +60,6 @@ afterAll(() => {
 
 beforeEach(async () => {
   await AsyncStorage.clear();
-  resetPermissionSession();
   resetShieldPermissionCache();
   jest.clearAllMocks();
   jest.spyOn(AppState, 'addEventListener').mockImplementation(((_: string, l: (s: string) => void) => {
@@ -72,7 +70,6 @@ beforeEach(async () => {
   jest.spyOn(PermissionsAndroid, 'request').mockResolvedValue(PermissionsAndroid.RESULTS.DENIED);
   shield.hasOverlayPermission.mockResolvedValue(true);
   shield.requestOverlayPermission.mockResolvedValue(true);
-  shield.requestScreenCapturePermission.mockResolvedValue(true);
   nativeRunning = false;
   emitEvents = true;
   shield.isShieldRunning.mockImplementation(async () => nativeRunning);
@@ -150,7 +147,6 @@ describe('useShieldControl', () => {
     await act(async () => {
       await result.current.setEnabled(true);
     });
-    resetPermissionSession();
     await act(async () => {
       await result.current.setEnabled(true);
     });
@@ -391,7 +387,6 @@ describe('the circle reacts at once', () => {
     expect(shield.startShield).toHaveBeenCalledTimes(1);
     expect(shield.hasOverlayPermission).not.toHaveBeenCalled();
     expect(PermissionsAndroid.check).not.toHaveBeenCalled();
-    expect(shield.requestScreenCapturePermission).not.toHaveBeenCalled();
     expect(explain).not.toHaveBeenCalled();
   });
 
@@ -455,53 +450,19 @@ describe('the circle reacts at once', () => {
     expect(button().props.accessibilityState.disabled).toBe(false);
   });
 
-  describe('Android 13 and lower', () => {
-    beforeEach(() => {
-      Object.defineProperty(Platform, 'Version', { value: 33, configurable: true });
-    });
-    afterEach(() => {
-      Object.defineProperty(Platform, 'Version', { value: 34, configurable: true });
-    });
-
-    it('asks for screen capture before the start, with the reason dialog once per install', async () => {
+  it.each([31, 33, 34, 35])('Android API %i turns the shield on without asking for screen capture', async version => {
+    Object.defineProperty(Platform, 'Version', { value: version, configurable: true });
+    try {
       await show();
       fireEvent.press(button());
       await tick();
-      await tick();
-      expect(shield.requestScreenCapturePermission).toHaveBeenCalledTimes(1);
-      expect(explain.mock.calls.filter(([k]) => k === 'screen')).toHaveLength(1);
+      expect(shield.startShield).toHaveBeenCalledTimes(1);
+      expect(explain.mock.calls.map(([k]) => k as string)).not.toContain('screen');
       await advance(SLOW_MS);
       await tick();
-      fireEvent.press(button());
-      await advance(SLOW_MS);
-      await tick();
-      resetPermissionSession();
-      fireEvent.press(button());
-      await tick();
-      await tick();
-      expect(shield.requestScreenCapturePermission).toHaveBeenCalledTimes(2);
-      expect(explain.mock.calls.filter(([k]) => k === 'screen')).toHaveLength(1);
-    });
-
-    it('rolls back to off with the error text when screen capture is refused', async () => {
-      shield.requestScreenCapturePermission.mockResolvedValue(false);
-      await show();
-      fireEvent.press(button());
       expect(status()).toBe('Shield is ON');
-      await tick();
-      await tick();
-      expect(status()).toBe('Shield is OFF');
-      expect(flat(screen.getByTestId('shield-error'))).toBe(i18n.t('shield:errors.needsScreen'));
-      expect(shield.startShield).not.toHaveBeenCalled();
-    });
-  });
-
-  it('Android 14 and up starts without asking for screen capture; the bubble asks on the first tap', async () => {
-    await show();
-    fireEvent.press(button());
-    await tick();
-    expect(shield.requestScreenCapturePermission).not.toHaveBeenCalled();
-    expect(explain).not.toHaveBeenCalledWith('screen');
-    expect(shield.startShield).toHaveBeenCalledTimes(1);
+    } finally {
+      Object.defineProperty(Platform, 'Version', { value: 34, configurable: true });
+    }
   });
 });

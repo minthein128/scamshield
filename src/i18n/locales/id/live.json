@@ -95,6 +95,7 @@
     "errTooLarge": "Tangkapan layar terlalu besar untuk diperiksa.",
     "errCapture": "Layar tidak bisa dibaca. Ketuk perisai untuk coba lagi.",
     "errCaptureDenied": "Tangkapan layar tidak diizinkan. Ketuk perisai untuk coba lagi.",
-    "errFailed": "Pemeriksaan gagal. Coba lagi."
+    "errFailed": "Pemeriksaan gagal. Coba lagi.",
+    "captureCancelled": "Tidak ada yang dibagikan. Ketuk boneka saat Anda ingin memeriksa."
   }
 }

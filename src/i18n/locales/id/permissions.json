@@ -15,10 +15,6 @@
       "title": "Tampilkan perisai di atas aplikasi lain",
       "body": "Boneka perisai melayang di atas aplikasi lain agar Anda bisa mengetuknya saat ada yang mencurigakan. Android membuka halaman pengaturan tempat Anda mengaktifkannya."
     },
-    "screen": {
-      "title": "Izinkan $t(common:appName) melihat layar Anda",
-      "body": "Saat Anda mengetuk boneka, $t(common:appName) membaca isi layar untuk memeriksanya. Hanya saat Anda mengetuk. Android akan meminta Anda mengonfirmasi."
-    },
     "notifications": {
       "title": "Izinkan notifikasi",
       "body": "Android menampilkan pemberitahuan kecil saat perisai berjalan. Perisai tetap berfungsi tanpanya, tetapi Anda mungkin tidak melihat bahwa perisai aktif."
@@ -36,10 +32,6 @@
     "overlay": {
       "title": "Tampilkan di atas aplikasi lain mati",
       "body": "Untuk memakai perisai, buka Pengaturan, cari Tampilkan di atas aplikasi lain, dan izinkan $t(common:appName). Bagian lain $t(common:appName) tetap berfungsi tanpanya."
-    },
-    "screen": {
-      "title": "Akses layar tidak diizinkan",
-      "body": "Perisai membutuhkannya untuk melihat apa yang ingin Anda periksa. Nyalakan perisai lagi dan pilih Mulai sekarang. Bagian lain $t(common:appName) tetap berfungsi tanpanya."
     },
     "contacts": {
       "title": "Kontak mati",

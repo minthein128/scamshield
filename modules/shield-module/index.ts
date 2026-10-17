@@ -51,6 +51,7 @@ export const COMPANION_STRING_KEYS = [
   'errCapture',
   'errCaptureDenied',
   'errFailed',
+  'captureCancelled',
   'dismiss',
   'fullReport',
   'showDetails',
@@ -108,7 +109,6 @@ export interface ShieldSubscription {
 interface ShieldModuleType {
   hasOverlayPermission(): Promise<boolean>;
   requestOverlayPermission(): Promise<boolean>;
-  requestScreenCapturePermission(): Promise<boolean>;
   startShield(options?: ShieldStartOptions): Promise<boolean>;
   setAuthToken(token: string | null): Promise<boolean>;
   setShareSignals(enabled: boolean): Promise<boolean>;
@@ -154,7 +154,6 @@ const MOCK_RESULT: ShieldCheckResult = {
 
 let mockRunning = false;
 let mockOverlayGranted = false;
-let mockCaptureGranted = false;
 const mockListeners = new Set<(r: ShieldCheckResult) => void>();
 
 export async function hasOverlayPermission(): Promise<boolean> {
@@ -178,22 +177,6 @@ export async function requestOverlayPermission(): Promise<boolean> {
     }
   }
   mockOverlayGranted = true;
-  return true;
-}
-
-/**
- * Shows the system screen-capture consent dialog. Resolves true when the user allows.
- * On Android 13 and lower a consent from earlier in the app process is reused without a dialog.
- */
-export async function requestScreenCapturePermission(): Promise<boolean> {
-  if (nativeShieldModule) {
-    try {
-      return await nativeShieldModule.requestScreenCapturePermission();
-    } catch {
-      return false;
-    }
-  }
-  mockCaptureGranted = true;
   return true;
 }
 
@@ -341,7 +324,6 @@ export async function takeUnsyncedResults(): Promise<ShieldCheckResult[]> {
 export default {
   hasOverlayPermission,
   requestOverlayPermission,
-  requestScreenCapturePermission,
   startShield,
   setShieldAuthToken,
   setShieldShareSignals,
