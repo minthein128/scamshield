@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
   column: { width: '100%', alignSelf: 'center' },
   inner: { gap: 16 },
   header: { paddingTop: 20, paddingHorizontal: 20, paddingBottom: 12, gap: 12, zIndex: 1, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: 'transparent' },
-  headerLifted: { borderBottomColor: theme.colors.border, shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 6, shadowOffset: { width: 0, height: 2 }, elevation: 2 },
+  headerLifted: { borderBottomColor: theme.colors.border },
   headerTablet: { paddingTop: 28 },
   belowHeader: { paddingTop: 16 },
   footer: { paddingTop: 10, paddingHorizontal: 20, paddingBottom: 16, gap: 8 },
