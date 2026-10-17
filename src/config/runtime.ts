@@ -2,7 +2,7 @@ import { appName } from './brand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useState } from 'react';
 import { diag } from '../lib/diagLog';
-import { API_URL, FALLBACK_API_URL, OFFLINE_MOCK, STABLE_API_URL } from './env';
+import { API_URL, API_URL_OVERRIDE, FALLBACK_API_URL, OFFLINE_MOCK, PRIMARY_API_URL, STABLE_API_URL } from './env';
 
 const DEFAULT_CONFIG_URLS = ['https://saferoute-aibc.web.app/config.json', 'https://saferoute-aibc.firebaseapp.com/config.json'];
 
@@ -18,8 +18,8 @@ export const CONFIG_URLS = parseConfigUrls(process.env.EXPO_PUBLIC_CONFIG_URLS);
 export const API_URL_CACHE_KEY = 'saferoute.apiUrl.v1';
 export const CONFIG_TIMEOUT_MS = 6000;
 export const CONFIG_STAGGER_MS = 1500;
-export const HEALTH_TIMEOUT_MS = 5000;
-export const CONFIG_GRACE_MS = 2000;
+export const HEALTH_TIMEOUT_MS = 4000;
+export const HEDGE_MS = 1500;
 export const INTERNET_PROBE_URLS = [
   'https://www.gstatic.com/generate_204',
   'https://www.cloudflare.com/cdn-cgi/trace',
@@ -130,20 +130,19 @@ export function fetchFirstApiUrl(
   });
 }
 
-/** Probes /health, then /healthz on a 404, and logs one line with the outcome. */
+/** Probes /healthz and /health together, because each host answers only one. Healthy when either does. */
 export async function checkHealth(url: string, fetchImpl: typeof fetch = fetch, timeoutMs = HEALTH_TIMEOUT_MS): Promise<boolean> {
   const root = url.replace(/\/+$/, '');
   const started = Date.now();
-  let res = await timedFetch(fetchImpl, `${root}/health`, timeoutMs, 'health');
-  const viaHealthz = res?.status === 404;
-  if (viaHealthz) res = await timedFetch(fetchImpl, `${root}/healthz`, timeoutMs, 'health');
+  const [viaHealthz, viaHealth] = await Promise.all(['/healthz', '/health'].map(path => timedFetch(fetchImpl, `${root}${path}`, timeoutMs, 'health')));
+  const res = viaHealth?.ok ? viaHealth : viaHealthz?.ok ? viaHealthz : (viaHealth ?? viaHealthz);
   const ok = Boolean(res?.ok);
   diag[ok ? 'info' : 'warn']('connection', 'health', {
     host: apiHost(url),
     ok,
     ms: Date.now() - started,
     ...(res ? { status: res.status } : {}),
-    ...(viaHealthz ? { via: 'healthz' } : {}),
+    ...(ok && res === viaHealthz ? { via: 'healthz' } : {}),
   });
   return ok;
 }
@@ -159,11 +158,14 @@ export async function hasInternet(fetchImpl: typeof fetch = fetch, urls: string[
 export interface ResolveDeps {
   fetchImpl?: typeof fetch;
   envUrl?: string;
+  overrideUrl?: string;
   configUrls?: string[];
   staggerMs?: number;
   stableUrl?: string;
   fallbackUrl?: string;
-  graceMs?: number;
+  hedgeMs?: number;
+  /** A host that just failed a request. It is tried last. */
+  avoid?: string;
 }
 
 export async function resolveApiUrl(deps: ResolveDeps = {}): Promise<string> {
@@ -174,15 +176,56 @@ export async function resolveApiUrl(deps: ResolveDeps = {}): Promise<string> {
   return chosen;
 }
 
+/**
+ * Probes the candidates in priority order. The next one starts when the previous fails or stays
+ * silent for hedgeMs, so a black-holed host costs hedgeMs. The first healthy one in priority order wins.
+ */
+export function pickHealthy(candidates: string[], healthy: (url: string) => Promise<boolean>, hedgeMs: number = HEDGE_MS): Promise<string | null> {
+  return new Promise(resolve => {
+    const results: (boolean | undefined)[] = candidates.map(() => undefined);
+    let started = 0;
+    let done = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const finish = (value: string | null) => {
+      if (done) return;
+      done = true;
+      clearTimeout(timer);
+      resolve(value);
+    };
+    const settle = () => {
+      const win = results.findIndex(r => r === true);
+      if (win >= 0) return finish(candidates[win]);
+      if (results.every(r => r === false)) finish(null);
+    };
+    const startNext = () => {
+      if (done || started >= candidates.length) return;
+      const i = started++;
+      clearTimeout(timer);
+      if (started < candidates.length) timer = setTimeout(startNext, hedgeMs);
+      healthy(candidates[i])
+        .catch(() => false)
+        .then(ok => {
+          results[i] = ok;
+          if (!ok && i === started - 1) startNext();
+          settle();
+        });
+    };
+    if (candidates.length === 0) return finish(null);
+    startNext();
+  });
+}
+
 async function resolveUrlInner(deps: ResolveDeps): Promise<string> {
-  if (OFFLINE_MOCK) return '';
   const fetchImpl = deps.fetchImpl ?? fetch;
   trace = [];
   const cached = validApiUrl(await AsyncStorage.getItem(API_URL_CACHE_KEY).catch(() => null));
+  const override = validApiUrl(deps.overrideUrl ?? API_URL_OVERRIDE);
   const baked = validApiUrl(deps.envUrl ?? API_URL);
   const stable = validApiUrl(deps.stableUrl ?? STABLE_API_URL);
   const fallback = validApiUrl(deps.fallbackUrl ?? FALLBACK_API_URL);
-  const known = [stable, fallback, cached, baked].filter((u, i, a): u is string => Boolean(u) && a.indexOf(u) === i);
+  const avoid = validApiUrl(deps.avoid);
+  const ordered = [override, stable, fallback, cached, baked].filter((u, i, a): u is string => Boolean(u) && a.indexOf(u) === i);
+  const known = avoid && ordered.includes(avoid) ? [...ordered.filter(u => u !== avoid), avoid] : ordered;
 
   const memo = new Map<string, Promise<boolean>>();
   const healthy = (u: string) => {
@@ -190,34 +233,21 @@ async function resolveUrlInner(deps: ResolveDeps): Promise<string> {
     if (!p) memo.set(u, (p = checkHealth(u, fetchImpl)));
     return p;
   };
-  const firstAlive = async (): Promise<string | null> => {
-    for (const u of known) if (await healthy(u)) return u;
-    return null;
-  };
   const remember = (u: string) => AsyncStorage.setItem(API_URL_CACHE_KEY, u).catch(() => undefined);
-  known.forEach(healthy);
 
-  // A healthy stable URL wins over config.json, which may still name an older host.
-  if (stable && (await healthy(stable))) {
-    if (cached !== stable) await remember(stable);
-    return stable;
+  const picked = await pickHealthy(known, healthy, deps.hedgeMs);
+  if (picked) {
+    if (cached !== picked) await remember(picked);
+    return picked;
   }
 
-  const remoteP = fetchFirstApiUrl(fetchImpl, deps.configUrls ?? CONFIG_URLS, { staggerMs: deps.staggerMs });
-  const grace = firstAlive().then(u => (u ? new Promise<null>(r => setTimeout(() => r(null), deps.graceMs ?? CONFIG_GRACE_MS)) : new Promise<null>(() => undefined)));
-  const remote = await Promise.race([remoteP, grace]);
-
-  if (remote) {
-    if (await healthy(remote)) {
-      await remember(remote);
-      return remote;
-    }
-    const alive = await firstAlive();
-    if (alive) return alive;
+  // Every known host failed its probe. config.json may name a host that was added later.
+  const remote = await fetchFirstApiUrl(fetchImpl, deps.configUrls ?? CONFIG_URLS, { staggerMs: deps.staggerMs });
+  if (remote && (await healthy(remote))) {
     await remember(remote);
     return remote;
   }
-  return (await firstAlive()) ?? known[0] ?? '';
+  return known[0] ?? remote ?? '';
 }
 
 let pending: Promise<string> | null = null;
@@ -230,7 +260,7 @@ const listeners = new Set<(url: string) => void>();
 function scheduleStableRecheck(url: string): void {
   if (stableTimer) clearTimeout(stableTimer);
   stableTimer = null;
-  const stable = validApiUrl(STABLE_API_URL);
+  const stable = validApiUrl(PRIMARY_API_URL);
   if (!stable || !url || url === stable || OFFLINE_MOCK) return;
   stableTimer = setTimeout(() => {
     stableTimer = null;
@@ -257,9 +287,9 @@ export function ensureApiUrl(): Promise<string> {
   return pending;
 }
 
-/** Resolves again and skips the per-process memo. Calls made during a refresh share it. */
-export function refreshApiUrl(): Promise<string> {
-  refreshing ??= resolveApiUrl()
+/** Resolves again and skips the per-process memo. Pass the host that just failed to try the others first. */
+export function refreshApiUrl(avoid?: string): Promise<string> {
+  refreshing ??= resolveApiUrl({ avoid })
     .then(publish)
     .then(url => {
       pending = Promise.resolve(url);

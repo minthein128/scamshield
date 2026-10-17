@@ -38,9 +38,14 @@ function createUnavailableClient(): CheckClient {
 }
 
 export interface RuntimeClientDeps {
-  refresh?: () => Promise<string>;
+  refresh?: (avoid?: string) => Promise<string>;
   internet?: () => Promise<boolean>;
   makeClient?: (url: string, allowMock: boolean) => CheckClient;
+}
+
+/** A dead host or a proxy that cannot reach its upstream. Other HTTP errors come from a working server. */
+export function shouldFailOver(e: unknown): e is ApiError {
+  return e instanceof ApiError && (e.code === 'network' || e.status === 502 || e.status === 504);
 }
 
 export function createRuntimeClient(resolve: () => Promise<string> = ensureApiUrl, allowMock: boolean = __DEV__, deps: RuntimeClientDeps = {}): CheckClient {
@@ -63,8 +68,8 @@ export function createRuntimeClient(resolve: () => Promise<string> = ensureApiUr
     try {
       return await op(clientFor(url));
     } catch (e) {
-      if (!(e instanceof ApiError) || e.code !== 'network') throw e;
-      const next = await refresh().catch(() => url);
+      if (!shouldFailOver(e)) throw e;
+      const next = await refresh(url).catch(() => url);
       if (next && next !== url) {
         try {
           return await op(clientFor(next));
