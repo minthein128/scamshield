@@ -1,6 +1,6 @@
 import type { Flag } from '../api/types';
-import { VERDICT_STYLES, filledSegments, groupFlags, telUrl, verdictFromScore } from '../lib/report';
-import { verdictLabel } from '../lib/labels';
+import { VERDICT_STYLES, filledSegments, groupFlags, linkStatus, sourceLines, telUrl, verdictFromScore } from '../lib/report';
+import { scamTypeLabel, verdictLabel } from '../lib/labels';
 import { draftFromShare } from '../lib/share';
 import { buildRequest } from '../lib/request';
 import { base64Bytes, prepareImage, prepareSharedImage } from '../lib/image';
@@ -149,5 +149,54 @@ describe('shield results', () => {
     expect(r.spokenWarning).toBe('s');
     expect(r.actions).toEqual([]);
     expect(isCleartext('http://x.test')).toBe(true);
+  });
+});
+
+describe('link status pill', () => {
+  const clean = { url: 'https://parcel-th.top/pay', webRisk: 'clean' as const };
+  const serious = (evidence: string, family: Flag['family'] = 'link_risk'): Flag => ({ family, severity: 'high', label: 'Domain not registered', evidence });
+
+  it('says "No known threats" only when nothing serious points at the link', () => {
+    expect(linkStatus(clean, [])).toBe('clean');
+    expect(linkStatus({ ...clean, domainAgeDays: 400 }, [flag('link_risk', 'medium')])).toBe('clean');
+  });
+
+  it('turns neutral for a very new domain or a serious link sign', () => {
+    expect(linkStatus({ ...clean, domainAgeDays: 3 }, [])).toBe('notListed');
+    expect(linkStatus(clean, [serious('parcel-th.top')])).toBe('notListed');
+    expect(linkStatus(clean, [serious('', 'known_bad')])).toBe('notListed');
+  });
+
+  it('keeps the other link clean when the serious sign names a different link', () => {
+    const other = { url: 'https://thailandpost.co.th', webRisk: 'clean' as const };
+    const links = [clean, other];
+    expect(linkStatus(other, [serious('https://parcel-th.top/pay')], links)).toBe('clean');
+    expect(linkStatus(clean, [serious('https://parcel-th.top/pay')], links)).toBe('notListed');
+  });
+
+  it('leaves Google threat results as they are', () => {
+    expect(linkStatus({ ...clean, webRisk: 'social_engineering', domainAgeDays: 2 }, [])).toBe('social_engineering');
+    expect(linkStatus({ ...clean, webRisk: 'unknown' }, [])).toBe('unknown');
+  });
+});
+
+describe('source lines', () => {
+  it('shows the title and the real domain, never a redirect URL', () => {
+    const redirect = 'https://vertexaisearch.cloud.google.com/grounding-api-redirect/AbC123';
+    expect(sourceLines({ title: 'thaipost.net', url: redirect })).toEqual({ title: 'thaipost.net', domain: undefined });
+    expect(sourceLines({ title: 'Thailand Post warns of SMS scam', url: 'https://www.google.com/url?q=https://www.thailandpost.co.th/news&sa=U' })).toEqual({
+      title: 'Thailand Post warns of SMS scam',
+      domain: 'thailandpost.co.th',
+    });
+    expect(sourceLines({ title: 'DMW', url: 'https://dmw.gov.ph/a' })).toEqual({ title: 'DMW', domain: 'dmw.gov.ph' });
+    expect(sourceLines({ title: 'Scam alert', url: redirect })).toEqual({ title: 'Scam alert', domain: undefined });
+  });
+});
+
+describe('scam type label', () => {
+  it('names a link check as a suspicious link', () => {
+    expect(scamTypeLabel('other', 'link')).toBe('Suspicious link');
+    expect(scamTypeLabel('other', 'message')).toBe('Suspicious message');
+    expect(scamTypeLabel('parcel_phishing', 'link')).toBe('Possible parcel phishing');
   });
 });

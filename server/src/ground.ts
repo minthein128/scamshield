@@ -162,6 +162,20 @@ export function searched(res: GroundedResponse): boolean {
   return (g?.groundingChunks?.length ?? 0) > 0 || (g?.webSearchQueries?.length ?? 0) > 0;
 }
 
+const REDIRECT_HOST = /(^|\.)(vertexaisearch\.cloud\.google\.com|google\.[a-z.]+)$/;
+
+/** Host of a source URL, or of its redirect target; undefined for a bare Google redirect. */
+export function sourceHost(url: string): string | undefined {
+  try {
+    const u = new URL(url);
+    if (!REDIRECT_HOST.test(u.hostname)) return u.hostname;
+    const target = u.searchParams.get('q') ?? u.searchParams.get('url');
+    return target && /^https?:\/\//i.test(target) ? new URL(target).hostname : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 export function extractSources(res: GroundedResponse): Source[] {
   const seen = new Set<string>();
   const out: Source[] = [];
@@ -169,7 +183,9 @@ export function extractSources(res: GroundedResponse): Source[] {
     const url = c.web?.uri;
     if (!url || seen.has(url)) continue;
     seen.add(url);
-    out.push({ title: c.web?.title || new URL(url).hostname, url });
+    const title = c.web?.title?.trim() || sourceHost(url);
+    if (!title) continue;
+    out.push({ title, url });
     if (out.length >= MAX_SOURCES) break;
   }
   return out;
