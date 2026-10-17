@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { buildActions, titleFor } from '../src/explain.js';
-import { GROUND_EXAMPLES } from '../src/ground.js';
+import { buildGroundingRequest, GROUND_EXAMPLES } from '../src/ground.js';
 import {
   countCertainty,
   countMaleForms,
@@ -8,14 +8,18 @@ import {
   findMaleForms,
   findMaleFormsAny,
   findPromises,
+  findSourceFiller,
   fixAppName,
   GROUND_EVIDENCE_FALLBACK,
   guardExtraction,
   guardFlags,
+  guardJobText,
   isHeavy,
   rewriteCertainty,
+  stripSourceFiller,
   wrongLanguage,
 } from '../src/language-guard.js';
+import { LIKELIHOOD_RULES, SYSTEM_PROMPT } from '../src/prompt.js';
 import type { Extraction } from '../src/types.js';
 
 describe('language guard', () => {
@@ -236,5 +240,77 @@ describe('app name guard', () => {
     expect(extraction.spokenWarning).toContain('Kakwe');
     expect(extraction.flags[0]?.label).toContain('Kakwe');
     expect(JSON.stringify(extraction)).not.toContain('ควาย');
+  });
+});
+
+describe('source filler', () => {
+  it.each([
+    ['Credible sources indicated that Acme Ltd has no licence record.', 'en', 'Acme Ltd has no licence record.'],
+    ['According to credible sources, the agency is not registered.', 'en', 'The agency is not registered.'],
+    ['The agency is not registered, according to reliable sources.', 'en', 'The agency is not registered.'],
+    ['The agency, according to credible sources, is not registered.', 'en', 'The agency, is not registered.'],
+    ['Reliable sources suggest that the site is new. We found no licence.', 'en', 'The site is new. We found no licence.'],
+    ['Reports indicate that the number was used in scams.', 'en', 'The number was used in scams.'],
+    ['We found this. Credible sources have indicated the firm is unlisted.', 'en', 'We found this. The firm is unlisted.'],
+    ['Menurut sumber terpercaya, agen ini tidak terdaftar.', 'id', 'Agen ini tidak terdaftar.'],
+    ['Sumber yang terpercaya menyebutkan bahwa perusahaan ini tidak punya izin.', 'id', 'Perusahaan ini tidak punya izin.'],
+    ['Agen ini tidak terdaftar menurut sumber kredibel.', 'id', 'Agen ini tidak terdaftar.'],
+    ['Ayon sa mapagkakatiwalaang source, walang rekord ang ahensya.', 'tl', 'Walang rekord ang ahensya.'],
+    ['Ipinahiwatig ng mga mapagkakatiwalaang source na walang lisensya ang kumpanya.', 'tl', 'Walang lisensya ang kumpanya.'],
+    ['Walang lisensya ang kumpanya, ayon sa maaasahang mga source.', 'tl', 'Walang lisensya ang kumpanya.'],
+    ['ယုံကြည်ရသော သတင်းရင်းမြစ်များအရ ဤအေဂျင်စီ မှတ်ပုံတင်မထားပါ။', 'my', 'ဤအေဂျင်စီ မှတ်ပုံတင်မထားပါ။'],
+    ['ဤအေဂျင်စီ မှတ်ပုံတင်မထားကြောင်း ယုံကြည်စိတ်ချရသော အရင်းအမြစ်များက ဖော်ပြသည်။', 'my', 'ဤအေဂျင်စီ မှတ်ပုံတင်မထားကြောင်း ဖော်ပြသည်။'],
+    ['จากแหล่งข้อมูลที่น่าเชื่อถือ บริษัทนี้ไม่มีใบอนุญาต', 'th', 'บริษัทนี้ไม่มีใบอนุญาต'],
+    ['แหล่งข้อมูลที่น่าเชื่อถือระบุว่าบริษัทนี้ไม่มีใบอนุญาต', 'th', 'บริษัทนี้ไม่มีใบอนุญาต'],
+    ['บริษัทนี้ไม่มีใบอนุญาต ตามแหล่งข่าวที่เชื่อถือได้', 'th', 'บริษัทนี้ไม่มีใบอนุญาต'],
+  ] as const)('strips filler from %s', (input, lang, expected) => {
+    expect(findSourceFiller(input, lang).length).toBeGreaterThan(0);
+    const out = stripSourceFiller(input, lang);
+    expect(out).toBe(expected);
+    expect(findSourceFiller(out, lang)).toEqual([]);
+  });
+
+  it.each([
+    ['Search found no registered agency named X.', 'en'],
+    ['Reports online describe similar messages as scams.', 'en'],
+    ['We could not find a source for this claim. The source of the link is unclear.', 'en'],
+    ['Kami tidak menemukan catatan izin untuk X.', 'id'],
+    ['May mga ulat online na ginagamit ang mga katulad na mensahe sa panloloko.', 'tl'],
+    ['X အတွက် လိုင်စင်မှတ်တမ်း ရှာမတွေ့ပါ။', 'my'],
+    ['มีรายงานออนไลน์ว่าข้อความคล้ายกันถูกใช้หลอกลวง', 'th'],
+    ['เราไม่พบบริษัทนี้ในแหล่งข้อมูลที่น่าเชื่อถือ', 'th'],
+  ] as const)('leaves direct text alone: %s', (input, lang) => {
+    expect(stripSourceFiller(input, lang)).toBe(input);
+  });
+
+  it('strips filler in extraction, grounded flags and job text', () => {
+    const x = {
+      summary: 'Credible sources indicated that this offer looks risky.',
+      spokenWarning: 'Please check first.',
+      flags: [
+        {
+          family: 'identity',
+          label: 'Reliable sources suggest that no licence exists',
+          evidence: 'According to credible sources, no record.',
+          severity: 'low',
+        },
+      ],
+    } as unknown as Extraction;
+    const g = guardExtraction(x, 'en').extraction;
+    expect(g.summary).toBe('This offer looks risky.');
+    expect(g.flags[0]?.label).toBe('No licence exists');
+    const f = guardFlags(x.flags, 'en').flags[0];
+    expect(f?.evidence).toBe('No record.');
+    expect(guardJobText('Credible sources indicated that X is unlisted.', 'en').text).toBe('X is unlisted.');
+  });
+
+  it('tells the model to state findings directly', () => {
+    expect(LIKELIHOOD_RULES).toContain('credible sources indicated');
+    expect(SYSTEM_PROMPT).toContain('Never add attribution filler');
+    for (const l of ['en', 'my', 'th', 'id', 'tl'] as const) {
+      expect(buildGroundingRequest({ entities: { companies: ['Acme'], domains: [], phones: [] } } as never, l).system).toContain(
+        'Never write "credible sources indicated"',
+      );
+    }
   });
 });
