@@ -80,7 +80,7 @@ class ShieldService : Service(), ShieldOverlay.Listener {
         return START_NOT_STICKY
     }
 
-    /** True only while one capture is open. The shield holds no projection while the bubble is idle. */
+    /** True while this shield session holds the user's screen-capture consent. */
     fun hasProjection(): Boolean = capturer != null
 
     internal val overlayForTest: ShieldOverlay? get() = overlay
@@ -117,11 +117,15 @@ class ShieldService : Service(), ShieldOverlay.Listener {
         return source
     }
 
-    /** Stops the projection of one check, drops its VirtualDisplay and leaves the mediaProjection type. */
+    /** Stops the session's projection, drops its VirtualDisplay and the consent, and leaves the mediaProjection type. */
     private fun endProjection(source: ScreenSource) {
         source.release()
         if (capturer === source) capturer = null
         if (capturer == null) setProjectionType(false)
+    }
+
+    private fun endSession() {
+        capturer?.let { endProjection(it) }
     }
 
     private fun onConsentCancelled() {
@@ -138,9 +142,13 @@ class ShieldService : Service(), ShieldOverlay.Listener {
         main.post { checkNow() }
     }
 
-    /** Every check asks for consent. Taps during a dialog, a capture or a check are ignored. */
+    /** The first check of a session asks for consent; later ones reuse it. Taps during a dialog or a check are ignored. */
     private fun checkNow() {
-        if (!started || busy.get() || capturer != null) return
+        if (!started || busy.get()) return
+        if (capturer != null) {
+            startCheck(settleUntil = 0L)
+            return
+        }
         if (awaitingConsent && SystemClock.elapsedRealtime() - consentAskedAt < CONSENT_RETRY_MS) return
         askConsent()
     }
@@ -162,13 +170,10 @@ class ShieldService : Service(), ShieldOverlay.Listener {
         }
     }
 
-    /** Captures one frame once the dialog has gone ([settleUntil]), stops the projection, then checks the frame. */
+    /** Captures one frame once the dialog has gone ([settleUntil]) and checks it. The projection stays for the session. */
     private fun startCheck(settleUntil: Long) {
         val currentCapturer = capturer ?: return
-        if (!busy.compareAndSet(false, true)) {
-            endProjection(currentCapturer)
-            return
-        }
+        if (!busy.compareAndSet(false, true)) return
         val tapAt = SystemClock.elapsedRealtime()
         overlay?.setChecking()
         val masks = overlay?.captureRects().orEmpty()
@@ -176,22 +181,17 @@ class ShieldService : Service(), ShieldOverlay.Listener {
             worker.execute {
                 try {
                     var path = "mask"
-                    val shot = try {
-                        val settle = settleUntil - SystemClock.elapsedRealtime()
-                        if (settle > 0) Thread.sleep(settle)
-                        var frame = currentCapturer.capture(ANY_FRAME, FRAME_WAIT_MS, masks)
-                        if (frame is ScreenCapturer.Capture.Busy) {
-                            path = "fade"
-                            val fadedBy = onMain { overlay?.fadeForCapture() } ?: SystemClock.elapsedRealtime()
-                            frame = currentCapturer.capture(fadedBy + FRAME_AFTER_FADE_MS, FADE_FRAME_WAIT_MS, emptyList()) {
-                                main.post { overlay?.afterCapture() }
-                            }
-                        } else {
+                    val settle = settleUntil - SystemClock.elapsedRealtime()
+                    if (settle > 0) Thread.sleep(settle)
+                    var shot = currentCapturer.capture(tapAt + FRESH_FRAME_MS, FRAME_WAIT_MS, masks)
+                    if (shot is ScreenCapturer.Capture.Busy) {
+                        path = "fade"
+                        val fadedBy = onMain { overlay?.fadeForCapture() } ?: SystemClock.elapsedRealtime()
+                        shot = currentCapturer.capture(fadedBy + FRAME_AFTER_FADE_MS, FADE_FRAME_WAIT_MS, emptyList()) {
                             main.post { overlay?.afterCapture() }
                         }
-                        frame
-                    } finally {
-                        main.post { endProjection(currentCapturer) }
+                    } else {
+                        main.post { overlay?.afterCapture() }
                     }
                     val jpeg = (shot as? ScreenCapturer.Capture.Jpeg)
                         ?: throw CheckException("Could not read the screen. Tap the shield to try again.")
@@ -213,7 +213,6 @@ class ShieldService : Service(), ShieldOverlay.Listener {
                 }
             }
         } catch (e: Exception) {
-            endProjection(currentCapturer)
             onFailure("The check failed. Try again.")
         }
     }
@@ -463,11 +462,12 @@ class ShieldService : Service(), ShieldOverlay.Listener {
 
     override fun onClose() = stopNow()
 
-    /** Removes the bubble and reports the shield stopped at once; onDestroy finishes the teardown. */
+    /** Removes the bubble, drops the session's consent and reports the shield stopped at once; onDestroy finishes the teardown. */
     fun stopNow() {
         overlay?.remove()
         overlay = null
         markStopped()
+        endSession()
         companion?.end(EndReason.SHIELD)
         companion = null
         stopSelf()
@@ -485,13 +485,13 @@ class ShieldService : Service(), ShieldOverlay.Listener {
         overlay?.refreshTheme()
     }
 
-    /** Adds the mediaProjection type for one capture and removes it as soon as the capture ends. */
+    /** Adds the mediaProjection type while the session holds a projection and removes it when the projection ends. */
     private fun setProjectionType(on: Boolean) {
         if (projectionTyped == on) return
         projectionTyped = on
         if (on) {
             promoteToForeground()
-        } else {
+        } else if (started) {
             runCatching { promoteToForeground() }.onFailure { Log.w(TAG, "type reset failed: ${it.javaClass.simpleName}") }
         }
     }
@@ -505,7 +505,7 @@ class ShieldService : Service(), ShieldOverlay.Listener {
         ServiceCompat.startForeground(this, NOTIFICATION_ID, buildNotification(), foregroundType())
     }
 
-    /** mediaProjection only during a capture; idle is specialUse on Android 14 and up, no type on 10 to 13. */
+    /** mediaProjection while the session holds a projection; otherwise specialUse on Android 14 and up, no type on 10 to 13. */
     internal fun foregroundType(): Int {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return 0
         var type = when {
@@ -544,7 +544,9 @@ class ShieldService : Service(), ShieldOverlay.Listener {
         val launch = packageManager.getLaunchIntentForPackage(packageName)?.let {
             PendingIntent.getActivity(this, 0, it, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
         }
-        return ShieldNotification.build(this, CHANNEL_ID, launch, ShieldBridge.strings.appName)
+        val strings = ShieldBridge.strings
+        val text = if (projectionTyped) strings.sharingNotice else ShieldNotification.TEXT
+        return ShieldNotification.build(this, CHANNEL_ID, launch, strings.appName, text)
     }
 
     override fun onDestroy() {
@@ -556,8 +558,7 @@ class ShieldService : Service(), ShieldOverlay.Listener {
         companion = null
         pendingCheck = null
         worker.shutdownNow()
-        capturer?.release()
-        capturer = null
+        endSession()
         if (instance === this) instance = null
     }
 
@@ -574,7 +575,8 @@ class ShieldService : Service(), ShieldOverlay.Listener {
         internal const val DIALOG_SETTLE_MS = 300L
         /** A tap this long after an unanswered dialog asks again (the user left the dialog with Home). */
         internal const val CONSENT_RETRY_MS = 10_000L
-        private const val ANY_FRAME = 1L
+        /** A dismissed card or notice is off the screen in the first frame this long after the tap. */
+        private const val FRESH_FRAME_MS = 34L
         private const val FRAME_WAIT_MS = 200L
         private const val FRAME_AFTER_FADE_MS = 17L
         private const val FADE_FRAME_WAIT_MS = 150L

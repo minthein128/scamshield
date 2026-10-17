@@ -3,7 +3,7 @@ package com.saferoute.shield
 import android.content.Intent
 
 object ShieldBridge {
-    /** One screen-capture consent result. It opens one projection for one check and is then dropped. */
+    /** One screen-capture consent result. It opens the projection for one shield session and is then dropped. */
     class Consent(val resultCode: Int, val data: Intent)
 
     const val EXTRA_RESULT_JSON = "shieldResultJson"

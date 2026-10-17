@@ -16,14 +16,15 @@ internal object ShieldNotification {
 
     fun channelDescription(name: String = TITLE) = "Keeps $name ready"
 
-    fun build(context: Context, channelId: String, contentIntent: PendingIntent?, title: String = TITLE): Notification {
+    fun build(context: Context, channelId: String, contentIntent: PendingIntent?, title: String = TITLE, text: String = TEXT): Notification {
         val public = NotificationCompat.Builder(context, channelId)
             .setContentTitle(title)
             .setSmallIcon(android.R.drawable.ic_dialog_info)
             .build()
         return NotificationCompat.Builder(context, channelId)
             .setContentTitle(title)
-            .setContentText(TEXT)
+            .setContentText(text)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(text))
             .setSmallIcon(android.R.drawable.ic_dialog_info)
             .setOngoing(true)
             .setPriority(NotificationCompat.PRIORITY_LOW)

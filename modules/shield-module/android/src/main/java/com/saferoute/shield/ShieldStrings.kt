@@ -66,6 +66,7 @@ class ShieldStrings private constructor(private val values: Map<String, String>)
     val needsForeground get() = this["needsForeground"]
     val endedCap get() = this["endedCap"]
     val captureCancelled get() = this["captureCancelled"]
+    val sharingNotice get() = this["sharingNotice"]
     val muteA11y get() = this["muteA11y"]
     val unmuteA11y get() = this["unmuteA11y"]
 
@@ -107,6 +108,7 @@ class ShieldStrings private constructor(private val values: Map<String, String>)
             "errCaptureDenied" to "Screen capture was not allowed. Tap the shield to try again.",
             "errFailed" to "The check failed. Try again.",
             "captureCancelled" to "Nothing was shared. Tap the doll when you want a check.",
+            "sharingNotice" to "Kakwe can check your screen while the shield is on. Turn off the shield to stop.",
             "dismiss" to "Dismiss",
             "fullReport" to "Full report",
             "showDetails" to "Show details",
