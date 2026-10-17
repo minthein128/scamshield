@@ -127,10 +127,10 @@ class CompanionOverlayTest {
         val pill = overlay.pillForTest!!
         assertEquals("only the status chip carries text", listOf("Nar htaung nay"), texts(pill))
         assertEquals(ShieldStrings.DEFAULTS["endA11y"], pill.endViewForTest.contentDescription)
-        assertEquals("Pyit Taing Htaung. Nar htaung nay", pill.chipViewForTest.contentDescription)
+        assertEquals("Kakwe. Nar htaung nay", pill.chipViewForTest.contentDescription)
         assertEquals("status changes are announced", View.ACCESSIBILITY_LIVE_REGION_POLITE, pill.chipViewForTest.accessibilityLiveRegion)
         assertEquals(View.VISIBLE, pill.muteViewForTest.visibility)
-        assertTrue(overlay.bubbleViewForTest.contentDescription.startsWith("Pyit Taing Htaung."))
+        assertTrue(overlay.bubbleViewForTest.contentDescription.startsWith("Kakwe."))
 
         overlay.showCompanion(CompanionView(CompanionState.SPEAKING))
         assertEquals(BubbleView.Voice.SPEAKING, overlay.bubbleVoiceForTest)

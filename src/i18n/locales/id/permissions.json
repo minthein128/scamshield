@@ -9,7 +9,7 @@
   "explain": {
     "mic": {
       "title": "Izinkan mikrofon",
-      "body": "Untuk berbicara dengan Pyit Taing Htaung, $t(common:appName) membutuhkan mikrofon Anda. Suara Anda dikirim ke Google untuk dijawab. Tidak ada yang direkam atau disimpan."
+      "body": "Untuk berbicara lewat suara, $t(common:appName) membutuhkan mikrofon Anda. Suara Anda dikirim ke Google untuk dijawab. Tidak ada yang direkam atau disimpan."
     },
     "overlay": {
       "title": "Tampilkan perisai di atas aplikasi lain",
@@ -31,7 +31,7 @@
   "help": {
     "mic": {
       "title": "Mikrofon mati",
-      "body": "Untuk berbicara dengan Pyit Taing Htaung, buka Pengaturan, pilih Izin, lalu Mikrofon, dan izinkan. Bagian lain $t(common:appName) tetap berfungsi tanpanya."
+      "body": "Untuk berbicara lewat suara, buka Pengaturan, pilih Izin, lalu Mikrofon, dan izinkan. Bagian lain $t(common:appName) tetap berfungsi tanpanya."
     },
     "overlay": {
       "title": "Tampilkan di atas aplikasi lain mati",

@@ -45,7 +45,7 @@ class OverlayTalkBackTest {
             val text = bubbleDescription(state, my)
             assertTrue("$state: $text", myanmar.containsMatchIn(text))
             assertFalse("$state: $text", english.containsMatchIn(text))
-            assertTrue(text.startsWith("ပစ်တိုင်းထောင်"))
+            assertTrue(text.startsWith("ကာကွယ်"))
         }
     }
 
@@ -73,7 +73,7 @@ class OverlayTalkBackTest {
     @Test
     fun englishFallbacksStayReadable() {
         val d = ShieldStrings.DEFAULT
-        assertEquals("Pyit Taing Htaung, Kakwe shield. Double tap to check the screen.", bubbleDescription(ShieldOverlay.State.IDLE, d))
+        assertEquals("Kakwe shield. Double tap to check the screen.", bubbleDescription(ShieldOverlay.State.IDLE, d))
         assertEquals("No connection. Check your internet and try again.", d.errorText("No connection. Check your internet and try again."))
         assertEquals("The check failed. Try again.", d.errorText("anything else"))
     }

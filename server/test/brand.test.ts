@@ -25,6 +25,7 @@ describe('app name', () => {
     });
     expect(p).toContain('NAME: The app is called Kakwe');
     expect(p).toContain('ကာကွယ်');
-    expect(p).not.toMatch(/SafeRoute/);
+    expect(p).not.toMatch(/SafeRoute|Pyit|Kakwe Voice/);
+    expect(p).toContain('You are Kakwe,');
   });
 });
