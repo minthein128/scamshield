@@ -70,6 +70,7 @@ export async function ensureAndroidPermission(
   permission: Permission,
   api: AndroidPermissionApi = permissionApi(),
 ): Promise<PermissionResult> {
+  if (api.platform === 'web') return 'granted';
   if (api.platform !== 'android') return (await api.explain(kind)) ? 'granted' : 'declined';
   if (await api.check(permission).catch(() => false)) return 'granted';
   if (!(await api.explain(kind))) return 'declined';
