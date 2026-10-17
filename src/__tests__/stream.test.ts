@@ -1,4 +1,6 @@
+import { createClientFromEnv, streamsChecks } from '../api';
 import { createHttpClient } from '../api/http';
+import { diag } from '../lib/diagLog';
 import { createMockClient } from '../api/mock';
 import { createSseParser } from '../api/sse';
 import type { CheckRequest, CheckUpdate } from '../api/types';
@@ -112,5 +114,119 @@ describe('streamed check', () => {
     await createMockClient({ delayMs: 10 }).check(request, { onUpdate: u => updates.push(u.type) });
     expect(updates.filter(u => u !== 'stage')).toEqual(['verdict', 'final']);
     expect(updates.filter(u => u === 'stage')).toHaveLength(8);
+  });
+});
+
+describe('streamed check fallback', () => {
+  const plainReply = (verdict = 'careful') => ({ ok: true, status: 200, headers: { get: () => 'application/json' }, json: async () => result(verdict) });
+  const urls = (fetchImpl: jest.Mock) => fetchImpl.mock.calls.map(c => c[0]);
+  const hangsUntilAbort = (_url: string, init: RequestInit) =>
+    new Promise((_resolve, reject) => {
+      if (init.signal?.aborted) reject(new Error('aborted'));
+      init.signal?.addEventListener('abort', () => reject(new Error('aborted')));
+    });
+
+  let warn: jest.SpyInstance;
+  beforeEach(() => {
+    warn = jest.spyOn(diag, 'warn');
+  });
+  afterEach(() => warn.mockRestore());
+
+  it('retries plainly once when the streamed fetch rejects, and returns one result', async () => {
+    const fetchImpl = jest.fn().mockRejectedValueOnce(new TypeError('fetch failed')).mockResolvedValueOnce(plainReply());
+    const updates: CheckUpdate[] = [];
+    const out = await createHttpClient({ baseUrl: 'https://api.test', fetchImpl }).check(request, { onUpdate: u => updates.push(u) });
+    expect(urls(fetchImpl)).toEqual(['https://api.test/v1/check?stream=1', 'https://api.test/v1/check']);
+    expect(out.verdict).toBe('careful');
+    expect(updates.filter(u => u.type === 'final')).toHaveLength(0);
+    expect(warn).toHaveBeenCalledWith('api', 'stream_fallback', expect.objectContaining({ kind: 'network' }));
+  });
+
+  it('retries plainly when the stream ends without a final event', async () => {
+    const fetchImpl = jest.fn().mockResolvedValueOnce(streamResponse(sse('stage', { stage: 'extract', status: 'done', ms: 5 }))).mockResolvedValueOnce(plainReply('safe'));
+    const out = await createHttpClient({ baseUrl: 'https://api.test', fetchImpl }).check(request, { onUpdate: () => {} });
+    expect(urls(fetchImpl)).toEqual(['https://api.test/v1/check?stream=1', 'https://api.test/v1/check']);
+    expect(out.verdict).toBe('safe');
+    expect(warn).toHaveBeenCalledWith('api', 'stream_fallback', expect.objectContaining({ kind: 'no_final' }));
+  });
+
+  it('retries plainly when the stream sends no byte in time', async () => {
+    const silentStream = (_url: string, init: RequestInit) =>
+      Promise.resolve({
+        ...streamResponse(''),
+        body: { getReader: () => ({ read: () => hangsUntilAbort(_url, init) }) },
+      });
+    const fetchImpl = jest.fn().mockImplementationOnce(silentStream).mockResolvedValueOnce(plainReply());
+    const out = await createHttpClient({ baseUrl: 'https://api.test', fetchImpl, streamFirstByteMs: 20 }).check(request, { onUpdate: () => {} });
+    expect(out.verdict).toBe('careful');
+    expect(fetchImpl).toHaveBeenCalledTimes(2);
+    expect(warn).toHaveBeenCalledWith('api', 'stream_fallback', expect.objectContaining({ kind: 'first_byte_timeout' }));
+  });
+
+  it('keeps the final result when the stream breaks after it', async () => {
+    const res = streamResponse(body);
+    const reader = res.body.getReader();
+    const chunked = {
+      ...res,
+      body: {
+        getReader: () => ({
+          read: async () => {
+            const r = await reader.read();
+            if (r.done) throw new Error('connection reset');
+            return r;
+          },
+        }),
+      },
+    };
+    const fetchImpl = jest.fn().mockResolvedValue(chunked);
+    const out = await createHttpClient({ baseUrl: 'https://api.test', fetchImpl }).check(request, { onUpdate: () => {} });
+    expect(fetchImpl).toHaveBeenCalledTimes(1);
+    expect(out.sources).toHaveLength(1);
+  });
+
+  it('does not retry an answer from the server', async () => {
+    const fetchImpl = jest.fn().mockResolvedValue({ ok: false, status: 429, headers: { get: () => null }, json: async () => ({ error: { code: 'rate_limited', message: 'slow down' } }) });
+    await expect(createHttpClient({ baseUrl: 'https://api.test', fetchImpl }).check(request, { onUpdate: () => {} })).rejects.toMatchObject({ code: 'rate_limited' });
+    expect(fetchImpl).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not retry a cancelled check', async () => {
+    const controller = new AbortController();
+    const fetchImpl = jest.fn().mockImplementation(hangsUntilAbort);
+    const pending = createHttpClient({ baseUrl: 'https://api.test', fetchImpl }).check(request, { onUpdate: () => {}, signal: controller.signal });
+    controller.abort();
+    await expect(pending).rejects.toMatchObject({ code: 'cancelled' });
+    expect(fetchImpl).toHaveBeenCalledTimes(1);
+  });
+
+  it('gives up when the stream used the whole check budget', async () => {
+    const fetchImpl = jest.fn().mockImplementation(hangsUntilAbort);
+    await expect(createHttpClient({ baseUrl: 'https://api.test', fetchImpl, checkTimeoutMs: 30 }).check(request, { onUpdate: () => {} })).rejects.toMatchObject({ code: 'timeout' });
+    expect(fetchImpl).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('stream choice by platform', () => {
+  const realFetch = global.fetch;
+  afterEach(() => {
+    global.fetch = realFetch;
+  });
+
+  it('streams only on web', () => {
+    expect(streamsChecks('web')).toBe(true);
+    expect(streamsChecks('android')).toBe(false);
+    expect(streamsChecks('ios')).toBe(false);
+  });
+
+  it.each([
+    ['android', 'https://api.test/v1/check'],
+    ['web', 'https://api.test/v1/check?stream=1'],
+  ])('on %s posts to %s', async (os, url) => {
+    const fetchMock = jest.fn().mockResolvedValue({ ...streamResponse(body), json: async () => result('danger') });
+    global.fetch = fetchMock as unknown as typeof fetch;
+    const out = await createClientFromEnv('https://api.test', false, os).check(request, { onUpdate: () => {} });
+    expect(fetchMock.mock.calls[0][0]).toBe(url);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(out.verdict).toBe('danger');
   });
 });
