@@ -53,9 +53,9 @@ export const Wordmark: React.FC<{ size?: number; dark?: boolean; header?: boolea
   );
 };
 
-export const BrandLockup: React.FC<{ size?: number; dark?: boolean; header?: boolean }> = ({ size = 32, dark, header }) => (
+export const BrandLockup: React.FC<{ size?: number; dark?: boolean; header?: boolean; hideMark?: boolean }> = ({ size = 32, dark, header, hideMark }) => (
   <View style={styles.row}>
-    <BrandMark size={Math.round(size * 1.2)} medallion={dark ? colors.brandGold : undefined} />
+    {hideMark ? null : <BrandMark size={Math.round(size * 1.2)} medallion={dark ? colors.brandGold : undefined} />}
     <Wordmark size={size} dark={dark} header={header} />
   </View>
 );

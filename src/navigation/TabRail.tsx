@@ -22,7 +22,7 @@ export const TabRail: React.FC<BottomTabBarProps> = ({ state, descriptors, navig
       {state.routes.map((route, index) => {
         const { options } = descriptors[route.key];
         const focused = state.index === index;
-        const color = focused ? colors.accent : colors.textSecondary;
+        const color = focused ? colors.brandGoldDeep : colors.textSecondary;
         const label = options.title ?? route.name;
         const onPress = () => {
           const event = navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
