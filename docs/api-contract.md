@@ -123,7 +123,7 @@ Rules for clients:
 - `final` always arrives unless `error` does. It is the response to store in history.
 - Unknown events and unknown fields must be ignored.
 - Time to `verdict` is the extraction time (about 1.5 to 2.5 s); `final` adds the verification time that is not already hidden by it.
-- A repeat of an identical check inside 24 hours is answered from the server cache (in memory, per instance, keyed by a hash of the normalised input, language and kind). `verdict` and `final` then arrive together, with the same `id`.
+- A repeat of an identical check within an hour is answered from the server cache (in memory only, per instance, keyed by a hash of the normalised input, language and kind; never written to disk or logs). `verdict` and `final` then arrive together, with the same `id`.
 
 Add `debug=1` to get a `timings` object in the response (`final` event or JSON body). It lists per-stage durations and token counts. It is off by default.
 
@@ -202,7 +202,7 @@ Admin errors extend the error body: codes `unauthorized` (401), `forbidden` (403
 
 ## Job Shield: POST /v1/job/extract and POST /v1/job/assess
 
-Job Shield compares what a job ad promises with what the recruiter asks in chat. It is a two-step flow: extract the facts, let the user confirm or correct them, then assess. Both routes share the per-IP limit of `/v1/check`. Nothing from either route is stored in Firestore or logged; extractions live in memory for 24 hours, and an identical ad and chat returns the same `jobId` and facts.
+Job Shield compares what a job ad promises with what the recruiter asks in chat. It is a two-step flow: extract the facts, let the user confirm or correct them, then assess. Both routes share the per-IP limit of `/v1/check`. Nothing from either route is stored in Firestore or logged; extractions live in memory for 1 hour, and an identical ad and chat within that hour returns the same `jobId` and facts.
 
 ### POST /v1/job/extract
 

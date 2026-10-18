@@ -53,6 +53,7 @@ export interface Config {
 }
 
 const DAY_MS = 86_400_000;
+const HOUR_MS = 3_600_000;
 
 /** Fixed sampling for every judging call, so the same input gets the same flags and severities. */
 export const SAMPLING = { temperature: 0, seed: 1729 } as const;
@@ -104,9 +105,9 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     streamExtract: env.STREAM_EXTRACT !== '0',
     dangerGroundCapMs: Number(env.GROUND_DANGER_CAP_MS ?? 1500),
     recordAfterResponse: bool(env.RECORD_AFTER_RESPONSE),
-    resultCacheTtlMs: Number(env.RESULT_CACHE_TTL_MS ?? DAY_MS),
+    resultCacheTtlMs: Number(env.RESULT_CACHE_TTL_MS ?? HOUR_MS),
     groundCacheTtlMs: Number(env.GROUND_CACHE_TTL_MS ?? DAY_MS),
-    jobCacheTtlMs: Number(env.JOB_CACHE_TTL_MS ?? DAY_MS),
+    jobCacheTtlMs: Number(env.JOB_CACHE_TTL_MS ?? HOUR_MS),
     linkCacheTtlMs: Number(env.LINK_CACHE_TTL_MS ?? 3_600_000),
     ttsModel: env.TTS_MODEL || 'gemini-3.8-flash-tts',
     ttsVoice: env.TTS_VOICE || 'Kore',

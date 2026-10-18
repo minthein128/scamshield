@@ -10,6 +10,7 @@ import { createPipeline } from '../src/pipeline.js';
 import type { Extraction } from '../src/types.js';
 
 const DAY_MS = 86_400_000;
+const HOUR_MS = 3_600_000;
 const cfg = loadConfig({ GEMINI_API_KEY: 'g', GEMINI_MODEL: 'gemini-test' });
 type Call = [{ config: Record<string, unknown> }];
 
@@ -67,11 +68,13 @@ describe('fixed sampling', () => {
 });
 
 describe('cache defaults', () => {
-  it('keeps results, grounding and job facts for a day unless CACHE=0', () => {
-    expect(cfg.resultCacheTtlMs).toBe(DAY_MS);
+  it('keeps results and job facts for an hour and grounding for a day, unless CACHE=0', () => {
+    expect(cfg.resultCacheTtlMs).toBe(HOUR_MS);
     expect(cfg.groundCacheTtlMs).toBe(DAY_MS);
-    expect(cfg.jobCacheTtlMs).toBe(DAY_MS);
-    expect(pipelineOptions(cfg).resultCacheTtlMs).toBe(DAY_MS);
+    expect(cfg.jobCacheTtlMs).toBe(HOUR_MS);
+    expect(pipelineOptions(cfg).resultCacheTtlMs).toBe(HOUR_MS);
+    const custom = loadConfig({ GEMINI_API_KEY: 'g', RESULT_CACHE_TTL_MS: '5', JOB_CACHE_TTL_MS: '6', GROUND_CACHE_TTL_MS: '7' });
+    expect([custom.resultCacheTtlMs, custom.jobCacheTtlMs, custom.groundCacheTtlMs]).toEqual([5, 6, 7]);
     expect(pipelineOptions(loadConfig({ GEMINI_API_KEY: 'g', CACHE: '0' })).resultCacheTtlMs).toBe(0);
   });
 });
@@ -175,7 +178,7 @@ describe('pipeline result cache', () => {
       correlator: createMockCorrelator(),
       grounder: { ground: async () => ({ flags: [], sources: [], incomplete: true }) },
       model: 'm',
-      resultCacheTtlMs: DAY_MS,
+      resultCacheTtlMs: HOUR_MS,
     });
     const req = { kind: 'agency' as const, language: 'en' as const, text: 'Sunrise Overseas Agency, deposit 5000' };
     await p.run(req);
@@ -189,7 +192,7 @@ describe('pipeline result cache', () => {
       correlator: createMockCorrelator(),
       grounder: { ground: async () => ({ flags: [], sources: [] }) },
       model: 'm',
-      resultCacheTtlMs: DAY_MS,
+      resultCacheTtlMs: HOUR_MS,
     });
     const req = { kind: 'message' as const, language: 'my' as const, text: 'Pay the deposit today. Send your passport photo.' };
     const a = await p.run(req);
