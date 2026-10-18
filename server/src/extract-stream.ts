@@ -1,5 +1,5 @@
 import type { GoogleGenAI } from '@google/genai';
-import { type Config, thinkingOf } from './config.js';
+import { type Config, SAMPLING, thinkingOf } from './config.js';
 import { createGeminiExtractor, type Extractor, parseExtraction, responseSchema } from './extract.js';
 import { buildUserParts, SYSTEM_PROMPT } from './prompt.js';
 import { ApiError, type CheckRequest, type Entities, type Extraction } from './types.js';
@@ -78,7 +78,7 @@ export function createStreamingExtractor(cfg: Config, client: Pick<GoogleGenAI, 
             systemInstruction: SYSTEM_PROMPT,
             responseMimeType: 'application/json',
             responseSchema: schema,
-            temperature: 0.2,
+            ...SAMPLING,
             ...thinkingOf(cfg),
             maxOutputTokens: 2048,
             abortSignal: AbortSignal.timeout(cfg.upstreamTimeoutMs),

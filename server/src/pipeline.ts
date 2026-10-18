@@ -53,6 +53,7 @@ const RECORD_TIMEOUT_MS = 2500;
 const REASK_MIN_MS = 5000;
 const DANGER_SCORE = 80;
 const DEFAULT_ID_TTL_MS = 600_000;
+const DEFAULT_CACHE_MAX = 2000;
 
 const settle = <T>(p: Promise<T>, ms: number, fallback: T, onTimeout?: () => void): Promise<T> =>
   Promise.race([
@@ -117,9 +118,12 @@ export interface PipelineDeps {
 }
 
 export function createPipeline(deps: PipelineDeps): Pipeline {
-  const results = createTtlLru<CheckResponse>({ max: deps.resultCacheMax ?? 500, ttlMs: deps.resultCacheTtlMs ?? 0 });
+  const results = createTtlLru<CheckResponse>({ max: deps.resultCacheMax ?? DEFAULT_CACHE_MAX, ttlMs: deps.resultCacheTtlMs ?? 0 });
   const caching = (deps.resultCacheTtlMs ?? 0) > 0;
-  const ids = createTtlLru<CheckResponse>({ max: deps.resultCacheMax ?? 500, ttlMs: deps.resultCacheTtlMs || DEFAULT_ID_TTL_MS });
+  const ids = createTtlLru<CheckResponse>({
+    max: deps.resultCacheMax ?? DEFAULT_CACHE_MAX,
+    ttlMs: deps.resultCacheTtlMs || DEFAULT_ID_TTL_MS,
+  });
   const earlyLinks = deps.earlyLinks ?? true;
   const earlyEntities = deps.earlyGrounding ?? true;
 
@@ -156,15 +160,12 @@ export function createPipeline(deps: PipelineDeps): Pipeline {
 
       let earlyGround: Promise<GroundResult> | undefined;
       let groundStartedAt = 0;
-      const startGround = (entities: Extraction['entities'], ms: () => number) => {
+      const startGround = (entities: Extraction['entities'], ms: () => number, onTimeout?: () => void) => {
         stage('ground', 'start');
         groundStartedAt = Date.now();
         return tm
           .span('ground', () =>
-            settle(deps.grounder.ground(req, { entities }, ms()), ms() + 50, {
-              flags: [] as Flag[],
-              sources: [] as Source[],
-            }),
+            settle(deps.grounder.ground(req, { entities }, ms()), ms() + 50, { flags: [] as Flag[], sources: [] as Source[] }, onTimeout),
           )
           .then((g) => {
             stage('ground', 'done');
@@ -174,7 +175,7 @@ export function createPipeline(deps: PipelineDeps): Pipeline {
       const streamOpts: StreamOpts = {
         onEntities: (entities) => {
           if (earlyEntities && !earlyGround) {
-            earlyGround = startGround(entities, left);
+            earlyGround = startGround(entities, left, markDegraded);
             tm.meta.groundEarlyAtMs = Math.round(tm.now());
           }
         },
@@ -235,7 +236,7 @@ export function createPipeline(deps: PipelineDeps): Pipeline {
         ? capped
           ? settle(earlyGround, capMs - (Date.now() - groundStartedAt), { flags: [] as Flag[], sources: [] as Source[] })
           : earlyGround
-        : startGround(extraction.entities, groundMs);
+        : startGround(extraction.entities, groundMs, capped ? undefined : markDegraded);
       const networkP = tm
         .span('intel', () =>
           deps.intel && prepared
@@ -290,6 +291,7 @@ export function createPipeline(deps: PipelineDeps): Pipeline {
       }
 
       const [linkChecks, grounded, network] = await Promise.all([linksP, groundP, networkP]);
+      if (grounded.incomplete && !capped) markDegraded();
       const scoreStart = performance.now();
       const groundedGuard = guardFlags(grounded.flags, req.language);
       if (groundedGuard.stats.dropped)

@@ -1,6 +1,8 @@
+import { createHash } from 'node:crypto';
 import type { GoogleGenAI } from '@google/genai';
 import { z } from 'zod';
-import { type Config, thinkingOf } from './config.js';
+import { createTtlLru, memoize } from './cache.js';
+import { type Config, SAMPLING, thinkingOf } from './config.js';
 import { redactDeterministic } from './intel/redact.js';
 import { log } from './log.js';
 import type { CheckRequest, Extraction, Flag, Lang, Source } from './types.js';
@@ -10,6 +12,8 @@ export interface GroundResult {
   sources: Source[];
   /** Set only with `companyCheck`: whether search found a company or agency with the name. */
   companyFound?: boolean;
+  /** Set when the search timed out or failed, so callers do not cache the result. */
+  incomplete?: boolean;
 }
 
 export interface GroundOptions {
@@ -205,37 +209,71 @@ export function extractSources(res: GroundedResponse): Source[] {
   return out;
 }
 
+/** Same organisations, hosts, country, language and mode give the same key, whatever the order. */
+export function groundingKey(x: Pick<Extraction, 'entities'>, lang: Lang, opts: GroundOptions = {}): string {
+  const q = groundingQuery(x);
+  const norm = (xs: string[]) => xs.map((v) => v.toLowerCase()).sort();
+  const parts = [lang, norm(q.companies), norm(q.domains), q.country?.toLowerCase() ?? '', opts.companyCheck === true];
+  return createHash('sha256').update(JSON.stringify(parts)).digest('hex');
+}
+
+interface Searched {
+  result: GroundResult;
+  /** False on a timeout, an error or an answer from memory: never cached. */
+  ok: boolean;
+}
+
+const EMPTY: Searched = { result: { flags: [], sources: [] }, ok: false };
+const FAILED: Searched = { result: { flags: [], sources: [], incomplete: true }, ok: false };
+
 export function createGrounder(cfg: Config, client: Pick<GoogleGenAI, 'models'>): Grounder {
+  const cache = createTtlLru<Promise<Searched>>({ max: 1000, ttlMs: cfg.groundCacheTtlMs ?? 0 });
+  const caching = (cfg.groundCacheTtlMs ?? 0) > 0 && cfg.cacheEnabled !== false;
+
+  async function search(
+    req: Pick<CheckRequest, 'language'>,
+    extraction: Pick<Extraction, 'entities'>,
+    timeoutMs: number,
+    opts: GroundOptions,
+  ): Promise<Searched> {
+    const request = buildGroundingRequest(extraction, req.language, opts);
+    try {
+      const res = await client.models.generateContent({
+        model: cfg.model,
+        contents: [{ role: 'user', parts: [{ text: request.question }] }],
+        config: {
+          systemInstruction: request.system,
+          tools: [{ googleSearch: {} }],
+          ...SAMPLING,
+          ...thinkingOf(cfg),
+          maxOutputTokens: 1024,
+          abortSignal: AbortSignal.timeout(timeoutMs),
+        },
+      });
+      const flags = parseFindings(res.text);
+      if (!searched(res as GroundedResponse)) {
+        log('INFO', 'grounding_unsearched', { dropped: flags.length });
+        return EMPTY;
+      }
+      const sources = extractSources(res as GroundedResponse);
+      if (!opts.companyCheck) return { result: { flags, sources }, ok: true };
+      const companyFound = parseCompanyFound(res.text);
+      return { result: companyFound === undefined ? { flags, sources } : { flags, sources, companyFound }, ok: true };
+    } catch (err) {
+      log('WARNING', 'grounding_failed', { error: (err as Error).message });
+      return FAILED;
+    }
+  }
+
   return {
     async ground(req, extraction, timeoutMs, opts = {}) {
-      if (!cfg.grounding || !needsGrounding(extraction) || timeoutMs < 1000) return { flags: [], sources: [] };
-      const request = buildGroundingRequest(extraction, req.language, opts);
-      try {
-        const res = await client.models.generateContent({
-          model: cfg.model,
-          contents: [{ role: 'user', parts: [{ text: request.question }] }],
-          config: {
-            systemInstruction: request.system,
-            tools: [{ googleSearch: {} }],
-            temperature: 0.1,
-            ...thinkingOf(cfg),
-            maxOutputTokens: 1024,
-            abortSignal: AbortSignal.timeout(timeoutMs),
-          },
-        });
-        const flags = parseFindings(res.text);
-        if (!searched(res as GroundedResponse)) {
-          log('INFO', 'grounding_unsearched', { dropped: flags.length });
-          return { flags: [], sources: [] };
-        }
-        const sources = extractSources(res as GroundedResponse);
-        if (!opts.companyCheck) return { flags, sources };
-        const companyFound = parseCompanyFound(res.text);
-        return companyFound === undefined ? { flags, sources } : { flags, sources, companyFound };
-      } catch (err) {
-        log('WARNING', 'grounding_failed', { error: (err as Error).message });
-        return { flags: [], sources: [] };
-      }
+      if (!cfg.grounding || !needsGrounding(extraction)) return { flags: [], sources: [] };
+      const key = caching ? groundingKey(extraction, req.language, opts) : undefined;
+      const hit = key ? cache.get(key) : undefined;
+      if (hit) return (await hit).result;
+      if (timeoutMs < 1000) return FAILED.result;
+      const load = () => search(req, extraction, timeoutMs, opts);
+      return (await (key ? memoize(cache, key, load, (v) => v.ok) : load())).result;
     },
   };
 }
