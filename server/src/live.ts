@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import type { IncomingMessage, Server } from 'node:http';
 import type { Duplex } from 'node:stream';
-import { type LiveConnectConfig, Modality, Type } from '@google/genai';
+import { ActivityHandling, EndSensitivity, type LiveConnectConfig, Modality, StartSensitivity, Type } from '@google/genai';
 import { type RawData, type WebSocket, WebSocketServer } from 'ws';
 import { z } from 'zod';
 import { clientIp, type Limits } from './app.js';
@@ -163,7 +163,8 @@ const RECHECK_DECLARATION = {
 
 /** No fixed output language: the model answers in the listener's language from the allowed set. */
 export function liveConfig(
-  cfg: Pick<Config, 'liveVoice'>,
+  cfg: Pick<Config, 'liveVoice'> &
+    Partial<Pick<Config, 'liveStartSensitivity' | 'liveEndSensitivity' | 'livePrefixPaddingMs' | 'liveSilenceMs'>>,
   systemInstruction: string,
   allowed: readonly Lang[],
   mode: LiveMode = 'self',
@@ -172,6 +173,17 @@ export function liveConfig(
     responseModalities: [Modality.AUDIO],
     systemInstruction,
     speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: cfg.liveVoice } } },
+    realtimeInputConfig: {
+      activityHandling: ActivityHandling.START_OF_ACTIVITY_INTERRUPTS,
+      automaticActivityDetection: {
+        startOfSpeechSensitivity:
+          cfg.liveStartSensitivity === 'high' ? StartSensitivity.START_SENSITIVITY_HIGH : StartSensitivity.START_SENSITIVITY_LOW,
+        endOfSpeechSensitivity:
+          cfg.liveEndSensitivity === 'high' ? EndSensitivity.END_SENSITIVITY_HIGH : EndSensitivity.END_SENSITIVITY_LOW,
+        prefixPaddingMs: cfg.livePrefixPaddingMs ?? 400,
+        silenceDurationMs: cfg.liveSilenceMs ?? 700,
+      },
+    },
     outputAudioTranscription: {},
     inputAudioTranscription: { languageCodes: allowed.map(speechLocale) },
     tools: [

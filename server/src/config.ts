@@ -40,6 +40,10 @@ export interface Config {
   liveCompanionMaxMs: number;
   liveLanguages: Lang[];
   liveMaxConcurrent: number;
+  liveStartSensitivity: 'low' | 'high';
+  liveEndSensitivity: 'low' | 'high';
+  livePrefixPaddingMs: number;
+  liveSilenceMs: number;
   adminAiModel: string;
   adminAiPerHour: number;
   apkPath?: string;
@@ -107,6 +111,10 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     liveCompanionMaxMs: Number(env.LIVE_COMPANION_MAX_MS ?? 300_000),
     liveLanguages: liveLanguages(env.LIVE_LANGUAGES),
     liveMaxConcurrent: Number(env.LIVE_MAX_CONCURRENT ?? 20),
+    liveStartSensitivity: sensitivity(env.LIVE_VAD_START, 'low'),
+    liveEndSensitivity: sensitivity(env.LIVE_VAD_END, 'low'),
+    livePrefixPaddingMs: clampMs(env.LIVE_VAD_PREFIX_MS, 400, 0, 2000),
+    liveSilenceMs: clampMs(env.LIVE_VAD_SILENCE_MS, 700, 100, 5000),
     adminAiModel: env.ADMIN_AI_MODEL || 'gemini-3.8-flash',
     adminAiPerHour: Number(env.ADMIN_AI_LIMIT_PER_HOUR ?? 30),
     apkPath: env.APK_PATH?.trim() || undefined,
@@ -141,4 +149,14 @@ export function liveLanguages(raw: string | undefined): Lang[] {
     .map((x) => x.trim().toLowerCase())
     .filter((x): x is Lang => (LANGS as readonly string[]).includes(x));
   return picked.length ? [...new Set(picked)] : [...LANGS];
+}
+
+export function sensitivity(raw: string | undefined, fallback: 'low' | 'high'): 'low' | 'high' {
+  const v = raw?.trim().toLowerCase();
+  return v === 'low' || v === 'high' ? v : fallback;
+}
+
+export function clampMs(raw: string | undefined, fallback: number, min: number, max: number): number {
+  const n = raw === undefined || raw.trim() === '' ? Number.NaN : Number(raw);
+  return Number.isFinite(n) ? Math.min(max, Math.max(min, Math.round(n))) : fallback;
 }

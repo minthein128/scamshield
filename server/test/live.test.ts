@@ -197,6 +197,47 @@ describe('companion tools and context', () => {
     expect(c.inputAudioTranscription).toEqual({ languageCodes: ['en-US', 'my-MM', 'th-TH'] });
   });
 
+  it('sets calm voice activity detection by default', () => {
+    expect(liveConfig({ liveVoice: 'v' }, 'x', ['en']).realtimeInputConfig).toEqual({
+      activityHandling: 'START_OF_ACTIVITY_INTERRUPTS',
+      automaticActivityDetection: {
+        startOfSpeechSensitivity: 'START_SENSITIVITY_LOW',
+        endOfSpeechSensitivity: 'END_SENSITIVITY_LOW',
+        prefixPaddingMs: 400,
+        silenceDurationMs: 700,
+      },
+    });
+  });
+
+  it('takes voice activity detection values from config', () => {
+    const cfg = {
+      liveVoice: 'v',
+      liveStartSensitivity: 'high',
+      liveEndSensitivity: 'high',
+      livePrefixPaddingMs: 250,
+      liveSilenceMs: 900,
+    } as const;
+    expect(liveConfig(cfg, 'x', ['en']).realtimeInputConfig?.automaticActivityDetection).toEqual({
+      startOfSpeechSensitivity: 'START_SENSITIVITY_HIGH',
+      endOfSpeechSensitivity: 'END_SENSITIVITY_HIGH',
+      prefixPaddingMs: 250,
+      silenceDurationMs: 900,
+    });
+  });
+
+  it('loads voice activity detection env with safe defaults and clamping', () => {
+    const d = loadConfig({ MOCK: '1' });
+    expect([d.liveStartSensitivity, d.liveEndSensitivity, d.livePrefixPaddingMs, d.liveSilenceMs]).toEqual(['low', 'low', 400, 700]);
+    const c = loadConfig({
+      MOCK: '1',
+      LIVE_VAD_START: 'HIGH',
+      LIVE_VAD_END: 'bogus',
+      LIVE_VAD_PREFIX_MS: '99999',
+      LIVE_VAD_SILENCE_MS: 'x',
+    });
+    expect([c.liveStartSensitivity, c.liveEndSensitivity, c.livePrefixPaddingMs, c.liveSilenceMs]).toEqual(['high', 'low', 2000, 700]);
+  });
+
   it('validates context frames', () => {
     const ok = (o: object) => parseContext(JSON.stringify({ type: 'context', ...o }));
     expect(ok({ report: REPORT })).toMatchObject({ ok: true });
