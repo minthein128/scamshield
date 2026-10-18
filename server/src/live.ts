@@ -161,7 +161,7 @@ const RECHECK_DECLARATION = {
     'Capture and check the screen again when the listener asks about something new on their screen. The new report arrives later as a NEW CURRENT REPORT message.',
 };
 
-/** No fixed output language: the model answers in the listener's language from the allowed set. */
+/** One session language. Native audio models reject speechConfig.languageCode, so the prompt pins output. */
 export function liveConfig(
   cfg: Pick<Config, 'liveVoice'> &
     Partial<Pick<Config, 'liveStartSensitivity' | 'liveEndSensitivity' | 'livePrefixPaddingMs' | 'liveSilenceMs'>>,
@@ -390,13 +390,12 @@ export function attachLive(server: Server, deps: LiveDeps) {
         mode: start.mode,
         home: start.home,
         destination: start.destination,
-        allowed: cfg.liveLanguages,
       });
       try {
         const opened = await deps.connect(
           {
             model: cfg.liveModel,
-            config: liveConfig(cfg, system, cfg.liveLanguages, start.mode),
+            config: liveConfig(cfg, system, [start.language], start.mode),
             callbacks: {
               onmessage: onServer,
               onerror: () => fail('upstream', 'Voice service error'),
