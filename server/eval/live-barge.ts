@@ -18,7 +18,14 @@ function ffPcm(args: string[]): Buffer {
 const burst = {
   'pink noise 150ms': () => ffPcm(['-f', 'lavfi', '-i', 'anoisesrc=color=pink:amplitude=0.5:duration=0.15:sample_rate=16000']),
   'cough-like 300ms': () =>
-    ffPcm(['-f', 'lavfi', '-i', 'anoisesrc=color=brown:amplitude=0.9:duration=0.3:sample_rate=16000', '-af', 'afade=t=out:st=0.05:d=0.25,highpass=f=200']),
+    ffPcm([
+      '-f',
+      'lavfi',
+      '-i',
+      'anoisesrc=color=brown:amplitude=0.9:duration=0.3:sample_rate=16000',
+      '-af',
+      'afade=t=out:st=0.05:d=0.25,highpass=f=200',
+    ]),
 };
 
 async function speech(text: string): Promise<Buffer> {
@@ -53,7 +60,7 @@ async function trial(name: string, checkId: string, question: Buffer, interrupti
   const send = (b: Buffer) => ws.send(JSON.stringify({ type: 'audio', data: b.toString('base64') }));
   const t0 = Date.now();
   let i = 0;
-  const tick = () => sleep(Math.max(0, t0 + (++i) * 100 - Date.now()));
+  const tick = () => sleep(Math.max(0, t0 + ++i * 100 - Date.now()));
   const stream = async (pcm: Buffer) => {
     for (let o = 0; o < pcm.length; o += CHUNK) {
       send(pcm.subarray(o, o + CHUNK));
@@ -80,7 +87,9 @@ async function trial(name: string, checkId: string, question: Buffer, interrupti
   const hit = interrupts.find((t) => t >= tInject);
   ws.send(JSON.stringify({ type: 'end' }));
   ws.close();
-  console.log(`${name.padEnd(20)} speaking=${speakingAtInjection} interrupted=${hit ? `YES after ${hit - tInject}ms` : 'no'}${err ? ` err=${err}` : ''}`);
+  console.log(
+    `${name.padEnd(20)} speaking=${speakingAtInjection} interrupted=${hit ? `YES after ${hit - tInject}ms` : 'no'}${err ? ` err=${err}` : ''}`,
+  );
   await sleep(1500);
 }
 
@@ -91,7 +100,9 @@ const report = (await post('/v1/check', {
   shareSignals: false,
   context: { destination: 'Thailand', home: 'Myanmar' },
 })) as { id: string };
-const question = await speech('Please explain slowly and in detail, step by step, everything I should do if a job recruiter keeps my passport.');
+const question = await speech(
+  'Please explain slowly and in detail, step by step, everything I should do if a job recruiter keeps my passport.',
+);
 const phrase = await speech('Wait, stop. I have a different question for you.');
 for (const [n, make] of Object.entries(burst)) await trial(n, report.id, question, make());
 await trial('spoken phrase', report.id, question, phrase);

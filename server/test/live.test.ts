@@ -92,17 +92,21 @@ describe('buildSystemInstruction', () => {
     expect(prompt({ home: 'TH', destination: undefined })).toContain(consular?.number as string);
   });
 
-  it('answers in the listener language from the allowed set, starting in the session language', () => {
+  it('pins one session language, tells other-language speakers about Settings', () => {
     const p = prompt();
-    expect(p).not.toContain('Speak ONLY');
-    expect(p).toContain('Answer in the language the listener is speaking, if it is one of these');
-    expect(p).toContain('Start in Burmese (Myanmar script)');
-    expect(p).toContain('Kakwe can talk in မြန်မာ, English, ไทย, Bahasa Indonesia, Tagalog');
+    expect(p).toContain('Always listen for and speak only Burmese (Myanmar script), from the first word to the last');
+    expect(p).toContain('even if the listener speaks or asks for another language');
+    expect(p).toContain('that they can change the app language in Settings');
+    expect(p).not.toContain('Answer in the language the listener is speaking');
+    expect(p).not.toContain('Kakwe can talk in');
     expect(p).toContain('ဒီအလုပ်ကမ်းလှမ်းချက်မှာ');
     expect(p).toContain('Two or three short sentences');
-    const narrow = prompt({ allowed: ['en', 'my'] });
-    expect(narrow).toContain('You can speak Burmese (Myanmar script), English.');
-    expect(narrow).not.toContain('ไทย');
+    expect(p).not.toContain('ไทย');
+    expect(p).toContain('ကာကွယ်');
+    expect(p).toContain('never transliterate it into Thai script');
+    const en = prompt({ language: 'en' });
+    expect(en).toContain('speak only English');
+    expect(en).not.toContain('ဒီအလုပ်ကမ်းလှမ်းချက်မှာ');
   });
 
   it('forbids promising actions Kakwe cannot take, in every mode', () => {
@@ -191,10 +195,10 @@ describe('companion tools and context', () => {
     expect(names('self')).toEqual(['open_action_sheet']);
   });
 
-  it('sets no fixed output language and hints the allowed languages to transcription', () => {
-    const c = liveConfig({ liveVoice: 'Sulafat' }, 'x', ['en', 'my', 'th']);
+  it('uses one transcription locale and sets no output languageCode', () => {
+    const c = liveConfig({ liveVoice: 'Sulafat' }, 'x', ['my']);
     expect(c.speechConfig).toEqual({ voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Sulafat' } } });
-    expect(c.inputAudioTranscription).toEqual({ languageCodes: ['en-US', 'my-MM', 'th-TH'] });
+    expect(c.inputAudioTranscription).toEqual({ languageCodes: ['my-MM'] });
   });
 
   it('sets calm voice activity detection by default', () => {
@@ -380,6 +384,18 @@ describe('live relay', () => {
     expect(loadConfig({}).liveLanguages).toEqual(['en', 'my', 'th', 'id', 'tl']);
     expect(loadConfig({ LIVE_LANGUAGES: ' MY, en ,xx,my' }).liveLanguages).toEqual(['my', 'en']);
     expect(loadConfig({ LIVE_LANGUAGES: 'xx' }).liveLanguages).toEqual(['en', 'id', 'tl', 'my', 'th']);
+  });
+
+  it('opens the upstream session with only the start language', async () => {
+    const { url, fake } = await boot();
+    const c = client(url);
+    await c.open;
+    c.send(start({ language: 'my' }));
+    await c.until((f) => f.type === 'ready');
+    const cfg = fake.sessions[0]?.config as { inputAudioTranscription: unknown; systemInstruction: string };
+    expect(cfg.inputAudioTranscription).toEqual({ languageCodes: ['my-MM'] });
+    expect(cfg.systemInstruction).toContain('speak only Burmese');
+    expect(cfg.systemInstruction).not.toContain('Answer in the language the listener is speaking');
   });
 
   it('counts promises in the spoken text, detect only', async () => {
