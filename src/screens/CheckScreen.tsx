@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView, Keyboard } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import * as Clipboard from 'expo-clipboard';
 import { Screen } from '../components/Screen';
@@ -102,6 +102,7 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
   const [notice, setNotice] = useState<{ id: string; message: string } | null>(null);
   const hasClip = useClipboardHasText();
   const scrollRef = useRef<ScrollView>(null);
+  const submitRef = useRef<View>(null);
 
   const reveal = useCallback((node: View | null) => {
     const scroller = scrollRef.current;
@@ -109,6 +110,11 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
     if (!node || !scroller || !inner) return;
     node.measureLayout(inner, (_x, y) => scroller.scrollTo({ y: Math.max(0, y - 150), animated: true }), () => undefined);
   }, []);
+
+  useEffect(() => {
+    const sub = Keyboard.addListener('keyboardDidShow', () => reveal(submitRef.current));
+    return () => sub.remove();
+  }, [reveal]);
 
   const attachImage = useCallback(async (loader: () => Promise<PreparedImage | null>, target: (image: PreparedImage) => void = setImage, cardId = 'check') => {
     setBusy(true);
@@ -199,13 +205,6 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
           <LeaveQuicklyButton />
         </View>
       }
-      footer={
-        <>
-          {ready ? null : <Text testID="check-submit-hint" style={styles.hint}>{isJob ? t('job.submitHint') : t('submitHint')}</Text>}
-          <Button testID="check-submit" label={isJob ? t('job.submit') : t('submit')} leading={<BlockIcon name="magnify" size={22} color={ready && !busy ? colors.white : colors.textSecondary} strokeWidth={2.2} />} onPress={submit} disabled={!ready || busy} mutedDisabled />
-          <Text testID="check-warn" style={styles.warn}>{t('warn', { app: appName() })}</Text>
-        </>
-      }
     >
       <View style={{ gap: 4 }}>
         <Text accessibilityRole="header" style={styles.title}>{t('title')}</Text>
@@ -289,6 +288,11 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
         />
       </FoldRow>
 
+      <View ref={submitRef} style={styles.submitBlock}>
+        {ready ? null : <Text testID="check-submit-hint" style={styles.hint}>{isJob ? t('job.submitHint') : t('submitHint')}</Text>}
+        <Button testID="check-submit" label={isJob ? t('job.submit') : t('submit')} leading={<BlockIcon name="magnify" size={22} color={ready && !busy ? colors.white : colors.textSecondary} strokeWidth={2.2} />} onPress={submit} disabled={!ready || busy} mutedDisabled />
+        <Text testID="check-warn" style={styles.warn}>{t('warn', { app: appName() })}</Text>
+      </View>
     </Screen>
   );
 };
@@ -300,6 +304,7 @@ const styles = StyleSheet.create({
   question: { color: colors.textPrimary, fontSize: 15.5, lineHeight: 22, fontFamily: fonts.extraBold, includeFontPadding: false },
   label: { color: colors.textPrimary, fontSize: 15, lineHeight: 21, fontFamily: fonts.bold, includeFontPadding: false },
   input: { minHeight: 48, borderRadius: 14, borderWidth: 1, borderColor: colors.borderLight, backgroundColor: colors.background, paddingHorizontal: 12, paddingVertical: 12, color: colors.textPrimary, fontSize: 15, lineHeight: 21, fontFamily: fonts.regular },
+  submitBlock: { gap: 8 },
   hint: { color: colors.textSecondary, fontSize: 14, lineHeight: 20, fontFamily: fonts.medium, textAlign: 'center' },
   warn: { color: colors.textSecondary, fontSize: 12.5, lineHeight: 18, fontFamily: fonts.regular, textAlign: 'center' },
 });
