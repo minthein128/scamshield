@@ -6,6 +6,7 @@ export const colors = {
   brandRedDeep: '#8E2614',
   brandGold: '#F2B01E',
   brandGoldSoft: '#FCEFD2',
+  brandGoldDeep: '#8A5A00',
   brandCream: '#FFF6EA',
   brandInk: '#1F1A17',
 

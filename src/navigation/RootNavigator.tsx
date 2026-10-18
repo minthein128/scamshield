@@ -1,3 +1,4 @@
+import { View } from 'react-native';
 import { appName } from '../config/brand';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -43,6 +44,8 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const navTheme = { ...DefaultTheme, colors: { ...DefaultTheme.colors, background: theme.colors.background, card: theme.colors.white, border: theme.colors.border, primary: theme.colors.accent } };
 
+const tabPill = { width: 56, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center' } as const;
+
 const Tabs: React.FC = () => {
   const { t, i18n } = useTranslation();
   const tall = i18n.language === 'my' || i18n.language === 'th';
@@ -54,12 +57,16 @@ const Tabs: React.FC = () => {
     screenOptions={({ route }) => ({
       headerShown: false,
       tabBarPosition: rail ? 'left' : 'bottom',
-      tabBarActiveTintColor: theme.colors.accent,
+      tabBarActiveTintColor: theme.colors.brandGoldDeep,
       tabBarInactiveTintColor: theme.colors.textSecondary,
       tabBarLabel: ({ color, children }) => <Text style={{ color, fontFamily: theme.fonts.semiBold, fontSize: TAB_LABEL_SIZE, lineHeight: tall ? TAB_LABEL_LINE_TALL : TAB_LABEL_LINE, marginTop: TAB_ICON_LABEL_GAP, textAlign: 'center' }}>{children}</Text>,
       tabBarStyle: tabBarStyle(insetBottom, tall),
       tabBarItemStyle: { minHeight: TAB_MIN_TOUCH },
-      tabBarIcon: ({ color }) => <TabIcon name={route.name} color={color} />,
+      tabBarIcon: ({ color, focused }) => (
+        <View style={[tabPill, focused && { backgroundColor: theme.colors.brandGoldSoft }]}>
+          <TabIcon name={route.name} color={color} />
+        </View>
+      ),
     })}
   >
     <Tab.Screen name="Home" component={HomeScreen} options={{ title: t('tabs.home') }} />
