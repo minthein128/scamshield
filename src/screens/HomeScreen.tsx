@@ -54,7 +54,7 @@ export const HomeScreen: React.FC<TabScreenProps<'Home'>> = ({ navigation }) => 
       header={
         <View style={styles.brandRow}>
           <View style={styles.brandSlot}>
-            <BrandLockup header />
+            <BrandLockup header hideMark={layout.isExpanded} />
           </View>
           <TouchableOpacity testID="home-get-help" accessibilityRole="button" accessibilityLabel={t('help.a11y')} activeOpacity={0.7} onPress={() => navigation.navigate('GetHelp')} style={[styles.helpButton, iconOnlyHelp && styles.helpButtonIcon]}>
             <Icon name="phone" size={20} color={colors.textPrimary} />

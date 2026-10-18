@@ -16,6 +16,7 @@ import { countryName } from '../lib/countries';
 import { hasInput } from '../api';
 import { PreparedImage, pickScreenshot, prepareSharedImage } from '../lib/image';
 import { CHECK_MODES, CheckMode, buildJobRequest, buildRequest, jobSourceLabel, kindForMode, looksLikeUrl, modeForKind, sourceLabel } from '../lib/request';
+import { useLayout } from '../hooks/useLayout';
 import { useClipboardHasText } from '../hooks/useClipboardText';
 import type { TabScreenProps } from '../navigation/types';
 import { useAppState } from '../state/AppState';
@@ -100,6 +101,7 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
   const [focusKey, setFocusKey] = useState(0);
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<{ id: string; message: string } | null>(null);
+  const layout = useLayout();
   const hasClip = useClipboardHasText();
   const scrollRef = useRef<ScrollView>(null);
   const submitRef = useRef<View>(null);
@@ -200,7 +202,7 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
       header={
         <View style={styles.headRow}>
           <View style={{ flex: 1 }}>
-            <BrandLockup />
+            <BrandLockup hideMark={layout.isExpanded} />
           </View>
           <LeaveQuicklyButton />
         </View>
