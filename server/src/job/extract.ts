@@ -1,8 +1,8 @@
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import type { GoogleGenAI, Schema } from '@google/genai';
 import { Type } from '@google/genai';
 import { createTtlLru } from '../cache.js';
-import { type Config, thinkingOf } from '../config.js';
+import { type Config, SAMPLING, thinkingOf } from '../config.js';
 import { log } from '../log.js';
 import { ApiError } from '../types.js';
 import { quoteInSource } from './parse.js';
@@ -125,8 +125,8 @@ export interface JobStore {
   get(jobId: string): JobExtraction | undefined;
 }
 
-export function createJobStore(now?: () => number): JobStore {
-  const cache = createTtlLru<JobExtraction>({ max: 500, ttlMs: TEN_MINUTES_MS, ...(now ? { now } : {}) });
+export function createJobStore(now?: () => number, ttlMs = TEN_MINUTES_MS): JobStore {
+  const cache = createTtlLru<JobExtraction>({ max: 2000, ttlMs: Math.max(ttlMs, TEN_MINUTES_MS), ...(now ? { now } : {}) });
   return { save: (id, data) => cache.set(id, data), get: (id) => cache.get(id) };
 }
 
@@ -197,6 +197,15 @@ export function normalizeFacts(raw: unknown, src: JobExtractSource | undefined, 
   return out as unknown as JobFacts;
 }
 
+const sha = (s: string) => createHash('sha256').update(s).digest('hex');
+const sourceKey = (src: JobExtractSource | undefined) =>
+  src ? [src.text?.replace(/\s+/g, ' ').trim() ?? '', src.imageBase64 ? sha(src.imageBase64) : ''] : null;
+
+/** Hash of the normalised sources and language. The raw text is never kept as a key. */
+export function jobCacheKey(req: JobExtractRequest): string {
+  return sha(JSON.stringify(['job', req.language, sourceKey(req.ad), sourceKey(req.chat)]));
+}
+
 export interface JobExtractor {
   extract(req: JobExtractRequest): Promise<JobExtractResponse>;
   getStored(jobId: string): JobExtraction | undefined;
@@ -207,10 +216,22 @@ type GenClient = Pick<GoogleGenAI, 'models'>;
 export const JOB_READ_FAILED = 'Could not read the job details. Please try again.';
 
 /** One Gemini call for both sources. Any model or JSON failure is a 502, never invented facts. */
-export function createJobExtractor(cfg: Config, client: GenClient | undefined, store: JobStore = createJobStore()): JobExtractor {
+export function createJobExtractor(
+  cfg: Config,
+  client: GenClient | undefined,
+  store: JobStore = createJobStore(undefined, cfg.jobCacheTtlMs),
+): JobExtractor {
+  const ttlMs = cfg.cacheEnabled === false ? 0 : (cfg.jobCacheTtlMs ?? 0);
+  const results = createTtlLru<JobExtractResponse>({ max: 2000, ttlMs });
   return {
     async extract(req) {
       if (!client) throw new ApiError(502, 'upstream', 'Job extraction needs the model, which is not configured on this server.');
+      const key = ttlMs > 0 ? jobCacheKey(req) : undefined;
+      const hit = key ? results.get(key) : undefined;
+      if (hit && store.get(hit.jobId)) {
+        log('INFO', 'job_extract_cache_hit', {});
+        return structuredClone(hit);
+      }
       let raw: string | undefined;
       try {
         const res = await client.models.generateContent({
@@ -220,7 +241,7 @@ export function createJobExtractor(cfg: Config, client: GenClient | undefined, s
             systemInstruction: JOB_SYSTEM_PROMPT,
             responseMimeType: 'application/json',
             responseSchema: jobExtractSchema,
-            temperature: 0.1,
+            ...SAMPLING,
             ...thinkingOf(cfg),
             maxOutputTokens: 6144,
             abortSignal: AbortSignal.timeout(cfg.upstreamTimeoutMs),
@@ -245,7 +266,9 @@ export function createJobExtractor(cfg: Config, client: GenClient | undefined, s
       const jobId = `job_${randomUUID().replaceAll('-', '').slice(0, 16)}`;
       store.save(jobId, { ad, chat });
       log('INFO', 'job_extract_parsed', { droppedFields: stats.dropped, unverifiedQuotes: stats.unverifiedQuotes });
-      return { jobId, ad, chat };
+      const response: JobExtractResponse = { jobId, ad, chat };
+      if (key) results.set(key, structuredClone(response));
+      return response;
     },
     getStored: (jobId) => store.get(jobId),
   };

@@ -95,7 +95,7 @@ Draw it in the brand palette: boxes on the warm page colour `#F7F3EE`, lacquer-b
 
 - Android build **1.0.195** (Android workflow run 38919909379 on `feat/production` at `02fe69b2`), from Firebase App Distribution. Check the version in Android App info before the first take.
 - The API answers at `https://sg-dev-808112092414.asia-southeast1.run.app/health` with `"mock": false`. Check it before each session. The app must not show the "Offline demo mode" banner.
-- Run every input once before the take. An identical check inside 10 minutes comes from the server cache, so the recorded take is fast and gives the same result.
+- Run every input once before the take. An identical check within an hour comes from the server cache, so the recorded take is fast and gives the same result.
 - If a take fails, open Settings, Diagnostics log, and read the last error.
 
 ### Device setup

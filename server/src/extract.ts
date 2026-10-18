@@ -1,6 +1,6 @@
 import { GoogleGenAI, type Schema, Type } from '@google/genai';
 import { z } from 'zod';
-import { type Config, thinkingOf } from './config.js';
+import { type Config, SAMPLING, thinkingOf } from './config.js';
 import { buildUserParts, SYSTEM_PROMPT } from './prompt.js';
 import { ApiError, type CheckRequest, type Entities, type Extraction, FAMILIES, SCAM_TYPES, SEVERITIES } from './types.js';
 import { findUrls, mergeUrls } from './urls.js';
@@ -129,7 +129,7 @@ export function createGeminiExtractor(cfg: Config, client: GenClient = createCli
             systemInstruction: SYSTEM_PROMPT,
             responseMimeType: 'application/json',
             responseSchema,
-            temperature: 0.2,
+            ...SAMPLING,
             ...thinkingOf(cfg),
             maxOutputTokens: 2048,
             abortSignal: AbortSignal.timeout(cfg.upstreamTimeoutMs),

@@ -117,7 +117,11 @@ describe('grounding', () => {
     const generateContent = vi.fn(async () => {
       throw new Error('boom');
     });
-    expect(await createGrounder(cfg, { models: { generateContent } } as never).ground(req, base, 5000)).toEqual({ flags: [], sources: [] });
+    expect(await createGrounder(cfg, { models: { generateContent } } as never).ground(req, base, 5000)).toEqual({
+      flags: [],
+      sources: [],
+      incomplete: true,
+    });
   });
 
   it('is disabled by GROUNDING=0 or a tiny budget', async () => {

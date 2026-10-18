@@ -58,7 +58,7 @@ Details: [docs/architecture.md](docs/architecture.md), [docs/api-contract.md](do
 
 - **Likelihood, never accusation.** Reports say "shows signs of" and never call a named person or company a criminal.
 - **Leave quickly.** One button on every report clears the screen back to Home and stops any audio.
-- **Nothing stored from the check.** Images and message text are not stored or logged. Synced history keeps only the verdict, a score band, the title and the summary, and history can be turned off.
+- **Nothing stored from the check.** Images and message text are not stored or logged. Results are held in server memory for up to an hour so a repeat check gives the same answer, and are never written to disk or logs. Synced history keeps only the verdict, a score band, the title and the summary, and history can be turned off.
 - **Consent first.** Signal sharing is off until the user turns it on during setup or in Settings.
 - **Hashed network.** Phones, handles and accounts are stored as HMAC-SHA256 hashes, signals expire after 90 days, and clients cannot read the network directly.
 
