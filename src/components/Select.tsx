@@ -12,6 +12,7 @@ const { colors, fonts } = theme;
 export interface SelectOption<T extends string> {
   value: T;
   label: string;
+  a11yLabel?: string;
 }
 
 interface SelectProps<T extends string> {
@@ -43,7 +44,7 @@ export function Select<T extends string>({ label, value, options, onChange, test
       <TouchableOpacity
         testID={testID}
         accessibilityRole="button"
-        accessibilityLabel={`${label}: ${current?.label ?? placeholder ?? ''}`}
+        accessibilityLabel={`${label}: ${current?.a11yLabel ?? current?.label ?? placeholder ?? ''}`}
         accessibilityState={{ expanded: open }}
         activeOpacity={0.7}
         onPress={() => setOpen(true)}
@@ -68,7 +69,7 @@ export function Select<T extends string>({ label, value, options, onChange, test
                     key={o.value}
                     testID={testID ? `${testID}-${o.value}` : undefined}
                     accessibilityRole="button"
-                    accessibilityLabel={o.label}
+                    accessibilityLabel={o.a11yLabel ?? o.label}
                     accessibilityState={{ selected }}
                     activeOpacity={0.7}
                     onPress={() => choose(o.value)}

@@ -161,7 +161,12 @@ export const OnboardingScreen: React.FC = () => {
                   onPress={() => chooseLanguage(l.code)}
                   style={[styles.tile, on && styles.tileOn]}
                 >
-                  <Text style={[styles.tileText, on && { color: colors.white }]}>{l.label}</Text>
+                  <View style={styles.tileLines}>
+                    <Text style={[styles.tileText, on && { color: colors.white }]}>{l.nativeLabel}</Text>
+                    {l.nativeLabel !== l.label ? (
+                      <Text style={[styles.tileSub, on && styles.tileSubOn]}>{l.label}</Text>
+                    ) : null}
+                  </View>
                   {on ? <Icon name="check" size={22} color={colors.white} /> : null}
                 </TouchableOpacity>
               );
@@ -288,8 +293,11 @@ const styles = StyleSheet.create({
   h1: { color: colors.textPrimary, fontSize: 24, lineHeight: 32, fontFamily: fonts.bold, letterSpacing: -0.4 },
   body: { color: colors.textSecondary, fontSize: 14, lineHeight: 20, fontFamily: fonts.regular },
   tiles: { gap: 4 },
-  tile: { minHeight: 48, borderRadius: 16, borderWidth: 1.5, borderColor: colors.borderLight, backgroundColor: colors.white, paddingHorizontal: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  tile: { minHeight: 48, borderRadius: 16, borderWidth: 1.5, borderColor: colors.borderLight, backgroundColor: colors.white, paddingHorizontal: 20, paddingVertical: 8, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
   tileOn: { backgroundColor: colors.accent, borderColor: colors.accent },
+  tileLines: { flex: 1 },
+  tileSub: { color: colors.textSecondary, fontSize: 13, lineHeight: 18, fontFamily: fonts.regular, opacity: 0.75 },
+  tileSubOn: { color: 'rgba(255,255,255,0.72)', opacity: 1 },
   tileText: { color: colors.textPrimary, fontSize: 18, lineHeight: 24, fontFamily: fonts.bold },
   wrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   group: { borderRadius: 16, paddingHorizontal: 12, paddingVertical: 6, gap: 2 },

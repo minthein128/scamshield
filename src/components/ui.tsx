@@ -96,16 +96,17 @@ const BUTTON_VARIANTS = {
 interface ChipProps {
   label: string;
   nativeLabel?: string;
+  a11yLabel?: string;
   selected: boolean;
   onPress: () => void;
   testID?: string;
 }
 
-export const Chip: React.FC<ChipProps> = ({ label, nativeLabel, selected, onPress, testID }) => (
+export const Chip: React.FC<ChipProps> = ({ label, nativeLabel, a11yLabel, selected, onPress, testID }) => (
   <TouchableOpacity
     testID={testID}
     accessibilityRole="button"
-    accessibilityLabel={label}
+    accessibilityLabel={a11yLabel ?? label}
     accessibilityState={{ selected }}
     activeOpacity={0.7}
     onPress={onPress}
