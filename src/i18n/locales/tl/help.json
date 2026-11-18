@@ -9,9 +9,9 @@
     "body": "Piliin kung saan ka nanggaling at kung saan ka magtatrabaho, at ipapakita muna namin ang mga hotline na iyon.",
     "action": "Pumili ng mga bansa"
   },
-  "none": {
-    "title": "Walang maipakitang hotline",
-    "body": "Hindi ma-load ang mga detalye ng hotline. Subukang muli mamaya."
+  "noneListed": {
+    "title": "Walang nakalistang contact",
+    "body": "Wala pa kaming nakalistang contact para sa iyong mga bansa. Maaari kang pumili ng ibang bansa o tingnan ang lahat ng bansa."
   },
   "whereWork": "{{country}} (kung saan ka magtatrabaho)",
   "yourCountry": "{{country}} (iyong bansa)",
@@ -22,6 +22,7 @@
   "source": "Opisyal na pinagmulan",
   "showMine": "Ipakita lang ang aking mga bansa",
   "showAll": "Ipakita ang lahat ng bansa",
+  "hideAll": "Itago ang lahat ng bansa",
   "categories": {
     "trafficking": "Anti-trafficking",
     "police": "Pulisya",

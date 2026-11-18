@@ -1,6 +1,13 @@
 import type { CountryCode } from './countries';
+import type { UiLanguage } from '../i18n/languages';
 
 export type HotlineCategory = 'trafficking' | 'police' | 'cybercrime' | 'consular' | 'ngo';
+
+export interface HotlineCopy {
+  name?: string;
+  hours?: string;
+  notes?: string;
+}
 
 export interface Hotline {
   id: string;
@@ -13,6 +20,7 @@ export interface Hotline {
   reportUrl?: string;
   hours?: string;
   notes?: string;
+  i18n?: Partial<Record<UiLanguage, HotlineCopy>>;
   sourceUrl: string;
   asOf?: string;
   verifiedOn: string;
@@ -28,6 +36,7 @@ export const HOTLINES: Hotline[] = [
     dial: '1599',
     domesticOnly: true,
     hours: 'Open 24 hours',
+    i18n: { my: { name: 'လူကုန်ကူးမှု တိုက်ဖျက်ရေး ဌာန (AHTD)၊ ထိုင်းတော်ဝင်ရဲ', hours: '၂၄ နာရီ ဖွင့်သည်' } },
     sourceUrl: 'https://humantrafficking.police.go.th/en/contact-us/',
     verifiedOn: '2026-10-14',
   },
@@ -40,6 +49,7 @@ export const HOTLINES: Hotline[] = [
     dial: '1300',
     domesticOnly: true,
     notes: 'Help line for people who have been trafficked.',
+    i18n: { my: { name: 'လူမှုအကူအညီ စင်တာ (1300)၊ လူမှုဖွံ့ဖြိုးရေးနှင့် လူ့လုံခြုံရေး ဝန်ကြီးဌာန', notes: 'လူကုန်ကူးခံရသူများအတွက် အကူအညီ ဖုန်းလိုင်း။' } },
     sourceUrl: 'https://thailand.iom.int/sites/g/files/tmzbdl1371/files/documents/2024-10/engtakservicedirectory_final.pdf',
     verifiedOn: '2026-10-14',
   },
@@ -53,6 +63,7 @@ export const HOTLINES: Hotline[] = [
     domesticOnly: true,
     hours: 'Open 24 hours, free',
     notes: 'Report an online scam and ask to suspend suspicious accounts.',
+    i18n: { my: { name: 'အွန်လိုင်းလိမ်လည်မှု တိုက်ဖျက်ရေး စင်တာ၊ ဒစ်ဂျစ်တယ်စီးပွားရေးနှင့် လူ့အဖွဲ့အစည်း ဝန်ကြီးဌာန', hours: '၂၄ နာရီ ဖွင့်သည်၊ အခမဲ့', notes: 'အွန်လိုင်းလိမ်လည်မှုကို တိုင်ကြားပြီး သံသယရှိသော အကောင့်များကို ရပ်ဆိုင်းရန် တောင်းဆိုနိုင်ပါသည်။' } },
     sourceUrl: 'https://www.mdes.go.th/mission/detail/9122-Anti-Online-Scam-Operation-Center',
     verifiedOn: '2026-10-14',
   },
@@ -64,6 +75,7 @@ export const HOTLINES: Hotline[] = [
     number: '191',
     dial: '191',
     domesticOnly: true,
+    i18n: { my: { name: 'အရေးပေါ်ခေါ်ဆိုမှု စင်တာ (191)၊ ထိုင်းတော်ဝင်ရဲ' } },
     sourceUrl: 'https://www.thailand.go.th/useful-information-detail/essential-tourist-assistance-contact-numbers-to-ensure-a-smooth-and-safe-journey',
     verifiedOn: '2026-10-14',
   },
@@ -75,6 +87,7 @@ export const HOTLINES: Hotline[] = [
     number: '1155',
     dial: '1155',
     domesticOnly: true,
+    i18n: { my: { name: 'ခရီးသွားဧည့်သည် ရဲဌာန (1155)' } },
     sourceUrl: 'https://www.thailand.go.th/useful-information-detail/essential-tourist-assistance-contact-numbers-to-ensure-a-smooth-and-safe-journey',
     verifiedOn: '2026-10-14',
   },
@@ -86,6 +99,7 @@ export const HOTLINES: Hotline[] = [
     number: '02-572-8442',
     dial: '+6625728442',
     hours: 'Open 24 hours. From abroad dial +66 2 572 8442.',
+    i18n: { my: { name: 'ကောင်စစ်ဝန် ဖုန်းခေါ်ဆိုမှု စင်တာ၊ နိုင်ငံခြားရေး ဝန်ကြီးဌာန (ပြည်ပရောက် ထိုင်းနိုင်ငံသားများအတွက်)', hours: '၂၄ နာရီ ဖွင့်သည်။ ပြည်ပမှ ခေါ်လျှင် +66 2 572 8442 သို့ ခေါ်ပါ။' } },
     sourceUrl: 'https://consular.mfa.go.th/th/content/22-3-67?cate=5ddbe42115e39c4768007e1d',
     verifiedOn: '2026-10-14',
   },
@@ -323,6 +337,7 @@ export const HOTLINES: Hotline[] = [
     number: '199',
     dial: '199',
     domesticOnly: true,
+    i18n: { my: { name: 'ရဲ အရေးပေါ်ဖုန်း (199)' } },
     sourceUrl: 'https://www.gov.uk/foreign-travel-advice/myanmar/getting-help',
     verifiedOn: '2026-10-14',
   },
@@ -334,6 +349,7 @@ export const HOTLINES: Hotline[] = [
     number: '+66 94 884 5484',
     dial: '+66948845484',
     notes: 'Mobile and Viber. Email: labourattacheofficebkk@gmail.com.',
+    i18n: { my: { name: 'မြန်မာ အလုပ်သမားသံအရာရှိရုံး၊ ဘန်ကောက် (ထိုင်းရှိ မြန်မာလုပ်သားများအတွက်)', notes: 'မိုဘိုင်းနှင့် Viber။ အီးမေးလ်: labourattacheofficebkk@gmail.com။' } },
     sourceUrl: 'https://www.mol.gov.mm/wp-content/uploads/2023/11/labour-attache.pdf',
     asOf: '2023-11',
     verifiedOn: '2026-10-15',
@@ -345,6 +361,7 @@ export const HOTLINES: Hotline[] = [
     name: 'Myanmar Labour Officer, Bangkok (for Myanmar workers in Thailand)',
     number: '+66 65 220 6952',
     dial: '+66652206952',
+    i18n: { my: { name: 'မြန်မာ အလုပ်သမားရေး အရာရှိ၊ ဘန်ကောက် (ထိုင်းရှိ မြန်မာလုပ်သားများအတွက်)' } },
     sourceUrl: 'https://www.gnlm.com.mm/myanmar-labour-offices-provide-services-for-migrants-rights-in-thailand/',
     asOf: '2025-09-19',
     verifiedOn: '2026-10-15',
@@ -358,6 +375,7 @@ export const HOTLINES: Hotline[] = [
     dial: '+6620030015',
     domesticOnly: false,
     notes: 'General call centre for Myanmar workers in Thailand.',
+    i18n: { my: { name: 'မြန်မာ အလုပ်သမားရုံးများ ဖုန်းခေါ်ဆိုမှု စင်တာ (ထိုင်း)', notes: 'ထိုင်းရှိ မြန်မာလုပ်သားများအတွက် အထွေထွေ ဖုန်းခေါ်ဆိုမှု စင်တာ။' } },
     sourceUrl: 'https://www.gnlm.com.mm/myanmar-labour-offices-provide-services-for-migrants-rights-in-thailand/',
     asOf: '2025-09-19',
     verifiedOn: '2026-10-15',
@@ -370,6 +388,7 @@ export const HOTLINES: Hotline[] = [
     number: '+66 65 220 6953',
     dial: '+66652206953',
     notes: 'Mobile and Viber.',
+    i18n: { my: { name: 'မြန်မာ အလုပ်သမားသံအရာရှိရုံး၊ မဲဆောက်', notes: 'မိုဘိုင်းနှင့် Viber။' } },
     sourceUrl: 'https://www.gnlm.com.mm/myanmar-labour-offices-provide-services-for-migrants-rights-in-thailand/',
     asOf: '2025-09-19',
     verifiedOn: '2026-10-15',
@@ -382,6 +401,7 @@ export const HOTLINES: Hotline[] = [
     number: '+66 63 481 8121',
     dial: '+66634818121',
     notes: 'Mobile.',
+    i18n: { my: { name: 'မြန်မာ အလုပ်သမားသံအရာရှိရုံး၊ ရနောင်း', notes: 'မိုဘိုင်း။' } },
     sourceUrl: 'https://www.gnlm.com.mm/myanmar-labour-offices-provide-services-for-migrants-rights-in-thailand/',
     asOf: '2025-09-19',
     verifiedOn: '2026-10-15',
@@ -394,6 +414,7 @@ export const HOTLINES: Hotline[] = [
     number: '+66 94 586 6607',
     dial: '+66945866607',
     notes: 'Mobile.',
+    i18n: { my: { name: 'မြန်မာ အလုပ်သမားသံအရာရှိရုံး၊ ချင်းမိုင်', notes: 'မိုဘိုင်း။' } },
     sourceUrl: 'https://www.gnlm.com.mm/myanmar-labour-offices-provide-services-for-migrants-rights-in-thailand/',
     asOf: '2025-09-19',
     verifiedOn: '2026-10-15',
@@ -406,6 +427,7 @@ export const HOTLINES: Hotline[] = [
     number: '+60 18 287 7327',
     dial: '+60182877327',
     notes: 'Mobile. Second number: +60 17 223 6515. Email: labourattache.malaysia@gmail.com.',
+    i18n: { my: { name: 'မြန်မာ အလုပ်သမားသံအရာရှိရုံး၊ မလေးရှား (မလေးရှားရှိ မြန်မာလုပ်သားများအတွက်)', notes: 'မိုဘိုင်း။ ဒုတိယနံပါတ်: +60 17 223 6515။ အီးမေးလ်: labourattache.malaysia@gmail.com။' } },
     sourceUrl: 'https://www.mol.gov.mm/wp-content/uploads/2023/11/labour-attache.pdf',
     asOf: '2023-11',
     verifiedOn: '2026-10-14',
@@ -418,6 +440,7 @@ export const HOTLINES: Hotline[] = [
     number: '+60 11 2510 5774',
     dial: '+601125105774',
     notes: 'Embassy lines: +60 3 4251 4455, 4251 5595, 4251 6355.',
+    i18n: { my: { name: 'ကွာလာလမ်ပူရှိ မြန်မာသံရုံး၊ ကောင်စစ်ဝန်ကိစ္စများအတွက် WhatsApp', notes: 'သံရုံးလိုင်းများ: +60 3 4251 4455, 4251 5595, 4251 6355။' } },
     sourceUrl: 'https://myanmarembassykl.org/contact-us/',
     asOf: '2026-10-14',
     verifiedOn: '2026-10-14',
@@ -430,6 +453,7 @@ export const HOTLINES: Hotline[] = [
     number: '+66 2 234 0320',
     dial: '+6622340320',
     notes: 'Other lines: +66 2 637 9404, +66 62 628 3892.',
+    i18n: { my: { name: 'ဘန်ကောက်ရှိ မြန်မာသံရုံး', notes: 'အခြားလိုင်းများ: +66 2 637 9404, +66 62 628 3892။' } },
     sourceUrl: 'https://web.archive.org/web/20240302105117/https://mebangkok.org/labour-contact.html',
     asOf: '2024-03-02',
     verifiedOn: '2026-10-14',
@@ -442,6 +466,7 @@ export const HOTLINES: Hotline[] = [
     number: '+856 21 314 910',
     dial: '+85621314910',
     notes: 'Other lines: +856 21 314 911, +856 21 353 491.',
+    i18n: { my: { name: 'ဗီယင်ကျန်းရှိ မြန်မာသံရုံး', notes: 'အခြားလိုင်းများ: +856 21 314 911, +856 21 353 491။' } },
     sourceUrl: 'https://www.myanmarembassy-vte.org/index.php/en/contact-us',
     verifiedOn: '2026-10-15',
   },
@@ -453,6 +478,7 @@ export const HOTLINES: Hotline[] = [
     number: '+855 23 223 761',
     dial: '+85523223761',
     notes: 'Second line: +855 23 223 762.',
+    i18n: { my: { name: 'ဖနွမ်ပင်ရှိ မြန်မာသံရုံး', notes: 'ဒုတိယလိုင်း: +855 23 223 762။' } },
     sourceUrl: 'https://mephnompenh.org/contact-us/',
     asOf: '2026-10-14',
     verifiedOn: '2026-10-14',
@@ -466,6 +492,7 @@ export const HOTLINES: Hotline[] = [
     dial: '+9567412555',
     domesticOnly: true,
     notes: '24 hour help line. From abroad dial +95 67 412555. The number may have changed.',
+    i18n: { my: { name: 'လူကုန်ကူးမှု နှိမ်နင်းရေး ဗဟိုအဖွဲ့ (နေပြည်တော်)', notes: '၂၄ နာရီ အကူအညီ ဖုန်းလိုင်း။ ပြည်ပမှ ခေါ်လျှင် +95 67 412555 သို့ ခေါ်ပါ။ နံပါတ် ပြောင်းထားနိုင်ပါသည်။' } },
     sourceUrl: 'https://www.jica.go.jp/Resource/project/myanmar/032/materials/ku57pq00003sz6yz-att/ICTP_pamphlet.pdf',
     asOf: '2019-10',
     verifiedOn: '2026-10-15',
@@ -479,6 +506,7 @@ export const HOTLINES: Hotline[] = [
     dial: '+95949555888',
     domesticOnly: true,
     notes: '24 hour help line. From abroad dial +95 9 49555888. The number may have changed.',
+    i18n: { my: { name: 'လူကုန်ကူးမှု တိုက်ဖျက်ရေး အထူးတပ်ဖွဲ့ (ရန်ကုန်)', notes: '၂၄ နာရီ အကူအညီ ဖုန်းလိုင်း။ ပြည်ပမှ ခေါ်လျှင် +95 9 49555888 သို့ ခေါ်ပါ။ နံပါတ် ပြောင်းထားနိုင်ပါသည်။' } },
     sourceUrl: 'https://www.jica.go.jp/Resource/project/myanmar/032/materials/ku57pq00003sz6yz-att/ICTP_pamphlet.pdf',
     asOf: '2019-10',
     verifiedOn: '2026-10-15',
@@ -491,6 +519,7 @@ export const HOTLINES: Hotline[] = [
     number: '067-430185',
     dial: '+9567430185',
     notes: 'Office line in Nay Pyi Taw. For Malaysia, Singapore and Japan: 067-430183 or 067-430442. From abroad dial +95 67 430185.',
+    i18n: { my: { name: 'အလုပ်သမားဦးစီးဌာန၊ ရွှေ့ပြောင်းအလုပ်သမား ဌာနခွဲ (ပြည်ပအလုပ်၊ ထိုင်းနှင့် ကိုရီးယား)', notes: 'နေပြည်တော်ရှိ ရုံးလိုင်း။ မလေးရှား၊ စင်ကာပူနှင့် ဂျပန်အတွက်: 067-430183 သို့မဟုတ် 067-430442။ ပြည်ပမှ ခေါ်လျှင် +95 67 430185 သို့ ခေါ်ပါ။' } },
     sourceUrl: 'https://www.mol.gov.mm/contact-us/address/',
     asOf: '2026-10-14',
     verifiedOn: '2026-10-14',
@@ -515,6 +544,7 @@ export const HOTLINES: Hotline[] = [
     number: '+855 77 888 114',
     dial: '+85577888114',
     notes: 'For death, accident or lost passport. LINE: @053lyyej. Office line: +855 23 726 307.',
+    i18n: { my: { name: 'ကမ္ဘောဒီးယားရှိ ထိုင်းတော်ဝင် သံရုံး၊ ဖနွမ်ပင်၊ အရေးပေါ်ဖုန်း (ကမ္ဘောဒီးယားရှိ ထိုင်းနိုင်ငံသားများအတွက်)', notes: 'သေဆုံးမှု၊ မတော်တဆမှု သို့မဟုတ် နိုင်ငံကူးလက်မှတ် ပျောက်ဆုံးမှုများအတွက်။ LINE: @053lyyej။ ရုံးလိုင်း: +855 23 726 307။' } },
     sourceUrl: 'https://phnompenh.thaiembassy.org/en/page/emergency-assistance-for-thai-nationals',
     asOf: '2022-11-30',
     verifiedOn: '2026-10-14',
@@ -563,6 +593,7 @@ export const HOTLINES: Hotline[] = [
     number: '+856 21 214 581',
     dial: '+85621214581',
     notes: 'Lines 214 581 to 214 583. Consular section: +856 21 453 916.',
+    i18n: { my: { name: 'လာအိုရှိ ထိုင်းတော်ဝင် သံရုံး၊ ဗီယင်ကျန်း (လာအိုရှိ ထိုင်းနိုင်ငံသားများအတွက်)', notes: 'လိုင်းများ 214 581 မှ 214 583 အထိ။ ကောင်စစ်ဝန်ဌာန: +856 21 453 916။' } },
     sourceUrl: 'https://vientiane.thaiembassy.org/en/page/contact-us?menu=63bb8e86f1bb04668f0fde13',
     asOf: '2026-10-14',
     verifiedOn: '2026-10-14',

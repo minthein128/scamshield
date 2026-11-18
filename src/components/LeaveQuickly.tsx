@@ -45,7 +45,7 @@ export const HeaderWithLeave: React.FC<{ title: string; onBack?: () => void }> =
 );
 
 const styles = StyleSheet.create({
-  row: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   title: { flex: 1, minWidth: 0 },
   button: { minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, borderRadius: 22, borderWidth: 1.5, borderColor: colors.brandInk, backgroundColor: colors.white },
   label: { flexShrink: 1, color: colors.textPrimary, fontSize: 14, lineHeight: 20, fontFamily: fonts.bold, includeFontPadding: false },
