@@ -2,7 +2,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { basename, dirname, extname, join, resolve } from 'node:path';
 import type * as Yaml from 'yaml';
-import { FAMILIES, type Family, type Kind, LANGS, type Lang, type ScamType, type Verdict } from '../../server/src/types.js';
+import { type Family, type Kind, LANGS, type Lang, type ScamType, type Verdict } from '../../server/src/types.js';
 import { BENCH_DIR, IMAGE_EXT, readLabels, VERDICTS } from '../lib.js';
 import { ADVICE_IDS, type AdviceId, FACT_LIBRARY, type Phrase } from './lexicon.js';
 import { countryCode, type FactSpec } from './match.js';
@@ -240,5 +240,3 @@ export function legacyCases(labelsPath: string): Case[] {
       } satisfies Case;
     });
 }
-
-export const isFamily = (f: string): f is Family => (FAMILIES as readonly string[]).includes(f);

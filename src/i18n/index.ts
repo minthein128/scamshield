@@ -55,9 +55,5 @@ export async function setUiLanguage(code: UiLanguage): Promise<void> {
   await saveUiLanguage(code).catch(() => undefined);
 }
 
-export function currentUiLanguage(): UiLanguage {
-  return i18n.language as UiLanguage;
-}
-
 export const t = ((...args: unknown[]) => (i18n.t as unknown as (...a: unknown[]) => string)(...args)) as unknown as typeof i18n.t;
 export default i18n;

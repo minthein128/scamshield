@@ -50,5 +50,5 @@ Other env vars: `EXPO_PUBLIC_APK_URL` (download link on web), `EXPO_PUBLIC_FIREB
 
 - UI copy lives in `src/i18n/locales/<lang>/*.json` (English is the source, keys are typed). Use `t()` from react-i18next, never a string literal, and import `Text` from `src/components/Text`. See `docs/i18n.md`. The model response follows the report language, not the UI language.
 - No seeded data in the UI. Every screen needs an empty state.
-- Android only: share intent, shield overlay. Guard with `Platform.OS`; web shows `AndroidNote`.
+- Android only: share intent, shield overlay. Guard with `Platform.OS`.
 - Keep the visual design in `src/theme/theme.ts`. Comments: one line, only when the code is not obvious.

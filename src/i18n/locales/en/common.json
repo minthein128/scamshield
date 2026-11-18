@@ -25,7 +25,6 @@
   "loading": "Loading $t(common:appName)...",
   "offlineDemo": "Offline demo mode",
   "copied": {
-    "title": "Copied",
     "message": "The warning is copied. Paste it into any chat to share it."
   },
   "time": {
@@ -70,12 +69,5 @@
     "ID": "Indonesia",
     "PH": "Philippines",
     "VN": "Vietnam"
-  },
-  "languageNames": {
-    "en": "English",
-    "id": "Bahasa Indonesia",
-    "tl": "Tagalog",
-    "my": "Myanmar",
-    "th": "Thai"
   }
 }

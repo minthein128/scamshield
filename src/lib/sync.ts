@@ -20,14 +20,6 @@ export interface HistoryDoc {
   summary: string;
 }
 
-/** The shape apps up to this release wrote: the whole report as JSON plus a snippet of the input. */
-export interface LegacyHistoryDoc {
-  createdAt: string;
-  language: string;
-  source?: string;
-  report: string;
-}
-
 export interface ContactDoc {
   name: string;
   phone: string;
