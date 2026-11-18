@@ -23,7 +23,7 @@ export const BackButton: React.FC<{ onPress: () => void }> = ({ onPress }) => {
 export const ScreenHeader: React.FC<{ title: string; onBack?: () => void }> = ({ title, onBack }) => (
   <View style={styles.header}>
     {onBack ? <BackButton onPress={onBack} /> : null}
-    <Text wrap="word" style={styles.headerTitle}>{title}</Text>
+    <Text wrap="word" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8} style={styles.headerTitle}>{title}</Text>
   </View>
 );
 
@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
   noticeText: { fontSize: 14, lineHeight: 20, fontFamily: fonts.regular },
   back: { width: 48, height: 48, borderRadius: 24, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.border, alignItems: 'center', justifyContent: 'center' },
   header: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 48 },
-  headerTitle: { fontSize: 22, lineHeight: 28, fontFamily: fonts.bold, color: colors.textPrimary, includeFontPadding: false },
+  headerTitle: { flexShrink: 1, marginRight: 12, fontSize: 22, lineHeight: 28, fontFamily: fonts.bold, color: colors.textPrimary, includeFontPadding: false },
   button: { minHeight: 48, maxWidth: '100%', borderRadius: 16, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 16, paddingVertical: 14 },
   buttonRow: { flexDirection: 'row', gap: 8, alignItems: 'flex-start', maxWidth: '100%' },
   buttonRowCentered: { alignItems: 'center', gap: 10 },
