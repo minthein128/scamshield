@@ -45,11 +45,6 @@
   "warnMessage": "$t(common:appName) warning ({{verdict}}): {{title}}. {{summary}} Please do not pay money or send documents. Call me first.",
   "thanks": "Thanks, this helps protect others",
   "attention": {
-    "word": {
-      "lower": "Fewer signs",
-      "verify": "Check first",
-      "pause": "Pause"
-    },
     "headline": {
       "lower": "Few warning signs found, but important details may still be missing",
       "verify": "Some details do not add up, check them before you go",

@@ -126,7 +126,7 @@ export const SettingsScreen: React.FC<RootScreenProps<'Settings'>> = ({ navigati
         <Text style={styles.body}>{t('language.body')}</Text>
         <View style={styles.wrap} testID="settings-language">
           {UI_LANGUAGES.map(l => (
-            <Chip key={l.code} testID={`language-${l.code}`} label={l.label} selected={language === l.code} onPress={() => setLanguage(l.code)} />
+            <Chip key={l.code} testID={`language-${l.code}`} label={l.nativeLabel} a11yLabel={l.label} selected={language === l.code} onPress={() => setLanguage(l.code)} />
           ))}
         </View>
       </View>

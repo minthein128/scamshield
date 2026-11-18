@@ -89,9 +89,14 @@ describe('language switch', () => {
     expect(await restoreUiLanguage()).toBe('en');
   });
 
-  it('offers the five languages once, without native-script duplicates', () => {
+  it('offers the five languages once, with native labels', () => {
     expect(UI_LANGUAGES.map(l => l.label)).toEqual(['English', 'Myanmar', 'Bahasa Indonesia', 'Tagalog', 'Thai']);
-    expect(UI_LANGUAGES.every(l => Object.keys(l).sort().join() === 'code,label')).toBe(true);
+    expect(UI_LANGUAGES.map(l => l.nativeLabel)).toEqual(['English', 'မြန်မာ', 'Bahasa Indonesia', 'Tagalog', 'ไทย']);
+    expect(UI_LANGUAGES.every(l => Object.keys(l).sort().join() === 'code,label,nativeLabel')).toBe(true);
+  });
+
+  it('gives every language a non-empty native label', () => {
+    expect(UI_LANGUAGES.every(l => l.nativeLabel.trim().length > 0)).toBe(true);
   });
 });
 
@@ -200,6 +205,18 @@ describe('app name', () => {
       for (const f of readdirSync(join(LOCALES, lng))) {
         expect(readFileSync(join(LOCALES, lng, f), 'utf8')).not.toContain('SafeRoute');
       }
+    }
+  });
+
+  it('words the rate-limit message without a stray "about" when the wait is unknown', async () => {
+    const limited = (sec?: number) => errorCopy(new ApiError('rate_limited', 'x', 429, sec)).message;
+    expect(limited()).toBe('Try again in a little while. Sign in for a higher limit.');
+    expect(limited(300)).toBe('Try again in about 5 minutes. Sign in for a higher limit.');
+    expect(limited(30)).toContain('Try again in about a minute.');
+    for (const lng of TARGETS) {
+      await i18n.changeLanguage(lng);
+      expect(limited()).not.toContain('rateLimited');
+      expect(limited()).not.toBe(limited(300));
     }
   });
 });

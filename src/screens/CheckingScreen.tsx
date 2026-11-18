@@ -21,8 +21,8 @@ import theme from '../theme/theme';
 
 const { colors, fonts } = theme;
 
-const HOLD_SAFE_MS = 1500;
-const HOLD_RISK_MS = 3600;
+const HOLD_SAFE_MS = 3000;
+const HOLD_RISK_MS = 6000;
 
 export const CheckingScreen: React.FC<RootScreenProps<'Checking'>> = ({ navigation, route }) => {
   const { t } = useTranslation(['checking', 'common', 'errors']);
@@ -133,11 +133,11 @@ export const CheckingScreen: React.FC<RootScreenProps<'Checking'>> = ({ navigati
         )}
       </View>
       <View style={styles.footer}>
-        {error ? <Button testID="checking-retry" label={t('retry')} onPress={run} /> : null}
+        {error ? <Button testID="checking-retry" label={t('retry')} style={styles.cta} onPress={run} /> : null}
         {result ? (
-          <Button testID="checking-see-why" label={t('seeWhy')} variant="secondary" onPress={() => openReport(result)} />
+          <Button testID="checking-see-why" label={t('seeWhy')} variant="secondary" style={styles.cta} onPress={() => openReport(result)} />
         ) : (
-          <Button label={error ? t('goBack') : t('cancel')} variant="secondary" onPress={() => navigation.goBack()} />
+          <Button label={error ? t('goBack') : t('cancel')} variant="secondary" style={styles.cta} onPress={() => navigation.goBack()} />
         )}
       </View>
     </SafeAreaView>
@@ -155,6 +155,7 @@ const styles = StyleSheet.create({
   under: { minHeight: 80, alignItems: 'center' },
   stage: { color: colors.textLight, fontSize: 14, lineHeight: 20, fontFamily: fonts.regular, textAlign: 'center', minHeight: 20 },
   footer: { paddingHorizontal: 24, paddingBottom: 24, gap: 10 },
+  cta: { width: '100%', maxWidth: 420, alignSelf: 'center' },
   errorBox: { gap: 8, alignItems: 'center' },
   errorTitle: { color: colors.white, fontSize: 22, lineHeight: 30, fontFamily: fonts.extraBold, textAlign: 'center' },
   errorText: { color: colors.textLighter, fontSize: 15, lineHeight: 22, fontFamily: fonts.regular, textAlign: 'center' },

@@ -87,7 +87,7 @@ describe('http client', () => {
     expect(errorCopy(new ApiError('network', 'x')).title).toMatch(/offline/i);
     expect(errorCopy(new ApiError('upstream', 'x')).title).toMatch(/down/i);
     expect(errorCopy(new ApiError('rate_limited', 'x', 429, 1800)).message).toMatch(/30 minutes/);
-    expect(errorCopy(new ApiError('rate_limited', 'x', 429)).message).toMatch(/free account/i);
+    expect(errorCopy(new ApiError('rate_limited', 'x', 429)).message).toMatch(/sign in/i);
   });
 
   it('sends the auth token when there is one and keeps working without', async () => {

@@ -9,9 +9,9 @@
     "body": "Pilih negara asal Anda dan tempat Anda akan bekerja, lalu kami akan menampilkan nomor darurat tersebut lebih dulu.",
     "action": "Pilih negara"
   },
-  "none": {
-    "title": "Tidak ada nomor darurat",
-    "body": "Kami tidak dapat memuat rincian nomor darurat. Coba lagi nanti."
+  "noneListed": {
+    "title": "Belum ada kontak",
+    "body": "Kami belum mencantumkan kontak untuk negara Anda. Anda dapat memilih negara lain atau melihat semua negara."
   },
   "whereWork": "{{country}} (tempat Anda akan bekerja)",
   "yourCountry": "{{country}} (negara asal Anda)",
@@ -22,6 +22,7 @@
   "source": "Sumber resmi",
   "showMine": "Tampilkan negara saya saja",
   "showAll": "Tampilkan semua negara",
+  "hideAll": "Sembunyikan semua negara",
   "categories": {
     "trafficking": "Anti-perdagangan orang",
     "police": "Polisi",

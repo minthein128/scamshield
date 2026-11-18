@@ -14,7 +14,9 @@ import {
   linkStatus,
   shareMessage,
   sourceLines,
+  uniqueSources,
   warnMessage,
+  withoutConflictFlags,
 } from '../lib/report';
 import { callLabel } from '../lib/callLabel';
 import { scamTypeLabel } from '../lib/labels';
@@ -24,6 +26,7 @@ import { useLayout } from '../hooks/useLayout';
 import { useRuntimeConfig } from '../lib/runtimeConfig';
 import { seenLine } from '../lib/radar';
 import { callNumber } from '../lib/warn';
+import { appName } from '../config/brand';
 import { WarnFamilySheet } from '../components/WarnFamilySheet';
 import { Avatar } from '../components/Avatar';
 import { BrandMark } from '../components/BrandMark';
@@ -67,8 +70,11 @@ const FAMILY_ICONS: Record<string, IconName> = {
   trafficking: 'octagon',
 };
 
+const FooterPair: React.FC<{ paired: boolean; hidden: boolean; children: React.ReactNode }> = ({ paired, hidden, children }) =>
+  paired ? <View style={[styles.footerPair, hidden && styles.footerHidden]}>{children}</View> : <>{children}</>;
+
 export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, route }) => {
-  const { t, i18n } = useTranslation(['report', 'common', 'live']);
+  const { t, i18n } = useTranslation(['report', 'common', 'live', 'check']);
   const { result, language, fresh, reported } = route.params;
   const tier = result.attention;
   const level: Verdict = tier ? TIER_VERDICT[tier] : result.verdict;
@@ -77,10 +83,12 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
   const conflicts = result.conflicts ?? [];
   const unclear = result.stillUnclear ?? [];
   const findings = result.findings ?? [];
-  const flags = groupFlags(result.flags).flatMap(g => g.flags);
-  const sources = result.sources ?? [];
+  const flags = groupFlags(withoutConflictFlags(result.flags, conflicts)).flatMap(g => g.flags);
+  const sources = uniqueSources(result.sources ?? []);
   const [warnOpen, setWarnOpen] = useState(false);
   const [liveOpen, setLiveOpen] = useState(false);
+  const [barHeight, setBarHeight] = useState(0);
+  const [measured, setMeasured] = useState<{ key?: string; warn?: number; label?: number; sub?: number }>({});
   const { profile, language: settingLanguage } = useAppState();
   const { width } = useWindowDimensions();
   const layout = useLayout();
@@ -109,6 +117,13 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
   const call = hotline ? callLabel(hotline, callTexts) : { label: '' };
   const talkLabel = t('live:button');
   const footerButton = tablet ? styles.footerButton : undefined;
+  const hasSecond = level !== 'safe' || Boolean(tier);
+  const fitKey = `${i18n.language}|${call.label}|${call.sub ?? ''}|${hotline?.dial ? 'call' : 'help'}`;
+  const fit = measured.key === fitKey ? measured : undefined;
+  const measuredAll = fit?.warn !== undefined && fit.label !== undefined;
+  const fits = measuredAll && (fit.warn ?? 0) <= 2 && (fit.label ?? 0) <= 2 && (fit.sub ?? 0) <= 2;
+  const paired = !tablet && (!hasSecond || !measuredAll || fits);
+  const pending = !tablet && hasSecond && !measuredAll;
 
   const shareResult = async () => {
     await shareText(shareMessage(result));
@@ -196,6 +211,8 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
           <Text style={[styles.summary, readable(tablet, 16, 24)]}>{tier ? rest : result.summary}</Text>
         </Card>
       )}
+
+      {level === 'safe' ? <Text testID="report-disclaimer" style={styles.disclaimer}>{t('check:warn', { app: appName() })}</Text> : null}
 
       {tier && tier !== 'pause' ? <Text testID="report-tier-note" style={styles.tierNote}>{t(`attention.note.${tier}`)}</Text> : null}
     </>
@@ -331,16 +348,21 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
       header={<HeaderWithLeave title={t('title')} onBack={() => (navigation.canGoBack() ? navigation.goBack() : navigation.navigate('Tabs'))} />}
       wide={layout.isExpanded}
       footerRow={tablet}
+      footerStyle={tablet ? undefined : styles.footerTight}
+      onFooterLayout={setBarHeight}
+      contentStyle={tablet || !barHeight ? undefined : { paddingBottom: barHeight }}
       footer={
         <>
-          <Button testID="report-warn" label={t('warn')} icon="people" style={footerButton} onPress={() => setWarnOpen(true)} />
-          {level !== 'safe' || tier ? (
-            hotline?.dial ? (
-              <Button testID="report-call" icon="phone" label={call.label} subLabel={call.sub} maxLines={3} subMaxLines={4} variant="secondary" style={footerButton} onPress={() => callNumber(hotline.dial ?? '')} />
-            ) : (
-              <Button testID="report-help" label={t('help')} variant="secondary" style={footerButton} onPress={() => navigation.navigate('GetHelp')} />
-            )
-          ) : null}
+          <FooterPair paired={paired} hidden={pending}>
+            <Button testID="report-warn" label={t('warn')} icon="people" variant={level === 'safe' ? 'secondary' : 'primary'} style={footerButton ?? (paired ? styles.footerHalf : undefined)} maxLines={pending ? 6 : 2} onLines={pending ? l => setMeasured(m => ({ ...(m.key === fitKey ? m : { key: fitKey }), warn: l.label })) : undefined} onPress={() => setWarnOpen(true)} />
+            {hasSecond ? (
+              hotline?.dial ? (
+                <Button testID="report-call" icon="phone" label={call.label} subLabel={call.sub} maxLines={tablet ? 3 : pending ? 6 : 2} subMaxLines={tablet ? 4 : pending ? 6 : 1} compact={!tablet} variant="secondary" style={footerButton ?? (paired ? styles.footerHalf : undefined)} onLines={pending ? l => setMeasured(m => ({ ...(m.key === fitKey ? m : { key: fitKey }), label: l.label, sub: l.sub })) : undefined} onPress={() => callNumber(hotline.dial ?? '')} />
+              ) : (
+                <Button testID="report-help" label={t('help')} variant="secondary" style={footerButton ?? (paired ? styles.footerHalf : undefined)} maxLines={pending ? 6 : 2} onLines={pending ? l => setMeasured(m => ({ ...(m.key === fitKey ? m : { key: fitKey }), label: l.label, sub: 0 })) : undefined} onPress={() => navigation.navigate('GetHelp')} />
+              )
+            ) : null}
+          </FooterPair>
           <LinkButton testID="report-share" label={t('share')} onPress={shareResult} />
         </>
       }
@@ -394,6 +416,11 @@ const styles = StyleSheet.create({
   unclearText: { flex: 1, minWidth: 0 },
   panes: { flexDirection: 'row', alignItems: 'flex-start', gap: PANE_GAP },
   pane: { flex: 1, flexBasis: 0, minWidth: 0, gap: 16 },
+  disclaimer: { color: colors.textSecondary, fontSize: 13, lineHeight: 20, fontFamily: fonts.regular },
+  footerPair: { flexDirection: 'row', gap: 8, alignItems: 'stretch' },
+  footerHidden: { opacity: 0 },
+  footerHalf: { flex: 1, flexBasis: 0, minWidth: 0, minHeight: 48, paddingVertical: 10 },
+  footerTight: { paddingTop: 6, paddingBottom: 8, gap: 2 },
   footerButton: { flex: 1, flexBasis: 0, minWidth: 0 },
   talkButton: { alignSelf: 'stretch', minHeight: 56 },
   banner: { flexDirection: 'row', alignItems: 'center', gap: 16, borderRadius: 24, paddingVertical: 20, paddingHorizontal: 20 },

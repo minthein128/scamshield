@@ -285,7 +285,7 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
           testID="check-language"
           label={t('optional.language')}
           value={language}
-          options={UI_LANGUAGES.map(l => ({ value: l.code, label: l.label }))}
+          options={UI_LANGUAGES.map(l => ({ value: l.code, label: l.nativeLabel, a11yLabel: l.label }))}
           onChange={setLanguage}
         />
       </FoldRow>

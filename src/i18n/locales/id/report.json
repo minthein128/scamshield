@@ -46,11 +46,6 @@
   "warnMessage": "Peringatan $t(common:appName) ({{verdict}}): {{title}}. {{summary}} Mohon jangan kirim uang atau berkas apa pun. Hubungi saya dulu.",
   "thanks": "Terima kasih, ini membantu melindungi orang lain",
   "attention": {
-    "word": {
-      "lower": "Tanda lebih sedikit",
-      "verify": "Periksa dulu",
-      "pause": "Tunggu dulu"
-    },
     "headline": {
       "lower": "Sedikit tanda bahaya ditemukan, tetapi rincian penting mungkin belum lengkap",
       "verify": "Ada rincian yang tidak cocok, periksa dulu sebelum Anda pergi",

@@ -8,14 +8,14 @@ export const TIER_VERDICT: Record<AttentionTier, Verdict> = { lower: 'safe', ver
 type Leveled = Pick<CheckResponse, 'verdict'> & { attention?: AttentionTier };
 
 export function tierWord(tier: AttentionTier): string {
-  return t(`report:attention.word.${tier}`);
+  return verdictLabel(TIER_VERDICT[tier]);
 }
 
 export function tierHeadline(tier: AttentionTier): string {
   return t(`report:attention.headline.${tier}`);
 }
 
-/** The word on the verdict band, meter and chips. Job results never say Low risk, so the tier word wins. */
+/** The word on the verdict band, meter and chips. A tier result maps its tier to the verdict word. */
 export function resultWord(result: Leveled): string {
   return result.attention ? tierWord(result.attention) : verdictLabel(result.verdict);
 }

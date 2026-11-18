@@ -67,6 +67,20 @@ const https = (v: unknown): string | undefined => {
 };
 const list = (v: unknown): string[] | undefined => (Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : undefined);
 
+const COPY_LANGS = ['en', 'my', 'id', 'tl', 'th'] as const;
+
+function parseHotlineI18n(v: unknown): Hotline['i18n'] {
+  if (!isRecord(v)) return undefined;
+  const out: NonNullable<Hotline['i18n']> = {};
+  for (const lang of COPY_LANGS) {
+    const c = v[lang];
+    if (!isRecord(c)) continue;
+    const copy = { name: str(c.name, 300), hours: str(c.hours), notes: str(c.notes) };
+    if (copy.name || copy.hours || copy.notes) out[lang] = copy;
+  }
+  return Object.keys(out).length > 0 ? out : undefined;
+}
+
 export function parseHotlines(body: unknown): Snapshot<Hotline[]> | null {
   if (!isRecord(body) || typeof body.version !== 'number' || !Array.isArray(body.items)) return null;
   const items: Hotline[] = [];
@@ -91,6 +105,7 @@ export function parseHotlines(body: unknown): Snapshot<Hotline[]> | null {
       reportUrl,
       hours: str(raw.hours),
       notes: str(raw.notes),
+      i18n: parseHotlineI18n(raw.i18n),
       sourceUrl,
       asOf: str(raw.asOf, 20),
       verifiedOn: str(raw.verifiedOn, 20) ?? '',

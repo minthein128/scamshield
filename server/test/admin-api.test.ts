@@ -79,6 +79,20 @@ describe('admin API', () => {
     expect(body.drafts).toHaveLength(1);
   });
 
+  it('keeps per-language copy through validation and storage', async () => {
+    const i18n = { my: { name: 'Burmese name', hours: '24 hours' }, th: { notes: 'Thai notes' } };
+    const created = (await (await draft('editor', { item: { ...newLine, i18n } })).json()) as { id: string };
+    expect((await call('POST', `/drafts/${created.id}/approve`, 'admin')).status).toBe(200);
+    const stored = (await store.getDoc('hotlines'))?.items.find((i) => i.id === 'la-test-line');
+    expect(stored?.i18n).toEqual(i18n);
+  });
+
+  it('rejects a non-string i18n field and still accepts records without i18n', async () => {
+    const bad = await draft('editor', { item: { ...newLine, i18n: { my: { name: 5 } } } });
+    expect(bad.status).toBe(400);
+    expect((await draft('editor')).status).toBe(201);
+  });
+
   it('an editor drafts, cannot approve; an admin approves, bumping the version and auditing', async () => {
     const created = (await (await draft('editor')).json()) as { id: string; status: string; createdBy: string };
     expect(created).toMatchObject({ status: 'pending', createdBy: 'u-editor' });

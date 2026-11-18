@@ -1,4 +1,4 @@
-import type { CheckResponse, FlagFamily, LinkCheck, Severity, Source, Verdict, Flag, WebRisk } from '../api/types';
+import type { CheckResponse, FlagFamily, JobConflict, LinkCheck, Severity, Source, Verdict, Flag, WebRisk } from '../api/types';
 import { t } from '../i18n';
 import { familyLabel } from './labels';
 import { resultWord } from './attention';
@@ -51,6 +51,14 @@ export function groupFlags(flags: Flag[]): FlagGroup[] {
   }));
 }
 
+
+const sameText = (a: string, b: string) => a.trim().toLowerCase() === b.trim().toLowerCase();
+
+/** A mismatch is shown once: the server also lists it as a warning sign, so drop that copy. */
+export function withoutConflictFlags(flags: Flag[], conflicts: JobConflict[] | undefined): Flag[] {
+  if (!conflicts?.length) return flags;
+  return flags.filter(f => !conflicts.some(c => sameText(f.label, c.description)));
+}
 
 export function telUrl(number: string): string {
   return `tel:${number.replace(/[^\d+]/g, '')}`;
@@ -111,4 +119,20 @@ export function sourceLines(src: Source): { title: string; domain?: string } {
   const domain = sourceDomain(src);
   const title = src.title.trim() || domain || hostOf(src.url);
   return { title, domain: domain && domain !== title.toLowerCase() ? domain : undefined };
+}
+
+export const MAX_SOURCES = 5;
+
+/** One source per site, in API order, capped so the list stays short. */
+export function uniqueSources(sources: Source[], max = MAX_SOURCES): Source[] {
+  const seen = new Set<string>();
+  const out: Source[] = [];
+  for (const src of sources) {
+    const host = (sourceDomain(src) ?? hostOf(src.url)).toLowerCase();
+    if (seen.has(host)) continue;
+    seen.add(host);
+    out.push(src);
+    if (out.length === max) break;
+  }
+  return out;
 }

@@ -1,5 +1,5 @@
 import type { Flag } from '../api/types';
-import { VERDICT_STYLES, filledSegments, groupFlags, linkStatus, sourceLines, telUrl, verdictFromScore } from '../lib/report';
+import { VERDICT_STYLES, filledSegments, groupFlags, linkStatus, sourceLines, telUrl, uniqueSources, verdictFromScore, withoutConflictFlags } from '../lib/report';
 import { scamTypeLabel, verdictLabel } from '../lib/labels';
 import { draftFromShare } from '../lib/share';
 import { buildRequest } from '../lib/request';
@@ -8,6 +8,17 @@ import { findVoiceLocale, pickSpeechLocale } from '../lib/speech';
 import { isCleartext, reportIdFromUrl, toCheckResponse } from '../lib/shield';
 
 const flag = (family: Flag['family'], severity: Flag['severity'], label = family): Flag => ({ family, severity, label, evidence: '' });
+
+describe('conflict flags', () => {
+  const conflict = { field: 'workerFee', description: 'The ad says no fee, but the chat asks for 15000 THB', family: 'payment_route', severity: 'high' } as never;
+
+  it('drops a warning sign that repeats a mismatch and keeps the rest', () => {
+    const flags = [{ ...flag('payment_route', 'high'), label: ' The ad says no fee, but the chat asks for 15000 THB ' }, { ...flag('trafficking', 'medium'), label: 'They want your passport photo' }];
+    expect(withoutConflictFlags(flags, [conflict]).map(f => f.label)).toEqual(['They want your passport photo']);
+    expect(withoutConflictFlags(flags, [])).toBe(flags);
+    expect(withoutConflictFlags(flags, undefined)).toBe(flags);
+  });
+});
 
 describe('report mapping', () => {
   it('maps score bands', () => {
@@ -198,5 +209,24 @@ describe('scam type label', () => {
     expect(scamTypeLabel('other', 'link')).toBe('Suspicious link');
     expect(scamTypeLabel('other', 'message')).toBe('Suspicious message');
     expect(scamTypeLabel('parcel_phishing', 'link')).toBe('Possible parcel phishing');
+  });
+});
+
+describe('uniqueSources', () => {
+  const src = (url: string, title = '') => ({ url, title });
+
+  it('keeps the first entry per host and the API order', () => {
+    const out = uniqueSources([src('https://www.reddit.com/a'), src('https://quora.com/b'), src('https://reddit.com/c'), src('https://apple.com/d')]);
+    expect(out.map(s => s.url)).toEqual(['https://www.reddit.com/a', 'https://quora.com/b', 'https://apple.com/d']);
+  });
+
+  it('dedupes redirect links by the site behind them', () => {
+    const redirect = (title: string) => src('https://vertexaisearch.cloud.google.com/grounding-api-redirect/x' + title, title);
+    expect(uniqueSources([redirect('tbanky.com'), redirect('tbanky.com'), redirect('mea.gov.in')])).toHaveLength(2);
+  });
+
+  it('caps the list at five', () => {
+    const many = Array.from({ length: 9 }, (_, i) => src(`https://site${i}.com/x`));
+    expect(uniqueSources(many).map(s => s.url)).toEqual(many.slice(0, 5).map(s => s.url));
   });
 });

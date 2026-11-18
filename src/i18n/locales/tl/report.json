@@ -48,11 +48,6 @@
   "warnMessage": "Babala mula sa $t(common:appName) ({{verdict}}): {{title}}. {{summary}} Huwag munang magbayad ng pera o magpadala ng mga dokumento. Tawagan muna ako.",
   "thanks": "Salamat, nakakatulong ito na maprotektahan ang iba",
   "attention": {
-    "word": {
-      "lower": "Mas kaunting babala",
-      "verify": "Suriin muna",
-      "pause": "Huminto muna"
-    },
     "headline": {
       "lower": "Kakaunti ang nakitang babala, ngunit maaaring may kulang pa ring mahahalagang detalye",
       "verify": "May ilang detalyeng hindi nagtutugma, suriin muna ang mga ito bago ka umalis",

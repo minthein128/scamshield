@@ -20,6 +20,7 @@ export interface Hotline {
   reportUrl?: string;
   hours?: string;
   notes?: string;
+  i18n?: Partial<Record<'en' | 'my' | 'id' | 'tl' | 'th', { name?: string; hours?: string; notes?: string }>>;
   sourceUrl: string;
   asOf?: string;
   verifiedOn: string;

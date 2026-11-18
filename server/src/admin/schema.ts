@@ -30,6 +30,12 @@ export const sourceSchema = z.object({
   note: z.string().max(400).optional(),
 });
 
+const hotlineCopySchema = z.object({
+  name: z.string().trim().max(200).optional(),
+  hours: z.string().trim().max(200).optional(),
+  notes: z.string().trim().max(500).optional(),
+});
+
 export const hotlineInputSchema = z
   .object({
     id: z.string().regex(/^[a-z0-9][a-z0-9-]{2,63}$/, 'id must be a lowercase slug of 3 to 64 characters'),
@@ -45,6 +51,10 @@ export const hotlineInputSchema = z
     reportUrl: httpsUrl.optional(),
     hours: z.string().trim().max(200).optional(),
     notes: z.string().trim().max(500).optional(),
+    i18n: z
+      .object({ en: hotlineCopySchema, my: hotlineCopySchema, id: hotlineCopySchema, tl: hotlineCopySchema, th: hotlineCopySchema })
+      .partial()
+      .optional(),
     sourceUrl: httpsUrl.optional(),
     asOf: asOfDate.optional(),
     verifiedOn: day.optional(),
@@ -68,6 +78,7 @@ export interface HotlineItem {
   reportUrl?: string;
   hours?: string;
   notes?: string;
+  i18n?: Partial<Record<(typeof CONTENT_LANGS)[number], { name?: string; hours?: string; notes?: string }>>;
   sourceUrl: string;
   asOf?: string;
   verifiedOn: string;

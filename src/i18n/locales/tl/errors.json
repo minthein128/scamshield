@@ -17,7 +17,7 @@
     },
     "rate_limited": {
       "title": "Naabot mo na ang limitasyon sa pagsusuri",
-      "message": "Maghintay nang kaunti at subukan muli. Mas mataas ang limitasyon sa libreng account."
+      "message": "Maghintay nang kaunti at subukan muli. Mag-sign in para sa mas mataas na limitasyon."
     },
     "network": {
       "title": "Wala kang internet",
@@ -52,7 +52,8 @@
       "message": "Tinatanggap ang feedback sa loob ng ilang araw pagkatapos ng pagsusuri."
     }
   },
-  "rateLimitedWait": "Subukan muli sa loob ng mga {{wait}}. Mas mataas ang limitasyon sa libreng account.",
+  "rateLimitedWait": "Subukan muli sa loob ng mga {{wait}}. Mag-sign in para sa mas mataas na limitasyon.",
+  "rateLimitedSoon": "Subukan muli sa loob ng kaunting sandali. Mag-sign in para sa mas mataas na limitasyon.",
   "wait": {
     "unknown": "kaunting sandali",
     "minute": "isang minuto",
