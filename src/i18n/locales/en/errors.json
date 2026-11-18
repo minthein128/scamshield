@@ -14,7 +14,7 @@
     },
     "rate_limited": {
       "title": "You reached the check limit",
-      "message": "Wait a little and try again. A free account gets a higher limit."
+      "message": "Wait a little and try again. Sign in for a higher limit."
     },
     "network": {
       "title": "You are offline",

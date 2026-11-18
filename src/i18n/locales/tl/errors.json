@@ -17,7 +17,7 @@
     },
     "rate_limited": {
       "title": "Naabot mo na ang limitasyon sa pagsusuri",
-      "message": "Maghintay nang kaunti at subukan muli. Mas mataas ang limitasyon sa libreng account."
+      "message": "Maghintay nang kaunti at subukan muli. Mag-sign in para sa mas mataas na limitasyon."
     },
     "network": {
       "title": "Wala kang internet",
