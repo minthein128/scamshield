@@ -22,7 +22,7 @@ Expo SDK 52 / React Native, TypeScript strict. Android anti-scam app. The Expo w
 - `src/hooks/useLayout.ts` size classes from window width: `compact` < 600 dp (phone layout), `medium` 600-899, `expanded` >= 900 (nav rail, two-pane Report). `Screen` centers a reading column on tablets (`wide` for grids); `Grid` lays out card columns; sheets become centered dialogs through `useSheetLayout`. Phones lock to portrait through `useOrientationPolicy`.
 - `src/screens/` real screens. `src/screens/demo/` illustrated walkthroughs, listed in `boards.ts` and shown under Learn as "See how scams look".
 - `src/hooks/useSharedDraft.android.ts` Android share intent. The default file is a no-op for web.
-- `bench/` screenshot benchmark (run from `server/`, see `bench/README.md`). Never commit real screenshots. `media/` holds the deck PDF and the demo video (Git LFS).
+- `bench/` screenshot benchmark (run from `server/`, see `bench/README.md`). Never commit real screenshots. `media/` holds the demo video (Git LFS). The deck PDF is `pitch/deck.pdf`.
 - `modules/shield-module/` native overlay owned by another engineer. `server/` is the backend. Do not edit either from app work.
 
 ## Mock or real API

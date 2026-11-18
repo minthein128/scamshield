@@ -2,8 +2,7 @@
 
 | File | What it is |
 | --- | --- |
-| `SafeRoute-deck.pdf` | Pitch deck. Copy of `pitch/deck.pdf`. |
-| `demo.mp4` | Demo video, under 3 minutes. Stored with Git LFS. |
+| `demo.mp4` | Demo video, under 3 minutes. Stored with Git LFS. Not yet committed. |
 
 Video link (hosted copy): TBD
 
