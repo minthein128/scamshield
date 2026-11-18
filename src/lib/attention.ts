@@ -15,7 +15,7 @@ export function tierHeadline(tier: AttentionTier): string {
   return t(`report:attention.headline.${tier}`);
 }
 
-/** The word on the verdict band, meter and chips. Job results never say Low risk, so the tier word wins. */
+/** The word on the verdict band, meter and chips. A tier result maps its tier to the verdict word. */
 export function resultWord(result: Leveled): string {
   return result.attention ? tierWord(result.attention) : verdictLabel(result.verdict);
 }
