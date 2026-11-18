@@ -1,8 +1,9 @@
 import { t } from '../i18n';
-import { HOTLINES, type Hotline, type HotlineCategory } from '../data/hotlines';
+import { HOTLINES, type Hotline, type HotlineCategory, type HotlineCopy } from '../data/hotlines';
 import { COUNTRIES, type CountryCode } from '../data/countries';
 import { runtimeHotlines } from './runtimeConfig';
 import type { CheckResponse } from '../api/types';
+import type { UiLanguage } from '../i18n/languages';
 
 export { HOTLINES };
 export type { Hotline, HotlineCategory };
@@ -17,7 +18,7 @@ export function categoryLabel(category: HotlineCategory): string {
 export function mergeHotlines(bundled: Hotline[], runtime: Hotline[] | null): Hotline[] {
   if (!runtime || runtime.length === 0) return bundled;
   const base = new Map(bundled.map(h => [h.id, h]));
-  return runtime.map(r => ({ ...base.get(r.id), ...r }));
+  return runtime.map(r => ({ ...base.get(r.id), ...r, i18n: r.i18n }));
 }
 
 let merged: { bundled: Hotline[]; runtime: Hotline[] | null; out: Hotline[] } | null = null;
@@ -27,6 +28,13 @@ export function currentHotlines(): Hotline[] {
   const runtime = runtimeHotlines();
   if (!merged || merged.runtime !== runtime || merged.bundled !== HOTLINES) merged = { bundled: HOTLINES, runtime, out: mergeHotlines(HOTLINES, runtime) };
   return merged.out;
+}
+
+/** Name, hours and notes in the UI language, each falling back to English when missing or blank. */
+export function localizedHotline(h: Hotline, lang: UiLanguage | string): Pick<Hotline, 'name' | 'hours' | 'notes'> {
+  const tr = (h.i18n as Record<string, HotlineCopy | undefined> | undefined)?.[lang];
+  const pick = (v: unknown, en: string | undefined) => (typeof v === 'string' && v.trim() ? v : en);
+  return { name: pick(tr?.name, h.name) as string, hours: pick(tr?.hours, h.hours), notes: pick(tr?.notes, h.notes) };
 }
 
 const categoryRank = (c: HotlineCategory) => CATEGORY_ORDER.indexOf(c);

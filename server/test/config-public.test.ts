@@ -37,6 +37,18 @@ describe('public config API', () => {
     expect(res.headers.get('etag')).toMatch(/^W\//);
   });
 
+  it('serves per-language hotline copy and still serves records without it', async () => {
+    const store = createMemoryStore();
+    const list = items();
+    (list[0] as { i18n?: unknown }).i18n = { my: { name: 'Burmese name' } };
+    await store.seed('hotlines', list, 'seed', false);
+    const { app } = appOf(store);
+    const body = (await (await app.request('/v1/config/hotlines')).json()) as { items: Array<{ id: string; i18n?: unknown }> };
+    expect(body.items[0]?.i18n).toEqual({ my: { name: 'Burmese name' } });
+    expect(body.items[1]).toBeDefined();
+    expect(body.items[1]).not.toHaveProperty('history');
+  });
+
   it('serves the published version, hides retired items and internal fields, and answers 304', async () => {
     const store = createMemoryStore();
     const list = items();

@@ -1,6 +1,6 @@
 import { COUNTRIES } from '../data/countries';
-import { HOTLINES } from '../data/hotlines';
-import { allSections, helpSections, hotlineByDial, hotlineFocus, hotlinesForCountry, primaryHotline, resolveCallTarget } from '../lib/hotlines';
+import { HOTLINES, type Hotline } from '../data/hotlines';
+import { allSections, helpSections, localizedHotline, hotlineByDial, hotlineFocus, hotlinesForCountry, primaryHotline, resolveCallTarget } from '../lib/hotlines';
 import { defaultScope, seenLine, reportCountText } from '../lib/radar';
 import { countryFromText } from '../lib/countries';
 import { smsUrl, telLink, validateContact, normalizePhone } from '../lib/contacts';
@@ -136,5 +136,53 @@ describe('radar helpers', () => {
     expect(seenLine(1)).toMatch(/1 time by/);
     expect(seenLine(undefined)).toBeNull();
     expect(reportCountText(1)).toBe('1 report in 30 days');
+  });
+});
+
+describe('localizedHotline', () => {
+  const base: Hotline = {
+    id: 'th-test',
+    country: 'TH',
+    category: 'police',
+    name: 'English name',
+    hours: 'English hours',
+    notes: 'English notes',
+    dial: '191',
+    sourceUrl: 'https://example.org',
+    verifiedOn: '2026-10-14',
+  };
+
+  it('uses every translated field', () => {
+    const h = { ...base, i18n: { my: { name: 'MY name', hours: 'MY hours', notes: 'MY notes' } } };
+    expect(localizedHotline(h, 'my')).toEqual({ name: 'MY name', hours: 'MY hours', notes: 'MY notes' });
+  });
+
+  it('falls back field by field when only some fields are translated', () => {
+    const h = { ...base, i18n: { my: { name: 'MY name' } } };
+    expect(localizedHotline(h, 'my')).toEqual({ name: 'MY name', hours: 'English hours', notes: 'English notes' });
+  });
+
+  it('treats blank and whitespace translations as missing', () => {
+    const h = { ...base, i18n: { my: { name: '', hours: '   ', notes: '\n' } } };
+    expect(localizedHotline(h, 'my')).toEqual({ name: 'English name', hours: 'English hours', notes: 'English notes' });
+  });
+
+  it('falls back to English for a language without copy or an unknown language', () => {
+    const h = { ...base, i18n: { my: { name: 'MY name' } } };
+    expect(localizedHotline(h, 'th').name).toBe('English name');
+    expect(localizedHotline(h, 'xx').name).toBe('English name');
+    expect(localizedHotline(base, 'my').notes).toBe('English notes');
+  });
+
+  it('returns English for en and keeps absent optional fields absent', () => {
+    const h = { ...base, hours: undefined, i18n: { my: { name: 'MY name' } } };
+    expect(localizedHotline(h, 'en')).toEqual({ name: 'English name', hours: undefined, notes: 'English notes' });
+    expect(localizedHotline(h, 'my').hours).toBeUndefined();
+  });
+
+  it('gives Burmese copy to every Myanmar entry and the Thailand demo entries without touching numbers', () => {
+    for (const h of HOTLINES.filter(x => x.country === 'MM' && x.i18n)) expect(h.i18n?.my?.name).toBeTruthy();
+    expect(HOTLINES.filter(h => h.i18n?.my)).toHaveLength(23);
+    expect(localizedHotline(HOTLINES.find(h => h.id === 'th-rtp-ahtd-1599') as Hotline, 'my').name).toContain('AHTD');
   });
 });

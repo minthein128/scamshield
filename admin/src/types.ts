@@ -39,6 +39,7 @@ export interface HotlineItem {
   reportUrl?: string;
   hours?: string;
   notes?: string;
+  i18n?: Partial<Record<'en' | 'my' | 'id' | 'tl' | 'th', { name?: string; hours?: string; notes?: string }>>;
   status: 'published' | 'retired';
   source: { url: string; asOf: string; fetchedBy: 'human' | 'ai'; note?: string };
   sourceUrl?: string;

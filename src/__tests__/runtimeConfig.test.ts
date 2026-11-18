@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { HOTLINES } from '../data/hotlines';
 import i18n from '../i18n';
-import { currentHotlines, hotlinesForCountry, mergeHotlines, primaryHotline } from '../lib/hotlines';
+import { currentHotlines, hotlinesForCountry, localizedHotline, mergeHotlines, primaryHotline } from '../lib/hotlines';
 import { dismissNotice, loadDismissed, pickNotice } from '../lib/notices';
 import {
   CONFIG_KEYS,
@@ -41,6 +41,24 @@ describe('hotline merge', () => {
     expect(merged.map(h => h.id)).toEqual(['th-rtp-ahtd-1599', 'th-new']);
     expect(merged[0].name).toBe(th.name);
     expect(merged[0].hours).toBe('Mon to Fri');
+  });
+
+  it('shows English for an older published record without i18n', async () => {
+    const bundled = [{ ...th, i18n: { my: { name: 'Bundled Burmese' } } }];
+    const merged = mergeHotlines(bundled, [{ ...th, i18n: undefined }]);
+    expect(localizedHotline(merged[0], 'my').name).toBe(th.name);
+    const body = { version: 4, items: [{ ...th, i18n: undefined }] };
+    await refreshConfig(route({ '/v1/config/hotlines': body }), 'https://api.example');
+    expect(localizedHotline(currentHotlines()[0], 'my').name).toBe(th.name);
+  });
+
+  it('a published record with i18n wins over the bundled one and survives parsing', async () => {
+    const bundled = [{ ...th, i18n: { my: { name: 'Bundled Burmese' } } }];
+    const merged = mergeHotlines(bundled, [{ ...th, i18n: { my: { name: 'Published Burmese' } } }]);
+    expect(localizedHotline(merged[0], 'my').name).toBe('Published Burmese');
+    const body = { version: 5, items: [{ ...th, i18n: { my: { name: 'Published Burmese', hours: 5 }, xx: { name: 'x' } } }] };
+    await refreshConfig(route({ '/v1/config/hotlines': body }), 'https://api.example');
+    expect(currentHotlines()[0].i18n).toEqual({ my: { name: 'Published Burmese' } });
   });
 
   it('the access functions read the published list after a refresh', async () => {
