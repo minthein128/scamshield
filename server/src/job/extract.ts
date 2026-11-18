@@ -26,6 +26,13 @@ import {
 import { FACT_SCHEMAS } from './validate.js';
 
 const TEN_MINUTES_MS = 600_000;
+const FILLER_WORDS = /^(we|i|you|they|he|she|it|us|me|them|our|ours|my|your|their|someone|somebody|myself|ourselves|n\/?a|none|null|unknown)$/i;
+
+/** A bare pronoun or placeholder where the schema wants a named party, place or phrase. */
+export function isFillerText(value: unknown): boolean {
+  return typeof value === 'string' && FILLER_WORDS.test(value.trim().replace(/[.!,;:]+$/, ''));
+}
+const FREE_TEXT_KEYS: readonly FactKey[] = ['employer', 'jobTitle', 'workplace', 'destinationCountry', 'travelArrangedBy', 'route', 'urgency'];
 const UNVERIFIED_CONFIDENCE = 0.3;
 
 export const JOB_SYSTEM_PROMPT = `You are the fact extraction stage of Kakwe Job Shield. Migrant workers in Southeast Asia share a job ad and the chat they had with a recruiter. You copy facts out of each source into the JSON schema. You do not judge the offer: a rules engine compares the two sources later.
@@ -47,7 +54,7 @@ Every field is null or an object {value, quote, confidence, refused}
 Values
 - Enum fields use exactly the English codes from the schema, whatever language the source or the user speaks. Quotes stay in the source language.
 - employer: the company or agency that hires or recruits, as written. Never a person's name: "I am Ko Aung from HR" gives no employer unless a company is named.
-- jobTitle, workplace (city and address), travelArrangedBy (who arranges the trip), route (places the trip passes through), urgency (a deadline or pressure to decide or leave fast): short text as written in the source.
+- jobTitle, workplace (city and address), travelArrangedBy (the named person, company or agency that arranges the trip; never a pronoun such as "we", null if no one is named), route (places the trip passes through), urgency (a deadline or pressure to decide or leave fast): short text as written in the source.
 - destinationCountry: the country of the job, as an English country name.
 - salary: amount as a plain number with ASCII digits (convert Burmese and Thai digits, expand "15k" or "3 သိန်း"; for a range use the lowest amount), currency as an ISO 4217 code, period as one of the codes. If the source gives no amount, set amount to null.
 - workerFee: money the worker must pay (recruitment, placement, processing, deposit, training, travel, medical). "none" when the source says the worker pays nothing. Otherwise the amount and currency with ASCII digits, such as "15000 THB", or a few words if no amount is given.
@@ -183,7 +190,8 @@ export function normalizeFacts(raw: unknown, src: JobExtractSource | undefined, 
     if (!f.refused) delete f.refused;
     const v = f.value;
     const empty = v === 'not_mentioned' || v === false || (typeof v === 'string' && v.trim() === '');
-    if (empty && !f.refused) {
+    const filler = FREE_TEXT_KEYS.includes(k) && isFillerText(v);
+    if ((empty || filler) && !f.refused) {
       out[k] = null;
       continue;
     }

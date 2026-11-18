@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { loadConfig } from '../src/config.js';
-import { buildJobParts, createJobExtractor, createJobStore, JOB_SYSTEM_PROMPT, jobExtractSchema } from '../src/job/extract.js';
+import { isFillerText, buildJobParts, createJobExtractor, createJobStore, JOB_SYSTEM_PROMPT, jobExtractSchema } from '../src/job/extract.js';
 import { emptyFacts } from '../src/job/types.js';
 import { ApiError } from '../src/types.js';
 
@@ -93,6 +93,24 @@ describe('job extraction', () => {
       quote: 'Golden Lotus Garment Co., Ltd.',
       confidence: 0.95,
     });
+  });
+
+  it('treats a bare pronoun in a free-text field as not stated', async () => {
+    const out = {
+      ad: { ...emptyFacts(), travelArrangedBy: { value: 'we', quote: 'we arrange it', confidence: 0.8 } },
+      chat: {
+        ...emptyFacts(),
+        travelArrangedBy: { value: 'Golden Lotus agency', quote: 'Golden Lotus agency', confidence: 0.8 },
+        urgency: { value: 'They.', quote: 'x', confidence: 0.4 },
+      },
+    };
+    const res = await createJobExtractor(cfg, client(JSON.stringify(out)) as never).extract({ ad: { text: adText }, chat: { text: chatText }, language: 'en' });
+    expect(res.ad?.travelArrangedBy).toBeNull();
+    expect(res.chat?.travelArrangedBy?.value).toBe('Golden Lotus agency');
+    expect(res.chat?.urgency).toBeNull();
+    expect(isFillerText('We')).toBe(true);
+    expect(isFillerText('We Travel Co')).toBe(false);
+    expect(JOB_SYSTEM_PROMPT).toMatch(/never a pronoun/);
   });
 
   it('drops a quote that is not in the source and lowers its confidence', async () => {

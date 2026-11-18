@@ -84,11 +84,18 @@ export function parseAmount(raw: string | number | null | undefined): number | n
   return Number(text);
 }
 
+const FILLER_TEXT = /^(we|i|you|they|he|she|it|us|me|them|our|ours|my|your|their|someone|somebody|n\/?a|none|null|unknown)$/i;
+
+/** A bare pronoun or placeholder the model put where a name or phrase belongs. */
+export function isFillerText(value: string): boolean {
+  return FILLER_TEXT.test(value.trim().replace(/[.!,;:]+$/, ''));
+}
+
 export function isEmptyValue(def: FieldDef, value: FactValue | null): boolean {
   if (value === null || value === undefined) return true;
   if (def.kind === 'salary') return parseAmount((value as SalaryValue).amount) === null;
   if (def.kind === 'fee' && value === FEE_MENTIONED) return true;
-  if (typeof value === 'string') return !value.trim();
+  if (typeof value === 'string') return !value.trim() || (def.kind === 'text' && isFillerText(value));
   return false;
 }
 
@@ -164,7 +171,7 @@ export function valueLabel(key: JobFactKey, value: FactValue | null): string {
     case 'fee':
       return value === NO_FEE ? t('check:job.values.workerFee.none') : value === FEE_MENTIONED ? t('check:job.values.workerFee.some') : String(value);
     case 'enum':
-      return enumLabel(key, String(value));
+      return def.options?.includes(String(value)) ? enumLabel(key, String(value)) : t('check:job.notMentioned');
     default:
       return String(value);
   }

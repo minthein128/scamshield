@@ -7,6 +7,7 @@ import {
   NO_FEE,
   draftFromFacts,
   enumOptions,
+  isEmptyValue,
   isUnclear,
   parseAmount,
   resetFact,
@@ -52,6 +53,22 @@ describe('fact editing', () => {
     await i18n.changeLanguage('my');
     expect(valueLabel('meetingPoint', 'driver_pickup')).not.toBe('driver_pickup');
     expect(valueLabel('meetingPoint', 'driver_pickup')).not.toBe('A driver picks you up');
+  });
+
+  it('shows a bare pronoun or an unknown code as not mentioned, never raw', async () => {
+    const raw = { ...empty(), travelArrangedBy: fact('we', 'we arrange it'), paymentRequest: fact('No payment' as never, 'x') };
+    const draft = draftFromFacts(raw);
+    expect(isEmptyValue(FIELD_DEFS.find(d => d.key === 'travelArrangedBy')!, 'We.')).toBe(true);
+    expect(toFacts(draft).travelArrangedBy).toBeNull();
+    expect(valueLabel('travelArrangedBy', null)).toBe('Not mentioned');
+    expect(valueLabel('paymentRequest', 'No payment')).toBe('Not mentioned');
+    expect(valueLabel('paymentRequest', 'none')).toBe('No payment');
+    expect(valueLabel('travelArrangedBy', 'Golden Star agency')).toBe('Golden Star agency');
+    for (const lang of ['id', 'my', 'th', 'tl']) {
+      await i18n.changeLanguage(lang);
+      expect(valueLabel('paymentRequest', 'unknown_code')).not.toBe('unknown_code');
+      expect(valueLabel('paymentRequest', 'none')).not.toBe('No payment');
+    }
   });
 
   it('edits salary as amount, currency and period', () => {
