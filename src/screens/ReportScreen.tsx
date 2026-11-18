@@ -24,6 +24,7 @@ import { useLayout } from '../hooks/useLayout';
 import { useRuntimeConfig } from '../lib/runtimeConfig';
 import { seenLine } from '../lib/radar';
 import { callNumber } from '../lib/warn';
+import { appName } from '../config/brand';
 import { WarnFamilySheet } from '../components/WarnFamilySheet';
 import { Avatar } from '../components/Avatar';
 import { BrandMark } from '../components/BrandMark';
@@ -68,7 +69,7 @@ const FAMILY_ICONS: Record<string, IconName> = {
 };
 
 export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, route }) => {
-  const { t, i18n } = useTranslation(['report', 'common', 'live']);
+  const { t, i18n } = useTranslation(['report', 'common', 'live', 'check']);
   const { result, language, fresh, reported } = route.params;
   const tier = result.attention;
   const level: Verdict = tier ? TIER_VERDICT[tier] : result.verdict;
@@ -196,6 +197,8 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
           <Text style={[styles.summary, readable(tablet, 16, 24)]}>{tier ? rest : result.summary}</Text>
         </Card>
       )}
+
+      {level === 'safe' ? <Text testID="report-disclaimer" style={styles.disclaimer}>{t('check:warn', { app: appName() })}</Text> : null}
 
       {tier && tier !== 'pause' ? <Text testID="report-tier-note" style={styles.tierNote}>{t(`attention.note.${tier}`)}</Text> : null}
     </>
@@ -333,7 +336,7 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
       footerRow={tablet}
       footer={
         <>
-          <Button testID="report-warn" label={t('warn')} icon="people" style={footerButton} onPress={() => setWarnOpen(true)} />
+          <Button testID="report-warn" label={t('warn')} icon="people" variant={level === 'safe' ? 'secondary' : 'primary'} style={footerButton} onPress={() => setWarnOpen(true)} />
           {level !== 'safe' || tier ? (
             hotline?.dial ? (
               <Button testID="report-call" icon="phone" label={call.label} subLabel={call.sub} maxLines={3} subMaxLines={4} variant="secondary" style={footerButton} onPress={() => callNumber(hotline.dial ?? '')} />
@@ -394,6 +397,7 @@ const styles = StyleSheet.create({
   unclearText: { flex: 1, minWidth: 0 },
   panes: { flexDirection: 'row', alignItems: 'flex-start', gap: PANE_GAP },
   pane: { flex: 1, flexBasis: 0, minWidth: 0, gap: 16 },
+  disclaimer: { color: colors.textSecondary, fontSize: 13, lineHeight: 20, fontFamily: fonts.regular },
   footerButton: { flex: 1, flexBasis: 0, minWidth: 0 },
   talkButton: { alignSelf: 'stretch', minHeight: 56 },
   banner: { flexDirection: 'row', alignItems: 'center', gap: 16, borderRadius: 24, paddingVertical: 20, paddingHorizontal: 20 },
