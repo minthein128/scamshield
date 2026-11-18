@@ -53,6 +53,7 @@
     }
   },
   "rateLimitedWait": "Coba lagi dalam {{wait}}. Akun gratis mendapat batas lebih tinggi.",
+  "rateLimitedSoon": "Coba lagi dalam beberapa saat. Akun gratis mendapat batas lebih tinggi.",
   "wait": {
     "unknown": "beberapa saat",
     "minute": "1 menit",

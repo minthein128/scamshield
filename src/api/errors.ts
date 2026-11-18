@@ -33,7 +33,8 @@ export function errorCopy(error: unknown): ErrorCopy {
   const code: ClientErrorCode = error instanceof ApiError ? error.code : 'unknown';
   const title = t(`errors:api.${code}.title`);
   if (code === 'rate_limited') {
-    return { title, message: t('errors:rateLimitedWait', { wait: waitText((error as ApiError).retryAfterSec) }) };
+    const seconds = (error as ApiError).retryAfterSec;
+    return { title, message: seconds ? t('errors:rateLimitedWait', { wait: waitText(seconds) }) : t('errors:rateLimitedSoon') };
   }
   return { title, message: t(`errors:api.${code}.message`) };
 }

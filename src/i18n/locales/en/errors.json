@@ -50,6 +50,7 @@
     }
   },
   "rateLimitedWait": "Try again in about {{wait}}. A free account gets a higher limit.",
+  "rateLimitedSoon": "Try again in a little while. A free account gets a higher limit.",
   "wait": {
     "unknown": "a little while",
     "minute": "a minute",

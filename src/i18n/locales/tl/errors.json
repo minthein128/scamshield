@@ -53,6 +53,7 @@
     }
   },
   "rateLimitedWait": "Subukan muli sa loob ng mga {{wait}}. Mas mataas ang limitasyon sa libreng account.",
+  "rateLimitedSoon": "Subukan muli sa loob ng kaunting sandali. Mas mataas ang limitasyon sa libreng account.",
   "wait": {
     "unknown": "kaunting sandali",
     "minute": "isang minuto",
