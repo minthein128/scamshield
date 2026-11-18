@@ -2,7 +2,7 @@
 
 TLDR: all four non-English languages have every key, and none has a human review. Burmese has the most automatic flags (121 of 516) and the weakest model coverage, so it needs a native reviewer first. Verdict copy from the backend reads well and keeps its hedges in most cases, with a few exceptions listed below. Spoken warnings work in my, id and tl.
 
-Generated 2026-10-15 from commit `3d1bf79`. Files in this folder: `languages-to-check.json` (main review file), `languages-to-check.csv` (same items for spreadsheets), `verdict-samples.json` (live backend samples). The merge script is `scripts/i18n-apply-review.mjs`. No app code, translation or locale file was changed.
+Generated 2026-10-15 from commit `3d1bf79`. The review dumps named below were removed from the tree after the review; they remain in git history at commit `aa0e97f`. Files that were in this folder: `languages-to-check.json` (main review file), `languages-to-check.csv` (same items for spreadsheets), `verdict-samples.json` (live backend samples). The merge script is `scripts/i18n-apply-review.mjs`. No app code, translation or locale file was changed.
 
 ## How the pre-screen was made
 

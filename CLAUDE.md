@@ -18,7 +18,7 @@ Expo SDK 52 / React Native, TypeScript strict. Android anti-scam app. The Expo w
 - `src/data/hotlines.ts` verified hotlines with source URLs; the server reads a generated copy (`pnpm sync:hotlines`).
 - `firestore.rules`, `firestore-tests/`: per-user rules and the emulator test (`pnpm test:rules`).
 - `src/i18n/` i18next setup, UI language list, persistence. `pnpm i18n:check` lists missing or unreviewed translations; `pnpm i18n:translate` fills missing keys with Gemini.
-- `src/navigation/` React Navigation: bottom tabs (Home, Check, Contacts, Learn) inside a native stack (Onboarding, Checking, Report, Shield, Settings, Account, GetHelp, DemoBoard).
+- `src/navigation/` React Navigation: bottom tabs (Home, Check, Contacts, Learn) inside a native stack (Onboarding, Checking, Report, Shield, Settings, Account, GetHelp).
 - `src/hooks/useLayout.ts` size classes from window width: `compact` < 600 dp (phone layout), `medium` 600-899, `expanded` >= 900 (nav rail, two-pane Report). `Screen` centers a reading column on tablets (`wide` for grids); `Grid` lays out card columns; sheets become centered dialogs through `useSheetLayout`. Phones lock to portrait through `useOrientationPolicy`.
 - `src/screens/` real screens. `src/screens/demo/` illustrated walkthroughs, listed in `boards.ts` and shown under Learn as "See how scams look".
 - `src/hooks/useSharedDraft.android.ts` Android share intent. The default file is a no-op for web.
