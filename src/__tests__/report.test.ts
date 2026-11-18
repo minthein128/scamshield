@@ -1,5 +1,5 @@
 import type { Flag } from '../api/types';
-import { VERDICT_STYLES, filledSegments, groupFlags, linkStatus, sourceLines, telUrl, uniqueSources, verdictFromScore } from '../lib/report';
+import { VERDICT_STYLES, filledSegments, groupFlags, linkStatus, sourceLines, telUrl, uniqueSources, verdictFromScore, withoutConflictFlags } from '../lib/report';
 import { scamTypeLabel, verdictLabel } from '../lib/labels';
 import { draftFromShare } from '../lib/share';
 import { buildRequest } from '../lib/request';
@@ -8,6 +8,17 @@ import { findVoiceLocale, pickSpeechLocale } from '../lib/speech';
 import { isCleartext, reportIdFromUrl, toCheckResponse } from '../lib/shield';
 
 const flag = (family: Flag['family'], severity: Flag['severity'], label = family): Flag => ({ family, severity, label, evidence: '' });
+
+describe('conflict flags', () => {
+  const conflict = { field: 'workerFee', description: 'The ad says no fee, but the chat asks for 15000 THB', family: 'payment_route', severity: 'high' } as never;
+
+  it('drops a warning sign that repeats a mismatch and keeps the rest', () => {
+    const flags = [{ ...flag('payment_route', 'high'), label: ' The ad says no fee, but the chat asks for 15000 THB ' }, { ...flag('trafficking', 'medium'), label: 'They want your passport photo' }];
+    expect(withoutConflictFlags(flags, [conflict]).map(f => f.label)).toEqual(['They want your passport photo']);
+    expect(withoutConflictFlags(flags, [])).toBe(flags);
+    expect(withoutConflictFlags(flags, undefined)).toBe(flags);
+  });
+});
 
 describe('report mapping', () => {
   it('maps score bands', () => {

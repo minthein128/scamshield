@@ -16,6 +16,7 @@ import {
   sourceLines,
   uniqueSources,
   warnMessage,
+  withoutConflictFlags,
 } from '../lib/report';
 import { callLabel } from '../lib/callLabel';
 import { scamTypeLabel } from '../lib/labels';
@@ -82,7 +83,7 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
   const conflicts = result.conflicts ?? [];
   const unclear = result.stillUnclear ?? [];
   const findings = result.findings ?? [];
-  const flags = groupFlags(result.flags).flatMap(g => g.flags);
+  const flags = groupFlags(withoutConflictFlags(result.flags, conflicts)).flatMap(g => g.flags);
   const sources = uniqueSources(result.sources ?? []);
   const [warnOpen, setWarnOpen] = useState(false);
   const [liveOpen, setLiveOpen] = useState(false);

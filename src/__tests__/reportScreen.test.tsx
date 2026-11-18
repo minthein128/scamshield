@@ -74,3 +74,18 @@ describe('Report screen, phone call button', () => {
     expect(sub.props.numberOfLines).toBe(1);
   });
 });
+
+describe('Report screen, Job Shield duplicates', () => {
+  it('shows a mismatch once, under What does not match', async () => {
+    const description = 'The ad says no fee, but the chat asks for 15000 THB';
+    const conflict = { field: 'workerFee', code: 'fee_vs_no_fee', fieldLabel: 'Worker fee', adValue: 'none', adQuote: 'No fee', chatValue: '15000 THB', chatQuote: 'pay 15000 THB', description, family: 'payment_route', severity: 'high' };
+    const flags = [
+      { family: 'payment_route', severity: 'high', label: description, evidence: 'Ad: "No fee" / Chat: "pay 15000 THB"' },
+      { family: 'trafficking', severity: 'medium', label: 'They ask for a passport photo', evidence: '' },
+    ];
+    await renderReport({ ...base, verdict: 'danger', attention: 'pause', attentionHeadline: 'Pause', conflicts: [conflict], flags } as never);
+    expect(within(screen.getByTestId('report-conflicts')).getAllByText(description).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(description)).toHaveLength(1);
+    expect(screen.getByText('They ask for a passport photo')).toBeTruthy();
+  });
+});
