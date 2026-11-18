@@ -24,7 +24,41 @@ beforeEach(async () => {
 });
 
 describe('get help list states', () => {
-  it('shows only the prompt and a show-all button when no country is chosen', () => {
+  it('shows the prompt, a show-all button and one default country when no country is chosen', () => {
+    render(<GetHelpScreen navigation={nav} route={route} />);
+    expect(screen.getByTestId('help-no-countries')).toBeTruthy();
+    expect(screen.getByTestId('hotline-mm-police-199')).toBeTruthy();
+    expect(screen.queryByTestId('hotline-th-rtp-ahtd-1599')).toBeNull();
+    expect(screen.getByText('Show all countries')).toBeTruthy();
+  });
+
+  it.each([
+    ['my', 'MM'],
+    ['th', 'TH'],
+    ['id', 'ID'],
+    ['tl', 'PH'],
+  ])('with no country, the %s UI shows only the %s section', async (lang, country) => {
+    await i18n.changeLanguage(lang);
+    render(<GetHelpScreen navigation={nav} route={route} />);
+    expect(screen.getByTestId('help-no-countries')).toBeTruthy();
+    const shown = screen
+      .UNSAFE_queryAllByProps({})
+      .map(n => n.props.testID)
+      .filter((v): v is string => typeof v === 'string' && v.startsWith('hotline-'));
+    const expected = HOTLINES.filter(h => h.country === country).map(h => `hotline-${h.id}`);
+    expect([...new Set(shown)].sort()).toEqual(expected.sort());
+    fireEvent.press(screen.getByTestId('help-toggle-all'));
+    expect(screen.queryByTestId('help-no-countries')).toBeNull();
+    expect(screen.getByTestId('hotline-th-rtp-ahtd-1599')).toBeTruthy();
+    expect(screen.getByTestId('hotline-mm-police-199')).toBeTruthy();
+  });
+
+  it('shows only the prompt and button when the default country is not published', async () => {
+    const items = HOTLINES.filter(h => h.country === 'TH');
+    const fetchImpl = (async () => ({ ok: true, json: async () => ({ version: 1, items }) })) as unknown as typeof fetch;
+    await act(async () => {
+      await refreshConfig(fetchImpl, 'https://api.example');
+    });
     render(<GetHelpScreen navigation={nav} route={route} />);
     expect(screen.getByTestId('help-no-countries')).toBeTruthy();
     expect(screen.queryByTestId('hotline-th-rtp-ahtd-1599')).toBeNull();

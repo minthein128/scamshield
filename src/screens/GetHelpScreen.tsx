@@ -8,7 +8,8 @@ import { Text } from '../components/Text';
 import { Button, Card, EmptyState, LinkButton, Notice, Pill, SectionTitle } from '../components/ui';
 import { HeaderWithLeave } from '../components/LeaveQuickly';
 import { countryLabel } from '../lib/countries';
-import { categoryLabel, allSections, helpSections, localizedHotline, type Hotline } from '../lib/hotlines';
+import { categoryLabel, allSections, hotlinesForCountry, helpSections, localizedHotline, type Hotline } from '../lib/hotlines';
+import type { CountryCode } from '../data/countries';
 import { useRuntimeConfig } from '../lib/runtimeConfig';
 import { callNumber } from '../lib/warn';
 import type { RootScreenProps } from '../navigation/types';
@@ -16,6 +17,8 @@ import { useAppState } from '../state/AppState';
 import theme from '../theme/theme';
 
 const { colors, fonts } = theme;
+
+const DEFAULT_COUNTRY: Record<string, CountryCode> = { my: 'MM', th: 'TH', id: 'ID', tl: 'PH', en: 'MM' };
 
 const HotlineCard: React.FC<{ h: Hotline; style?: StyleProp<ViewStyle> }> = ({ h, style }) => {
   const { t, i18n } = useTranslation('help');
@@ -40,7 +43,7 @@ const HotlineCard: React.FC<{ h: Hotline; style?: StyleProp<ViewStyle> }> = ({ h
 };
 
 export const GetHelpScreen: React.FC<RootScreenProps<'GetHelp'>> = ({ navigation }) => {
-  const { t } = useTranslation('help');
+  const { t, i18n } = useTranslation('help');
   const { profile } = useAppState();
   const layout = useLayout();
   useRuntimeConfig();
@@ -48,7 +51,15 @@ export const GetHelpScreen: React.FC<RootScreenProps<'GetHelp'>> = ({ navigation
   const mine = helpSections(profile.destinationCountry, profile.homeCountry);
   const chosen = Boolean(profile.destinationCountry || profile.homeCountry);
   const noneListed = chosen && mine.every(section => section.entries.length === 0);
-  const sections = showAll ? allSections() : chosen && !noneListed ? mine : [];
+  const fallback = DEFAULT_COUNTRY[i18n.language] ?? DEFAULT_COUNTRY.en;
+  const fallbackEntries = !chosen && !showAll ? hotlinesForCountry(fallback) : [];
+  const sections = showAll
+    ? allSections()
+    : chosen && !noneListed
+      ? mine
+      : fallbackEntries.length > 0
+        ? [{ country: fallback, entries: fallbackEntries }]
+        : [];
 
   return (
     <Screen wide header={<HeaderWithLeave title={t('title')} onBack={() => navigation.goBack()} />}>
