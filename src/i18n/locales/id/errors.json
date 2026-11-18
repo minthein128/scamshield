@@ -52,8 +52,8 @@
       "message": "Masukan diterima selama beberapa hari setelah pemeriksaan."
     }
   },
-  "rateLimitedWait": "Coba lagi dalam {{wait}}. Akun gratis mendapat batas lebih tinggi.",
-  "rateLimitedSoon": "Coba lagi dalam beberapa saat. Akun gratis mendapat batas lebih tinggi.",
+  "rateLimitedWait": "Coba lagi dalam {{wait}}. Masuk untuk batas lebih tinggi.",
+  "rateLimitedSoon": "Coba lagi dalam beberapa saat. Masuk untuk batas lebih tinggi.",
   "wait": {
     "unknown": "beberapa saat",
     "minute": "1 menit",

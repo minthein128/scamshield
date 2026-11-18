@@ -205,8 +205,8 @@ describe('app name', () => {
 
   it('words the rate-limit message without a stray "about" when the wait is unknown', async () => {
     const limited = (sec?: number) => errorCopy(new ApiError('rate_limited', 'x', 429, sec)).message;
-    expect(limited()).toBe('Try again in a little while. A free account gets a higher limit.');
-    expect(limited(300)).toBe('Try again in about 5 minutes. A free account gets a higher limit.');
+    expect(limited()).toBe('Try again in a little while. Sign in for a higher limit.');
+    expect(limited(300)).toBe('Try again in about 5 minutes. Sign in for a higher limit.');
     expect(limited(30)).toContain('Try again in about a minute.');
     for (const lng of TARGETS) {
       await i18n.changeLanguage(lng);
