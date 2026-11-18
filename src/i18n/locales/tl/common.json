@@ -28,7 +28,6 @@
   "loading": "Naglo-load ang $t(common:appName)...",
   "offlineDemo": "Offline demo mode",
   "copied": {
-    "title": "Nakopya na",
     "message": "Nakopya na ang babala. I-paste ito sa kahit anong chat para ibahagi."
   },
   "time": {
@@ -73,12 +72,5 @@
     "ID": "Indonesia",
     "PH": "Pilipinas",
     "VN": "Vietnam"
-  },
-  "languageNames": {
-    "en": "Ingles",
-    "id": "Indonesian",
-    "tl": "Tagalog",
-    "my": "Burmese",
-    "th": "Thai"
   }
 }

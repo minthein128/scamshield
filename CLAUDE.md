@@ -18,11 +18,11 @@ Expo SDK 52 / React Native, TypeScript strict. Android anti-scam app. The Expo w
 - `src/data/hotlines.ts` verified hotlines with source URLs; the server reads a generated copy (`pnpm sync:hotlines`).
 - `firestore.rules`, `firestore-tests/`: per-user rules and the emulator test (`pnpm test:rules`).
 - `src/i18n/` i18next setup, UI language list, persistence. `pnpm i18n:check` lists missing or unreviewed translations; `pnpm i18n:translate` fills missing keys with Gemini.
-- `src/navigation/` React Navigation: bottom tabs (Home, Check, Contacts, Learn) inside a native stack (Onboarding, Checking, Report, Shield, Settings, Account, GetHelp, DemoBoard).
+- `src/navigation/` React Navigation: bottom tabs (Home, Check, Contacts, Learn) inside a native stack (Onboarding, Checking, Report, Shield, Settings, Account, GetHelp).
 - `src/hooks/useLayout.ts` size classes from window width: `compact` < 600 dp (phone layout), `medium` 600-899, `expanded` >= 900 (nav rail, two-pane Report). `Screen` centers a reading column on tablets (`wide` for grids); `Grid` lays out card columns; sheets become centered dialogs through `useSheetLayout`. Phones lock to portrait through `useOrientationPolicy`.
 - `src/screens/` real screens. `src/screens/demo/` illustrated walkthroughs, listed in `boards.ts` and shown under Learn as "See how scams look".
 - `src/hooks/useSharedDraft.android.ts` Android share intent. The default file is a no-op for web.
-- `bench/` screenshot benchmark (run from `server/`, see `bench/README.md`). Never commit real screenshots. `media/` holds the deck PDF and the demo video (Git LFS).
+- `bench/` screenshot benchmark (run from `server/`, see `bench/README.md`). Never commit real screenshots. `media/` holds the demo video (Git LFS). The deck PDF is `pitch/deck.pdf`.
 - `modules/shield-module/` native overlay owned by another engineer. `server/` is the backend. Do not edit either from app work.
 
 ## Mock or real API
@@ -50,5 +50,5 @@ Other env vars: `EXPO_PUBLIC_APK_URL` (download link on web), `EXPO_PUBLIC_FIREB
 
 - UI copy lives in `src/i18n/locales/<lang>/*.json` (English is the source, keys are typed). Use `t()` from react-i18next, never a string literal, and import `Text` from `src/components/Text`. See `docs/i18n.md`. The model response follows the report language, not the UI language.
 - No seeded data in the UI. Every screen needs an empty state.
-- Android only: share intent, shield overlay. Guard with `Platform.OS`; web shows `AndroidNote`.
+- Android only: share intent, shield overlay. Guard with `Platform.OS`.
 - Keep the visual design in `src/theme/theme.ts`. Comments: one line, only when the code is not obvious.

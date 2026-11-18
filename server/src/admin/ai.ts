@@ -7,7 +7,6 @@ import { log } from '../log.js';
 import { HEDGE_RETRY, LIKELIHOOD_RULES } from '../prompt.js';
 import { ApiError, type Lang } from '../types.js';
 import { glossaryLines, LANG_NAMES, STYLE_RULES } from './glossary.js';
-import { CATEGORIES, CONTENT_LANGS } from './schema.js';
 import { checkPage, hostOf, isOfficialUrl, numberAppears, type PageCheck } from './sources.js';
 
 export type Confidence = 'high' | 'medium' | 'low';
@@ -330,6 +329,3 @@ export function createAiAssist(deps: AiDeps): AiAssist {
     },
   };
 }
-
-export const VALID_CATEGORIES: readonly string[] = CATEGORIES;
-export const VALID_LANGS: readonly string[] = CONTENT_LANGS;

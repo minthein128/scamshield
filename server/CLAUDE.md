@@ -37,7 +37,7 @@ Hono + TypeScript service implementing `docs/api-contract.md`. Pipeline: Extract
 - Change the API shape only together with `docs/api-contract.md`.
 - Verified live: extraction schema, Search grounding, and `gemini-3.8-flash-tts` through `generateContent` with AUDIO modality (returns 24 kHz PCM, wrapped to WAV). Web Risk rejects API keys: it needs ADC.
 - Caches are in memory only, never written to disk or logs. Results and job extractions hold quotes from the user's message, so they stay 1 hour (`RESULT_CACHE_TTL_MS`, `JOB_CACHE_TTL_MS`); grounding holds only public company names and hosts, so it stays 24 hours. `CACHE=0` turns all three off.
-- Extraction, job extraction and grounding use `SAMPLING` from `config.ts` (temperature 0, fixed seed) so the same input gets the same flags. In a probe, adding `topK: 1` made 6 of 32 streamed extractions hit the 12 s timeout; leave it out. `npx tsx eval/consistency.ts` against a running server prints the verdict spread per demo input.
+- Extraction, job extraction and grounding use `SAMPLING` from `config.ts` (temperature 0, fixed seed) so the same input gets the same flags. In a probe, adding `topK: 1` made 6 of 32 streamed extractions hit the 12 s timeout; leave it out.
 - Default model is `gemini-3.5-flash-lite` (measured: see README). `THINKING_LEVEL` defaults to LOW; set it empty to use the model default.
 - Grounding must not report brand-impersonation advisories as `known_bad`; the eval case `legit-sms-en` guards this.
 - Grounding cannot share a call with `responseSchema`, so `ground.ts` asks for JSON in plain text and parses leniently.

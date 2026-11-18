@@ -31,10 +31,6 @@ export function toCheckResponse(result: ShieldCheckResult): CheckResponse {
 
 export const SCREEN_SOURCE = 'Screen check';
 
-export function apiUrlFromEnv(): string {
-  return process.env.EXPO_PUBLIC_API_URL?.trim() ?? '';
-}
-
 export function isCleartext(url: string): boolean {
   return /^http:\/\//i.test(url);
 }

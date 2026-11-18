@@ -169,8 +169,6 @@ export const Notice: React.FC<{ title?: string; message: string; tone?: 'error' 
   </View>
 );
 
-export const Divider: React.FC = () => <View accessibilityRole="none" style={styles.divider} />;
-
 export const SectionTitle: React.FC<{ children: string }> = ({ children }) => <Text wrap="word" accessibilityRole="header" style={styles.sectionTitle}>{children}</Text>;
 
 const styles = StyleSheet.create({
@@ -206,6 +204,5 @@ const styles = StyleSheet.create({
   chipText: { fontSize: 14, lineHeight: 20, fontFamily: fonts.semiBold, includeFontPadding: false },
   card: { backgroundColor: colors.white, borderWidth: 1, borderColor: colors.border, borderRadius: 16, padding: 16 },
   pill: { alignSelf: 'flex-start', maxWidth: '100%', paddingVertical: 4, paddingHorizontal: 12, borderRadius: 999, fontSize: 13, lineHeight: 18, fontFamily: fonts.bold, overflow: 'hidden', includeFontPadding: false },
-  divider: { height: 1, alignSelf: 'stretch', backgroundColor: colors.border },
   sectionTitle: { fontSize: 18, lineHeight: 24, fontFamily: fonts.bold, color: colors.textPrimary, includeFontPadding: false },
 });

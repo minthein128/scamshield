@@ -28,7 +28,6 @@
   "loading": "Memuat $t(common:appName)...",
   "offlineDemo": "Mode demo offline",
   "copied": {
-    "title": "Tersalin",
     "message": "Peringatan sudah disalin. Tempel di obrolan apa pun untuk membagikannya."
   },
   "time": {
@@ -72,12 +71,5 @@
     "ID": "Indonesia",
     "PH": "Filipina",
     "VN": "Vietnam"
-  },
-  "languageNames": {
-    "en": "Inggris",
-    "id": "Bahasa Indonesia",
-    "tl": "Tagalog",
-    "my": "Myanmar",
-    "th": "Thai"
   }
 }
