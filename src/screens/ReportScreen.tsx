@@ -69,6 +69,8 @@ const FAMILY_ICONS: Record<string, IconName> = {
   trafficking: 'octagon',
 };
 
+const FooterPair: React.FC<{ tablet: boolean; children: React.ReactNode }> = ({ tablet, children }) => (tablet ? <>{children}</> : <View style={styles.footerPair}>{children}</View>);
+
 export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, route }) => {
   const { t, i18n } = useTranslation(['report', 'common', 'live', 'check']);
   const { result, language, fresh, reported } = route.params;
@@ -83,6 +85,7 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
   const sources = uniqueSources(result.sources ?? []);
   const [warnOpen, setWarnOpen] = useState(false);
   const [liveOpen, setLiveOpen] = useState(false);
+  const [barHeight, setBarHeight] = useState(0);
   const { profile, language: settingLanguage } = useAppState();
   const { width } = useWindowDimensions();
   const layout = useLayout();
@@ -335,16 +338,21 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
       header={<HeaderWithLeave title={t('title')} onBack={() => (navigation.canGoBack() ? navigation.goBack() : navigation.navigate('Tabs'))} />}
       wide={layout.isExpanded}
       footerRow={tablet}
+      footerStyle={tablet ? undefined : styles.footerTight}
+      onFooterLayout={setBarHeight}
+      contentStyle={tablet || !barHeight ? undefined : { paddingBottom: barHeight }}
       footer={
         <>
-          <Button testID="report-warn" label={t('warn')} icon="people" variant={level === 'safe' ? 'secondary' : 'primary'} style={footerButton} onPress={() => setWarnOpen(true)} />
-          {level !== 'safe' || tier ? (
-            hotline?.dial ? (
-              <Button testID="report-call" icon="phone" label={call.label} subLabel={call.sub} maxLines={3} subMaxLines={4} variant="secondary" style={footerButton} onPress={() => callNumber(hotline.dial ?? '')} />
-            ) : (
-              <Button testID="report-help" label={t('help')} variant="secondary" style={footerButton} onPress={() => navigation.navigate('GetHelp')} />
-            )
-          ) : null}
+          <FooterPair tablet={tablet}>
+            <Button testID="report-warn" label={t('warn')} icon="people" variant={level === 'safe' ? 'secondary' : 'primary'} style={footerButton ?? styles.footerHalf} onPress={() => setWarnOpen(true)} />
+            {level !== 'safe' || tier ? (
+              hotline?.dial ? (
+                <Button testID="report-call" icon="phone" label={call.label} subLabel={call.sub} maxLines={3} subMaxLines={4} variant="secondary" style={footerButton ?? styles.footerHalf} onPress={() => callNumber(hotline.dial ?? '')} />
+              ) : (
+                <Button testID="report-help" label={t('help')} variant="secondary" style={footerButton ?? styles.footerHalf} onPress={() => navigation.navigate('GetHelp')} />
+              )
+            ) : null}
+          </FooterPair>
           <LinkButton testID="report-share" label={t('share')} onPress={shareResult} />
         </>
       }
@@ -399,6 +407,9 @@ const styles = StyleSheet.create({
   panes: { flexDirection: 'row', alignItems: 'flex-start', gap: PANE_GAP },
   pane: { flex: 1, flexBasis: 0, minWidth: 0, gap: 16 },
   disclaimer: { color: colors.textSecondary, fontSize: 13, lineHeight: 20, fontFamily: fonts.regular },
+  footerPair: { flexDirection: 'row', gap: 8, alignItems: 'stretch' },
+  footerHalf: { flex: 1, flexBasis: 0, minWidth: 0, minHeight: 48, paddingVertical: 10 },
+  footerTight: { paddingTop: 6, paddingBottom: 8, gap: 2 },
   footerButton: { flex: 1, flexBasis: 0, minWidth: 0 },
   talkButton: { alignSelf: 'stretch', minHeight: 56 },
   banner: { flexDirection: 'row', alignItems: 'center', gap: 16, borderRadius: 24, paddingVertical: 20, paddingHorizontal: 20 },

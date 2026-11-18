@@ -20,9 +20,10 @@ interface ScreenProps {
   /** Overrides the footer spacing for screens that need a tighter footer. */
   footerStyle?: StyleProp<ViewStyle>;
   scrollRef?: React.Ref<ScrollView>;
+  onFooterLayout?: (height: number) => void;
 }
 
-export const Screen: React.FC<ScreenProps> = ({ children, footer, edges = ['top'], background = theme.colors.background, contentStyle, scroll = true, wide, footerRow, header, footerStyle, scrollRef }) => {
+export const Screen: React.FC<ScreenProps> = ({ children, footer, edges = ['top'], background = theme.colors.background, contentStyle, scroll = true, wide, footerRow, header, footerStyle, scrollRef, onFooterLayout }) => {
   const layout = useLayout();
   const [lifted, setLifted] = useState(false);
   const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -63,7 +64,7 @@ export const Screen: React.FC<ScreenProps> = ({ children, footer, edges = ['top'
       ) : (
         <View style={[styles.flex, tablet ? [styles.tabletContent, padX, topPad] : [styles.content, contentStyle, topPad]]}>{body}</View>
       )}
-      {footer ? <View style={[styles.footer, tablet && padX, { backgroundColor: background }, footerStyle]}>{footerBody}</View> : null}
+      {footer ? <View onLayout={onFooterLayout ? e => onFooterLayout(e.nativeEvent.layout.height) : undefined} style={[styles.footer, tablet && padX, { backgroundColor: background }, footerStyle]}>{footerBody}</View> : null}
     </SafeAreaView>
   );
 };
