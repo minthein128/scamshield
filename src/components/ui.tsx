@@ -51,12 +51,16 @@ interface ButtonProps {
   mutedDisabled?: boolean;
   /** Reports how many lines the label and sub label need, measured from their rendered height. */
   onLines?: (lines: { label: number; sub: number }) => void;
+  /** Tighter padding and a smaller sub label for phone action bars. */
+  compact?: boolean;
 }
 
 const LABEL_LINE = 20;
 const SUB_LINE = 18;
+const COMPACT_SUB_LINE = 16;
 
-export const Button: React.FC<ButtonProps> = ({ label, subLabel, onPress, variant = 'primary', disabled, style, testID, icon, leading, trailing, accessibilityLabel, maxLines = 2, subMaxLines = 2, mutedDisabled, onLines }) => {
+export const Button: React.FC<ButtonProps> = ({ label, subLabel, onPress, variant = 'primary', disabled, style, testID, icon, leading, trailing, accessibilityLabel, maxLines = 2, subMaxLines = 2, mutedDisabled, onLines, compact }) => {
+  const subLine = compact ? COMPACT_SUB_LINE : SUB_LINE;
   const heights = React.useRef({ label: 0, sub: 0 });
   const report = (key: 'label' | 'sub', height: number, line: number) => {
     heights.current[key] = Math.round(height / Math.round(line * PixelRatio.getFontScale()));
@@ -74,7 +78,7 @@ export const Button: React.FC<ButtonProps> = ({ label, subLabel, onPress, varian
       activeOpacity={0.7}
       disabled={disabled}
       onPress={onPress}
-      style={[styles.button, v.container, disabled && !muted && { opacity: 0.45 }, style]}
+      style={[styles.button, v.container, compact && styles.buttonCompact, disabled && !muted && { opacity: 0.45 }, style]}
     >
       <View style={[styles.buttonRow, leading ? styles.buttonRowCentered : null, trailing ? styles.buttonRowFull : null]}>
         {leading ? (
@@ -86,7 +90,7 @@ export const Button: React.FC<ButtonProps> = ({ label, subLabel, onPress, varian
         ) : null}
         <View style={[styles.buttonBody, trailing ? styles.buttonBodyFill : null]}>
           <Text wrap="word" numberOfLines={maxLines} ellipsizeMode="tail" onLayout={onLines ? e => report('label', e.nativeEvent.layout.height, scriptStyle(label, 'bold', LABEL_LINE).lineHeight ?? LABEL_LINE) : undefined} style={[styles.buttonText, { color: v.color }]}>{label}</Text>
-          {subLabel ? <Text numberOfLines={subMaxLines} ellipsizeMode="tail" onLayout={onLines ? e => report('sub', e.nativeEvent.layout.height, scriptStyle(subLabel, 'medium', SUB_LINE).lineHeight ?? SUB_LINE) : undefined} style={[styles.buttonSub, { color: v.color }]}>{subLabel}</Text> : null}
+          {subLabel ? <Text numberOfLines={subMaxLines} ellipsizeMode="tail" onLayout={onLines ? e => report('sub', e.nativeEvent.layout.height, scriptStyle(subLabel, 'medium', subLine).lineHeight ?? subLine) : undefined} style={[styles.buttonSub, compact && styles.buttonSubCompact, { color: v.color }]}>{subLabel}</Text> : null}
         </View>
         {trailing ? <View style={styles.buttonIcon}>{trailing}</View> : null}
       </View>
@@ -199,6 +203,8 @@ const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 48 },
   headerTitle: { flexShrink: 1, marginRight: 12, fontSize: 22, lineHeight: 28, fontFamily: fonts.bold, color: colors.textPrimary, includeFontPadding: false },
   button: { minHeight: 48, maxWidth: '100%', borderRadius: 16, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 16, paddingVertical: 14 },
+  buttonCompact: { paddingVertical: 10 },
+  buttonSubCompact: { fontSize: 12, lineHeight: 16 },
   buttonRow: { flexDirection: 'row', gap: 8, alignItems: 'flex-start', maxWidth: '100%' },
   buttonRowCentered: { alignItems: 'center', gap: 10 },
   buttonRowFull: { alignSelf: 'stretch' },
