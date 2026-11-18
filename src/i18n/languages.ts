@@ -6,14 +6,15 @@ export type UiLanguage = LanguageCode;
 export interface UiLanguageOption {
   code: UiLanguage;
   label: string;
+  nativeLabel: string;
 }
 
 export const UI_LANGUAGES: UiLanguageOption[] = [
-  { code: 'en', label: 'English' },
-  { code: 'my', label: 'Myanmar' },
-  { code: 'id', label: 'Bahasa Indonesia' },
-  { code: 'tl', label: 'Tagalog' },
-  { code: 'th', label: 'Thai' },
+  { code: 'en', label: 'English', nativeLabel: 'English' },
+  { code: 'my', label: 'Myanmar', nativeLabel: 'မြန်မာ' },
+  { code: 'id', label: 'Bahasa Indonesia', nativeLabel: 'Bahasa Indonesia' },
+  { code: 'tl', label: 'Tagalog', nativeLabel: 'Tagalog' },
+  { code: 'th', label: 'Thai', nativeLabel: 'ไทย' },
 ];
 
 export const DEFAULT_UI_LANGUAGE: UiLanguage = 'en';

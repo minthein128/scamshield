@@ -89,9 +89,14 @@ describe('language switch', () => {
     expect(await restoreUiLanguage()).toBe('en');
   });
 
-  it('offers the five languages once, without native-script duplicates', () => {
+  it('offers the five languages once, with native labels', () => {
     expect(UI_LANGUAGES.map(l => l.label)).toEqual(['English', 'Myanmar', 'Bahasa Indonesia', 'Tagalog', 'Thai']);
-    expect(UI_LANGUAGES.every(l => Object.keys(l).sort().join() === 'code,label')).toBe(true);
+    expect(UI_LANGUAGES.map(l => l.nativeLabel)).toEqual(['English', 'မြန်မာ', 'Bahasa Indonesia', 'Tagalog', 'ไทย']);
+    expect(UI_LANGUAGES.every(l => Object.keys(l).sort().join() === 'code,label,nativeLabel')).toBe(true);
+  });
+
+  it('gives every language a non-empty native label', () => {
+    expect(UI_LANGUAGES.every(l => l.nativeLabel.trim().length > 0)).toBe(true);
   });
 });
 
