@@ -6,9 +6,9 @@
     "body": "Choose where you are from and where you will work, and we show those hotlines first.",
     "action": "Choose countries"
   },
-  "none": {
-    "title": "No hotlines to show",
-    "body": "We could not load hotline details. Try again later."
+  "noneListed": {
+    "title": "No contacts listed",
+    "body": "We have not listed any contacts for your countries yet. You can choose different countries or look at all countries."
   },
   "whereWork": "{{country}} (where you will work)",
   "yourCountry": "{{country}} (your country)",
@@ -19,6 +19,7 @@
   "source": "Official source",
   "showMine": "Show only my countries",
   "showAll": "Show all countries",
+  "hideAll": "Hide all countries",
   "categories": {
     "trafficking": "Anti-trafficking",
     "police": "Police",
