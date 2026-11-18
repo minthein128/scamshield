@@ -85,7 +85,7 @@ export const Button: React.FC<ButtonProps> = ({ label, subLabel, onPress, varian
           </View>
         ) : null}
         <View style={[styles.buttonBody, trailing ? styles.buttonBodyFill : null]}>
-          <Text numberOfLines={maxLines} ellipsizeMode="tail" onLayout={onLines ? e => report('label', e.nativeEvent.layout.height, scriptStyle(label, 'bold', LABEL_LINE).lineHeight ?? LABEL_LINE) : undefined} style={[styles.buttonText, { color: v.color }]}>{label}</Text>
+          <Text wrap="word" numberOfLines={maxLines} ellipsizeMode="tail" onLayout={onLines ? e => report('label', e.nativeEvent.layout.height, scriptStyle(label, 'bold', LABEL_LINE).lineHeight ?? LABEL_LINE) : undefined} style={[styles.buttonText, { color: v.color }]}>{label}</Text>
           {subLabel ? <Text numberOfLines={subMaxLines} ellipsizeMode="tail" onLayout={onLines ? e => report('sub', e.nativeEvent.layout.height, scriptStyle(subLabel, 'medium', SUB_LINE).lineHeight ?? SUB_LINE) : undefined} style={[styles.buttonSub, { color: v.color }]}>{subLabel}</Text> : null}
         </View>
         {trailing ? <View style={styles.buttonIcon}>{trailing}</View> : null}
