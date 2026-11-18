@@ -72,7 +72,6 @@ All runs use `gemini-3.5-flash-lite` and the production prompt. A public evaluat
 | --- | --- | --- |
 | Synthetic screenshots, 5 languages ([results](bench/RESULTS-v2.md)) | 24 | Protection Score **89.7**. 0 critical failures, 0 dangerous messages called safe, 0 false alarms, 48/48 quotes found in the image, verdict stable in 98% of 210 variants (blur, crop, dark mode, prompt injection) |
 | Synthetic text eval (`server/eval`) | 31 | **31/31** correct, 0 responses with certainty wording after the guard, p50 2.8 s, p95 4.4 s |
-| Real redacted screenshots | 54 | Protection Score **66.6**, provisional, on draft labels |
 
 ## Built with
 
