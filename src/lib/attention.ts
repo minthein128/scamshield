@@ -8,7 +8,7 @@ export const TIER_VERDICT: Record<AttentionTier, Verdict> = { lower: 'safe', ver
 type Leveled = Pick<CheckResponse, 'verdict'> & { attention?: AttentionTier };
 
 export function tierWord(tier: AttentionTier): string {
-  return t(`report:attention.word.${tier}`);
+  return verdictLabel(TIER_VERDICT[tier]);
 }
 
 export function tierHeadline(tier: AttentionTier): string {

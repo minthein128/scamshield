@@ -182,20 +182,32 @@ describe('attention tiers', () => {
 
   it('maps lower, verify and pause onto the three verdict steps', () => {
     expect(TIER_VERDICT).toEqual({ lower: 'safe', verify: 'careful', pause: 'danger' });
-    expect([stepWord('safe', 'lower'), stepWord('careful', 'lower'), stepWord('danger', 'lower')]).toEqual(['Fewer signs', 'Check first', 'Pause']);
+    expect([stepWord('safe', 'lower'), stepWord('careful', 'lower'), stepWord('danger', 'lower')]).toEqual(['Low risk', 'Be careful', 'High risk']);
   });
 
   it('uses the spec wording and never a reassuring word', async () => {
     expect(tierHeadline('lower')).toBe('Few warning signs found, but important details may still be missing');
     expect(tierHeadline('verify')).toBe('Some details do not add up, check them before you go');
     expect(tierHeadline('pause')).toBe('Pause before you pay, send documents or travel');
-    expect(resultWord({ verdict: 'safe', attention: 'lower' })).not.toMatch(/low risk|safe/i);
+    expect(resultWord({ verdict: 'safe', attention: 'lower' })).toBe('Low risk');
     expect(resultWord({ verdict: 'safe' })).toBe('Low risk');
     for (const lang of ['en', 'my', 'id', 'tl', 'th']) {
       await i18n.changeLanguage(lang);
       const all = JSON.stringify((['lower', 'verify', 'pause'] as const).map(tierHeadline).concat(['lower', 'verify', 'pause'].map(k => i18n.t(`report:attention.note.${k}` as never)).filter(Boolean)));
       expect(all).not.toMatch(/proceed with caution|no major conflicts|\bsafe\b/i);
     }
+  });
+});
+
+describe('tier labels match the normal check', () => {
+  const { tierWord } = require('../lib/attention') as typeof import('../lib/attention');
+  const { verdictLabel } = require('../lib/labels') as typeof import('../lib/labels');
+  it.each(['en', 'id', 'my', 'th', 'tl'])('uses the verdict words in %s', async lang => {
+    await i18n.changeLanguage(lang);
+    expect(tierWord('lower')).toBe(verdictLabel('safe'));
+    expect(tierWord('verify')).toBe(verdictLabel('careful'));
+    expect(tierWord('pause')).toBe(verdictLabel('danger'));
+    expect(new Set([tierWord('lower'), tierWord('verify'), tierWord('pause')]).size).toBe(3);
   });
 });
 
