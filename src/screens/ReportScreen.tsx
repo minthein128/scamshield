@@ -14,6 +14,7 @@ import {
   linkStatus,
   shareMessage,
   sourceLines,
+  uniqueSources,
   warnMessage,
 } from '../lib/report';
 import { callLabel } from '../lib/callLabel';
@@ -79,7 +80,7 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
   const unclear = result.stillUnclear ?? [];
   const findings = result.findings ?? [];
   const flags = groupFlags(result.flags).flatMap(g => g.flags);
-  const sources = result.sources ?? [];
+  const sources = uniqueSources(result.sources ?? []);
   const [warnOpen, setWarnOpen] = useState(false);
   const [liveOpen, setLiveOpen] = useState(false);
   const { profile, language: settingLanguage } = useAppState();

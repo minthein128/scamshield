@@ -112,3 +112,19 @@ export function sourceLines(src: Source): { title: string; domain?: string } {
   const title = src.title.trim() || domain || hostOf(src.url);
   return { title, domain: domain && domain !== title.toLowerCase() ? domain : undefined };
 }
+
+export const MAX_SOURCES = 5;
+
+/** One source per site, in API order, capped so the list stays short. */
+export function uniqueSources(sources: Source[], max = MAX_SOURCES): Source[] {
+  const seen = new Set<string>();
+  const out: Source[] = [];
+  for (const src of sources) {
+    const host = (sourceDomain(src) ?? hostOf(src.url)).toLowerCase();
+    if (seen.has(host)) continue;
+    seen.add(host);
+    out.push(src);
+    if (out.length === max) break;
+  }
+  return out;
+}

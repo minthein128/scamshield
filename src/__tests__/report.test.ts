@@ -1,5 +1,5 @@
 import type { Flag } from '../api/types';
-import { VERDICT_STYLES, filledSegments, groupFlags, linkStatus, sourceLines, telUrl, verdictFromScore } from '../lib/report';
+import { VERDICT_STYLES, filledSegments, groupFlags, linkStatus, sourceLines, telUrl, uniqueSources, verdictFromScore } from '../lib/report';
 import { scamTypeLabel, verdictLabel } from '../lib/labels';
 import { draftFromShare } from '../lib/share';
 import { buildRequest } from '../lib/request';
@@ -198,5 +198,24 @@ describe('scam type label', () => {
     expect(scamTypeLabel('other', 'link')).toBe('Suspicious link');
     expect(scamTypeLabel('other', 'message')).toBe('Suspicious message');
     expect(scamTypeLabel('parcel_phishing', 'link')).toBe('Possible parcel phishing');
+  });
+});
+
+describe('uniqueSources', () => {
+  const src = (url: string, title = '') => ({ url, title });
+
+  it('keeps the first entry per host and the API order', () => {
+    const out = uniqueSources([src('https://www.reddit.com/a'), src('https://quora.com/b'), src('https://reddit.com/c'), src('https://apple.com/d')]);
+    expect(out.map(s => s.url)).toEqual(['https://www.reddit.com/a', 'https://quora.com/b', 'https://apple.com/d']);
+  });
+
+  it('dedupes redirect links by the site behind them', () => {
+    const redirect = (title: string) => src('https://vertexaisearch.cloud.google.com/grounding-api-redirect/x' + title, title);
+    expect(uniqueSources([redirect('tbanky.com'), redirect('tbanky.com'), redirect('mea.gov.in')])).toHaveLength(2);
+  });
+
+  it('caps the list at five', () => {
+    const many = Array.from({ length: 9 }, (_, i) => src(`https://site${i}.com/x`));
+    expect(uniqueSources(many).map(s => s.url)).toEqual(many.slice(0, 5).map(s => s.url));
   });
 });
