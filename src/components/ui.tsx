@@ -49,11 +49,19 @@ interface ButtonProps {
   subMaxLines?: number;
   /** When disabled, show a flat sand button with muted text instead of a faded one. */
   mutedDisabled?: boolean;
+  /** Reports how many lines the label and sub label need, measured from their rendered height. */
+  onLines?: (lines: { label: number; sub: number }) => void;
 }
 
 const LABEL_LINE = 20;
+const SUB_LINE = 18;
 
-export const Button: React.FC<ButtonProps> = ({ label, subLabel, onPress, variant = 'primary', disabled, style, testID, icon, leading, trailing, accessibilityLabel, maxLines = 2, subMaxLines = 2, mutedDisabled }) => {
+export const Button: React.FC<ButtonProps> = ({ label, subLabel, onPress, variant = 'primary', disabled, style, testID, icon, leading, trailing, accessibilityLabel, maxLines = 2, subMaxLines = 2, mutedDisabled, onLines }) => {
+  const heights = React.useRef({ label: 0, sub: 0 });
+  const report = (key: 'label' | 'sub', height: number, line: number) => {
+    heights.current[key] = Math.round(height / Math.round(line * PixelRatio.getFontScale()));
+    onLines?.({ ...heights.current });
+  };
   const muted = Boolean(disabled && mutedDisabled);
   const v = muted ? { container: { backgroundColor: colors.border }, color: colors.textSecondary } : BUTTON_VARIANTS[variant];
   const firstLine = Math.round((scriptStyle(label, 'bold', LABEL_LINE).lineHeight ?? LABEL_LINE) * PixelRatio.getFontScale());
@@ -77,8 +85,8 @@ export const Button: React.FC<ButtonProps> = ({ label, subLabel, onPress, varian
           </View>
         ) : null}
         <View style={[styles.buttonBody, trailing ? styles.buttonBodyFill : null]}>
-          <Text numberOfLines={maxLines} ellipsizeMode="tail" style={[styles.buttonText, { color: v.color }]}>{label}</Text>
-          {subLabel ? <Text numberOfLines={subMaxLines} ellipsizeMode="tail" style={[styles.buttonSub, { color: v.color }]}>{subLabel}</Text> : null}
+          <Text numberOfLines={maxLines} ellipsizeMode="tail" onLayout={onLines ? e => report('label', e.nativeEvent.layout.height, scriptStyle(label, 'bold', LABEL_LINE).lineHeight ?? LABEL_LINE) : undefined} style={[styles.buttonText, { color: v.color }]}>{label}</Text>
+          {subLabel ? <Text numberOfLines={subMaxLines} ellipsizeMode="tail" onLayout={onLines ? e => report('sub', e.nativeEvent.layout.height, scriptStyle(subLabel, 'medium', SUB_LINE).lineHeight ?? SUB_LINE) : undefined} style={[styles.buttonSub, { color: v.color }]}>{subLabel}</Text> : null}
         </View>
         {trailing ? <View style={styles.buttonIcon}>{trailing}</View> : null}
       </View>

@@ -69,7 +69,8 @@ const FAMILY_ICONS: Record<string, IconName> = {
   trafficking: 'octagon',
 };
 
-const FooterPair: React.FC<{ tablet: boolean; children: React.ReactNode }> = ({ tablet, children }) => (tablet ? <>{children}</> : <View style={styles.footerPair}>{children}</View>);
+const FooterPair: React.FC<{ paired: boolean; hidden: boolean; children: React.ReactNode }> = ({ paired, hidden, children }) =>
+  paired ? <View style={[styles.footerPair, hidden && styles.footerHidden]}>{children}</View> : <>{children}</>;
 
 export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, route }) => {
   const { t, i18n } = useTranslation(['report', 'common', 'live', 'check']);
@@ -86,6 +87,7 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
   const [warnOpen, setWarnOpen] = useState(false);
   const [liveOpen, setLiveOpen] = useState(false);
   const [barHeight, setBarHeight] = useState(0);
+  const [measured, setMeasured] = useState<{ key?: string; warn?: number; label?: number; sub?: number }>({});
   const { profile, language: settingLanguage } = useAppState();
   const { width } = useWindowDimensions();
   const layout = useLayout();
@@ -114,6 +116,13 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
   const call = hotline ? callLabel(hotline, callTexts) : { label: '' };
   const talkLabel = t('live:button');
   const footerButton = tablet ? styles.footerButton : undefined;
+  const hasSecond = level !== 'safe' || Boolean(tier);
+  const fitKey = `${i18n.language}|${call.label}|${call.sub ?? ''}|${hotline?.dial ? 'call' : 'help'}`;
+  const fit = measured.key === fitKey ? measured : undefined;
+  const measuredAll = fit?.warn !== undefined && fit.label !== undefined;
+  const fits = measuredAll && (fit.warn ?? 0) <= 2 && (fit.label ?? 0) <= 2 && (fit.sub ?? 0) <= 2;
+  const paired = !tablet && (!hasSecond || !measuredAll || fits);
+  const pending = !tablet && hasSecond && !measuredAll;
 
   const shareResult = async () => {
     await shareText(shareMessage(result));
@@ -343,13 +352,13 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
       contentStyle={tablet || !barHeight ? undefined : { paddingBottom: barHeight }}
       footer={
         <>
-          <FooterPair tablet={tablet}>
-            <Button testID="report-warn" label={t('warn')} icon="people" variant={level === 'safe' ? 'secondary' : 'primary'} style={footerButton ?? styles.footerHalf} onPress={() => setWarnOpen(true)} />
-            {level !== 'safe' || tier ? (
+          <FooterPair paired={paired} hidden={pending}>
+            <Button testID="report-warn" label={t('warn')} icon="people" variant={level === 'safe' ? 'secondary' : 'primary'} style={footerButton ?? (paired ? styles.footerHalf : undefined)} maxLines={pending ? 6 : 2} onLines={pending ? l => setMeasured(m => ({ ...(m.key === fitKey ? m : { key: fitKey }), warn: l.label })) : undefined} onPress={() => setWarnOpen(true)} />
+            {hasSecond ? (
               hotline?.dial ? (
-                <Button testID="report-call" icon="phone" label={call.label} subLabel={call.sub} maxLines={3} subMaxLines={4} variant="secondary" style={footerButton ?? styles.footerHalf} onPress={() => callNumber(hotline.dial ?? '')} />
+                <Button testID="report-call" icon="phone" label={call.label} subLabel={call.sub} maxLines={tablet ? 3 : pending ? 6 : 2} subMaxLines={tablet ? 4 : pending ? 6 : 2} variant="secondary" style={footerButton ?? (paired ? styles.footerHalf : undefined)} onLines={pending ? l => setMeasured(m => ({ ...(m.key === fitKey ? m : { key: fitKey }), label: l.label, sub: l.sub })) : undefined} onPress={() => callNumber(hotline.dial ?? '')} />
               ) : (
-                <Button testID="report-help" label={t('help')} variant="secondary" style={footerButton ?? styles.footerHalf} onPress={() => navigation.navigate('GetHelp')} />
+                <Button testID="report-help" label={t('help')} variant="secondary" style={footerButton ?? (paired ? styles.footerHalf : undefined)} maxLines={pending ? 6 : 2} onLines={pending ? l => setMeasured(m => ({ ...(m.key === fitKey ? m : { key: fitKey }), label: l.label, sub: 0 })) : undefined} onPress={() => navigation.navigate('GetHelp')} />
               )
             ) : null}
           </FooterPair>
@@ -408,6 +417,7 @@ const styles = StyleSheet.create({
   pane: { flex: 1, flexBasis: 0, minWidth: 0, gap: 16 },
   disclaimer: { color: colors.textSecondary, fontSize: 13, lineHeight: 20, fontFamily: fonts.regular },
   footerPair: { flexDirection: 'row', gap: 8, alignItems: 'stretch' },
+  footerHidden: { opacity: 0 },
   footerHalf: { flex: 1, flexBasis: 0, minWidth: 0, minHeight: 48, paddingVertical: 10 },
   footerTight: { paddingTop: 6, paddingBottom: 8, gap: 2 },
   footerButton: { flex: 1, flexBasis: 0, minWidth: 0 },
