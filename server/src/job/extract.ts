@@ -26,13 +26,22 @@ import {
 import { FACT_SCHEMAS } from './validate.js';
 
 const TEN_MINUTES_MS = 600_000;
-const FILLER_WORDS = /^(we|i|you|they|he|she|it|us|me|them|our|ours|my|your|their|someone|somebody|myself|ourselves|n\/?a|none|null|unknown)$/i;
+const FILLER_WORDS =
+  /^(we|i|you|they|he|she|it|us|me|them|our|ours|my|your|their|someone|somebody|myself|ourselves|n\/?a|none|null|unknown)$/i;
 
 /** A bare pronoun or placeholder where the schema wants a named party, place or phrase. */
 export function isFillerText(value: unknown): boolean {
   return typeof value === 'string' && FILLER_WORDS.test(value.trim().replace(/[.!,;:]+$/, ''));
 }
-const FREE_TEXT_KEYS: readonly FactKey[] = ['employer', 'jobTitle', 'workplace', 'destinationCountry', 'travelArrangedBy', 'route', 'urgency'];
+const FREE_TEXT_KEYS: readonly FactKey[] = [
+  'employer',
+  'jobTitle',
+  'workplace',
+  'destinationCountry',
+  'travelArrangedBy',
+  'route',
+  'urgency',
+];
 const UNVERIFIED_CONFIDENCE = 0.3;
 
 export const JOB_SYSTEM_PROMPT = `You are the fact extraction stage of Kakwe Job Shield. Migrant workers in Southeast Asia share a job ad and the chat they had with a recruiter. You copy facts out of each source into the JSON schema. You do not judge the offer: a rules engine compares the two sources later.
