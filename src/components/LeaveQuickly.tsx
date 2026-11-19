@@ -14,8 +14,9 @@ const { colors, fonts } = theme;
 /** Resets the stack to Home with Recent checks hidden, then leaves the app or page. */
 export const leaveQuickly = (dispatch: (action: ReturnType<typeof CommonActions.reset>) => void) => {
   stopSpeaking();
+  const exited = exitAfterQuickExit();
   dispatch(CommonActions.reset({ index: 0, routes: [{ name: 'Tabs', state: { index: 0, routes: [{ name: 'Home' }] } }] }));
-  return exitAfterQuickExit();
+  return exited;
 };
 
 export const LeaveQuicklyButton: React.FC = () => {
