@@ -220,3 +220,33 @@ describe('grounding', () => {
     expect(needsGrounding({ ...base, entities: { companies: [], phones: ['+66 81 234 5678'], domains: [] } })).toBe(false);
   });
 });
+
+describe('source relevance', () => {
+  const redirect = 'https://vertexaisearch.cloud.google.com/grounding-api-redirect/';
+  const res = {
+    candidates: [
+      {
+        groundingMetadata: {
+          groundingChunks: [
+            { web: { title: 'apple.com', uri: `${redirect}a` } },
+            { web: { title: 'KBZPay scam warning - wikipedia.org', uri: `${redirect}b` } },
+            { web: { title: 'consumer.gov.mm', uri: `${redirect}c` } },
+          ],
+        },
+      },
+    ],
+  };
+  const query = { companies: ['KBZPay'], domains: ['kbz-pay-verify-account.example.com'] };
+
+  it('drops a common platform that does not name anything checked', () => {
+    expect(extractSources(res, query).map((s) => s.title)).toEqual(['KBZPay scam warning - wikipedia.org', 'consumer.gov.mm']);
+  });
+
+  it('keeps a common platform the check is about', () => {
+    expect(extractSources(res, { companies: ['Apple'], domains: [] }).map((s) => s.title)).toContain('apple.com');
+  });
+
+  it('leaves sources untouched without a query', () => {
+    expect(extractSources(res)).toHaveLength(3);
+  });
+});

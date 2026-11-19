@@ -3,6 +3,7 @@ import type { GoogleGenAI } from '@google/genai';
 import { z } from 'zod';
 import { createTtlLru, memoize } from './cache.js';
 import { type Config, SAMPLING, thinkingOf } from './config.js';
+import { publicHost } from './intel/indicators.js';
 import { redactDeterministic } from './intel/redact.js';
 import { log } from './log.js';
 import type { CheckRequest, Extraction, Flag, Lang, Source } from './types.js';
@@ -194,12 +195,31 @@ export function sourceHost(url: string): string | undefined {
   }
 }
 
-export function extractSources(res: GroundedResponse): Source[] {
+const DOMAIN_TITLE = /^[a-z\d-]+(\.[a-z\d-]+)+$/i;
+
+/** Words of 4+ letters from the checked names, so a source can be matched to what was checked. */
+export function queryTokens(q: GroundingQuery): string[] {
+  const words = [...q.companies, ...q.domains].flatMap((n) => n.toLowerCase().split(/[^\p{L}\p{N}]+/u));
+  return [...new Set(words.filter((w) => w.length >= 4 && !/^(www|com|net|org|https?|example)$/.test(w)))];
+}
+
+/** A common platform (apple.com, microsoft.com) is kept only when it names something that was checked. */
+function relevant(c: { title?: string; uri?: string }, tokens: string[]): boolean {
+  const title = c.title?.trim() ?? '';
+  const host = (c.uri ? sourceHost(c.uri) : undefined) ?? (DOMAIN_TITLE.test(title) ? title.toLowerCase() : undefined);
+  if (!host || publicHost(host) !== null) return true;
+  const hay = `${host} ${title}`.toLowerCase();
+  return tokens.some((t) => hay.includes(t));
+}
+
+export function extractSources(res: GroundedResponse, query?: GroundingQuery): Source[] {
   const seen = new Set<string>();
   const out: Source[] = [];
+  const tokens = query ? queryTokens(query) : [];
   for (const c of res.candidates?.[0]?.groundingMetadata?.groundingChunks ?? []) {
     const url = c.web?.uri;
     if (!url || seen.has(url)) continue;
+    if (query && c.web && !relevant(c.web, tokens)) continue;
     seen.add(url);
     const title = c.web?.title?.trim() || sourceHost(url);
     if (!title) continue;
@@ -255,7 +275,7 @@ export function createGrounder(cfg: Config, client: Pick<GoogleGenAI, 'models'>)
         log('INFO', 'grounding_unsearched', { dropped: flags.length });
         return EMPTY;
       }
-      const sources = extractSources(res as GroundedResponse);
+      const sources = extractSources(res as GroundedResponse, groundingQuery(extraction));
       if (!opts.companyCheck) return { result: { flags, sources }, ok: true };
       const companyFound = parseCompanyFound(res.text);
       return { result: companyFound === undefined ? { flags, sources } : { flags, sources, companyFound }, ok: true };

@@ -136,3 +136,12 @@ export function uniqueSources(sources: Source[], max = MAX_SOURCES): Source[] {
   }
   return out;
 }
+
+const SEVERITY_ORDER: Severity[] = ['low', 'medium', 'high'];
+const VERDICT_CAP: Record<Verdict, Severity> = { safe: 'low', careful: 'medium', danger: 'high' };
+
+/** A row's severity wording never reads stronger than the verdict above it. */
+export function cappedSeverity(severity: Severity, verdict: Verdict): Severity {
+  const cap = VERDICT_CAP[verdict];
+  return SEVERITY_ORDER.indexOf(severity) > SEVERITY_ORDER.indexOf(cap) ? cap : severity;
+}

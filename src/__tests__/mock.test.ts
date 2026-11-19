@@ -44,3 +44,15 @@ describe('mock backend', () => {
     expect(r.id).toMatch(/^chk_/);
   });
 });
+
+describe('mock scam type for links', () => {
+  it('does not call a bank lookalike link parcel phishing', () => {
+    const r = buildMockResponse({ kind: 'link', language: 'en', url: 'http://kbz-pay-verify-account.example.com/login' });
+    expect(r.scamType).not.toBe('parcel_phishing');
+  });
+
+  it('keeps parcel phishing for a parcel link', () => {
+    const r = buildMockResponse({ kind: 'link', language: 'en', url: 'https://track-parcel-fee.top/claim' });
+    expect(r.scamType).toBe('parcel_phishing');
+  });
+});

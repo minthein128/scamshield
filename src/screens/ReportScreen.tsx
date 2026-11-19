@@ -13,6 +13,7 @@ import {
   groupFlags,
   linkStatus,
   shareMessage,
+  cappedSeverity,
   sourceLines,
   uniqueSources,
   warnMessage,
@@ -260,7 +261,8 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
         <View style={{ gap: 12 }}>
           <SectionTitle>{level === 'safe' ? t('flagsSafe') : t('flagsRisky')}</SectionTitle>
           {flags.map((flag, i) => {
-            const sev = SEVERITY[flag.severity];
+            const severity = cappedSeverity(flag.severity, level);
+            const sev = SEVERITY[severity];
             return (
               <View key={`${flag.label}-${i}`} style={styles.flagCard}>
                 <View style={[styles.flagBar, { backgroundColor: sev.bar }]} />
@@ -270,7 +272,7 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
                 <View style={{ flex: 1, gap: 4 }}>
                   <Text style={[styles.flagLabel, readable(tablet, 15, 22)]}>{flag.label}</Text>
                   {flag.evidence ? <Text numberOfLines={3} style={[styles.flagEvidence, readable(tablet, 14, 20)]}>{flag.evidence}</Text> : null}
-                  <Pill label={t(`severity.${flag.severity}`)} background={sev.bg} color={sev.fg} />
+                  <Pill label={t(`severity.${severity}`)} background={sev.bg} color={sev.fg} />
                 </View>
               </View>
             );

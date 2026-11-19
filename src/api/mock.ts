@@ -44,7 +44,7 @@ function pickScamType(request: CheckRequest, families: Set<string>): ScamType {
   if (families.has('trafficking') || (request.kind === 'job' && families.size > 1)) return 'job_trafficking';
   if (request.kind === 'shop') return 'marketplace_fraud';
   if (request.kind === 'agency') return 'fake_agency';
-  if (request.kind === 'link' || /parcel|delivery|warehouse/i.test(request.text ?? '')) return 'parcel_phishing';
+  if (/parcel|delivery|warehouse|track-|courier/i.test(`${request.text ?? ''} ${request.url ?? ''}`)) return 'parcel_phishing';
   if (/invest|profit|trading/i.test(request.text ?? '')) return 'investment';
   return families.size ? 'other' : 'none';
 }

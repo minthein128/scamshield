@@ -117,6 +117,16 @@ export interface PipelineDeps {
   resultCacheMax?: number;
 }
 
+const PARCEL_WORDS =
+  /parcel|package|courier|customs|deliver|shipment|tracking|track-|j&t|jnt|flash|kerry|dhl|ninja|lbc|pos\b|shopee|lazada|paket|kiriman|barang|พัสดุ|ส่งของ|ပါဆယ်|ကုန်ပစ္စည်း/i;
+
+/** A link typed as parcel phishing must carry some parcel or courier evidence, else it is filed as other. */
+export function reconcileScamType(req: Pick<CheckRequest, 'kind' | 'url' | 'text'>, x: Pick<Extraction, 'scamType' | 'flags'>) {
+  if (x.scamType !== 'parcel_phishing' || req.kind !== 'link') return x.scamType;
+  const hay = [req.url, req.text, ...x.flags.flatMap((f) => [f.label, f.evidence])].filter(Boolean).join(' ');
+  return PARCEL_WORDS.test(hay) ? x.scamType : 'other';
+}
+
 export function createPipeline(deps: PipelineDeps): Pipeline {
   const results = createTtlLru<CheckResponse>({ max: deps.resultCacheMax ?? DEFAULT_CACHE_MAX, ttlMs: deps.resultCacheTtlMs ?? 0 });
   const caching = (deps.resultCacheTtlMs ?? 0) > 0;
@@ -194,7 +204,7 @@ export function createPipeline(deps: PipelineDeps): Pipeline {
         if (again && foreignInExtraction(again, req.language) <= foreign0) guarded = guardExtraction(again, req.language);
       }
       tm.meta.reasked = reasked;
-      const extraction = guarded.extraction;
+      const extraction = { ...guarded.extraction, scamType: reconcileScamType(req, guarded.extraction) };
 
       const prepared = deps.intel?.prepare(req, extraction);
       const ownScore = (flags: Flag[], linkChecks: LinkCheck[]) =>
