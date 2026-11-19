@@ -6,14 +6,16 @@ import { Text } from './Text';
 import { BlockIcon } from './blockIcons';
 import { ScreenHeader } from './ui';
 import { stopSpeaking } from '../lib/speech';
+import { exitAfterQuickExit } from '../lib/quickExit';
 import theme from '../theme/theme';
 
 const { colors, fonts } = theme;
 
-/** Resets the whole stack to Home, so no report, form or Live session survives. */
+/** Resets the stack to Home with Recent checks hidden, then leaves the app or page. */
 export const leaveQuickly = (dispatch: (action: ReturnType<typeof CommonActions.reset>) => void) => {
   stopSpeaking();
   dispatch(CommonActions.reset({ index: 0, routes: [{ name: 'Tabs', state: { index: 0, routes: [{ name: 'Home' }] } }] }));
+  return exitAfterQuickExit();
 };
 
 export const LeaveQuicklyButton: React.FC = () => {

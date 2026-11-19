@@ -19,7 +19,8 @@
     "emptyTitle": "Belum ada pemeriksaan",
     "emptyBody": "Pemeriksaan Anda disimpan di perangkat ini dan akan muncul di sini.",
     "historyOff": "Riwayat tidak aktif. Pemeriksaan tidak disimpan di ponsel ini.",
-    "older": "Lihat pemeriksaan lama"
+    "older": "Lihat pemeriksaan lama",
+    "show": "Tampilkan pemeriksaan terbaru"
   },
   "radar": {
     "title": "Radar penipuan",

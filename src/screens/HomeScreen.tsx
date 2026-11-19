@@ -16,6 +16,7 @@ import { VERDICT_STYLES } from '../lib/report';
 import { entryLabel } from '../lib/labels';
 import { resultWord } from '../lib/attention';
 import { formatRelative } from '../lib/time';
+import { useRecentHidden } from '../lib/quickExit';
 import theme from '../theme/theme';
 
 const { colors, fonts } = theme;
@@ -30,6 +31,7 @@ export const HomeScreen: React.FC<TabScreenProps<'Home'>> = ({ navigation }) => 
   const layout = useLayout();
   const iconOnlyHelp = layout.width < 380;
   const [showAll, setShowAll] = useState(false);
+  const [recentHidden, showRecent] = useRecentHidden();
   const startCheck = (intent: 'link' | 'image' | 'text') => navigation.navigate('Check', { intent, nonce: Date.now() });
 
   const checkCard = (style?: StyleProp<ViewStyle>) => (
@@ -83,6 +85,9 @@ export const HomeScreen: React.FC<TabScreenProps<'Home'>> = ({ navigation }) => 
         <Icon name="chevron" size={22} color={colors.textMuted} />
       </TouchableOpacity>
 
+      {recentHidden ? (
+        <Button testID="recent-show" label={t('recent.show')} variant="secondary" onPress={showRecent} />
+      ) : (
       <View style={{ gap: 8 }}>
         <SectionTitle>{t('recent.title')}</SectionTitle>
         {history.length === 0 ? (
@@ -120,6 +125,7 @@ export const HomeScreen: React.FC<TabScreenProps<'Home'>> = ({ navigation }) => 
           </TouchableOpacity>
         ) : null}
       </View>
+      )}
 
     </Screen>
   );
