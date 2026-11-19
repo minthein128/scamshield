@@ -32,3 +32,26 @@ describe('check progress', () => {
     expect(stageKey(START)).toBe('read');
   });
 });
+
+describe('wait captions', () => {
+  const { captionKey, isStillWorking, STEP_MS, STILL_WORKING_MS } = jest.requireActual('../lib/checkProgress');
+
+  it('walks the read steps in order while the server has not answered', () => {
+    expect(captionKey('read', 0)).toBe('read');
+    expect(captionKey('read', STEP_MS)).toBe('pick');
+    expect(captionKey('read', STEP_MS * 2)).toBe('spot');
+    expect(captionKey('read', 60000)).toBe('spot');
+  });
+
+  it('never shows a later phase caption before that phase starts', () => {
+    expect(captionKey('read', 60000)).not.toBe('links');
+    expect(captionKey('sources', 60000)).toBe('links');
+    expect(captionKey('score', 0)).toBe('score');
+    expect(captionKey('score', STEP_MS)).toBe('write');
+  });
+
+  it('shows the still-working line after 12 seconds', () => {
+    expect(isStillWorking(STILL_WORKING_MS - 1)).toBe(false);
+    expect(isStillWorking(STILL_WORKING_MS)).toBe(true);
+  });
+});

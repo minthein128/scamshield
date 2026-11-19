@@ -7,7 +7,7 @@ import DollLoader from '../components/DollLoader';
 import { CrossfadeText } from '../components/CrossfadeText';
 import { useReduceMotion } from '../hooks/useReduceMotion';
 import type { CheckResponse, CheckUpdate, Verdict } from '../api/types';
-import { advance, FINISHED, stageKey, START, UNSTAGED, type CheckProgress } from '../lib/checkProgress';
+import { advance, captionKey, FINISHED, isStillWorking, START, UNSTAGED, type CheckProgress } from '../lib/checkProgress';
 import { forHistory, resultWord } from '../lib/attention';
 import { diag, errorCode } from '../lib/diagLog';
 import { Button, LinkButton } from '../components/ui';
@@ -38,6 +38,15 @@ export const CheckingScreen: React.FC<RootScreenProps<'Checking'>> = ({ navigati
   const holdRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const openedRef = useRef(false);
   const [result, setResult] = useState<CheckResponse | null>(null);
+  const startRef = useRef(Date.now());
+  const phaseStartRef = useRef(Date.now());
+  const phaseRef = useRef<string>('read');
+  const [now, setNow] = useState(Date.now());
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
 
   const openReport = useCallback(
     (checked: CheckResponse) => {
@@ -51,6 +60,8 @@ export const CheckingScreen: React.FC<RootScreenProps<'Checking'>> = ({ navigati
 
   const run = useCallback(async () => {
     setError(null);
+    startRef.current = Date.now();
+    phaseStartRef.current = Date.now();
     setProgress(UNSTAGED);
     const controller = new AbortController();
     abortRef.current = controller;
@@ -102,7 +113,13 @@ export const CheckingScreen: React.FC<RootScreenProps<'Checking'>> = ({ navigati
 
   const word = result ? resultWord(result) : t('title');
   const reassure = verdict === 'careful' || verdict === 'danger' ? t(`reassure.${verdict}`) : null;
-  const stage = job ? (job.phase === 'extract' ? 'read' : 'links') : stageKey(progress);
+  const phase = job ? (job.phase === 'extract' ? 'read' : 'sources') : progress.phase;
+  if (phaseRef.current !== phase) {
+    phaseRef.current = phase;
+    phaseStartRef.current = Date.now();
+  }
+  const stage = captionKey(phase, now - phaseStartRef.current);
+  const still = !verdict && !error && isStillWorking(now - startRef.current);
 
   return (
     <SafeAreaView style={styles.root}>
@@ -128,6 +145,9 @@ export const CheckingScreen: React.FC<RootScreenProps<'Checking'>> = ({ navigati
                 style={verdict ? styles.reassure : styles.stage}
                 text={verdict ? (reassure ?? '') : t(`steps.${stage}`)}
               />
+              {still ? (
+                <CrossfadeText testID="checking-still" accessibilityLiveRegion="polite" style={styles.still} text={t('stillWorking')} />
+              ) : null}
             </View>
           </View>
         )}
@@ -154,6 +174,7 @@ const styles = StyleSheet.create({
   head: { minHeight: 46, justifyContent: 'center' },
   under: { minHeight: 80, alignItems: 'center' },
   stage: { color: colors.textLight, fontSize: 14, lineHeight: 20, fontFamily: fonts.regular, textAlign: 'center', minHeight: 20 },
+  still: { color: colors.textLight, fontSize: 13, lineHeight: 20, fontFamily: fonts.regular, textAlign: 'center', maxWidth: 320, marginTop: 8 },
   footer: { paddingHorizontal: 24, paddingBottom: 24, gap: 10 },
   cta: { width: '100%', maxWidth: 420, alignSelf: 'center' },
   errorBox: { gap: 8, alignItems: 'center' },

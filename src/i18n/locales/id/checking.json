@@ -19,5 +19,6 @@
   "reassure": {
     "careful": "Anda memeriksa sebelum bertindak. Itu langkah yang tepat.",
     "danger": "Anda memeriksa sebelum bertindak. Itu langkah yang tepat."
-  }
+  },
+  "stillWorking": "Masih berjalan. Beberapa pemeriksaan memang butuh waktu lebih lama."
 }
