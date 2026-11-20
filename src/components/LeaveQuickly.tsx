@@ -38,12 +38,12 @@ export const LeaveQuicklyButton: React.FC = () => {
   );
 };
 
-export const HeaderWithLeave: React.FC<{ title: string; onBack?: () => void }> = ({ title, onBack }) => (
+export const HeaderWithLeave: React.FC<{ title: string; onBack?: () => void; leave?: boolean }> = ({ title, onBack, leave = true }) => (
   <View style={styles.row}>
     <View style={styles.title}>
       <ScreenHeader title={title} onBack={onBack} />
     </View>
-    <LeaveQuicklyButton />
+    {leave ? <LeaveQuicklyButton /> : null}
   </View>
 );
 

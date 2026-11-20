@@ -347,7 +347,7 @@ export const ReportScreen: React.FC<RootScreenProps<'Report'>> = ({ navigation, 
   return (
     <Screen
       edges={['top']}
-      header={<HeaderWithLeave title={t('title')} onBack={() => (navigation.canGoBack() ? navigation.goBack() : navigation.navigate('Tabs'))} />}
+      header={<HeaderWithLeave leave={!!tier} title={t('title')} onBack={() => (navigation.canGoBack() ? navigation.goBack() : navigation.navigate('Tabs'))} />}
       wide={layout.isExpanded}
       footerRow={tablet}
       footerStyle={tablet ? undefined : styles.footerTight}
