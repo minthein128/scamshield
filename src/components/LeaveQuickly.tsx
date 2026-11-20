@@ -6,14 +6,17 @@ import { Text } from './Text';
 import { BlockIcon } from './blockIcons';
 import { ScreenHeader } from './ui';
 import { stopSpeaking } from '../lib/speech';
+import { exitAfterQuickExit } from '../lib/quickExit';
 import theme from '../theme/theme';
 
 const { colors, fonts } = theme;
 
-/** Resets the whole stack to Home, so no report, form or Live session survives. */
+/** Resets the stack to Home with Recent checks hidden, then leaves the app or page. */
 export const leaveQuickly = (dispatch: (action: ReturnType<typeof CommonActions.reset>) => void) => {
   stopSpeaking();
+  const exited = exitAfterQuickExit();
   dispatch(CommonActions.reset({ index: 0, routes: [{ name: 'Tabs', state: { index: 0, routes: [{ name: 'Home' }] } }] }));
+  return exited;
 };
 
 export const LeaveQuicklyButton: React.FC = () => {
@@ -35,12 +38,12 @@ export const LeaveQuicklyButton: React.FC = () => {
   );
 };
 
-export const HeaderWithLeave: React.FC<{ title: string; onBack?: () => void }> = ({ title, onBack }) => (
+export const HeaderWithLeave: React.FC<{ title: string; onBack?: () => void; leave?: boolean }> = ({ title, onBack, leave = true }) => (
   <View style={styles.row}>
     <View style={styles.title}>
       <ScreenHeader title={title} onBack={onBack} />
     </View>
-    <LeaveQuicklyButton />
+    {leave ? <LeaveQuicklyButton /> : null}
   </View>
 );
 

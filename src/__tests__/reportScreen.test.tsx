@@ -55,6 +55,18 @@ describe('Report screen, Low risk', () => {
   });
 });
 
+describe('Report screen, Quick exit', () => {
+  it('is hidden on an ordinary report', async () => {
+    await renderReport({ ...base, attention: undefined });
+    expect(screen.queryByTestId('leave-quickly')).toBeNull();
+  });
+
+  it('shows on a report from a job check', async () => {
+    await renderReport({ ...base, attention: 'verify' });
+    expect(screen.getByTestId('leave-quickly')).toBeTruthy();
+  });
+});
+
 describe('Report screen, phone call button', () => {
   afterEach(() => jest.restoreAllMocks());
   it('keeps the call sub label to one line once measured', async () => {

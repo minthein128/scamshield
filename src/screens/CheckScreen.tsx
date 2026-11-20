@@ -204,7 +204,7 @@ export const CheckScreen: React.FC<TabScreenProps<'Check'>> = ({ navigation, rou
           <View style={{ flex: 1 }}>
             <BrandLockup hideMark={layout.isExpanded} />
           </View>
-          <LeaveQuicklyButton />
+          {isJob ? <LeaveQuicklyButton /> : null}
         </View>
       }
     >

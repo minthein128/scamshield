@@ -16,7 +16,8 @@
     "emptyTitle": "No checks yet",
     "emptyBody": "Your checks are saved on this device and show up here.",
     "historyOff": "History is off. Checks are not saved on this phone.",
-    "older": "Show older checks"
+    "older": "Show older checks",
+    "show": "Show recent checks"
   },
   "radar": {
     "title": "Scam radar",

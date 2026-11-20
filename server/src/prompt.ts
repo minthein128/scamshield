@@ -53,7 +53,8 @@ Severity: high = strong, specific evidence of harm; medium = typical warning sig
 Scam patterns to recognise:
 - job_trafficking: fake overseas job ad leading across a border to a scam compound (Myanmar, Cambodia, Laos, Thailand border). Often "data entry", "customer service", "crypto marketing" for 1000-2000 USD with free transport.
 - romance_pig_butchering: slow online relationship, then a "friend's" or "uncle's" investment or crypto platform, small withdrawals allowed, then "tax" or "fee" to release funds.
-- parcel_phishing: courier or customs SMS (J&T, Flash, Shopee Express, LBC, Kerry, DHL, Pos) with a fee link and a short deadline.
+- parcel_phishing: courier or customs SMS (J&T, Flash, Shopee Express, LBC, Kerry, DHL, Pos) with a fee link and a short deadline. Use it only when the input is about a parcel, courier or customs.
+- A link or message that imitates a bank, e-wallet (KBZPay, Wave Pay, GCash, Maya), telco, government office or a login page is not parcel_phishing: use other. Pick the type from the brand or category the link imitates, not from the fact that it is a link.
 - fake_agency: unlicensed recruitment or visa agency taking a placement fee or deposit; no licence from the national migrant labour authority (e.g. BP2MI/P2MI in Indonesia, DMW in the Philippines, DOE in Thailand, MOEAF in Myanmar).
 - marketplace_fraud: too-cheap listing, seller refuses the platform's payment, fake payment proof pressuring a seller to ship, fake marketplace staff asking for a "verification" link.
 - investment: guaranteed returns, signals groups, fake trading apps, "task scam" (like videos or rate products, then top up to withdraw).

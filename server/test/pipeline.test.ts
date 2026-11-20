@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createMockCorrelator, createMockExtractor, createMockGrounder } from '../src/mock.js';
-import { createPipeline } from '../src/pipeline.js';
+import { createPipeline, reconcileScamType } from '../src/pipeline.js';
 
 const never = () => new Promise<never>(() => {});
 
@@ -326,5 +326,24 @@ describe('pipeline report consistency', () => {
     const r = await run({ flags: [], scamType: 'none', verdictDraft: 'safe', summary: 'This looks like an ordinary chat.' });
     expect(r.verdict).toBe('safe');
     expect(r.summary).toBe('This looks like an ordinary chat.');
+  });
+});
+
+describe('reconcileScamType', () => {
+  const flags = [{ family: 'link_risk', label: 'Lookalike login page', evidence: 'kbz-pay-verify-account', severity: 'high' }] as never;
+
+  it('moves a bank lookalike link off parcel phishing', () => {
+    const req = { kind: 'link', url: 'http://kbz-pay-verify-account.example.com/login' } as never;
+    expect(reconcileScamType(req, { scamType: 'parcel_phishing', flags })).toBe('other');
+  });
+
+  it('keeps parcel phishing when the link is about a parcel', () => {
+    const req = { kind: 'link', url: 'http://jnt-parcel-fee.example.com' } as never;
+    expect(reconcileScamType(req, { scamType: 'parcel_phishing', flags })).toBe('parcel_phishing');
+  });
+
+  it('does not touch other types or kinds', () => {
+    expect(reconcileScamType({ kind: 'link', url: 'http://x.example.com' } as never, { scamType: 'investment', flags })).toBe('investment');
+    expect(reconcileScamType({ kind: 'message', text: 'hi' } as never, { scamType: 'parcel_phishing', flags })).toBe('parcel_phishing');
   });
 });

@@ -19,7 +19,8 @@
     "emptyTitle": "Wala pang pagsusuri",
     "emptyBody": "Naka-save ang iyong mga pagsusuri sa device na ito at makikita rito.",
     "historyOff": "Naka-off ang history. Hindi naitatabi ang mga pagsusuri sa teleponong ito.",
-    "older": "Ipakita ang mga lumang check"
+    "older": "Ipakita ang mga lumang check",
+    "show": "Ipakita ang mga kamakailang check"
   },
   "radar": {
     "title": "Scam radar",

@@ -230,3 +230,19 @@ describe('uniqueSources', () => {
     expect(uniqueSources(many).map(s => s.url)).toEqual(many.slice(0, 5).map(s => s.url));
   });
 });
+
+describe('cappedSeverity', () => {
+  const { cappedSeverity } = jest.requireActual('../lib/report');
+
+  it('never words a row stronger than the verdict', () => {
+    expect(cappedSeverity('high', 'careful')).toBe('medium');
+    expect(cappedSeverity('high', 'safe')).toBe('low');
+    expect(cappedSeverity('medium', 'safe')).toBe('low');
+  });
+
+  it('keeps wording that is already within the verdict', () => {
+    expect(cappedSeverity('high', 'danger')).toBe('high');
+    expect(cappedSeverity('low', 'danger')).toBe('low');
+    expect(cappedSeverity('medium', 'careful')).toBe('medium');
+  });
+});

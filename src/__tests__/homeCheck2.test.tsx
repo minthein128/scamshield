@@ -153,7 +153,7 @@ describe('Check page v3', () => {
     for (const m of ['message', 'job', 'shop', 'general']) expect(screen.getByTestId(`check-mode-${m}`)).toBeTruthy();
     expect(screen.getByText('Your message')).toBeTruthy();
     expect(screen.getByText('Upload a screenshot or photo')).toBeTruthy();
-    expect(screen.getByText('Quick exit')).toBeTruthy();
+    expect(screen.queryByText('Quick exit')).toBeNull();
     expect(textOf('check-warn')).toContain('can miss scams');
   });
 
@@ -191,6 +191,15 @@ describe('Check page v3', () => {
     fireEvent.press(screen.getByTestId('check-mode-shop'));
     fireEvent.press(screen.getByTestId('check-submit'));
     expect(navigate.mock.calls[0][1].request.kind).toBe('shop');
+  });
+
+  it('shows Quick exit in Job Shield mode only', () => {
+    renderCheck(undefined, 'message');
+    expect(screen.queryByTestId('leave-quickly')).toBeNull();
+    fireEvent.press(screen.getByTestId('check-mode-job'));
+    expect(screen.getByTestId('leave-quickly')).toBeTruthy();
+    fireEvent.press(screen.getByTestId('check-mode-shop'));
+    expect(screen.queryByTestId('leave-quickly')).toBeNull();
   });
 
   it('Job offer: two steps, hint, added bar and Check and compare', () => {

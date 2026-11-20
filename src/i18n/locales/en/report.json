@@ -30,7 +30,7 @@
   "domainAgeUnknown": "Domain age unknown",
   "webRisk": {
     "clean": "No known threats",
-    "notListed": "Not on Google's lists",
+    "notListed": "Not on Google's lists, not a guarantee",
     "malware": "Malware warning",
     "social_engineering": "Phishing or deception warning",
     "unwanted_software": "Unwanted software warning",
